@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 echo ========================================================
-echo   THUNDER HOUSE ENT - PUSH TO GITHUB & VERCEL
+echo   THUNDER HOUSE ENT - PUSH TO GITHUB ^& VERCEL
 echo ========================================================
 echo.
 
