@@ -1,8 +1,9 @@
 /**
  * Thunder House ENT - Supabase Client Configuration
+ * Project: https://kxoivmflghfgtvawhktt.supabase.co
  */
-const SUPABASE_URL = 'https://bxxthkocoutjszrjkxlk.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4eHRoa29jb3V0anN6cmpreGxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0NzQwMzgsImV4cCI6MjA4NTA1MDAzOH0.k9XRxmUw-QQIiApE-JCeSYrkogvRzfmJmRmVIdXnEmA';
+const SUPABASE_URL = 'https://kxoivmflghfgtvawhktt.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4b2l2bWZsZ2hmZ3R2YXdoa3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NTI5NTEsImV4cCI6MjEwNzIyODk1MX0.lrbLr6Q6tNwRWUGH7T3g6dL3jwU3TbaoUL1yRliBgTY';
 
 // Initialize Supabase Client using standard CDN library
 if (window.supabase) {
