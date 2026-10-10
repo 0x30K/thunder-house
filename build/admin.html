@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Thunder House ENT</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Custom Design System Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .admin-navbar {
+      background: rgba(14, 18, 28, 0.95);
+      border-bottom: 1px solid rgba(0, 229, 255, 0.25);
+      padding: 0.9rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+    }
+
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .admin-brand img {
+      height: 44px;
+    }
+
+    .admin-badge {
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      color: var(--primary);
+      font-size: 0.75rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .admin-user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-email-pill {
+      font-size: 0.82rem;
+      color: var(--text-light);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 0.4rem 0.85rem;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .admin-main {
+      flex: 1;
+      padding: 2.5rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* KPI Cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      transition: var(--transition);
+    }
+
+    .kpi-card:hover {
+      border-color: rgba(0, 229, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .kpi-title {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.35rem;
+    }
+
+    .kpi-value {
+      font-size: 2rem;
+      font-weight: 800;
+      font-family: var(--font-heading);
+      color: #fff;
+      line-height: 1;
+    }
+
+    .kpi-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+    }
+
+    /* Toolbar */
+    .dashboard-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-light);
+      padding: 0.45rem 1rem;
+      border-radius: var(--radius-full);
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: rgba(0, 229, 255, 0.15);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .search-box {
+      position: relative;
+      width: 280px;
+    }
+
+    .search-box input {
+      padding-left: 2.25rem;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* Data Table */
+    .table-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .data-table th {
+      background: rgba(0, 0, 0, 0.4);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.06em;
+      padding: 1rem 1.25rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .data-table td {
+      padding: 1.1rem 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      vertical-align: middle;
+    }
+
+    .data-table tr:hover {
+      background: rgba(0, 229, 255, 0.02);
+    }
+
+    .client-name-cell strong {
+      display: block;
+      color: #fff;
+      font-size: 0.95rem;
+    }
+
+    .client-contact-links {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.25rem;
+      font-size: 0.78rem;
+    }
+
+    .client-contact-links a {
+      color: var(--primary);
+    }
+
+    .client-contact-links a:hover {
+      text-decoration: underline;
+    }
+
+    .status-select {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-full);
+      padding: 0.3rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .status-select.New {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: rgba(0, 229, 255, 0.1);
+    }
+    .status-select.Contacted {
+      border-color: var(--accent-gold);
+      color: var(--accent-gold);
+      background: rgba(255, 183, 3, 0.1);
+    }
+    .status-select.Booked {
+      border-color: #10b981;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+    }
+    .status-select.Archived {
+      border-color: var(--text-muted);
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .btn-action-sm {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-light);
+      padding: 0.35rem 0.65rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-action-sm:hover {
+      background: rgba(0, 229, 255, 0.2);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .empty-state {
+      padding: 4rem 2rem;
+      text-align: center;
+      color: var(--text-muted);
+    }
+    .empty-state i {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Modal for details */
+    .detail-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+    .detail-modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .detail-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--primary);
+      border-radius: var(--radius-lg);
+      max-width: 650px;
+      width: 100%;
+      padding: 2.5rem;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9), 0 0 30px var(--primary-glow);
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Admin Navbar -->
+  <header class="admin-navbar">
+    <div class="admin-brand">
+      <img src="assets/images/branding/Thunder House Logo-PNG.png" alt="Thunder House ENT">
+      <span class="admin-badge"><i class="fa-solid fa-bolt"></i> Staff Backend</span>
+    </div>
+
+    <div class="admin-user-info">
+      <span id="admin-user-email" class="user-email-pill">Loading...</span>
+      <a href="index.html" class="btn btn-outline btn-sm" target="_blank">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> View Website
+      </a>
+      <button id="btn-admin-logout" class="btn btn-outline btn-sm" style="border-color: var(--secondary); color: #ff99bb;">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+      </button>
+    </div>
+  </header>
+
+  <!-- Dashboard Main Content -->
+  <main class="admin-main">
+    <!-- KPI Summary Row -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-title">Total Inquiries</div>
+          <div id="kpi-total" class="kpi-value">0</div>
+        </div>
+        <div class="kpi-icon" style="background: rgba(0, 229, 255, 0.1); color: var(--primary);">
+          <i class="fa-solid fa-inbox"></i>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-title">New Leads</div>
+          <div id="kpi-new" class="kpi-value" style="color: var(--primary);">0</div>
+        </div>
+        <div class="kpi-icon" style="background: rgba(0, 229, 255, 0.1); color: var(--primary);">
+          <i class="fa-solid fa-sparkles"></i>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-title">Booked Events</div>
+          <div id="kpi-booked" class="kpi-value" style="color: #10b981;">0</div>
+        </div>
+        <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+          <i class="fa-solid fa-calendar-check"></i>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-title">Estimated Pipeline</div>
+          <div id="kpi-pipeline" class="kpi-value" style="color: var(--accent-gold);">$0</div>
+        </div>
+        <div class="kpi-icon" style="background: rgba(255, 183, 3, 0.1); color: var(--accent-gold);">
+          <i class="fa-solid fa-sack-dollar"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="dashboard-toolbar">
+      <div class="filter-tabs">
+        <button class="filter-btn active" data-status="All">All Inquiries</button>
+        <button class="filter-btn" data-status="New">New</button>
+        <button class="filter-btn" data-status="Contacted">Contacted</button>
+        <button class="filter-btn" data-status="Booked">Booked</button>
+        <button class="filter-btn" data-status="Archived">Archived</button>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="admin-search-input" class="form-control" placeholder="Search client, city, date...">
+        </div>
+        <button id="btn-open-manual-lead" class="btn btn-primary btn-sm">
+          <i class="fa-solid fa-plus"></i> Add Lead
+        </button>
+        <button id="btn-export-csv" class="btn btn-outline btn-sm">
+          <i class="fa-solid fa-file-csv"></i> Export CSV
+        </button>
+        <button id="btn-refresh-data" class="btn btn-outline btn-sm" aria-label="Refresh">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Date Received</th>
+            <th>Client Info</th>
+            <th>Event Details</th>
+            <th>Package / Total</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="inquiries-tbody">
+          <!-- Dynamically populated via JS -->
+          <tr>
+            <td colspan="6" class="empty-state">
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              <p>Loading inquiries from Supabase...</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Lead Detail & Notes Modal -->
+  <div id="detail-modal" class="detail-modal-overlay">
+    <div class="detail-card">
+      <button id="detail-modal-close" class="modal-close-btn">&times;</button>
+      <div style="margin-bottom: 1.5rem;">
+        <h3 id="modal-lead-name" style="font-size: 1.5rem; color: #fff; margin-bottom: 0.25rem;">Client Details</h3>
+        <span id="modal-lead-date" style="font-size: 0.8rem; color: var(--text-muted);">Received: --</span>
+      </div>
+
+      <div id="modal-lead-body" style="margin-bottom: 1.5rem;">
+        <!-- Filled dynamically -->
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label class="form-label"><i class="fa-solid fa-note-sticky"></i> Internal Notes (Private)</label>
+        <textarea id="modal-lead-notes" class="form-control" rows="3" placeholder="Add notes on phone calls, deposit status, song requests..."></textarea>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button id="btn-save-notes" class="btn btn-primary btn-sm">
+          <i class="fa-solid fa-floppy-disk"></i> Save Notes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manual New Lead Modal -->
+  <div id="manual-lead-modal" class="detail-modal-overlay">
+    <div class="detail-card">
+      <button id="manual-lead-close" class="modal-close-btn">&times;</button>
+      <h3 style="font-size: 1.5rem; color: #fff; margin-bottom: 1.25rem;">Log Manual Lead / Phone Inquiry</h3>
+      
+      <form id="manual-lead-form">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Client Name</label>
+            <input type="text" id="m-name" class="form-control" required placeholder="e.g. John Doe">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="tel" id="m-phone" class="form-control" placeholder="(405) 555-0123">
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" id="m-email" class="form-control" placeholder="john@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Package</label>
+            <select id="m-package" class="form-select">
+              <option value="Thunder Party ($700)">Thunder Party (Up to 4h - $700)</option>
+              <option value="Thunder Basic ($500)">Thunder Basic (Up to 3h - $500)</option>
+              <option value="Thunder Premium ($900)">Thunder Premium (Up to 6h - $900)</option>
+              <option value="Thunder All-Night ($1,200)">Thunder All-Night (Up to 8h - $1,200)</option>
+              <option value="Custom Event">Custom Package</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Event Date</label>
+            <input type="date" id="m-date" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">City / Venue</label>
+            <input type="text" id="m-venue" class="form-control" placeholder="e.g. Oklahoma City">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label class="form-label">Estimated Total ($)</label>
+          <input type="number" id="m-total" class="form-control" placeholder="700">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label class="form-label">Notes & Details</label>
+          <textarea id="m-notes" class="form-control" rows="2" placeholder="Called directly, interested in wedding reception..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          <i class="fa-solid fa-plus"></i> Save to Database
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+
+  <script>
+    let allInquiries = [];
+    let currentFilter = 'All';
+    let activeInquiryId = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Session Auth Guard
+      if (!window.supabaseClient) {
+        alert('Supabase client failed to load.');
+        return;
+      }
+
+      const { data: { session } } = await window.supabaseClient.auth.getSession();
+      if (!session) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      document.getElementById('admin-user-email').textContent = session.user.email;
+
+      // Logout handler
+      document.getElementById('btn-admin-logout').addEventListener('click', async () => {
+        await window.supabaseClient.auth.signOut();
+        window.location.href = 'login.html';
+      });
+
+      // Load data
+      loadInquiries();
+
+      // Filter tabs
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentFilter = btn.dataset.status;
+          renderTable();
+        });
+      });
+
+      // Search input
+      document.getElementById('admin-search-input').addEventListener('input', () => {
+        renderTable();
+      });
+
+      // Refresh button
+      document.getElementById('btn-refresh-data').addEventListener('click', loadInquiries);
+
+      // Export CSV
+      document.getElementById('btn-export-csv').addEventListener('click', exportToCSV);
+
+      // Modals setup
+      setupModals();
+    });
+
+    async function loadInquiries() {
+      const tbody = document.getElementById('inquiries-tbody');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="empty-state">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <p>Fetching inquiries from Supabase...</p>
+          </td>
+        </tr>
+      `;
+
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('thunderhouse_inquiries')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        allInquiries = data || [];
+        updateKPIs();
+        renderTable();
+      } catch (err) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty-state" style="color: var(--secondary);">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <p>Error loading inquiries: ${err.message}</p>
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    function updateKPIs() {
+      const total = allInquiries.length;
+      const newCount = allInquiries.filter(i => i.status === 'New').length;
+      const bookedCount = allInquiries.filter(i => i.status === 'Booked').length;
+      const pipelineTotal = allInquiries.reduce((acc, i) => acc + (parseFloat(i.estimated_total) || 0), 0);
+
+      document.getElementById('kpi-total').textContent = total;
+      document.getElementById('kpi-new').textContent = newCount;
+      document.getElementById('kpi-booked').textContent = bookedCount;
+      document.getElementById('kpi-pipeline').textContent = `$${pipelineTotal.toLocaleString()}`;
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('inquiries-tbody');
+      const searchTerm = document.getElementById('admin-search-input').value.toLowerCase().trim();
+
+      let filtered = allInquiries;
+
+      // Status filter
+      if (currentFilter !== 'All') {
+        filtered = filtered.filter(i => i.status === currentFilter);
+      }
+
+      // Search filter
+      if (searchTerm) {
+        filtered = filtered.filter(i => {
+          return (
+            (i.client_name && i.client_name.toLowerCase().includes(searchTerm)) ||
+            (i.client_email && i.client_email.toLowerCase().includes(searchTerm)) ||
+            (i.client_phone && i.client_phone.toLowerCase().includes(searchTerm)) ||
+            (i.venue_city && i.venue_city.toLowerCase().includes(searchTerm)) ||
+            (i.package_name && i.package_name.toLowerCase().includes(searchTerm))
+          );
+        });
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty-state">
+              <i class="fa-solid fa-folder-open"></i>
+              <p>No inquiries found for this filter.</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(inquiry => {
+        const dateStr = inquiry.created_at ? new Date(inquiry.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A';
+        const total = parseFloat(inquiry.estimated_total) ? `$${parseFloat(inquiry.estimated_total).toLocaleString()}` : '--';
+
+        return `
+          <tr data-id="${inquiry.id}">
+            <td style="color: var(--text-muted); font-size: 0.82rem;">${dateStr}</td>
+            <td class="client-name-cell">
+              <strong>${escapeHtml(inquiry.client_name)}</strong>
+              <div class="client-contact-links">
+                ${inquiry.client_phone ? `<a href="tel:${inquiry.client_phone}"><i class="fa-solid fa-phone"></i> ${inquiry.client_phone}</a>` : ''}
+                ${inquiry.client_email ? `<a href="mailto:${inquiry.client_email}"><i class="fa-solid fa-envelope"></i> Email</a>` : ''}
+              </div>
+            </td>
+            <td>
+              <div style="color: #fff; font-weight: 500;">${inquiry.event_date || 'Flexible Date'}</div>
+              <small style="color: var(--text-muted);">${escapeHtml(inquiry.venue_city || 'Oklahoma City')}</small>
+            </td>
+            <td>
+              <div style="color: var(--primary); font-weight: 600;">${escapeHtml(inquiry.package_name || 'Thunder Package')}</div>
+              <small style="color: #fff; font-weight: 700;">${total}</small>
+            </td>
+            <td>
+              <select class="status-select ${inquiry.status}" onchange="updateInquiryStatus('${inquiry.id}', this.value)">
+                <option value="New" ${inquiry.status === 'New' ? 'selected' : ''}>New</option>
+                <option value="Contacted" ${inquiry.status === 'Contacted' ? 'selected' : ''}>Contacted</option>
+                <option value="Booked" ${inquiry.status === 'Booked' ? 'selected' : ''}>Booked</option>
+                <option value="Archived" ${inquiry.status === 'Archived' ? 'selected' : ''}>Archived</option>
+              </select>
+            </td>
+            <td>
+              <button class="btn-action-sm" onclick="openLeadDetails('${inquiry.id}')">
+                <i class="fa-solid fa-eye"></i> Details
+              </button>
+              <button class="btn-action-sm" onclick="deleteInquiry('${inquiry.id}')" style="color: #ff99bb;">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function updateInquiryStatus(id, newStatus) {
+      try {
+        const { error } = await window.supabaseClient
+          .from('thunderhouse_inquiries')
+          .update({ status: newStatus })
+          .eq('id', id);
+
+        if (error) throw error;
+
+        // Update local state
+        const item = allInquiries.find(i => i.id === id);
+        if (item) item.status = newStatus;
+        updateKPIs();
+      } catch (err) {
+        alert('Failed to update status: ' + err.message);
+      }
+    }
+
+    async function deleteInquiry(id) {
+      if (!confirm('Are you sure you want to delete this inquiry?')) return;
+
+      try {
+        const { error } = await window.supabaseClient
+          .from('thunderhouse_inquiries')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+
+        allInquiries = allInquiries.filter(i => i.id !== id);
+        updateKPIs();
+        renderTable();
+      } catch (err) {
+        alert('Failed to delete inquiry: ' + err.message);
+      }
+    }
+
+    function openLeadDetails(id) {
+      const item = allInquiries.find(i => i.id === id);
+      if (!item) return;
+
+      activeInquiryId = id;
+      document.getElementById('modal-lead-name').textContent = item.client_name;
+      document.getElementById('modal-lead-date').textContent = `Received: ${new Date(item.created_at).toLocaleString()}`;
+      document.getElementById('modal-lead-notes').value = item.notes || '';
+
+      let bodyHtml = `
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); padding: 1.25rem; border-radius: 8px; margin-bottom: 1.25rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; font-size: 0.88rem;">
+            <div><strong>Phone:</strong> <a href="tel:${item.client_phone}" style="color: var(--primary);">${item.client_phone || 'N/A'}</a></div>
+            <div><strong>Email:</strong> <a href="mailto:${item.client_email}" style="color: var(--primary);">${item.client_email || 'N/A'}</a></div>
+            <div><strong>Event Date:</strong> ${item.event_date || 'N/A'}</div>
+            <div><strong>Venue / City:</strong> ${item.venue_city || 'N/A'}</div>
+            <div><strong>Package:</strong> ${item.package_name || 'N/A'}</div>
+            <div><strong>Estimated Total:</strong> $${parseFloat(item.estimated_total || 0).toLocaleString()}</div>
+          </div>
+          ${item.extra_hours > 0 ? `<div style="font-size: 0.82rem; color: var(--text-light); margin-bottom: 0.3rem;">Extra Hours: +${item.extra_hours} hrs</div>` : ''}
+          ${item.travel_miles > 0 ? `<div style="font-size: 0.82rem; color: var(--text-light); margin-bottom: 0.3rem;">Travel Outside OKC: ${item.travel_miles} miles ($${item.travel_miles})</div>` : ''}
+          ${item.addons && item.addons.length > 0 ? `<div style="font-size: 0.82rem; color: var(--text-light); margin-bottom: 0.3rem;">Add-ons: ${item.addons.join(', ')}</div>` : ''}
+          ${item.message ? `<div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px dashed rgba(255,255,255,0.1);"><strong style="color: #fff;">Client Message:</strong><p style="margin-top: 0.3rem; color: var(--text-muted); font-size: 0.85rem;">${escapeHtml(item.message)}</p></div>` : ''}
+        </div>
+      `;
+
+      document.getElementById('modal-lead-body').innerHTML = bodyHtml;
+      document.getElementById('detail-modal').classList.add('active');
+    }
+
+    function setupModals() {
+      // Close Details
+      const detailClose = document.getElementById('detail-modal-close');
+      const detailModal = document.getElementById('detail-modal');
+      detailClose.addEventListener('click', () => detailModal.classList.remove('active'));
+      detailModal.addEventListener('click', (e) => {
+        if (e.target === detailModal) detailModal.classList.remove('active');
+      });
+
+      // Save Notes
+      document.getElementById('btn-save-notes').addEventListener('click', async () => {
+        if (!activeInquiryId) return;
+        const notes = document.getElementById('modal-lead-notes').value;
+
+        try {
+          const { error } = await window.supabaseClient
+            .from('thunderhouse_inquiries')
+            .update({ notes: notes })
+            .eq('id', activeInquiryId);
+
+          if (error) throw error;
+
+          const item = allInquiries.find(i => i.id === activeInquiryId);
+          if (item) item.notes = notes;
+          detailModal.classList.remove('active');
+        } catch (err) {
+          alert('Failed to save notes: ' + err.message);
+        }
+      });
+
+      // Manual Lead Modal
+      const manualModal = document.getElementById('manual-lead-modal');
+      const manualOpen = document.getElementById('btn-open-manual-lead');
+      const manualClose = document.getElementById('manual-lead-close');
+      const manualForm = document.getElementById('manual-lead-form');
+
+      manualOpen.addEventListener('click', () => manualModal.classList.add('active'));
+      manualClose.addEventListener('click', () => manualModal.classList.remove('active'));
+      manualModal.addEventListener('click', (e) => {
+        if (e.target === manualModal) manualModal.classList.remove('active');
+      });
+
+      manualForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+          client_name: document.getElementById('m-name').value,
+          client_phone: document.getElementById('m-phone').value,
+          client_email: document.getElementById('m-email').value,
+          package_name: document.getElementById('m-package').value,
+          event_date: document.getElementById('m-date').value,
+          venue_city: document.getElementById('m-venue').value,
+          estimated_total: parseFloat(document.getElementById('m-total').value) || 0,
+          notes: document.getElementById('m-notes').value,
+          status: 'New'
+        };
+
+        try {
+          const { error } = await window.supabaseClient
+            .from('thunderhouse_inquiries')
+            .insert([payload]);
+
+          if (error) throw error;
+
+          manualModal.classList.remove('active');
+          manualForm.reset();
+          loadInquiries();
+        } catch (err) {
+          alert('Failed to create lead: ' + err.message);
+        }
+      });
+    }
+
+    function exportToCSV() {
+      if (allInquiries.length === 0) {
+        alert('No inquiries to export.');
+        return;
+      }
+
+      const headers = ['Date Received', 'Client Name', 'Phone', 'Email', 'Event Date', 'Venue/City', 'Package', 'Total', 'Status', 'Notes'];
+      const rows = allInquiries.map(i => [
+        i.created_at ? new Date(i.created_at).toLocaleDateString() : '',
+        `"${(i.client_name || '').replace(/"/g, '""')}"`,
+        `"${i.client_phone || ''}"`,
+        `"${i.client_email || ''}"`,
+        `"${i.event_date || ''}"`,
+        `"${(i.venue_city || '').replace(/"/g, '""')}"`,
+        `"${(i.package_name || '').replace(/"/g, '""')}"`,
+        i.estimated_total || 0,
+        i.status || 'New',
+        `"${(i.notes || '').replace(/"/g, '""')}"`
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `thunderhouse_leads_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+$flaticon_w3music-font: "flaticon_w3music";
+
+@font-face {
+    font-family: $flaticon_w3music-font;
+    src: url("./flaticon_w3music.ttf?af63c85fdce9f7f95b9146ec0d104273") format("truetype"),
+url("./flaticon_w3music.woff?af63c85fdce9f7f95b9146ec0d104273") format("woff"),
+url("./flaticon_w3music.woff2?af63c85fdce9f7f95b9146ec0d104273") format("woff2"),
+url("./flaticon_w3music.eot?af63c85fdce9f7f95b9146ec0d104273#iefix") format("embedded-opentype"),
+url("./flaticon_w3music.svg?af63c85fdce9f7f95b9146ec0d104273#flaticon_w3music") format("svg");
+}
+
+i[class^="flaticon-"]:before, i[class*=" flaticon-"]:before {
+    font-family: flaticon_w3music !important;
+    font-style: normal;
+    font-weight: normal !important;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+$flaticon_w3music-map: (
+    "twitter": "\f101",
+    "vk": "\f102",
+    "snapchat": "\f103",
+    "dribbble": "\f104",
+    "pinterest": "\f105",
+    "facebook-1": "\f106",
+    "envato": "\f107",
+    "linkedin": "\f108",
+    "behance": "\f109",
+    "vimeo": "\f10a",
+    "dropbox": "\f10b",
+    "blogger": "\f10c",
+    "check": "\f10d",
+    "add": "\f10e",
+    "minus-sign": "\f10f",
+    "minus": "\f110",
+    "minus-1": "\f111",
+    "timetable": "\f112",
+    "right-quote": "\f113",
+    "right-arrow": "\f114",
+    "hidden": "\f115",
+    "right-arrow-1": "\f116",
+    "up-right": "\f117",
+    "download": "\f118",
+    "right-arrow-2": "\f119",
+    "heart": "\f11a",
+    "cargo-truck": "\f11b",
+    "menu": "\f11c",
+    "speaker-filled-audio-tool": "\f11d",
+    "dribble": "\f11e",
+    "facebook-2": "\f11f",
+    "spotify": "\f120",
+    "twitter-1": "\f121",
+    "pie-chart": "\f122",
+    "loupe": "\f123",
+    "add-1": "\f124",
+    "star": "\f125",
+    "share": "\f126",
+    "email": "\f127",
+    "tick": "\f128",
+    "love": "\f129",
+    "download-circular-button": "\f12a",
+    "option": "\f12b",
+    "shuffle": "\f12c",
+    "hide": "\f12d",
+    "apple": "\f12e",
+    "close": "\f12f",
+    "music": "\f130",
+    "wine": "\f131",
+    "party": "\f132",
+    "down-arrow": "\f133",
+    "shopping-cart": "\f134",
+    "play-buttton": "\f135",
+    "mirror-ball": "\f136",
+    "equalizer": "\f137",
+    "left-arrow": "\f138",
+    "right-up": "\f139",
+    "plus": "\f13a",
+    "play-button": "\f13b",
+    "telephone-call": "\f13c",
+    "arrow-upper-right": "\f13d",
+    "youtube-1": "\f13e",
+    "wave-sound": "\f13f",
+    "refresh": "\f140",
+    "view": "\f141",
+    "repeat": "\f142",
+    "instagram-1": "\f143",
+);
+
+.flaticon-twitter:before {
+    content: map-get($flaticon_w3music-map, "twitter");
+}
+.flaticon-vk:before {
+    content: map-get($flaticon_w3music-map, "vk");
+}
+.flaticon-snapchat:before {
+    content: map-get($flaticon_w3music-map, "snapchat");
+}
+.flaticon-dribbble:before {
+    content: map-get($flaticon_w3music-map, "dribbble");
+}
+.flaticon-pinterest:before {
+    content: map-get($flaticon_w3music-map, "pinterest");
+}
+.flaticon-facebook-1:before {
+    content: map-get($flaticon_w3music-map, "facebook-1");
+}
+.flaticon-envato:before {
+    content: map-get($flaticon_w3music-map, "envato");
+}
+.flaticon-linkedin:before {
+    content: map-get($flaticon_w3music-map, "linkedin");
+}
+.flaticon-behance:before {
+    content: map-get($flaticon_w3music-map, "behance");
+}
+.flaticon-vimeo:before {
+    content: map-get($flaticon_w3music-map, "vimeo");
+}
+.flaticon-dropbox:before {
+    content: map-get($flaticon_w3music-map, "dropbox");
+}
+.flaticon-blogger:before {
+    content: map-get($flaticon_w3music-map, "blogger");
+}
+.flaticon-check:before {
+    content: map-get($flaticon_w3music-map, "check");
+}
+.flaticon-add:before {
+    content: map-get($flaticon_w3music-map, "add");
+}
+.flaticon-minus-sign:before {
+    content: map-get($flaticon_w3music-map, "minus-sign");
+}
+.flaticon-minus:before {
+    content: map-get($flaticon_w3music-map, "minus");
+}
+.flaticon-minus-1:before {
+    content: map-get($flaticon_w3music-map, "minus-1");
+}
+.flaticon-timetable:before {
+    content: map-get($flaticon_w3music-map, "timetable");
+}
+.flaticon-right-quote:before {
+    content: map-get($flaticon_w3music-map, "right-quote");
+}
+.flaticon-right-arrow:before {
+    content: map-get($flaticon_w3music-map, "right-arrow");
+}
+.flaticon-hidden:before {
+    content: map-get($flaticon_w3music-map, "hidden");
+}
+.flaticon-right-arrow-1:before {
+    content: map-get($flaticon_w3music-map, "right-arrow-1");
+}
+.flaticon-up-right:before {
+    content: map-get($flaticon_w3music-map, "up-right");
+}
+.flaticon-download:before {
+    content: map-get($flaticon_w3music-map, "download");
+}
+.flaticon-right-arrow-2:before {
+    content: map-get($flaticon_w3music-map, "right-arrow-2");
+}
+.flaticon-heart:before {
+    content: map-get($flaticon_w3music-map, "heart");
+}
+.flaticon-cargo-truck:before {
+    content: map-get($flaticon_w3music-map, "cargo-truck");
+}
+.flaticon-menu:before {
+    content: map-get($flaticon_w3music-map, "menu");
+}
+.flaticon-speaker-filled-audio-tool:before {
+    content: map-get($flaticon_w3music-map, "speaker-filled-audio-tool");
+}
+.flaticon-dribble:before {
+    content: map-get($flaticon_w3music-map, "dribble");
+}
+.flaticon-facebook-2:before {
+    content: map-get($flaticon_w3music-map, "facebook-2");
+}
+.flaticon-spotify:before {
+    content: map-get($flaticon_w3music-map, "spotify");
+}
+.flaticon-twitter-1:before {
+    content: map-get($flaticon_w3music-map, "twitter-1");
+}
+.flaticon-pie-chart:before {
+    content: map-get($flaticon_w3music-map, "pie-chart");
+}
+.flaticon-loupe:before {
+    content: map-get($flaticon_w3music-map, "loupe");
+}
+.flaticon-add-1:before {
+    content: map-get($flaticon_w3music-map, "add-1");
+}
+.flaticon-star:before {
+    content: map-get($flaticon_w3music-map, "star");
+}
+.flaticon-share:before {
+    content: map-get($flaticon_w3music-map, "share");
+}
+.flaticon-email:before {
+    content: map-get($flaticon_w3music-map, "email");
+}
+.flaticon-tick:before {
+    content: map-get($flaticon_w3music-map, "tick");
+}
+.flaticon-love:before {
+    content: map-get($flaticon_w3music-map, "love");
+}
+.flaticon-download-circular-button:before {
+    content: map-get($flaticon_w3music-map, "download-circular-button");
+}
+.flaticon-option:before {
+    content: map-get($flaticon_w3music-map, "option");
+}
+.flaticon-shuffle:before {
+    content: map-get($flaticon_w3music-map, "shuffle");
+}
+.flaticon-hide:before {
+    content: map-get($flaticon_w3music-map, "hide");
+}
+.flaticon-apple:before {
+    content: map-get($flaticon_w3music-map, "apple");
+}
+.flaticon-close:before {
+    content: map-get($flaticon_w3music-map, "close");
+}
+.flaticon-music:before {
+    content: map-get($flaticon_w3music-map, "music");
+}
+.flaticon-wine:before {
+    content: map-get($flaticon_w3music-map, "wine");
+}
+.flaticon-party:before {
+    content: map-get($flaticon_w3music-map, "party");
+}
+.flaticon-down-arrow:before {
+    content: map-get($flaticon_w3music-map, "down-arrow");
+}
+.flaticon-shopping-cart:before {
+    content: map-get($flaticon_w3music-map, "shopping-cart");
+}
+.flaticon-play-buttton:before {
+    content: map-get($flaticon_w3music-map, "play-buttton");
+}
+.flaticon-mirror-ball:before {
+    content: map-get($flaticon_w3music-map, "mirror-ball");
+}
+.flaticon-equalizer:before {
+    content: map-get($flaticon_w3music-map, "equalizer");
+}
+.flaticon-left-arrow:before {
+    content: map-get($flaticon_w3music-map, "left-arrow");
+}
+.flaticon-right-up:before {
+    content: map-get($flaticon_w3music-map, "right-up");
+}
+.flaticon-plus:before {
+    content: map-get($flaticon_w3music-map, "plus");
+}
+.flaticon-play-button:before {
+    content: map-get($flaticon_w3music-map, "play-button");
+}
+.flaticon-telephone-call:before {
+    content: map-get($flaticon_w3music-map, "telephone-call");
+}
+.flaticon-arrow-upper-right:before {
+    content: map-get($flaticon_w3music-map, "arrow-upper-right");
+}
+.flaticon-youtube-1:before {
+    content: map-get($flaticon_w3music-map, "youtube-1");
+}
+.flaticon-wave-sound:before {
+    content: map-get($flaticon_w3music-map, "wave-sound");
+}
+.flaticon-refresh:before {
+    content: map-get($flaticon_w3music-map, "refresh");
+}
+.flaticon-view:before {
+    content: map-get($flaticon_w3music-map, "view");
+}
+.flaticon-repeat:before {
+    content: map-get($flaticon_w3music-map, "repeat");
+}
+.flaticon-instagram-1:before {
+    content: map-get($flaticon_w3music-map, "instagram-1");
+}

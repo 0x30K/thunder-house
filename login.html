@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login | Thunder House ENT</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Custom Design System Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .login-container {
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg-surface);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 229, 255, 0.15);
+      position: relative;
+    }
+    .login-logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .login-logo img {
+      height: 58px;
+      margin: 0 auto 0.75rem;
+      filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.4));
+    }
+    .login-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      background: rgba(0, 229, 255, 0.1);
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+    }
+    .auth-error {
+      background: rgba(255, 0, 85, 0.15);
+      border: 1px solid var(--secondary);
+      color: #ff99bb;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      margin-bottom: 1.25rem;
+      display: none;
+    }
+    .auth-toggle {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .auth-toggle a {
+      color: var(--primary);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .back-home {
+      display: block;
+      text-align: center;
+      margin-top: 1.25rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    .back-home:hover {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="login-logo">
+      <img src="assets/images/branding/Thunder House Logo-PNG.png" alt="Thunder House ENT">
+      <div><span class="login-badge"><i class="fa-solid fa-lock"></i> Staff Admin Portal</span></div>
+    </div>
+
+    <div id="auth-error-msg" class="auth-error"></div>
+
+    <form id="admin-login-form">
+      <div class="form-group" style="margin-bottom: 1.25rem;">
+        <label class="form-label"><i class="fa-solid fa-envelope"></i> Admin Email</label>
+        <input type="email" id="login-email" class="form-control" placeholder="admin@thunderhouseent.com" required>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.75rem;">
+        <label class="form-label"><i class="fa-solid fa-key"></i> Password</label>
+        <input type="password" id="login-password" class="form-control" placeholder="••••••••••••" required>
+      </div>
+
+      <button type="submit" id="btn-login-submit" class="btn btn-primary btn-lg" style="width: 100%;">
+        <i class="fa-solid fa-right-to-bracket"></i> Sign In to Dashboard
+      </button>
+    </form>
+
+    <div class="auth-toggle">
+      <span id="auth-toggle-text">First time admin setup?</span>
+      <a id="btn-toggle-mode">Create Admin Account</a>
+    </div>
+
+    <a href="index.html" class="back-home"><i class="fa-solid fa-arrow-left"></i> Back to Public Website</a>
+  </div>
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      let isSignUpMode = false;
+      const form = document.getElementById('admin-login-form');
+      const emailInput = document.getElementById('login-email');
+      const passwordInput = document.getElementById('login-password');
+      const submitBtn = document.getElementById('btn-login-submit');
+      const errorDiv = document.getElementById('auth-error-msg');
+      const toggleBtn = document.getElementById('btn-toggle-mode');
+      const toggleText = document.getElementById('auth-toggle-text');
+
+      // Check if already logged in
+      if (window.supabaseClient) {
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        if (session) {
+          window.location.href = 'admin.html';
+          return;
+        }
+      }
+
+      // Toggle Login / Signup Mode
+      toggleBtn.addEventListener('click', () => {
+        isSignUpMode = !isSignUpMode;
+        if (isSignUpMode) {
+          submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Admin Account';
+          toggleBtn.textContent = 'Sign In Instead';
+          toggleText.textContent = 'Already have an admin account?';
+        } else {
+          submitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In to Dashboard';
+          toggleBtn.textContent = 'Create Admin Account';
+          toggleText.textContent = 'First time admin setup?';
+        }
+        errorDiv.style.display = 'none';
+      });
+
+      // Handle Submit
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorDiv.style.display = 'none';
+        submitBtn.disabled = true;
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+
+        try {
+          if (!window.supabaseClient) {
+            throw new Error('Supabase client could not be loaded. Please check your internet connection.');
+          }
+
+          if (isSignUpMode) {
+            // Sign Up
+            const { data, error } = await window.supabaseClient.auth.signUp({
+              email: email,
+              password: password
+            });
+
+            if (error) throw error;
+
+            if (data.session) {
+              window.location.href = 'admin.html';
+            } else {
+              errorDiv.style.display = 'block';
+              errorDiv.style.background = 'rgba(0, 229, 255, 0.15)';
+              errorDiv.style.borderColor = 'var(--primary)';
+              errorDiv.style.color = 'var(--primary)';
+              errorDiv.textContent = 'Account created! Please check your email inbox to confirm your account or sign in directly.';
+            }
+          } else {
+            // Sign In
+            const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+              email: email,
+              password: password
+            });
+
+            if (error) throw error;
+
+            if (data.session) {
+              window.location.href = 'admin.html';
+            }
+          }
+        } catch (err) {
+          errorDiv.style.display = 'block';
+          errorDiv.style.background = 'rgba(255, 0, 85, 0.15)';
+          errorDiv.style.borderColor = 'var(--secondary)';
+          errorDiv.style.color = '#ff99bb';
+          errorDiv.textContent = err.message || 'Authentication error. Please check your credentials.';
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

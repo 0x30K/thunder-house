@@ -1,0 +1,8 @@
+# Development & Template Archives
+Theme/
+*.zip
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
