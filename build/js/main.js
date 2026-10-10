@@ -557,6 +557,195 @@ function initBookingForms() {
   }
 
   // Main Contact Form
+  
+  // =========================================================================
+  // PUBLIC BOOKING CALENDAR SYSTEM
+  // =========================================================================
+  let pubCalDate = new Date();
+  let pubAvailabilityList = [];
+  let pubSelectedDate = null;
+  let pubSelectedTime = null;
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  async function initBookingCalendar() {
+    const daysGrid = document.getElementById('pub-cal-days-grid');
+    if (!daysGrid) return;
+
+    const prevBtn = document.getElementById('btn-pub-prev-month');
+    const nextBtn = document.getElementById('btn-pub-next-month');
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        pubCalDate.setMonth(pubCalDate.getMonth() - 1);
+        renderPublicCalendar();
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        pubCalDate.setMonth(pubCalDate.getMonth() + 1);
+        renderPublicCalendar();
+      });
+    }
+
+    await fetchPublicAvailability();
+  }
+
+  async function fetchPublicAvailability() {
+    if (window.supabaseClient) {
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('thunderhouse_availability')
+          .select('date, status, time_slots')
+          .order('date', { ascending: true });
+
+        if (!error && data) {
+          pubAvailabilityList = data;
+        }
+      } catch (err) {
+        console.warn('Note on public availability:', err);
+      }
+    }
+
+    renderPublicCalendar();
+  }
+
+  function renderPublicCalendar() {
+    const grid = document.getElementById('pub-cal-days-grid');
+    const title = document.getElementById('pub-cal-month-title');
+    if (!grid || !title) return;
+
+    const year = pubCalDate.getFullYear();
+    const month = pubCalDate.getMonth();
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    title.textContent = `${monthNames[month]} ${year}`;
+
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    grid.innerHTML = '';
+
+    // Empty cells
+    for (let i = 0; i < firstDayIndex; i++) {
+      const empty = document.createElement('div');
+      empty.className = 'pub-day-cell empty';
+      grid.appendChild(empty);
+    }
+
+    // Days in Month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const cellDate = new Date(year, month, day);
+      const yyyy = year;
+      const mm = String(month + 1).padStart(2, '0');
+      const dd = String(day).padStart(2, '0');
+      const dateStr = `${yyyy}-${mm}-${dd}`;
+
+      const cell = document.createElement('div');
+      cell.className = 'pub-day-cell';
+      cell.textContent = day;
+
+      const isPast = cellDate < today;
+      if (isPast) {
+        cell.classList.add('past');
+      } else {
+        const record = pubAvailabilityList.find(a => a.date === dateStr);
+        if (record && record.status === 'available') {
+          cell.classList.add('available');
+          if (dateStr === pubSelectedDate) {
+            cell.classList.add('selected');
+          }
+          cell.addEventListener('click', () => selectPublicBookingDate(dateStr, record));
+        } else if (record && record.status === 'booked') {
+          cell.classList.add('booked');
+        }
+      }
+
+      grid.appendChild(cell);
+    }
+  }
+
+  function selectPublicBookingDate(dateStr, record) {
+    pubSelectedDate = dateStr;
+    const hiddenDateInput = document.getElementById('contact-date');
+    if (hiddenDateInput) hiddenDateInput.value = dateStr;
+
+    // Re-render calendar cells to update selection ring
+    document.querySelectorAll('.pub-day-cell').forEach(c => c.classList.remove('selected'));
+    renderPublicCalendar();
+
+    // Format readable date
+    const [year, month, day] = dateStr.split('-');
+    const d = new Date(year, parseInt(month) - 1, day);
+    const dayFormatted = d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+
+    // Update Time Panel Header
+    const dateLabel = document.getElementById('time-panel-date-label');
+    const subLabel = document.getElementById('time-panel-sub-label');
+    if (dateLabel) dateLabel.innerHTML = `<i class="fa-solid fa-calendar-check" style="color:var(--primary);"></i> ${dayFormatted}`;
+    if (subLabel) subLabel.textContent = 'Click an available time slot below to secure your event hours.';
+
+    // Populate Time Slots
+    const container = document.getElementById('pub-time-slots-container');
+    const slots = (record && record.time_slots && record.time_slots.length > 0)
+      ? record.time_slots
+      : ['12:00 PM - 4:00 PM', '5:00 PM - 10:00 PM', '6:00 PM - 11:00 PM', '7:00 PM - 12:00 AM'];
+
+    container.innerHTML = slots.map(slot => `
+      <button type="button" class="time-slot-btn ${slot === pubSelectedTime ? 'active' : ''}" onclick="selectPublicTimeSlot('${escapeHtml(slot)}')">
+        <span><i class="fa-regular fa-clock"></i> ${escapeHtml(slot)}</span>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.75rem;"></i>
+      </button>
+    `).join('');
+
+    // If already has a selected time, update pill
+    if (pubSelectedTime) {
+      updateConfirmationPill(dayFormatted, pubSelectedTime);
+    }
+  }
+
+  window.selectPublicTimeSlot = function(slot) {
+    pubSelectedTime = slot;
+    const hiddenTimeInput = document.getElementById('contact-time');
+    if (hiddenTimeInput) hiddenTimeInput.value = slot;
+
+    // Update active slot buttons
+    document.querySelectorAll('.time-slot-btn').forEach(btn => {
+      if (btn.textContent.includes(slot)) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    if (pubSelectedDate) {
+      const [year, month, day] = pubSelectedDate.split('-');
+      const d = new Date(year, parseInt(month) - 1, day);
+      const dayFormatted = d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+      updateConfirmationPill(dayFormatted, slot);
+    }
+  };
+
+  function updateConfirmationPill(dateFormatted, slot) {
+    const pill = document.getElementById('booking-confirmation-pill');
+    const dateEl = document.getElementById('pill-selected-date');
+    const timeEl = document.getElementById('pill-selected-time');
+    if (pill && dateEl && timeEl) {
+      dateEl.textContent = dateFormatted;
+      timeEl.textContent = `Time Slot: ${slot}`;
+      pill.style.display = 'flex';
+    }
+  }
+
+  initBookingCalendar();
+
   if (mainContactForm) {
     mainContactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -571,15 +760,18 @@ function initBookingForms() {
       // Save to Supabase database
       if (window.supabaseClient) {
         try {
+          const chosenTime = document.getElementById('contact-time') ? document.getElementById('contact-time').value : '';
           await window.supabaseClient.from('thunderhouse_inquiries').insert([{
-            client_name: name,
-            client_email: email,
-            client_phone: phone,
+            full_name: name,
+            email: email,
+            phone: phone,
             package_name: selectedPkg,
-            event_date: date,
-            venue_city: venue,
-            message: message,
-            status: 'New'
+            event_date: date || null,
+            event_time: chosenTime,
+            venue_location: venue,
+            notes: message,
+            status: 'new',
+            source: 'website_calendar'
           }]);
         } catch (err) {
           console.warn('Supabase inquiry save note:', err);

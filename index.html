@@ -916,10 +916,77 @@
               </div>
             </div>
 
-            <div class="form-grid-2">
-              <div class="form-group">
+            <div class="form-grid-2" style="margin-bottom: 1.25rem;">
+              <div class="form-group" style="grid-column: 1 / -1;">
                 <label class="form-label">Email Address</label>
                 <input type="email" id="contact-email" class="form-control" placeholder="e.g. michael@example.com" required>
+              </div>
+            </div>
+
+            <!-- Interactive Booking Calendar & Time Slot Selector -->
+            <div class="booking-calendar-module" style="margin-bottom: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+                <label class="form-label" style="margin: 0; font-size: 1.05rem; color: #fff; font-weight: 700;">
+                  <i class="fa-solid fa-calendar-check" style="color: var(--primary);"></i> Choose Available Event Date & Time
+                </label>
+                <div style="display: flex; gap: 1rem; font-size: 0.78rem; color: var(--text-muted);">
+                  <span style="display: flex; align-items: center; gap: 0.35rem;"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary); display: inline-block; box-shadow: 0 0 6px var(--primary);"></span> Available</span>
+                  <span style="display: flex; align-items: center; gap: 0.35rem;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444; display: inline-block;"></span> Booked</span>
+                </div>
+              </div>
+
+              <div class="client-calendar-layout">
+                <!-- Left: Interactive Month Calendar -->
+                <div class="client-cal-card">
+                  <div class="client-cal-header">
+                    <button type="button" class="btn-cal-nav" id="btn-pub-prev-month" aria-label="Previous Month"><i class="fa-solid fa-chevron-left"></i></button>
+                    <span class="client-cal-title" id="pub-cal-month-title">Loading Calendar...</span>
+                    <button type="button" class="btn-cal-nav" id="btn-pub-next-month" aria-label="Next Month"><i class="fa-solid fa-chevron-right"></i></button>
+                  </div>
+
+                  <div class="client-cal-weekdays">
+                    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                  </div>
+
+                  <div class="client-cal-days" id="pub-cal-days-grid">
+                    <!-- Days dynamically rendered via JS from Supabase availability -->
+                  </div>
+                </div>
+
+                <!-- Right: Time Slots Selector -->
+                <div class="client-time-panel">
+                  <div class="time-panel-header">
+                    <h4 id="time-panel-date-label"><i class="fa-regular fa-clock" style="color: var(--primary);"></i> Available Times</h4>
+                    <p id="time-panel-sub-label">Select a glowing date on the calendar to view available performance times.</p>
+                  </div>
+
+                  <div class="time-slots-container" id="pub-time-slots-container">
+                    <div class="empty-time-state">
+                      <i class="fa-solid fa-calendar-days" style="font-size: 2rem; color: rgba(255,255,255,0.15); margin-bottom: 0.5rem; display: block;"></i>
+                      <span>Click any available date to choose your time slot</span>
+                    </div>
+                  </div>
+
+                  <!-- Chosen Date/Time Confirmation Pill -->
+                  <div id="booking-confirmation-pill" class="booking-selection-pill" style="display: none;">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div>
+                      <strong id="pill-selected-date" style="display: block; font-size: 0.92rem; color: #fff;"></strong>
+                      <span id="pill-selected-time" style="font-size: 0.82rem; color: var(--primary); font-weight: 600;"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Hidden inputs that store the chosen date & time -->
+              <input type="hidden" id="contact-date" name="event_date" required>
+              <input type="hidden" id="contact-time" name="event_time">
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label">City / Venue Location</label>
+                <input type="text" id="contact-venue" class="form-control" placeholder="e.g. Oklahoma City / Edmond / Norman" required>
               </div>
               <div class="form-group">
                 <label class="form-label">Interested Package</label>
@@ -930,17 +997,6 @@
                   <option value="Thunder All-Night ($1,200)">Thunder All-Night (Up to 8h - $1,200)</option>
                   <option value="Custom Event">Custom Package / Quote</option>
                 </select>
-              </div>
-            </div>
-
-            <div class="form-grid-2">
-              <div class="form-group">
-                <label class="form-label">Event Date</label>
-                <input type="date" id="contact-date" class="form-control" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">City / Venue</label>
-                <input type="text" id="contact-venue" class="form-control" placeholder="e.g. Oklahoma City / Edmond" required>
               </div>
             </div>
 

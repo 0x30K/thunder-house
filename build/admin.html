@@ -336,6 +336,261 @@
       max-height: 90vh;
       overflow-y: auto;
     }
+  
+    /* =========================================================================
+       DASHBOARD TABS & CALENDAR MANAGER STYLES
+       ========================================================================= */
+    .admin-tab-nav {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 0.75rem;
+    }
+    .tab-nav-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 0.75rem 1.4rem;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .tab-nav-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .tab-nav-btn.active {
+      color: var(--primary);
+      background: rgba(0, 229, 255, 0.08);
+      border-color: rgba(0, 229, 255, 0.3);
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
+    }
+
+    /* Calendar Manager Card */
+    .admin-calendar-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+      margin-bottom: 2.5rem;
+    }
+    .cal-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .cal-month-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .cal-month-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #fff;
+      font-family: var(--font-heading);
+      min-width: 220px;
+      text-align: center;
+    }
+    .cal-legend {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .legend-avail { background: var(--primary); box-shadow: 0 0 8px var(--primary); }
+    .legend-booked { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+    .legend-off { background: #64748b; }
+
+    /* Calendar Grid */
+    .cal-grid-header {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+    .cal-days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
+    }
+    .cal-day-cell {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius-sm);
+      min-height: 110px;
+      padding: 0.65rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .cal-day-cell:hover:not(.empty):not(.past) {
+      border-color: var(--primary);
+      background: rgba(0, 229, 255, 0.06);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    }
+    .cal-day-cell.empty {
+      background: transparent;
+      border-color: transparent;
+      cursor: default;
+    }
+    .cal-day-cell.past {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+    .cal-day-cell.today {
+      border-color: rgba(255, 183, 3, 0.6);
+    }
+    .cal-day-cell.available {
+      border-color: rgba(0, 229, 255, 0.4);
+      background: rgba(0, 229, 255, 0.04);
+    }
+    .cal-day-cell.booked {
+      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.04);
+    }
+    .cal-cell-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+    }
+    .cal-num {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .cal-day-pill {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .cal-day-pill.avail {
+      background: rgba(0, 229, 255, 0.2);
+      color: var(--primary);
+    }
+    .cal-day-pill.booked {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+    }
+    .cal-day-pill.blocked {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+    .cal-slots-mini-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin-top: auto;
+    }
+    .cal-slot-chip {
+      font-size: 0.68rem;
+      color: var(--text-light);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* Preset Chips in Editor Modal */
+    .slot-presets-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .preset-slot-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-light);
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .preset-slot-btn:hover {
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .preset-slot-btn.active {
+      background: rgba(0, 229, 255, 0.15);
+      border-color: var(--primary);
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .active-slots-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .active-slot-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0.5rem 0.85rem;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-size: 0.88rem;
+    }
+    .active-slot-row button {
+      background: none;
+      border: none;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 0.2rem 0.5rem;
+    }
+
   </style>
 </head>
 <body>
@@ -403,7 +658,20 @@
       </div>
     </div>
 
-    <!-- Toolbar -->
+    
+    <!-- Main Dashboard Tabs -->
+    <div class="admin-tab-nav">
+      <button class="tab-nav-btn active" id="tab-btn-inquiries" onclick="switchDashboardTab('inquiries')">
+        <i class="fa-solid fa-list-check"></i> Inquiries & Leads (<span id="inquiries-badge-count">0</span>)
+      </button>
+      <button class="tab-nav-btn" id="tab-btn-calendar" onclick="switchDashboardTab('calendar')">
+        <i class="fa-solid fa-calendar-days"></i> Booking & Availability Calendar
+      </button>
+    </div>
+
+    <!-- Tab 1: Inquiries Table View -->
+    <div id="view-inquiries" class="tab-view active">
+<!-- Toolbar -->
     <div class="dashboard-toolbar">
       <div class="filter-tabs">
         <button class="filter-btn active" data-status="All">All Inquiries</button>
@@ -453,8 +721,144 @@
           </tr>
         </tbody>
       </table>
-    </div>
+
+    </div><!-- End #view-inquiries -->
+
+    <!-- Tab 2: Availability & Booking Calendar View -->
+    <div id="view-calendar" class="tab-view" style="display: none;">
+      <div class="admin-calendar-card">
+        <!-- Top Toolbar -->
+        <div class="cal-top-bar">
+          <div class="cal-month-nav">
+            <button class="btn btn-outline btn-sm" onclick="changeAdminMonth(-1)" aria-label="Previous Month">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <span class="cal-month-title" id="admin-cal-title">Loading...</span>
+            <button class="btn btn-outline btn-sm" onclick="changeAdminMonth(1)" aria-label="Next Month">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="goAdminToday()" style="margin-left: 0.5rem;">
+              <i class="fa-solid fa-calendar-day"></i> Today
+            </button>
+          </div>
+
+          <div class="cal-legend">
+            <div class="legend-item"><span class="legend-dot legend-avail"></span> Available</div>
+            <div class="legend-item"><span class="legend-dot legend-booked"></span> Booked</div>
+            <div class="legend-item"><span class="legend-dot legend-off"></span> Blocked / Off</div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <button class="btn btn-primary btn-sm" onclick="quickSetMonthWeekends()">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Mark Month Weekends Available
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="loadAvailability()" aria-label="Refresh Calendar">
+              <i class="fa-solid fa-rotate-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Calendar Weekday Headers -->
+        <div class="cal-grid-header">
+          <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+        </div>
+
+        <!-- Dynamic Days Grid -->
+        <div class="cal-days-grid" id="admin-cal-days">
+          <!-- Populated via renderAdminCalendar() -->
+        </div>
+      </div>
+    </div><!-- End #view-calendar -->
+
   </main>
+
+  <!-- Date Availability Editor Modal -->
+  <div id="date-editor-modal" class="detail-modal-overlay">
+    <div class="detail-card" style="max-width: 580px;">
+      <button type="button" class="modal-close-btn" id="date-editor-close" onclick="closeDateEditor()">&times;</button>
+      
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+        <div class="kpi-icon" style="background: rgba(0, 229, 255, 0.15); color: var(--primary); width: 42px; height: 42px; font-size: 1.15rem;">
+          <i class="fa-solid fa-calendar-day"></i>
+        </div>
+        <div>
+          <h3 id="date-editor-title" style="font-size: 1.35rem; color: #fff; margin: 0;">Edit Availability</h3>
+          <span id="date-editor-sub" style="font-size: 0.85rem; color: var(--text-muted);">Configure times for clients to book</span>
+        </div>
+      </div>
+
+      <!-- Status Radio Buttons -->
+      <div class="form-group" style="margin-bottom: 1.25rem;">
+        <label class="form-label">Date Booking Status</label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.3); padding: 0.65rem; border-radius: var(--radius-sm); cursor: pointer; color: #fff; font-size: 0.88rem;">
+            <input type="radio" name="date-status-choice" value="available" id="status-rad-available" checked>
+            <span><i class="fa-solid fa-circle-check" style="color: var(--primary);"></i> Available</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.5rem; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); padding: 0.65rem; border-radius: var(--radius-sm); cursor: pointer; color: #fff; font-size: 0.88rem;">
+            <input type="radio" name="date-status-choice" value="booked" id="status-rad-booked">
+            <span><i class="fa-solid fa-lock" style="color: #ef4444;"></i> Booked</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-subtle); padding: 0.65rem; border-radius: var(--radius-sm); cursor: pointer; color: var(--text-muted); font-size: 0.88rem;">
+            <input type="radio" name="date-status-choice" value="blocked" id="status-rad-blocked">
+            <span><i class="fa-solid fa-ban"></i> Blocked/Off</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Time Slots Section (shown when status is available) -->
+      <div id="date-slots-section">
+        <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+          <span>Choose Available Time Slots for this Date</span>
+          <span style="font-size: 0.75rem; color: var(--primary);">Click preset to toggle</span>
+        </label>
+
+        <!-- Presets -->
+        <div class="slot-presets-wrap">
+          <button type="button" class="preset-slot-btn" onclick="togglePresetSlot('12:00 PM - 4:00 PM')"><i class="fa-regular fa-clock"></i> 12:00 PM - 4:00 PM</button>
+          <button type="button" class="preset-slot-btn" onclick="togglePresetSlot('2:00 PM - 6:00 PM')"><i class="fa-regular fa-clock"></i> 2:00 PM - 6:00 PM</button>
+          <button type="button" class="preset-slot-btn" onclick="togglePresetSlot('5:00 PM - 10:00 PM')"><i class="fa-regular fa-clock"></i> 5:00 PM - 10:00 PM</button>
+          <button type="button" class="preset-slot-btn" onclick="togglePresetSlot('6:00 PM - 11:00 PM')"><i class="fa-regular fa-clock"></i> 6:00 PM - 11:00 PM</button>
+          <button type="button" class="preset-slot-btn" onclick="togglePresetSlot('7:00 PM - 12:00 AM')"><i class="fa-regular fa-clock"></i> 7:00 PM - 12:00 AM</button>
+          <button type="button" class="preset-slot-btn" onclick="togglePresetSlot('All-Day Event (Up to 8h)')"><i class="fa-solid fa-bolt"></i> All-Day Event</button>
+        </div>
+
+        <!-- Custom Slot Input -->
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem;">
+          <input type="text" id="custom-slot-input" class="form-control" placeholder="Or type custom time (e.g. 1:00 PM - 5:00 PM)">
+          <button type="button" class="btn btn-outline btn-sm" onclick="addCustomSlot()" style="white-space: nowrap;">
+            <i class="fa-solid fa-plus"></i> Add
+          </button>
+        </div>
+
+        <!-- Active Slots List -->
+        <label class="form-label">Active Slots on Public Calendar (<span id="active-slots-count">0</span>)</label>
+        <div class="active-slots-list" id="active-slots-list">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Admin Notes -->
+      <div class="form-group" style="margin-bottom: 1.75rem;">
+        <label class="form-label">Internal Admin Notes (Optional)</label>
+        <input type="text" id="date-editor-notes" class="form-control" placeholder="e.g. Reserved for Johnson Wedding, or hold for venue confirm">
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+        <button type="button" class="btn btn-outline btn-sm" style="border-color: #ef4444; color: #f87171;" onclick="deleteDateAvailability()">
+          <i class="fa-solid fa-trash"></i> Delete / Clear
+        </button>
+        <div style="display: flex; gap: 0.75rem;">
+          <button type="button" class="btn btn-outline" onclick="closeDateEditor()">Cancel</button>
+          <button type="button" class="btn btn-primary" id="btn-save-date-avail" onclick="saveDateAvailability()">
+            <i class="fa-solid fa-floppy-disk"></i> Save Availability
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Lead Detail & Notes Modal -->
   <div id="detail-modal" class="detail-modal-overlay">
@@ -644,6 +1048,7 @@
       const pipelineTotal = allInquiries.reduce((acc, i) => acc + (parseFloat(i.estimated_total) || 0), 0);
 
       document.getElementById('kpi-total').textContent = total;
+      const countEl = document.getElementById('inquiries-badge-count'); if (countEl) countEl.textContent = total;
       document.getElementById('kpi-new').textContent = newCount;
       document.getElementById('kpi-booked').textContent = bookedCount;
       document.getElementById('kpi-pipeline').textContent = `$${pipelineTotal.toLocaleString()}`;
