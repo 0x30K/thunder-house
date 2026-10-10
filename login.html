@@ -115,11 +115,6 @@
       </button>
     </form>
 
-    <div class="auth-toggle">
-      <span id="auth-toggle-text">First time admin setup?</span>
-      <a id="btn-toggle-mode">Create Admin Account</a>
-    </div>
-
     <a href="index.html" class="back-home"><i class="fa-solid fa-arrow-left"></i> Back to Public Website</a>
   </div>
 
@@ -129,14 +124,11 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      let isSignUpMode = false;
       const form = document.getElementById('admin-login-form');
       const emailInput = document.getElementById('login-email');
       const passwordInput = document.getElementById('login-password');
       const submitBtn = document.getElementById('btn-login-submit');
       const errorDiv = document.getElementById('auth-error-msg');
-      const toggleBtn = document.getElementById('btn-toggle-mode');
-      const toggleText = document.getElementById('auth-toggle-text');
 
       // Check if already logged in
       if (window.supabaseClient) {
@@ -147,28 +139,13 @@
         }
       }
 
-      // Toggle Login / Signup Mode
-      toggleBtn.addEventListener('click', () => {
-        isSignUpMode = !isSignUpMode;
-        if (isSignUpMode) {
-          submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Admin Account';
-          toggleBtn.textContent = 'Sign In Instead';
-          toggleText.textContent = 'Already have an admin account?';
-        } else {
-          submitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In to Dashboard';
-          toggleBtn.textContent = 'Create Admin Account';
-          toggleText.textContent = 'First time admin setup?';
-        }
-        errorDiv.style.display = 'none';
-      });
-
-      // Handle Submit
+      // Handle Sign In Submit
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         errorDiv.style.display = 'none';
         submitBtn.disabled = true;
         const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Signing in...';
 
         const email = emailInput.value.trim();
         const password = passwordInput.value;
@@ -178,43 +155,22 @@
             throw new Error('Supabase client could not be loaded. Please check your internet connection.');
           }
 
-          if (isSignUpMode) {
-            // Sign Up
-            const { data, error } = await window.supabaseClient.auth.signUp({
-              email: email,
-              password: password
-            });
+          const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+          });
 
-            if (error) throw error;
+          if (error) throw error;
 
-            if (data.session) {
-              window.location.href = 'admin.html';
-            } else {
-              errorDiv.style.display = 'block';
-              errorDiv.style.background = 'rgba(0, 229, 255, 0.15)';
-              errorDiv.style.borderColor = 'var(--primary)';
-              errorDiv.style.color = 'var(--primary)';
-              errorDiv.textContent = 'Account created! Please check your email inbox to confirm your account or sign in directly.';
-            }
-          } else {
-            // Sign In
-            const { data, error } = await window.supabaseClient.auth.signInWithPassword({
-              email: email,
-              password: password
-            });
-
-            if (error) throw error;
-
-            if (data.session) {
-              window.location.href = 'admin.html';
-            }
+          if (data.session) {
+            window.location.href = 'admin.html';
           }
         } catch (err) {
           errorDiv.style.display = 'block';
           errorDiv.style.background = 'rgba(255, 0, 85, 0.15)';
           errorDiv.style.borderColor = 'var(--secondary)';
           errorDiv.style.color = '#ff99bb';
-          errorDiv.textContent = err.message || 'Authentication error. Please check your credentials.';
+          errorDiv.textContent = err.message || 'Authentication error. Please check your email and password.';
         } finally {
           submitBtn.disabled = false;
           submitBtn.innerHTML = originalText;
