@@ -6,3 +6,10 @@ Theme/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Agent skills & local tooling
+.agents/
+.claude/
+agent/
+skills-lock.json
+
