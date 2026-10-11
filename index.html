@@ -37,7 +37,7 @@
     <div class="top-bar">
       <div class="container top-bar-inner">
         <div class="top-bar-left">
-          <span><i class="fa-solid fa-location-dot" style="color: var(--primary);"></i> Oklahoma City - We Travel</span>
+          <span data-edit-key="topbar_location"><i class="fa-solid fa-location-dot" style="color: var(--primary);"></i> Oklahoma City - We Travel</span>
           <span><i class="fa-solid fa-users" style="color: var(--accent-gold);"></i> Family-Owned & Operated</span>
         </div>
         <div class="top-bar-right">
@@ -90,16 +90,16 @@
 
     <div class="container">
       <div class="hero-content">
-        <div class="badge-pill badge-gold">
+        <div class="badge-pill badge-gold" data-edit-key="hero_badge">
           <i class="fa-solid fa-star"></i> Oklahoma City's DJ & Event Entertainment
         </div>
         
-        <h1 class="hero-title">
+        <h1 class="hero-title" data-edit-key="hero_title">
           YOUR EVENT. YOUR SOUNDTRACK. <br>
           <span class="gradient-text">UNFORGETTABLE ENERGY.</span>
         </h1>
 
-        <p class="hero-subtitle">
+        <p class="hero-subtitle" data-edit-key="hero_subtitle">
           Thunder House ENT is a passionate family-owned DJ business bringing crowd-moving music, crisp professional sound, and seamless MC hosting to Wedding Receptions, Birthday Parties, and Corporate Events.
         </p>
 
@@ -199,8 +199,8 @@
         </div>
 
         <div>
-          <div class="badge-pill section-tag"><i class="fa-solid fa-handshake-angle"></i> Meet Thunder House ENT</div>
-          <h2 style="font-size: 2.3rem; margin-bottom: 1.25rem;">
+          <div class="badge-pill section-tag" data-edit-key="about_badge"><i class="fa-solid fa-handshake-angle"></i> Meet Thunder House ENT</div>
+          <h2 style="font-size: 2.3rem; margin-bottom: 1.25rem;" data-edit-key="about_title">
             DEDICATED TO <span class="gradient-text">MAKING YOUR EVENT EPIC</span>
           </h2>
           <p style="color: var(--text-light); margin-bottom: 1.25rem; font-size: 1.05rem;">
@@ -233,9 +233,9 @@
   <section id="services" class="section" style="background: rgba(14, 18, 27, 0.4);">
     <div class="container">
       <div class="section-header">
-        <div class="badge-pill section-tag"><i class="fa-solid fa-headphones"></i> What We Do</div>
-        <h2 class="section-title">EVENTS WE LOVE <span class="gradient-text">TO ROCK</span></h2>
-        <p class="section-desc">
+        <div class="badge-pill section-tag" data-edit-key="services_badge"><i class="fa-solid fa-headphones"></i> What We Do</div>
+        <h2 class="section-title" data-edit-key="services_title">EVENTS WE LOVE <span class="gradient-text">TO ROCK</span></h2>
+        <p class="section-desc" data-edit-key="services_desc">
           We bring our high-energy DJ performances, crystal-clear speakers, and host coordination to your most important celebrations.
         </p>
       </div>
@@ -1025,7 +1025,7 @@
           <p>
             Thunder House ENT is a family-owned DJ & Event Entertainment business based in Oklahoma City, delivering high-energy music, pro sound, and MC services.
           </p>
-          <div class="badge-pill badge-gold"><i class="fa-solid fa-users"></i> Family-Owned & Operated</div>
+          <div class="badge-pill badge-gold" data-edit-key="hero_badge"><i class="fa-solid fa-users"></i> Family-Owned & Operated</div>
         </div>
 
         <div class="footer-col">
@@ -1138,5 +1138,7 @@
   <script src="js/supabase-config.js"></script>
   <!-- Main JavaScript Logic -->
   <script src="js/main.js"></script>
+  <!-- Superuser Visual Site Editor -->
+  <script src="js/site-editor.js"></script>
 </body>
 </html>

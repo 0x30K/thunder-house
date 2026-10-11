@@ -630,6 +630,27 @@
       flex-shrink: 0;
     }
 
+  
+    .th-toggle-switch input:checked + .th-toggle-slider {
+      background-color: var(--primary) !important;
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+    .th-toggle-switch input:checked + .th-toggle-slider:before {
+      transform: translateX(18px);
+      background-color: #07090e;
+    }
+    .th-toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 12px;
+      width: 12px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    
   </style>
 </head>
 <body>
@@ -646,6 +667,20 @@
         <span id="admin-user-email" class="user-email-pill">Loading...</span>
         <span id="admin-role-badge" class="badge-role" style="display: none;"></span>
       </div>
+        <!-- Superuser Live Edit Mode Switch -->
+        <div id="admin-editmode-toggle-wrap" style="display: none; align-items: center; gap: 0.65rem; background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.3); padding: 0.35rem 0.85rem; border-radius: var(--radius-full);">
+          <span style="font-size: 0.78rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+            <i class="fa-solid fa-paintbrush" style="color: var(--primary);"></i> Live Site Edit Mode:
+          </span>
+          <label class="th-toggle-switch" style="width: 36px; height: 18px; position: relative; display: inline-block;">
+            <input type="checkbox" id="admin-site-editmode-switch" onchange="toggleAdminSiteEditMode(this.checked)" style="opacity: 0; width: 0; height: 0;">
+            <span class="th-toggle-slider" style="position: absolute; cursor: pointer; inset: 0; background: rgba(255,255,255,0.2); border-radius: 20px; transition: .3s;"></span>
+          </label>
+          <span id="admin-editmode-badge-status" style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted);">OFF</span>
+          <a href="index.html" id="btn-admin-view-site-link" target="_blank" class="btn btn-primary btn-sm" style="padding: 0.2rem 0.65rem; font-size: 0.75rem; margin-left: 0.25rem;">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live Site
+          </a>
+        </div>
       <a href="index.html" class="btn btn-outline btn-sm" target="_blank">
         <i class="fa-solid fa-arrow-up-right-from-square"></i> View Website
       </a>
@@ -1146,6 +1181,52 @@
     // =========================================================================
     // USER ROLES & ACCESS CONTROL STATE
     // =========================================================================
+    
+    // =========================================================================
+    // SUPERUSER LIVE SITE EDIT MODE CONTROLS
+    // =========================================================================
+    function initAdminEditModeControls() {
+      const wrap = document.getElementById('admin-editmode-toggle-wrap');
+      if (!wrap) return;
+
+      if (currentUserState.isSuperuser) {
+        wrap.style.display = 'inline-flex';
+        const isEditOn = localStorage.getItem('th_edit_mode') === 'true';
+        updateAdminEditModeUI(isEditOn);
+      } else {
+        wrap.style.display = 'none';
+      }
+    }
+
+    function toggleAdminSiteEditMode(enable) {
+      if (!currentUserState.isSuperuser) return;
+      localStorage.setItem('th_edit_mode', enable ? 'true' : 'false');
+      updateAdminEditModeUI(enable);
+
+      if (enable) {
+        alert('🎨 Live Site Edit Mode is now ON!\n\nWhen you open the website, titles, headings, and texts will be directly editable, and you can customize brand colors with live preview.\n\nClick "Open Visual Editor" to start editing.');
+      } else {
+        alert('Live Site Edit Mode is now OFF. The website is now in normal visitor view.');
+      }
+    }
+
+    function updateAdminEditModeUI(active) {
+      const switchEl = document.getElementById('admin-site-editmode-switch');
+      const badgeEl = document.getElementById('admin-editmode-badge-status');
+      const viewLink = document.getElementById('btn-admin-view-site-link');
+      if (switchEl) switchEl.checked = active;
+      if (badgeEl) {
+        badgeEl.textContent = active ? 'ON' : 'OFF';
+        badgeEl.style.color = active ? 'var(--primary)' : 'var(--text-muted)';
+      }
+      if (viewLink) {
+        viewLink.href = active ? 'index.html?edit_mode=true' : 'index.html';
+        viewLink.innerHTML = active 
+          ? '<i class="fa-solid fa-wand-magic-sparkles"></i> Open Visual Editor' 
+          : '<i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live Site';
+      }
+    }
+
     let currentUserState = {
       id: null,
       email: null,
@@ -1246,6 +1327,7 @@
           staffTabBtn.style.display = 'none';
         }
       }
+      initAdminEditModeControls();
     }
 
     // =========================================================================
