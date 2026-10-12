@@ -674,8 +674,10 @@ function initBookingForms() {
 
   function selectPublicBookingDate(dateStr, record) {
     pubSelectedDate = dateStr;
-    const hiddenDateInput = document.getElementById('contact-date');
-    if (hiddenDateInput) hiddenDateInput.value = dateStr;
+    const modalDateInput = document.getElementById('modal-event-date');
+    const contactDateInput = document.getElementById('contact-date');
+    if (modalDateInput) modalDateInput.value = dateStr;
+    if (contactDateInput) contactDateInput.value = dateStr;
 
     // Re-render calendar cells to update selection ring
     document.querySelectorAll('.pub-day-cell').forEach(c => c.classList.remove('selected'));
@@ -698,23 +700,29 @@ function initBookingForms() {
       ? record.time_slots
       : ['12:00 PM - 4:00 PM', '5:00 PM - 10:00 PM', '6:00 PM - 11:00 PM', '7:00 PM - 12:00 AM'];
 
-    container.innerHTML = slots.map(slot => `
-      <button type="button" class="time-slot-btn ${slot === pubSelectedTime ? 'active' : ''}" onclick="selectPublicTimeSlot('${escapeHtml(slot)}')">
-        <span><i class="fa-regular fa-clock"></i> ${escapeHtml(slot)}</span>
-        <i class="fa-solid fa-chevron-right" style="font-size:0.75rem;"></i>
-      </button>
-    `).join('');
+    if (container) {
+      container.innerHTML = slots.map(slot => `
+        <button type="button" class="time-slot-btn ${slot === pubSelectedTime ? 'active' : ''}" onclick="selectPublicTimeSlot('${escapeHtml(slot)}')">
+          <span><i class="fa-regular fa-clock"></i> ${escapeHtml(slot)}</span>
+          <i class="fa-solid fa-chevron-right" style="font-size:0.75rem;"></i>
+        </button>
+      `).join('');
+    }
 
-    // If already has a selected time, update pill
-    if (pubSelectedTime) {
+    // Default time if none selected yet
+    if (!pubSelectedTime && slots.length > 0) {
+      selectPublicTimeSlot(slots[0]);
+    } else if (pubSelectedTime) {
       updateConfirmationPill(dayFormatted, pubSelectedTime);
     }
   }
 
   window.selectPublicTimeSlot = function(slot) {
     pubSelectedTime = slot;
-    const hiddenTimeInput = document.getElementById('contact-time');
-    if (hiddenTimeInput) hiddenTimeInput.value = slot;
+    const modalTimeInput = document.getElementById('modal-event-time');
+    const contactTimeInput = document.getElementById('contact-time');
+    if (modalTimeInput) modalTimeInput.value = slot;
+    if (contactTimeInput) contactTimeInput.value = slot;
 
     // Update active slot buttons
     document.querySelectorAll('.time-slot-btn').forEach(btn => {
@@ -746,73 +754,165 @@ function initBookingForms() {
 
   initBookingCalendar();
 
+  // CTA button from Contact section to open modal
+  const openCalBtnFromContact = document.getElementById('btn-open-cal-modal-from-contact');
+  if (openCalBtnFromContact) {
+    openCalBtnFromContact.addEventListener('click', () => {
+      openBookingModalWithQuote(window.currentQuote);
+    });
+  }
+
+  // 1. Direct Contact Form Submission
   if (mainContactForm) {
     mainContactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const submitBtn = mainContactForm.querySelector('button[type="submit"]');
+      const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending Inquiry...';
+      }
+
       const name = document.getElementById('contact-name').value;
       const email = document.getElementById('contact-email').value;
       const phone = document.getElementById('contact-phone').value;
-      const selectedPkg = document.getElementById('contact-event-type').value;
-      const date = document.getElementById('contact-date').value;
-      const venue = document.getElementById('contact-venue').value;
-      const message = document.getElementById('contact-message').value;
+      const selectedPkg = document.getElementById('contact-event-type') ? document.getElementById('contact-event-type').value : 'General Inquiry';
+      const venue = document.getElementById('contact-venue') ? document.getElementById('contact-venue').value : 'Oklahoma City';
+      const message = document.getElementById('contact-message') ? document.getElementById('contact-message').value : '';
 
       // Save to Supabase database
       if (window.supabaseClient) {
         try {
-          const chosenTime = document.getElementById('contact-time') ? document.getElementById('contact-time').value : '';
           await window.supabaseClient.from('thunderhouse_inquiries').insert([{
             full_name: name,
             email: email,
             phone: phone,
             package_name: selectedPkg,
-            event_date: date || null,
-            event_time: chosenTime,
             venue_location: venue,
             notes: message,
             status: 'new',
-            source: 'website_calendar'
+            source: 'website_contact_form'
           }]);
         } catch (err) {
           console.warn('Supabase inquiry save note:', err);
         }
       }
 
-      showToast(`Thank you ${name}! Your booking inquiry has been received. Our team will contact you within 2 hours.`);
+      // Dispatch confirmation email
+      try {
+        await fetch('https://kxoivmflghfgtvawhktt.supabase.co/functions/v1/send-booking-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            client_name: name,
+            client_email: email,
+            client_phone: phone,
+            venue_city: venue,
+            package_name: selectedPkg,
+            notes: message
+          })
+        });
+      } catch (emailErr) {
+        console.warn('Email dispatch note:', emailErr);
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHtml;
+      }
+
+      showToast(`Thank you ${name}! Your booking inquiry has been received. A confirmation has been sent to ${email}.`);
       mainContactForm.reset();
     });
   }
 
-  // Modal final confirmation submission
+  // 2. Modal Final Booking & Quote Confirmation Submission
   if (modalBookingForm) {
     modalBookingForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const clientName = document.getElementById('modal-client-name').value;
-      const clientPhone = document.getElementById('modal-client-phone').value;
-      const clientEmail = document.getElementById('modal-client-email').value;
-      const quote = window.currentQuote || {};
+      const submitBtn = document.getElementById('btn-modal-submit-booking') || modalBookingForm.querySelector('button[type="submit"]');
+      const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+
+      const clientName = document.getElementById('modal-client-name').value.trim();
+      const clientEmail = document.getElementById('modal-client-email').value.trim();
+      const clientPhone = document.getElementById('modal-client-phone').value.trim();
+      const clientVenue = document.getElementById('modal-client-venue') ? document.getElementById('modal-client-venue').value.trim() : 'Oklahoma City';
+      const clientNotes = document.getElementById('modal-client-notes') ? document.getElementById('modal-client-notes').value.trim() : '';
+      
+      const eventDate = document.getElementById('modal-event-date') ? document.getElementById('modal-event-date').value : pubSelectedDate;
+      const eventTime = document.getElementById('modal-event-time') ? document.getElementById('modal-event-time').value : (pubSelectedTime || 'Flexible / Full Event');
+
+      if (!eventDate) {
+        showToast('⚠️ Please select an available event date on the calendar first!');
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Securing Your Date & Sending Confirmation...';
+      }
+
+      const quote = window.currentQuote || {
+        package: 'Thunder Party (4h)',
+        total: 700,
+        basePrice: 700,
+        extraHours: 0,
+        travelMiles: 0,
+        addons: []
+      };
 
       // Save to Supabase database
       if (window.supabaseClient) {
         try {
           await window.supabaseClient.from('thunderhouse_inquiries').insert([{
-            client_name: clientName,
-            client_email: clientEmail,
-            client_phone: clientPhone,
+            full_name: clientName,
+            email: clientEmail,
+            phone: clientPhone,
+            event_date: eventDate,
+            event_time: eventTime,
+            venue_location: clientVenue,
             package_name: quote.package || 'Thunder House Package',
-            extra_hours: quote.extraHours || 0,
-            travel_miles: quote.travelMiles || 0,
             addons: quote.addons || [],
             estimated_total: quote.total || 0,
-            status: 'New'
+            notes: clientNotes,
+            status: 'new',
+            source: 'quote_calculator_modal'
           }]);
         } catch (err) {
           console.warn('Supabase quote save note:', err);
         }
       }
 
+      // Dispatch confirmation email via Supabase Edge Function
+      try {
+        const emailResponse = await fetch('https://kxoivmflghfgtvawhktt.supabase.co/functions/v1/send-booking-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            client_name: clientName,
+            client_email: clientEmail,
+            client_phone: clientPhone,
+            event_date: eventDate,
+            event_time: eventTime,
+            venue_city: clientVenue,
+            package_name: quote.package,
+            estimated_total: quote.total,
+            notes: clientNotes
+          })
+        });
+        const emailResult = await emailResponse.json();
+        console.log('Confirmation email result:', emailResult);
+      } catch (emailErr) {
+        console.warn('Confirmation email note:', emailErr);
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHtml;
+      }
+
       if (modal) modal.classList.remove('active');
-      showToast(`Booking inquiry locked in for ${clientName}! Check your email (${clientEmail}) for your custom proposal.`);
+      showToast(`🎉 Reservation locked in for ${clientName}! Confirmation email sent to ${clientEmail}.`);
       modalBookingForm.reset();
     });
   }
@@ -823,22 +923,47 @@ function openBookingModalWithQuote(quote) {
   const modalSummaryDetails = document.getElementById('modal-summary-details');
   if (!modal) return;
 
-  if (modalSummaryDetails && quote) {
+  const currentQuoteData = quote || window.currentQuote || {
+    package: 'Thunder Party (4h)',
+    basePrice: 700,
+    extraHours: 0,
+    travelMiles: 0,
+    total: 700,
+    addons: []
+  };
+
+  if (modalSummaryDetails) {
     modalSummaryDetails.innerHTML = `
-      <div style="background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
-          <strong style="color: #fff;">${quote.package}</strong>
-          <span style="color: var(--primary); font-weight: 700;">$${quote.total.toLocaleString()}</span>
+      <div style="background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.35); border-radius: 10px; padding: 1.15rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+            <strong style="color: #fff; font-size: 1.1rem;">${currentQuoteData.package}</strong>
+            <span class="badge-pill" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; background: rgba(0,229,255,0.15); color: var(--primary);">Quote Locked</span>
+          </div>
+          <div style="font-size: 0.84rem; color: var(--text-light);">
+            Base Rate: $${currentQuoteData.basePrice.toLocaleString()} 
+            ${currentQuoteData.extraHours > 0 ? `| +${currentQuoteData.extraHours} Extra Hr(s)` : ''} 
+            ${currentQuoteData.travelMiles > 0 ? `| Travel: ${currentQuoteData.travelMiles} mi` : ''}
+          </div>
+          ${currentQuoteData.addons && currentQuoteData.addons.length > 0 ? `<div style="font-size: 0.8rem; color: var(--accent-gold); margin-top: 0.35rem;">Add-ons: ${currentQuoteData.addons.join(', ')}</div>` : ''}
         </div>
-        <div style="font-size: 0.82rem; color: var(--text-light);">
-          Base Price: $${quote.basePrice.toLocaleString()} ${quote.extraHours > 0 ? `| +${quote.extraHours} Extra Hrs` : ''} ${quote.travelMiles > 0 ? `| Travel: ${quote.travelMiles} mi ($${quote.travelMiles})` : ''}
+        <div style="text-align: right;">
+          <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Estimated Investment</div>
+          <div style="color: var(--accent-gold); font-weight: 800; font-size: 1.6rem; font-family: var(--font-heading);">$${currentQuoteData.total.toLocaleString()}</div>
         </div>
-        ${quote.addons && quote.addons.length > 0 ? `<div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.3rem;">Selected Options: ${quote.addons.join(', ')}</div>` : ''}
       </div>
     `;
   }
 
   modal.classList.add('active');
+  
+  // Make sure calendar is rendered inside modal
+  const grid = document.getElementById('pub-cal-days-grid');
+  if (grid && (!grid.children || grid.children.length === 0)) {
+    if (typeof fetchPublicAvailability === 'function') {
+      fetchPublicAvailability();
+    }
+  }
 }
 
 function openBookingModalWithData(data) {
@@ -848,16 +973,20 @@ function openBookingModalWithData(data) {
 
   if (modalSummaryDetails) {
     modalSummaryDetails.innerHTML = `
-      <div style="background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
-          <strong style="color: #fff;">${data.eventType}</strong>
-          <span class="badge-pill" style="padding: 0.2rem 0.6rem; font-size: 0.72rem;">Available</span>
+      <div style="background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.35); border-radius: 10px; padding: 1.15rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <strong style="color: #fff; font-size: 1.05rem; display: block; margin-bottom: 0.25rem;">${data.eventType || 'Event Entertainment'}</strong>
+          <div style="font-size: 0.84rem; color: var(--text-light);">Location: ${data.location || 'Oklahoma City'} | Date: ${data.date || 'Flexible Date'}</div>
         </div>
-        <div style="font-size: 0.82rem; color: var(--text-light);">
-          Date: ${data.date} | Location: ${data.location}
-        </div>
+        <span class="badge-pill" style="font-size: 0.78rem;">Available</span>
       </div>
     `;
+  }
+
+  // Pre-fill fields if provided
+  const venueInput = document.getElementById('modal-client-venue');
+  if (venueInput && data.location && data.location !== 'TBD Venue / City') {
+    venueInput.value = data.location;
   }
 
   modal.classList.add('active');

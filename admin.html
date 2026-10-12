@@ -894,6 +894,43 @@
           </table>
         </div>
       </div>
+
+      <!-- Superuser Email & Google App Password Configuration -->
+      <div class="table-card" style="padding: 1.75rem; border: 1px solid rgba(0, 229, 255, 0.3); background: rgba(14, 18, 28, 0.85);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+          <div>
+            <h3 style="font-size: 1.3rem; color: #fff; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.6rem;">
+              <i class="fa-solid fa-envelope-circle-check" style="color: var(--primary);"></i> Automated Booking Confirmation Email Settings
+            </h3>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0; max-width: 650px;">
+              Enter your Gmail and 16-character Google App Password below. When clients book on the website or lock in their quote, both you and the client will instantly receive branded confirmation emails.
+            </p>
+          </div>
+          <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener" class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Get Google App Password
+          </a>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) auto; gap: 1rem; align-items: flex-end;">
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label">Sender Gmail Address</label>
+            <input type="email" id="smtp-email-input" class="form-control" placeholder="e.g. booking@thunderhouseent.com">
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label">16-Character Google App Password</label>
+            <input type="password" id="smtp-pass-input" class="form-control" placeholder="•••• •••• •••• ••••">
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary" id="btn-save-email-settings" onclick="saveEmailSettings()">
+              <i class="fa-solid fa-floppy-disk"></i> Save Email Settings
+            </button>
+            <button type="button" class="btn btn-outline" id="btn-test-email-settings" onclick="sendTestConfirmationEmail()">
+              <i class="fa-solid fa-paper-plane"></i> Send Test Email
+            </button>
+          </div>
+        </div>
+        <div id="email-settings-status" style="margin-top: 0.85rem; font-size: 0.85rem; color: var(--text-muted);"></div>
+      </div>
     </div><!-- End #view-staff -->
 
 
@@ -1269,6 +1306,7 @@
         const view = document.getElementById('view-staff');
         if (view) view.style.display = 'block';
         loadStaffUsers();
+        loadEmailSettings();
       }
     }
 
@@ -1567,6 +1605,131 @@
         loadStaffUsers();
       } catch (err) {
         alert('Failed to remove staff member: ' + err.message);
+      }
+    }
+
+    // =========================================================================
+    // AUTOMATED EMAIL SETTINGS (SUPERUSER)
+    // =========================================================================
+    async function loadEmailSettings() {
+      if (!window.supabaseClient) return;
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('thunderhouse_site_settings')
+          .select('value')
+          .eq('key', 'email_settings')
+          .maybeSingle();
+
+        const statusEl = document.getElementById('email-settings-status');
+        const emailInput = document.getElementById('smtp-email-input');
+        const passInput = document.getElementById('smtp-pass-input');
+
+        if (data && data.value) {
+          if (emailInput && data.value.smtp_user) emailInput.value = data.value.smtp_user;
+          if (passInput && data.value.smtp_pass) passInput.value = data.value.smtp_pass;
+          if (statusEl) {
+            statusEl.innerHTML = `<span style="color: #10b981;"><i class="fa-solid fa-circle-check"></i> Email system active. Sending from: <strong>${data.value.smtp_user}</strong></span>`;
+          }
+        } else {
+          if (statusEl) {
+            statusEl.innerHTML = `<span style="color: #f59e0b;"><i class="fa-solid fa-triangle-exclamation"></i> Not configured yet. Add your Gmail & App Password to activate confirmation emails.</span>`;
+          }
+        }
+      } catch (err) {
+        console.warn('Error loading email settings:', err);
+      }
+    }
+
+    async function saveEmailSettings() {
+      if (!window.supabaseClient) return;
+      const emailInput = document.getElementById('smtp-email-input');
+      const passInput = document.getElementById('smtp-pass-input');
+      const statusEl = document.getElementById('email-settings-status');
+      const btn = document.getElementById('btn-save-email-settings');
+
+      const user = emailInput ? emailInput.value.trim() : '';
+      const pass = passInput ? passInput.value.trim().replace(/\s+/g, '') : '';
+
+      if (!user || !pass) {
+        alert('Please enter both your Gmail address and 16-character App Password.');
+        return;
+      }
+
+      const origText = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+      }
+
+      try {
+        const { error } = await window.supabaseClient
+          .from('thunderhouse_site_settings')
+          .upsert({
+            key: 'email_settings',
+            value: { smtp_user: user, smtp_pass: pass },
+            updated_at: new Date().toISOString()
+          });
+
+        if (error) throw error;
+
+        alert('Email settings saved successfully! Automated booking confirmation emails are now active.');
+        if (statusEl) {
+          statusEl.innerHTML = `<span style="color: #10b981;"><i class="fa-solid fa-circle-check"></i> Active. Sending confirmation emails from <strong>${user}</strong>.</span>`;
+        }
+      } catch (err) {
+        alert('Failed to save email settings: ' + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = origText;
+        }
+      }
+    }
+
+    async function sendTestConfirmationEmail() {
+      const emailInput = document.getElementById('smtp-email-input');
+      const testRecipient = emailInput && emailInput.value.trim() ? emailInput.value.trim() : prompt('Enter email address to send test confirmation to:');
+      if (!testRecipient) return;
+
+      const btn = document.getElementById('btn-test-email-settings');
+      const origText = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending Test...';
+      }
+
+      try {
+        const res = await fetch('https://kxoivmflghfgtvawhktt.supabase.co/functions/v1/send-booking-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            client_name: 'Test Thunder Client',
+            client_email: testRecipient,
+            client_phone: '(405) 555-0199',
+            event_date: 'October 24, 2026',
+            event_time: '6:00 PM - 11:00 PM',
+            venue_city: 'Oklahoma City, OK',
+            package_name: 'Thunder Party (4h) - Test Email',
+            estimated_total: 700,
+            notes: 'Test email dispatch from Thunder House ENT Admin'
+          })
+        });
+
+        const data = await res.json();
+        if (data.success && data.status !== 'pending_config') {
+          alert(`Success! Test booking confirmation email sent to ${testRecipient}. Please check your inbox.`);
+        } else if (data.status === 'pending_config') {
+          alert('Note: SMTP credentials not yet saved or configured. Please click "Save Email Settings" first.');
+        } else {
+          alert('Email send response: ' + (data.error || JSON.stringify(data)));
+        }
+      } catch (err) {
+        alert('Failed to trigger test email: ' + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = origText;
+        }
       }
     }
 
