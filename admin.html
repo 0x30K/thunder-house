@@ -1892,8 +1892,13 @@
         <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; margin-bottom: 1.75rem;">
           <div>
             <div class="form-group" style="margin-bottom: 1rem;">
-              <label class="form-label"><i class="fa-solid fa-credit-card"></i> Square Payment Link (Optional)</label>
-              <input type="url" id="inv-square-link" class="form-control" placeholder="https://square.link/u/... (Square checkout or payment link)">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                <label class="form-label" style="margin: 0;"><i class="fa-solid fa-credit-card"></i> Square Payment Link</label>
+                <button type="button" class="btn btn-outline btn-sm" id="btn-auto-gen-square" onclick="autoGenerateSquareLinkForCurrentForm()" style="font-size: 0.75rem; padding: 0.2rem 0.6rem; border-color: var(--accent-gold); color: var(--accent-gold);">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Generate Square Link
+                </button>
+              </div>
+              <input type="url" id="inv-square-link" class="form-control" placeholder="https://square.link/u/... (Auto-generated or custom Square link)">
               <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.25rem; display: block;">
                 Clients will see a direct "Pay via Square" button on their invoice page and in invoice emails.
               </small>
@@ -4017,6 +4022,59 @@
       if (balanceEl) balanceEl.textContent = `$${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
 
+    async function autoGenerateSquareLinkForCurrentForm() {
+      const invoiceNumber = document.getElementById('inv-number-input')?.value.trim() || 'INV-TEMP';
+      const clientName = document.getElementById('inv-client-name')?.value.trim() || 'Valued Client';
+      const clientEmail = document.getElementById('inv-client-email')?.value.trim();
+      const balanceEl = document.getElementById('inv-calc-balance');
+      const balanceText = balanceEl ? balanceEl.textContent.replace(/[^0-9.]/g, '') : '0';
+      const balanceDue = parseFloat(balanceText) || 0;
+
+      if (balanceDue <= 0) {
+        alert('Please add at least one line item with a rate greater than $0 before generating a Square payment link.');
+        return;
+      }
+
+      const btn = document.getElementById('btn-auto-gen-square');
+      const origText = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+      }
+
+      try {
+        const res = await fetch('https://kxoivmflghfgtvawhktt.supabase.co/functions/v1/square-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'create_payment_link',
+            invoice_data: {
+              invoice_number: invoiceNumber,
+              client_name: clientName,
+              client_email: clientEmail,
+              total_amount: balanceDue,
+              balance_due: balanceDue
+            }
+          })
+        });
+
+        const data = await res.json();
+        if (!data.success || !data.payment_link) {
+          throw new Error(data.error || 'Failed to generate Square payment link.');
+        }
+
+        document.getElementById('inv-square-link').value = data.payment_link;
+        alert(`⚡ Square Payment Link Generated Successfully!\n\n${data.payment_link}`);
+      } catch (err) {
+        alert('Failed to generate Square payment link: ' + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = origText;
+        }
+      }
+    }
+
     async function saveInvoice(statusToSet = null, andSendEmail = false) {
       const invoiceNumber = document.getElementById('inv-number-input').value.trim();
       const clientName = document.getElementById('inv-client-name').value.trim();
@@ -4074,6 +4132,37 @@
         status = 'Paid';
       }
 
+      let squareLink = document.getElementById('inv-square-link')?.value.trim() || null;
+
+      // Auto-generate Square payment link if left blank and balance is due
+      if (!squareLink && balanceDue > 0) {
+        try {
+          const sqRes = await fetch('https://kxoivmflghfgtvawhktt.supabase.co/functions/v1/square-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'create_payment_link',
+              invoice_data: {
+                invoice_number: invoiceNumber,
+                client_name: clientName,
+                client_email: clientEmail,
+                total_amount: totalAmount,
+                balance_due: balanceDue,
+                items: items
+              }
+            })
+          });
+          const sqData = await sqRes.json();
+          if (sqData.success && sqData.payment_link) {
+            squareLink = sqData.payment_link;
+            const linkInput = document.getElementById('inv-square-link');
+            if (linkInput) linkInput.value = squareLink;
+          }
+        } catch (sqErr) {
+          console.warn('Square auto-link generation notice:', sqErr);
+        }
+      }
+
       const payload = {
         invoice_number: invoiceNumber,
         inquiry_id: document.getElementById('inv-edit-inquiry-id').value || null,
@@ -4085,7 +4174,7 @@
         issue_date: document.getElementById('inv-issue-date-input').value || new Date().toISOString().slice(0, 10),
         due_date: document.getElementById('inv-due-date-input').value || null,
         status: status,
-        square_payment_link: document.getElementById('inv-square-link').value.trim() || null,
+        square_payment_link: squareLink,
         notes: document.getElementById('inv-notes-input').value.trim() || null,
         items: items,
         subtotal: subtotal,

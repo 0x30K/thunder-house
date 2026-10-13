@@ -17,6 +17,9 @@
   <!-- Design System CSS -->
   <link rel="stylesheet" href="css/styles.css">
 
+  <!-- Square Web Payments SDK (Production) -->
+  <script type="text/javascript" src="https://web.squarecdn.com/v1/square.js"></script>
+
   <style>
     body {
       background-color: #05070b;
@@ -386,18 +389,61 @@
 
     <!-- Payment Action Box (Hidden if Paid) -->
     <div id="inv-payment-section" class="payment-action-card">
-      <h3 style="font-size: 1.35rem; color: #fff; margin: 0 0 0.5rem 0;">
-        <i class="fa-solid fa-credit-card" style="color: var(--primary);"></i> Pay Online with Square
+      <div style="display: flex; align-items: center; justify-content: center; gap: 0.65rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+        <span class="status-badge" style="background: rgba(0, 229, 255, 0.15); color: var(--primary); border: 1px solid rgba(0, 229, 255, 0.4);"><i class="fa-solid fa-shield-halved"></i> 256-Bit SSL Encrypted</span>
+        <span class="status-badge" style="background: rgba(255, 183, 3, 0.12); color: var(--accent-gold); border: 1px solid rgba(255, 183, 3, 0.3);"><i class="fa-brands fa-square"></i> Powered by Square</span>
+      </div>
+      <h3 style="font-size: 1.45rem; color: #fff; margin: 0 0 0.35rem 0;">
+        Secure Payment Portal
       </h3>
-      <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0 0 1.25rem 0; max-width: 500px; margin-inline: auto;">
-        Secure contactless payment powered by Square. Accepts Apple Pay, Google Pay, Major Cards, and Cash App Pay.
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0 0 1.25rem 0; max-width: 520px; margin-inline: auto;">
+        Pay directly on this page via Credit/Debit Card, Apple Pay, Google Pay, or Cash App Pay.
       </p>
-      <div style="display: flex; justify-content: center; gap: 1rem; align-items: center; flex-wrap: wrap;">
-        <a id="btn-pay-square-link" href="#" target="_blank" class="btn btn-primary btn-lg" style="padding: 0.75rem 2.25rem;">
-          <i class="fa-solid fa-lock"></i> Pay Balance Now (<span id="btn-pay-balance-label">$0.00</span>)
+
+      <!-- Digital Wallets Area (Apple Pay / Google Pay / Cash App Pay if supported) -->
+      <div id="digital-wallets-wrap" style="max-width: 440px; margin: 0 auto 0.75rem auto; display: flex; flex-direction: column; gap: 0.5rem;">
+        <div id="apple-pay-container"></div>
+        <div id="google-pay-container"></div>
+        <div id="cash-app-pay-container"></div>
+      </div>
+
+      <!-- Embedded Credit / Debit Card Form -->
+      <div id="card-payment-box" style="max-width: 460px; margin: 0 auto; background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: var(--radius-md); padding: 1.25rem; box-shadow: inset 0 0 15px rgba(0, 229, 255, 0.05); text-align: left;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+          <span style="font-size: 0.82rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.05em;">
+            <i class="fa-regular fa-credit-card" style="color: var(--primary);"></i> Pay with Card
+          </span>
+          <span style="font-size: 0.82rem; color: var(--accent-gold); font-weight: 700;">
+            Due: <span id="card-pay-amount-label">$0.00</span>
+          </span>
+        </div>
+
+        <!-- Square Card Input Target Container -->
+        <div id="card-container" style="min-height: 90px;">
+          <div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1.5rem 0;">
+            <i class="fa-solid fa-spinner fa-spin"></i> Initializing secure Square payment fields...
+          </div>
+        </div>
+
+        <button id="btn-submit-card-pay" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 1rem; padding: 0.85rem;" onclick="handleCardPaymentSubmit()">
+          <i class="fa-solid fa-lock"></i> Pay $<span id="btn-pay-balance-label">0.00</span> Securely
+        </button>
+
+        <div id="card-payment-error" style="display: none; margin-top: 0.85rem; color: #f87171; font-size: 0.82rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 0.65rem; border-radius: 6px;"></div>
+      </div>
+
+      <!-- Alternative: Direct Square Hosted Checkout Link -->
+      <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+        <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.65rem;">
+          Prefer Square's external checkout window?
+        </span>
+        <a id="btn-pay-square-link" href="#" target="_blank" class="btn btn-outline btn-sm" style="border-color: rgba(255, 183, 3, 0.4); color: var(--accent-gold);">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Hosted Square Checkout Window
         </a>
       </div>
-      <div style="display: flex; justify-content: center; gap: 1.5rem; margin-top: 1.25rem; font-size: 1.25rem; color: var(--text-muted);">
+
+      <!-- Brand Logos -->
+      <div style="display: flex; justify-content: center; gap: 1.5rem; margin-top: 1.25rem; font-size: 1.35rem; color: var(--text-muted);">
         <i class="fa-brands fa-apple-pay" title="Apple Pay"></i>
         <i class="fa-brands fa-google-pay" title="Google Pay"></i>
         <i class="fa-brands fa-cc-visa" title="Visa"></i>
@@ -466,6 +512,27 @@
           return;
         }
 
+        // Check if returning from a successful hosted Square checkout
+        if (urlParams.get('paid') === 'true' && data.status !== 'Paid') {
+          try {
+            await window.supabaseClient
+              .from('thunderhouse_invoices')
+              .update({
+                status: 'Paid',
+                amount_paid: data.total_amount,
+                balance_due: 0,
+                payment_method: 'Square Hosted Checkout',
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', data.id);
+            data.status = 'Paid';
+            data.amount_paid = data.total_amount;
+            data.balance_due = 0;
+          } catch (e) {
+            console.warn('Status update notice:', e);
+          }
+        }
+
         renderInvoice(data);
       } catch (err) {
         showError('Error loading invoice: ' + err.message);
@@ -473,6 +540,7 @@
     });
 
     function renderInvoice(inv) {
+      activeInvoice = inv;
       document.title = `Invoice ${inv.invoice_number} | Thunder House ENT`;
       document.getElementById('inv-display-number').textContent = inv.invoice_number;
 
@@ -548,7 +616,6 @@
       // Payment section
       const paySection = document.getElementById('inv-payment-section');
       const paidConfirm = document.getElementById('inv-paid-confirmation');
-      const payBtn = document.getElementById('btn-pay-square-link');
       const payLabel = document.getElementById('btn-pay-balance-label');
 
       if (inv.status === 'Paid' || balance <= 0) {
@@ -557,18 +624,10 @@
       } else {
         paidConfirm.style.display = 'none';
         paySection.style.display = 'block';
-        payLabel.textContent = `$${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (payLabel) payLabel.textContent = balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-        if (inv.square_payment_link) {
-          payBtn.href = inv.square_payment_link;
-          payBtn.target = '_blank';
-        } else {
-          // If no custom Square link is set, provide fallback action
-          payBtn.onclick = (e) => {
-            e.preventDefault();
-            alert('To complete this payment via Square, please check your email for the direct Square checkout link or contact Thunder House ENT at (405) 555-0199.');
-          };
-        }
+        // Initialize Square payment controls
+        initSquarePayment(inv);
       }
 
       // Notes
@@ -576,6 +635,221 @@
         const notesBlock = document.getElementById('inv-notes-block');
         notesBlock.style.display = 'block';
         document.getElementById('inv-display-notes').innerHTML = escapeHtml(inv.notes).replace(/\n/g, '<br>');
+      }
+    }
+
+    // =========================================================================
+    // SQUARE PAYMENT SYSTEM (Embedded SDK + Hosted Fallback)
+    // =========================================================================
+    let squarePayments = null;
+    let squareCard = null;
+    let activeInvoice = null;
+
+    async function initSquarePayment(inv) {
+      activeInvoice = inv;
+      const balance = parseFloat(inv.balance_due !== undefined ? inv.balance_due : (inv.total_amount - (inv.amount_paid || 0)));
+      if (balance <= 0 || inv.status === 'Paid') return;
+
+      const cardAmountLabel = document.getElementById('card-pay-amount-label');
+      if (cardAmountLabel) cardAmountLabel.textContent = `$${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+      // Setup Square hosted checkout fallback button
+      const payBtn = document.getElementById('btn-pay-square-link');
+      if (inv.square_payment_link) {
+        if (payBtn) {
+          payBtn.href = inv.square_payment_link;
+          payBtn.target = '_blank';
+        }
+      } else {
+        ensureSquarePaymentLinkGenerated(inv);
+      }
+
+      // Initialize Square Web Payments SDK
+      if (!window.Square) {
+        console.warn('Square Web Payments SDK not loaded on this browser.');
+        return;
+      }
+
+      try {
+        squarePayments = window.Square.payments('sq0idp-qAjndUvkLYGtpnkKiQoDhQ', 'LQJ2VPXJ31QKV');
+
+        // Attach Card Component
+        const cardContainer = document.getElementById('card-container');
+        if (cardContainer) {
+          cardContainer.innerHTML = '';
+          squareCard = await squarePayments.card({
+            style: {
+              '.input-container': {
+                borderColor: 'rgba(0, 229, 255, 0.3)',
+                borderRadius: '8px',
+              },
+              'input': {
+                backgroundColor: '#07090e',
+                color: '#ffffff',
+                fontSize: '15px',
+              },
+              'input::placeholder': {
+                color: '#64748b',
+              },
+              '.input-container.is-focus': {
+                borderColor: '#00e5ff',
+              },
+              '.input-container.is-error': {
+                borderColor: '#ef4444',
+              }
+            }
+          });
+          await squareCard.attach('#card-container');
+        }
+
+        // Digital Wallets
+        const paymentRequest = squarePayments.paymentRequest({
+          countryCode: 'US',
+          currencyCode: 'USD',
+          total: {
+            amount: String(balance.toFixed(2)),
+            label: `Thunder House ENT Invoice #${inv.invoice_number}`,
+          },
+        });
+
+        // Try Apple Pay
+        try {
+          const applePay = await squarePayments.applePay(paymentRequest);
+          await applePay.attach('#apple-pay-container');
+          applePay.addEventListener('ontokenization', async (event) => {
+            const { tokenResult } = event.detail;
+            if (tokenResult.status === 'OK') {
+              await processSquarePayment(tokenResult.token);
+            }
+          });
+        } catch (e) {
+          // Apple Pay not available on non-Apple/non-Safari environment
+        }
+
+        // Try Google Pay
+        try {
+          const googlePay = await squarePayments.googlePay(paymentRequest);
+          await googlePay.attach('#google-pay-container');
+          googlePay.addEventListener('ontokenization', async (event) => {
+            const { tokenResult } = event.detail;
+            if (tokenResult.status === 'OK') {
+              await processSquarePayment(tokenResult.token);
+            }
+          });
+        } catch (e) {
+          // Google Pay not available
+        }
+
+        // Try Cash App Pay
+        try {
+          const cashAppPay = await squarePayments.cashAppPay(paymentRequest, {
+            redirectURL: window.location.href,
+            referenceId: `inv-${inv.invoice_number}`,
+          });
+          await cashAppPay.attach('#cash-app-pay-container');
+          cashAppPay.addEventListener('ontokenization', async (event) => {
+            const { tokenResult } = event.detail;
+            if (tokenResult.status === 'OK') {
+              await processSquarePayment(tokenResult.token);
+            }
+          });
+        } catch (e) {
+          // Cash App Pay not available
+        }
+
+      } catch (err) {
+        console.warn('Square SDK initialization info:', err);
+      }
+    }
+
+    async function handleCardPaymentSubmit() {
+      if (!squareCard || !activeInvoice) return;
+
+      const btn = document.getElementById('btn-submit-card-pay');
+      const errEl = document.getElementById('card-payment-error');
+      if (errEl) errEl.style.display = 'none';
+
+      const originalBtnText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authorizing with Square...';
+
+      try {
+        const result = await squareCard.tokenize();
+        if (result.status !== 'OK') {
+          const errMsg = result.errors && result.errors[0] ? result.errors[0].message : 'Card details invalid.';
+          throw new Error(errMsg);
+        }
+
+        await processSquarePayment(result.token);
+      } catch (err) {
+        if (errEl) {
+          errEl.textContent = err.message || 'Payment processing error.';
+          errEl.style.display = 'block';
+        }
+        btn.disabled = false;
+        btn.innerHTML = originalBtnText;
+      }
+    }
+
+    async function processSquarePayment(sourceId) {
+      const btn = document.getElementById('btn-submit-card-pay');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing Payment...';
+      }
+
+      const balance = parseFloat(activeInvoice.balance_due !== undefined ? activeInvoice.balance_due : activeInvoice.total_amount);
+
+      const res = await fetch('https://kxoivmflghfgtvawhktt.supabase.co/functions/v1/square-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'process_payment',
+          source_id: sourceId,
+          invoice_id: activeInvoice.id,
+          invoice_number: activeInvoice.invoice_number,
+          amount: balance,
+          client_email: activeInvoice.client_email,
+          client_name: activeInvoice.client_name
+        })
+      });
+
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Payment was declined by Square.');
+      }
+
+      // Success! Update local state and re-render
+      activeInvoice.status = 'Paid';
+      activeInvoice.amount_paid = activeInvoice.total_amount;
+      activeInvoice.balance_due = 0;
+      renderInvoice(activeInvoice);
+
+      alert(`⚡ Payment Successful!\n\nThank you, ${activeInvoice.client_name}! Your payment of $${balance.toFixed(2)} was approved by Square.\nTransaction ID: ${data.payment_id}`);
+    }
+
+    async function ensureSquarePaymentLinkGenerated(inv) {
+      try {
+        const res = await fetch('https://kxoivmflghfgtvawhktt.supabase.co/functions/v1/square-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'create_payment_link',
+            invoice_id: inv.id,
+            invoice_data: inv
+          })
+        });
+        const data = await res.json();
+        if (data.success && data.payment_link) {
+          inv.square_payment_link = data.payment_link;
+          const payBtn = document.getElementById('btn-pay-square-link');
+          if (payBtn) {
+            payBtn.href = data.payment_link;
+            payBtn.target = '_blank';
+          }
+        }
+      } catch (e) {
+        console.warn('Background link generation notice:', e);
       }
     }
 
