@@ -545,27 +545,7 @@
               <span>•</span>
               <span><i class="fa-solid fa-location-dot" style="color: var(--cyber-cyan);"></i> <span id="hero-venue-name">--</span></span>
             </div>
-            <div class="hero-meta-badges">
-              <span class="meta-badge countdown" id="hero-countdown-badge">
-                <i class="fa-regular fa-clock"></i> Calculating Days...
-              </span>
-              <span class="meta-badge dj">
-                <i class="fa-solid fa-headphones"></i> Lead DJ/MC: DJ Bresh
-              </span>
-              <span class="meta-badge" id="hero-guest-badge" style="display: none;">
-                <i class="fa-solid fa-users"></i> <span id="hero-guest-count">--</span> Guests
-              </span>
-            </div>
           </div>
-        </div>
-
-        <div style="text-align: right; min-width: 200px;">
-          <button class="btn btn-primary" onclick="forceSavePlan()" style="padding: 0.75rem 1.25rem; font-size: 0.88rem; width: 100%;">
-            <i class="fa-solid fa-floppy-disk"></i> Save Plan Now
-          </button>
-          <small style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem;">
-            Auto-saves continuously as you type
-          </small>
         </div>
       </div>
     </div>
@@ -972,12 +952,12 @@
         document.getElementById('hero-invoice-ref').textContent = `Linked to Invoice #${plan.invoice_number} • ${plan.event_type || 'Event'}`;
       }
 
-      // Countdown
-      if (plan.event_date) {
+      // Countdown & badges (if present)
+      const badge = document.getElementById('hero-countdown-badge');
+      if (badge && plan.event_date) {
         const eventD = new Date(plan.event_date + 'T00:00:00');
         const nowD = new Date();
         const diffDays = Math.ceil((eventD - nowD) / (1000 * 60 * 60 * 24));
-        const badge = document.getElementById('hero-countdown-badge');
         if (diffDays > 0) {
           badge.innerHTML = `<i class="fa-regular fa-clock"></i> <strong>${diffDays} Days</strong> Until Showtime!`;
         } else if (diffDays === 0) {
@@ -987,8 +967,8 @@
         }
       }
 
-      if (plan.guest_count) {
-        const guestBadge = document.getElementById('hero-guest-badge');
+      const guestBadge = document.getElementById('hero-guest-badge');
+      if (guestBadge && plan.guest_count) {
         guestBadge.style.display = 'inline-flex';
         document.getElementById('hero-guest-count').textContent = plan.guest_count;
       }
