@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client VIP Event & Music Hub | Thunder House ENT</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Design System CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    :root {
+      --cyber-cyan: #00e5ff;
+      --cyber-gold: #ffb703;
+      --cyber-pink: #ff2a85;
+      --cyber-green: #10b981;
+      --cyber-red: #ef4444;
+      --cyber-bg: #05070b;
+      --cyber-card: rgba(10, 14, 23, 0.88);
+      --cyber-border: rgba(0, 229, 255, 0.2);
+    }
+
+    body {
+      background-color: var(--cyber-bg);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem 1rem 3rem 1rem;
+    }
+
+    .portal-shell {
+      max-width: 960px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Top Bar */
+    .portal-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .save-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      transition: all 0.2s ease;
+    }
+
+    .save-indicator.saving {
+      background: rgba(255, 183, 3, 0.12);
+      border-color: rgba(255, 183, 3, 0.3);
+      color: var(--cyber-gold);
+    }
+
+    /* Hero Card */
+    .portal-hero-card {
+      background: var(--cyber-card);
+      border: 1px solid var(--cyber-border);
+      border-radius: var(--radius-lg);
+      padding: 2.25rem 2.5rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 229, 255, 0.08);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 1.75rem;
+    }
+
+    .portal-hero-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--cyber-cyan), var(--cyber-gold), transparent);
+    }
+
+    .hero-layout {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-brand-group {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .hero-brand-group img {
+      height: 60px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .hero-title-area h1 {
+      font-family: var(--font-heading);
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 0.35rem 0;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-meta-badges {
+      display: flex;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+      margin-top: 0.65rem;
+    }
+
+    .meta-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+    }
+
+    .meta-badge.countdown {
+      background: rgba(255, 183, 3, 0.12);
+      border-color: rgba(255, 183, 3, 0.4);
+      color: var(--cyber-gold);
+    }
+
+    .meta-badge.dj {
+      background: rgba(0, 229, 255, 0.12);
+      border-color: rgba(0, 229, 255, 0.4);
+      color: var(--cyber-cyan);
+    }
+
+    /* Tab Navigation */
+    .portal-tabs {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 2rem;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+    }
+
+    .portal-tab-btn {
+      background: transparent;
+      border: none;
+      padding: 0.85rem 1.35rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .portal-tab-btn:hover {
+      color: #fff;
+    }
+
+    .portal-tab-btn.active {
+      color: var(--cyber-cyan);
+      border-bottom-color: var(--cyber-cyan);
+      background: rgba(0, 229, 255, 0.05);
+      border-radius: 6px 6px 0 0;
+    }
+
+    /* Card Panels */
+    .portal-panel {
+      display: none;
+      background: var(--cyber-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-lg);
+      padding: 2.25rem;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+      margin-bottom: 2rem;
+    }
+
+    .portal-panel.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel-header {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 1.25rem;
+    }
+
+    .panel-header h2 {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      color: #fff;
+      margin: 0 0 0.35rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .panel-header p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin: 0;
+    }
+
+    /* Form Elements */
+    .portal-form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .portal-form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      margin-bottom: 0.45rem;
+    }
+
+    .portal-input, .portal-textarea, .portal-select {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1rem;
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .portal-input:focus, .portal-textarea:focus, .portal-select:focus {
+      outline: none;
+      border-color: var(--cyber-cyan);
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.25);
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    /* Genre Tags Matrix */
+    .genre-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 0.85rem;
+      margin-top: 1rem;
+    }
+
+    .genre-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .genre-card:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .genre-card.love {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.45);
+      color: #34d399;
+    }
+
+    .genre-card.love .genre-status {
+      background: #10b981;
+      color: #000;
+    }
+
+    .genre-card.avoid {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.45);
+      color: #f87171;
+    }
+
+    .genre-card.avoid .genre-status {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    .genre-status {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Song Lists */
+    .song-box-section {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .song-box-section.must-play {
+      border-left: 4px solid var(--cyber-cyan);
+    }
+
+    .song-box-section.do-not-play {
+      border-left: 4px solid var(--cyber-red);
+    }
+
+    .song-box-section.special-cues {
+      border-left: 4px solid var(--cyber-gold);
+    }
+
+    .song-box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .song-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+      transition: all 0.15s ease;
+    }
+
+    .song-item-row:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .song-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .song-title {
+      font-weight: 600;
+      color: #fff;
+      font-size: 0.95rem;
+    }
+
+    .song-artist {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .song-note {
+      font-size: 0.78rem;
+      color: var(--cyber-gold);
+      margin-top: 0.15rem;
+    }
+
+    .song-delete-btn {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 0.95rem;
+      padding: 0.4rem;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .song-delete-btn:hover {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    /* Add Track Inline Form */
+    .add-song-inline {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr auto;
+      gap: 0.65rem;
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      .add-song-inline {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Timeline Section */
+    .timeline-item-card {
+      display: grid;
+      grid-template-columns: 120px 1fr auto;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 1rem 1.25rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: var(--radius-md);
+      margin-bottom: 0.75rem;
+      position: relative;
+    }
+
+    .timeline-item-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--cyber-cyan);
+      border-radius: 4px 0 0 4px;
+    }
+
+    .timeline-time-badge {
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--cyber-cyan);
+    }
+
+    @media (max-width: 640px) {
+      .timeline-item-card {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: #fff !important;
+        color: #000 !important;
+        padding: 0 !important;
+      }
+      .portal-top-bar, .portal-tabs, .btn, .add-song-inline, .song-delete-btn, .hero-meta-badges, .genre-grid {
+        display: none !important;
+      }
+      .portal-panel {
+        display: block !important;
+        background: #fff !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 1rem 0 !important;
+        color: #000 !important;
+      }
+      .portal-hero-card {
+        background: #fff !important;
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+        color: #000 !important;
+      }
+      .hero-title-area h1, .song-title, .panel-header h2 {
+        color: #000 !important;
+      }
+      .song-box-section {
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="portal-shell">
+    <!-- Top Action Bar -->
+    <div class="portal-top-bar">
+      <a href="index.html" class="btn btn-outline btn-sm" style="font-size: 0.8rem; border-color: rgba(255,255,255,0.2);">
+        <i class="fa-solid fa-arrow-left"></i> Thunder House ENT
+      </a>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <span class="save-indicator" id="save-status-indicator">
+          <i class="fa-solid fa-cloud-check"></i> <span id="save-status-text">All changes synced</span>
+        </span>
+        <button class="btn btn-outline btn-sm" onclick="window.print()" style="font-size: 0.8rem;">
+          <i class="fa-solid fa-print"></i> Print DJ Cue Sheet
+        </button>
+      </div>
+    </div>
+
+    <!-- Hero Card -->
+    <div class="portal-hero-card">
+      <div class="hero-layout">
+        <div>
+          <div class="hero-brand-group">
+            <img src="assets/images/branding/Thunder House Logo-PNG.png" alt="Thunder House ENT">
+            <div>
+              <span style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--cyber-cyan); font-weight: 700;">
+                <i class="fa-solid fa-bolt"></i> VIP Event & Music Hub
+              </span>
+              <div style="font-size: 0.85rem; color: var(--text-muted);" id="hero-invoice-ref">
+                Thunder House ENT Event Planning
+              </div>
+            </div>
+          </div>
+          <div class="hero-title-area" style="margin-top: 1.25rem;">
+            <h1 id="hero-client-name">Loading Your Event Plan...</h1>
+            <div style="font-size: 0.95rem; color: #cbd5e1; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <span><i class="fa-regular fa-calendar" style="color: var(--cyber-gold);"></i> <strong id="hero-event-date">--</strong></span>
+              <span>•</span>
+              <span><i class="fa-solid fa-location-dot" style="color: var(--cyber-cyan);"></i> <span id="hero-venue-name">--</span></span>
+            </div>
+            <div class="hero-meta-badges">
+              <span class="meta-badge countdown" id="hero-countdown-badge">
+                <i class="fa-regular fa-clock"></i> Calculating Days...
+              </span>
+              <span class="meta-badge dj">
+                <i class="fa-solid fa-headphones"></i> Lead DJ/MC: DJ Bresh
+              </span>
+              <span class="meta-badge" id="hero-guest-badge" style="display: none;">
+                <i class="fa-solid fa-users"></i> <span id="hero-guest-count">--</span> Guests
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align: right; min-width: 200px;">
+          <button class="btn btn-primary" onclick="forceSavePlan()" style="padding: 0.75rem 1.25rem; font-size: 0.88rem; width: 100%;">
+            <i class="fa-solid fa-floppy-disk"></i> Save Plan Now
+          </button>
+          <small style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-top: 0.5rem;">
+            Auto-saves continuously as you type
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="portal-tabs">
+      <button class="portal-tab-btn active" onclick="switchPortalTab('music')">
+        <i class="fa-solid fa-music"></i> 1. Music & Playlists
+      </button>
+      <button class="portal-tab-btn" onclick="switchPortalTab('timeline')">
+        <i class="fa-solid fa-clock"></i> 2. Event Timeline
+      </button>
+      <button class="portal-tab-btn" onclick="switchPortalTab('mc')">
+        <i class="fa-solid fa-microphone-lines"></i> 3. VIPs & MC Notes
+      </button>
+      <button class="portal-tab-btn" onclick="switchPortalTab('preview')">
+        <i class="fa-solid fa-list-check"></i> 4. Gig Summary View
+      </button>
+    </div>
+
+    <!-- TAB 1: MUSIC & PLAYLISTS -->
+    <div id="tab-music" class="portal-panel active">
+      <div class="panel-header">
+        <h2><i class="fa-solid fa-compact-disc" style="color: var(--cyber-cyan);"></i> Curate Your Soundtrack</h2>
+        <p>Give DJ Bresh your favorites, paste your Spotify playlist, and let us know what songs are strictly banned.</p>
+      </div>
+
+      <!-- Spotify / Apple Music Link Input -->
+      <div class="song-box-section" style="border-left: 4px solid #1db954;">
+        <div class="song-box-header">
+          <div>
+            <strong style="color: #fff; font-size: 1.05rem;">
+              <i class="fa-brands fa-spotify" style="color: #1db954;"></i> Spotify or Apple Music Playlist Link
+            </strong>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">
+              Already have a playlist built? Paste the share link here and DJ Bresh will review your track list directly.
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+          <input type="url" id="input-spotify-url" class="portal-input" placeholder="https://open.spotify.com/playlist/... or Apple Music link" oninput="scheduleAutoSave()">
+        </div>
+        <div id="spotify-embed-container" style="margin-top: 1rem; display: none;"></div>
+      </div>
+
+      <!-- Special Moment Songs -->
+      <div class="song-box-section special-cues">
+        <div class="song-box-header">
+          <div>
+            <strong style="color: #fff; font-size: 1.05rem;">
+              <i class="fa-solid fa-star" style="color: var(--cyber-gold);"></i> Key Special Moment Songs
+            </strong>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">
+              Specify track title & artist for the pinnacle moments of your event.
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+          <div class="portal-form-group">
+            <label><i class="fa-solid fa-door-open" style="color: var(--cyber-cyan);"></i> Grand Entrance Song</label>
+            <input type="text" id="moment-grand-entrance" class="portal-input" placeholder="e.g. Bring 'Em Out - T.I." oninput="scheduleAutoSave()">
+          </div>
+          <div class="portal-form-group">
+            <label><i class="fa-solid fa-heart" style="color: var(--cyber-pink);"></i> First Dance Song</label>
+            <input type="text" id="moment-first-dance" class="portal-input" placeholder="e.g. Beyond - Leon Bridges" oninput="scheduleAutoSave()">
+          </div>
+          <div class="portal-form-group">
+            <label><i class="fa-solid fa-person" style="color: var(--cyber-gold);"></i> Father / Daughter Dance</label>
+            <input type="text" id="moment-parent-1" class="portal-input" placeholder="e.g. My Girl - The Temptations" oninput="scheduleAutoSave()">
+          </div>
+          <div class="portal-form-group">
+            <label><i class="fa-solid fa-person-dress" style="color: var(--cyber-gold);"></i> Mother / Son Dance</label>
+            <input type="text" id="moment-parent-2" class="portal-input" placeholder="e.g. You'll Be In My Heart - Phil Collins" oninput="scheduleAutoSave()">
+          </div>
+          <div class="portal-form-group">
+            <label><i class="fa-solid fa-cake-candles" style="color: var(--cyber-cyan);"></i> Cake Cutting (Optional)</label>
+            <input type="text" id="moment-cake" class="portal-input" placeholder="e.g. Sugar - Maroon 5" oninput="scheduleAutoSave()">
+          </div>
+          <div class="portal-form-group">
+            <label><i class="fa-solid fa-moon" style="color: var(--cyber-cyan);"></i> Last Song of the Night</label>
+            <input type="text" id="moment-last-song" class="portal-input" placeholder="e.g. Closing Time or Piano Man" oninput="scheduleAutoSave()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Genre Preference Vibe Matrix -->
+      <div class="song-box-section">
+        <div class="song-box-header">
+          <div>
+            <strong style="color: #fff; font-size: 1.05rem;">
+              <i class="fa-solid fa-sliders" style="color: var(--cyber-cyan);"></i> Music Vibe & Genre Preferences
+            </strong>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">
+              Click any genre to cycle between: <strong>Love It 🔥</strong>, <strong>Some is Good 👍</strong>, or <strong>Avoid / Ban 🚫</strong>.
+            </div>
+          </div>
+        </div>
+        <div class="genre-grid" id="genre-grid-container">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Must-Play Songs List -->
+      <div class="song-box-section must-play">
+        <div class="song-box-header">
+          <div>
+            <strong style="color: #fff; font-size: 1.05rem;">
+              <i class="fa-solid fa-fire" style="color: var(--cyber-cyan);"></i> Must-Play Songs (Top 10 - 20)
+            </strong>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">
+              The songs you and your crowd CANNOT imagine your party without.
+            </div>
+          </div>
+          <span style="font-size: 0.8rem; color: var(--cyber-cyan); font-weight: 700;" id="count-must-play">0 Tracks</span>
+        </div>
+
+        <div id="list-must-play">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="add-song-inline">
+          <input type="text" id="new-must-title" class="portal-input" placeholder="Song Title (e.g. September)">
+          <input type="text" id="new-must-artist" class="portal-input" placeholder="Artist (e.g. Earth Wind & Fire)">
+          <input type="text" id="new-must-note" class="portal-input" placeholder="Note (e.g. Right after dinner)">
+          <button type="button" class="btn btn-primary btn-sm" onclick="addTrackToCategory('must_play')">
+            <i class="fa-solid fa-plus"></i> Add Song
+          </button>
+        </div>
+      </div>
+
+      <!-- Play If Possible Songs List -->
+      <div class="song-box-section">
+        <div class="song-box-header">
+          <div>
+            <strong style="color: #fff; font-size: 1.05rem;">
+              <i class="fa-solid fa-thumbs-up" style="color: var(--cyber-gold);"></i> Play If Possible / Guest Requests
+            </strong>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">
+              Great tracks to mix in if time and energy permit.
+            </div>
+          </div>
+          <span style="font-size: 0.8rem; color: var(--cyber-gold); font-weight: 700;" id="count-play-possible">0 Tracks</span>
+        </div>
+
+        <div id="list-play-possible">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="add-song-inline">
+          <input type="text" id="new-pos-title" class="portal-input" placeholder="Song Title">
+          <input type="text" id="new-pos-artist" class="portal-input" placeholder="Artist">
+          <input type="text" id="new-pos-note" class="portal-input" placeholder="Note / Dedication">
+          <button type="button" class="btn btn-outline btn-sm" onclick="addTrackToCategory('play_if_possible')" style="border-color: var(--cyber-gold); color: var(--cyber-gold);">
+            <i class="fa-solid fa-plus"></i> Add Song
+          </button>
+        </div>
+      </div>
+
+      <!-- Strictly DO NOT PLAY List -->
+      <div class="song-box-section do-not-play">
+        <div class="song-box-header">
+          <div>
+            <strong style="color: #fff; font-size: 1.05rem;">
+              <i class="fa-solid fa-ban" style="color: var(--cyber-red);"></i> The Blacklist: Strictly DO NOT PLAY
+            </strong>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">
+              Songs or artists you do NOT want played under any circumstances (even if a guest requests it!).
+            </div>
+          </div>
+          <span style="font-size: 0.8rem; color: var(--cyber-red); font-weight: 700;" id="count-do-not-play">0 Tracks</span>
+        </div>
+
+        <div id="list-do-not-play">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="add-song-inline">
+          <input type="text" id="new-dnp-title" class="portal-input" placeholder="Song or Artist to ban (e.g. Cha Cha Slide)">
+          <input type="text" id="new-dnp-artist" class="portal-input" placeholder="Artist (Optional)">
+          <input type="text" id="new-dnp-note" class="portal-input" placeholder="Reason (e.g. Please no line dances)">
+          <button type="button" class="btn btn-sm" onclick="addTrackToCategory('do_not_play')" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171;">
+            <i class="fa-solid fa-ban"></i> Ban Track
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: EVENT TIMELINE & SCHEDULE -->
+    <div id="tab-timeline" class="portal-panel">
+      <div class="panel-header">
+        <h2><i class="fa-solid fa-timeline" style="color: var(--cyber-cyan);"></i> Event Run of Show</h2>
+        <p>Outline your target timeline so DJ Bresh can coordinate music cues, announcements, and microphone moments.</p>
+      </div>
+
+      <div id="timeline-items-container">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Add Milestone Form -->
+      <div style="background: rgba(0, 0, 0, 0.4); border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: var(--radius-md); padding: 1.25rem; margin-top: 1.25rem;">
+        <strong style="font-size: 0.95rem; color: #fff; display: block; margin-bottom: 0.75rem;">
+          <i class="fa-solid fa-plus-circle" style="color: var(--cyber-cyan);"></i> Add New Milestone / Agenda Item
+        </strong>
+        <div style="display: grid; grid-template-columns: 140px 1.5fr 2fr auto; gap: 0.75rem; align-items: center;">
+          <input type="text" id="new-time-val" class="portal-input" placeholder="e.g. 6:30 PM">
+          <input type="text" id="new-time-title" class="portal-input" placeholder="Milestone (e.g. Toasts & Speeches)">
+          <input type="text" id="new-time-notes" class="portal-input" placeholder="Notes (e.g. Wireless mic to Best Man)">
+          <button type="button" class="btn btn-primary btn-sm" onclick="addTimelineItem()">
+            <i class="fa-solid fa-plus"></i> Add Item
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: MC, VIPS & ANNOUNCEMENTS -->
+    <div id="tab-mc" class="portal-panel">
+      <div class="panel-header">
+        <h2><i class="fa-solid fa-microphone" style="color: var(--cyber-cyan);"></i> VIP Pronunciations & MC Notes</h2>
+        <p>Ensure the MC never mispronounces names and has every special announcement scheduled.</p>
+      </div>
+
+      <!-- VIP Names & Pronunciation Table -->
+      <div class="song-box-section">
+        <div class="song-box-header">
+          <div>
+            <strong style="color: #fff; font-size: 1.05rem;">
+              <i class="fa-solid fa-id-card-clip" style="color: var(--cyber-cyan);"></i> VIP & Bridal Party Names (with Pronunciations)
+            </strong>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">
+              Include phonetic spellings for names that are commonly mispronounced (e.g. "Elena [el-AY-nuh]").
+            </div>
+          </div>
+        </div>
+
+        <div id="list-vip-names">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="add-song-inline" style="grid-template-columns: 1fr 2fr auto;">
+          <input type="text" id="new-vip-role" class="portal-input" placeholder="Role (e.g. Maid of Honor, Parents)">
+          <input type="text" id="new-vip-names" class="portal-input" placeholder="Full Name & Phonetic Guide (e.g. Sarah [SAIR-uh] Smith)">
+          <button type="button" class="btn btn-primary btn-sm" onclick="addVipNameRow()">
+            <i class="fa-solid fa-plus"></i> Add VIP
+          </button>
+        </div>
+      </div>
+
+      <!-- Special Announcements Textarea -->
+      <div class="portal-form-group">
+        <label><i class="fa-solid fa-bullhorn" style="color: var(--cyber-gold);"></i> Special Announcements & Shoutouts</label>
+        <textarea id="input-special-announcements" class="portal-textarea" rows="4" placeholder="Any birthdays, anniversaries, shuttle bus departure times, or bar closing announcements?" oninput="scheduleAutoSave()"></textarea>
+      </div>
+
+      <!-- General Notes for DJ Bresh -->
+      <div class="portal-form-group">
+        <label><i class="fa-solid fa-note-sticky" style="color: var(--cyber-cyan);"></i> General Directives for DJ Bresh & Crew</label>
+        <textarea id="input-mc-notes" class="portal-textarea" rows="4" placeholder="Volume preferences, crowd style (e.g. high-energy club vibe vs relaxed elegance), special cultural traditions, etc." oninput="scheduleAutoSave()"></textarea>
+      </div>
+    </div>
+
+    <!-- TAB 4: GIG SUMMARY VIEW (Printable & Review) -->
+    <div id="tab-preview" class="portal-panel">
+      <div class="panel-header">
+        <h2><i class="fa-solid fa-file-invoice" style="color: var(--cyber-cyan);"></i> Master Event Cue Sheet</h2>
+        <p>This is the complete overview DJ Bresh and the audio crew reference during your event.</p>
+      </div>
+
+      <div id="gig-sheet-output" style="line-height: 1.6;">
+        <!-- Dynamically rendered summary -->
+      </div>
+
+      <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+        <button class="btn btn-outline" onclick="window.print()">
+          <i class="fa-solid fa-print"></i> Print Clean Copy
+        </button>
+        <button class="btn btn-primary" onclick="forceSavePlan()">
+          <i class="fa-solid fa-check-double"></i> Confirm & Sync Plan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+
+  <script>
+    // =========================================================================
+    // STATE & DEFAULTS
+    // =========================================================================
+    let activePlan = null;
+    let autoSaveTimeout = null;
+
+    const GENRES_LIST = [
+      { id: '90s_2000s', label: '90s & 2000s Throwbacks' },
+      { id: 'funk_motown', label: 'Funk, Soul & Motown' },
+      { id: 'top40_pop', label: 'Current Top 40 & Pop' },
+      { id: 'hiphop_rb', label: 'Hip-Hop & R&B Classics' },
+      { id: 'edm_club', label: 'EDM, House & Club Energy' },
+      { id: 'country', label: 'Country & Southern Rock' },
+      { id: 'latin', label: 'Latin, Reggaeton & Cumbia' },
+      { id: 'rock', label: 'Classic Rock & Anthems' },
+      { id: '80s_retro', label: '80s Retro & New Wave' }
+    ];
+
+    // =========================================================================
+    // INITIALIZATION
+    // =========================================================================
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      const invoice = urlParams.get('invoice');
+      const id = urlParams.get('id');
+
+      if (!token && !invoice && !id) {
+        showPortalError('No event portal token or invoice specified. Please use the link provided in your Thunder House ENT confirmation.');
+        return;
+      }
+
+      if (!window.supabaseClient) {
+        showPortalError('Database client failed to connect.');
+        return;
+      }
+
+      try {
+        let query = window.supabaseClient.from('thunderhouse_event_plans').select('*');
+        if (token) {
+          query = query.eq('portal_token', token);
+        } else if (invoice) {
+          query = query.eq('invoice_number', invoice);
+        } else if (id) {
+          query = query.eq('id', id);
+        }
+
+        const { data, error } = await query.maybeSingle();
+
+        if (error) throw error;
+
+        if (!data) {
+          // If accessing via invoice number, create an initial plan record if invoice exists
+          if (invoice) {
+            const { data: invData } = await window.supabaseClient
+              .from('thunderhouse_invoices')
+              .select('*')
+              .eq('invoice_number', invoice)
+              .maybeSingle();
+
+            if (invData) {
+              const newPlan = {
+                portal_token: `th-vip-${invoice.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+                invoice_number: invData.invoice_number,
+                client_name: invData.client_name,
+                client_email: invData.client_email,
+                client_phone: invData.client_phone,
+                event_date: invData.event_date,
+                venue_name: invData.venue_city,
+                event_type: 'Event',
+                must_play_songs: [],
+                play_if_possible_songs: [],
+                do_not_play_songs: [],
+                special_moments: {},
+                timeline_items: [
+                  { time: '5:00 PM', title: 'Cocktail Hour & Guest Arrival', notes: 'Background music' },
+                  { time: '6:00 PM', title: 'Grand Entrance & Welcome', notes: 'Mic announcement' },
+                  { time: '7:00 PM', title: 'Open Dance Floor', notes: 'High energy' }
+                ],
+                vip_names_pronunciations: []
+              };
+
+              const { data: createdPlan, error: createErr } = await window.supabaseClient
+                .from('thunderhouse_event_plans')
+                .insert([newPlan])
+                .select()
+                .single();
+
+              if (!createErr && createdPlan) {
+                renderPortal(createdPlan);
+                return;
+              }
+            }
+          }
+          showPortalError('Event plan not found. Please verify the URL or contact booking@thunderhouseent.com.');
+          return;
+        }
+
+        renderPortal(data);
+      } catch (err) {
+        showPortalError('Error loading event plan: ' + err.message);
+      }
+    });
+
+    // =========================================================================
+    // RENDER FUNCTIONS
+    // =========================================================================
+    function renderPortal(plan) {
+      activePlan = plan;
+
+      // Hero Elements
+      document.getElementById('hero-client-name').textContent = `${plan.client_name}'s Event Plan`;
+      document.getElementById('hero-event-date').textContent = plan.event_date ? new Date(plan.event_date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : 'Date To Be Confirmed';
+      document.getElementById('hero-venue-name').textContent = plan.venue_name || plan.venue_city || 'Oklahoma City, OK';
+      if (plan.invoice_number) {
+        document.getElementById('hero-invoice-ref').textContent = `Linked to Invoice #${plan.invoice_number} • ${plan.event_type || 'Event'}`;
+      }
+
+      // Countdown
+      if (plan.event_date) {
+        const eventD = new Date(plan.event_date + 'T00:00:00');
+        const nowD = new Date();
+        const diffDays = Math.ceil((eventD - nowD) / (1000 * 60 * 60 * 24));
+        const badge = document.getElementById('hero-countdown-badge');
+        if (diffDays > 0) {
+          badge.innerHTML = `<i class="fa-regular fa-clock"></i> <strong>${diffDays} Days</strong> Until Showtime!`;
+        } else if (diffDays === 0) {
+          badge.innerHTML = `<i class="fa-solid fa-bolt"></i> <strong>TODAY IS SHOWTIME!</strong>`;
+        } else {
+          badge.innerHTML = `<i class="fa-solid fa-check-circle"></i> Event Completed`;
+        }
+      }
+
+      if (plan.guest_count) {
+        const guestBadge = document.getElementById('hero-guest-badge');
+        guestBadge.style.display = 'inline-flex';
+        document.getElementById('hero-guest-count').textContent = plan.guest_count;
+      }
+
+      // Spotify URL
+      const spotifyInput = document.getElementById('input-spotify-url');
+      if (spotifyInput && plan.spotify_playlist_url) {
+        spotifyInput.value = plan.spotify_playlist_url;
+        renderSpotifyEmbed(plan.spotify_playlist_url);
+      }
+
+      // Special Moments Inputs
+      const moments = plan.special_moments || {};
+      setVal('moment-grand-entrance', moments.grand_entrance);
+      setVal('moment-first-dance', moments.first_dance);
+      setVal('moment-parent-1', moments.parent_dance_1);
+      setVal('moment-parent-2', moments.parent_dance_2);
+      setVal('moment-cake', moments.cake_cutting);
+      setVal('moment-last-song', moments.last_song);
+
+      // Genre Grid
+      renderGenreGrid(plan.genres_preferred || [], plan.genres_avoid || []);
+
+      // Song Lists
+      renderSongList('must_play', plan.must_play_songs || []);
+      renderSongList('play_if_possible', plan.play_if_possible_songs || []);
+      renderSongList('do_not_play', plan.do_not_play_songs || []);
+
+      // Timeline Items
+      renderTimelineList(plan.timeline_items || []);
+
+      // VIP Names
+      renderVipList(plan.vip_names_pronunciations || []);
+
+      // Textareas
+      setVal('input-special-announcements', plan.special_announcements);
+      setVal('input-mc-notes', plan.mc_notes);
+
+      // Render Gig Summary
+      renderGigSheetOutput();
+    }
+
+    function setVal(id, val) {
+      const el = document.getElementById(id);
+      if (el) el.value = val || '';
+    }
+
+    function getVal(id) {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : '';
+    }
+
+    function renderSpotifyEmbed(url) {
+      const container = document.getElementById('spotify-embed-container');
+      if (!container) return;
+      if (!url || !url.includes('spotify.com/playlist/')) {
+        container.style.display = 'none';
+        container.innerHTML = '';
+        return;
+      }
+      const match = url.match(/playlist\/([a-zA-Z0-9]+)/);
+      if (match && match[1]) {
+        container.style.display = 'block';
+        container.innerHTML = `
+          <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/${match[1]}?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        `;
+      }
+    }
+
+    // =========================================================================
+    // GENRE MATRIX
+    // =========================================================================
+    function renderGenreGrid(preferred, avoid) {
+      const container = document.getElementById('genre-grid-container');
+      if (!container) return;
+
+      container.innerHTML = GENRES_LIST.map(g => {
+        let state = 'neutral';
+        let statusText = 'Some is Fine';
+        let cls = '';
+
+        if (preferred.includes(g.label)) {
+          state = 'love';
+          statusText = 'Love It 🔥';
+          cls = 'love';
+        } else if (avoid.includes(g.label)) {
+          state = 'avoid';
+          statusText = 'Banned 🚫';
+          cls = 'avoid';
+        }
+
+        return `
+          <div class="genre-card ${cls}" onclick="cycleGenreState('${escapeHtml(g.label)}')">
+            <span style="font-weight: 600;">${escapeHtml(g.label)}</span>
+            <span class="genre-status">${statusText}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function cycleGenreState(label) {
+      if (!activePlan) return;
+      let preferred = activePlan.genres_preferred || [];
+      let avoid = activePlan.genres_avoid || [];
+
+      if (preferred.includes(label)) {
+        // Love -> Banned
+        preferred = preferred.filter(x => x !== label);
+        if (!avoid.includes(label)) avoid.push(label);
+      } else if (avoid.includes(label)) {
+        // Banned -> Neutral
+        avoid = avoid.filter(x => x !== label);
+      } else {
+        // Neutral -> Love
+        preferred.push(label);
+      }
+
+      activePlan.genres_preferred = preferred;
+      activePlan.genres_avoid = avoid;
+      renderGenreGrid(preferred, avoid);
+      scheduleAutoSave();
+    }
+
+    // =========================================================================
+    // SONG LISTS
+    // =========================================================================
+    function renderSongList(category, songs) {
+      let containerId = '';
+      let countId = '';
+
+      if (category === 'must_play') {
+        containerId = 'list-must-play';
+        countId = 'count-must-play';
+      } else if (category === 'play_if_possible') {
+        containerId = 'list-play-possible';
+        countId = 'count-play-possible';
+      } else if (category === 'do_not_play') {
+        containerId = 'list-do-not-play';
+        countId = 'count-do-not-play';
+      }
+
+      const container = document.getElementById(containerId);
+      const countEl = document.getElementById(countId);
+      if (countEl) countEl.textContent = `${songs.length} Tracks`;
+      if (!container) return;
+
+      if (songs.length === 0) {
+        container.innerHTML = `
+          <div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.85rem; text-align: center; font-style: italic;">
+            No tracks added yet. Use the quick form below to add a track.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = songs.map((s, idx) => `
+        <div class="song-item-row">
+          <div class="song-details">
+            <div class="song-title">${escapeHtml(s.title)}</div>
+            ${s.artist ? `<div class="song-artist">by ${escapeHtml(s.artist)}</div>` : ''}
+            ${s.note ? `<div class="song-note"><i class="fa-solid fa-comment-dots"></i> ${escapeHtml(s.note)}</div>` : ''}
+          </div>
+          <button class="song-delete-btn" onclick="removeSongFromCategory('${category}', ${idx})" title="Remove track">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function addTrackToCategory(category) {
+      if (!activePlan) return;
+      let titleInput, artistInput, noteInput;
+
+      if (category === 'must_play') {
+        titleInput = document.getElementById('new-must-title');
+        artistInput = document.getElementById('new-must-artist');
+        noteInput = document.getElementById('new-must-note');
+      } else if (category === 'play_if_possible') {
+        titleInput = document.getElementById('new-pos-title');
+        artistInput = document.getElementById('new-pos-artist');
+        noteInput = document.getElementById('new-pos-note');
+      } else if (category === 'do_not_play') {
+        titleInput = document.getElementById('new-dnp-title');
+        artistInput = document.getElementById('new-dnp-artist');
+        noteInput = document.getElementById('new-dnp-note');
+      }
+
+      const title = titleInput?.value.trim();
+      if (!title) {
+        alert('Please enter a track title or artist.');
+        return;
+      }
+
+      const songObj = {
+        title: title,
+        artist: artistInput?.value.trim() || '',
+        note: noteInput?.value.trim() || ''
+      };
+
+      if (category === 'must_play') {
+        activePlan.must_play_songs = activePlan.must_play_songs || [];
+        activePlan.must_play_songs.push(songObj);
+        renderSongList('must_play', activePlan.must_play_songs);
+      } else if (category === 'play_if_possible') {
+        activePlan.play_if_possible_songs = activePlan.play_if_possible_songs || [];
+        activePlan.play_if_possible_songs.push(songObj);
+        renderSongList('play_if_possible', activePlan.play_if_possible_songs);
+      } else if (category === 'do_not_play') {
+        activePlan.do_not_play_songs = activePlan.do_not_play_songs || [];
+        activePlan.do_not_play_songs.push(songObj);
+        renderSongList('do_not_play', activePlan.do_not_play_songs);
+      }
+
+      // Reset inputs
+      if (titleInput) titleInput.value = '';
+      if (artistInput) artistInput.value = '';
+      if (noteInput) noteInput.value = '';
+
+      scheduleAutoSave();
+    }
+
+    function removeSongFromCategory(category, index) {
+      if (!activePlan) return;
+      if (category === 'must_play') {
+        activePlan.must_play_songs.splice(index, 1);
+        renderSongList('must_play', activePlan.must_play_songs);
+      } else if (category === 'play_if_possible') {
+        activePlan.play_if_possible_songs.splice(index, 1);
+        renderSongList('play_if_possible', activePlan.play_if_possible_songs);
+      } else if (category === 'do_not_play') {
+        activePlan.do_not_play_songs.splice(index, 1);
+        renderSongList('do_not_play', activePlan.do_not_play_songs);
+      }
+      scheduleAutoSave();
+    }
+
+    // =========================================================================
+    // TIMELINE LIST
+    // =========================================================================
+    function renderTimelineList(items) {
+      const container = document.getElementById('timeline-items-container');
+      if (!container) return;
+
+      if (!items || items.length === 0) {
+        container.innerHTML = `
+          <div style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 2rem;">
+            No timeline items added. Use the form below to outline your agenda.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = items.map((t, idx) => `
+        <div class="timeline-item-card">
+          <div class="timeline-time-badge">${escapeHtml(t.time || '--')}</div>
+          <div>
+            <strong style="color: #fff; font-size: 1rem;">${escapeHtml(t.title || 'Agenda Item')}</strong>
+            ${t.notes ? `<div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem;"><i class="fa-solid fa-circle-info" style="color: var(--cyber-cyan); font-size: 0.75rem;"></i> ${escapeHtml(t.notes)}</div>` : ''}
+          </div>
+          <button class="song-delete-btn" onclick="removeTimelineItem(${idx})" title="Remove item">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function addTimelineItem() {
+      if (!activePlan) return;
+      const timeVal = document.getElementById('new-time-val')?.value.trim();
+      const titleVal = document.getElementById('new-time-title')?.value.trim();
+      const notesVal = document.getElementById('new-time-notes')?.value.trim();
+
+      if (!timeVal || !titleVal) {
+        alert('Please provide both a time (e.g. 6:30 PM) and a milestone title.');
+        return;
+      }
+
+      activePlan.timeline_items = activePlan.timeline_items || [];
+      activePlan.timeline_items.push({
+        time: timeVal,
+        title: titleVal,
+        notes: notesVal
+      });
+
+      document.getElementById('new-time-val').value = '';
+      document.getElementById('new-time-title').value = '';
+      document.getElementById('new-time-notes').value = '';
+
+      renderTimelineList(activePlan.timeline_items);
+      scheduleAutoSave();
+    }
+
+    function removeTimelineItem(idx) {
+      if (!activePlan) return;
+      activePlan.timeline_items.splice(idx, 1);
+      renderTimelineList(activePlan.timeline_items);
+      scheduleAutoSave();
+    }
+
+    // =========================================================================
+    // VIP NAMES LIST
+    // =========================================================================
+    function renderVipList(vips) {
+      const container = document.getElementById('list-vip-names');
+      if (!container) return;
+
+      if (!vips || vips.length === 0) {
+        container.innerHTML = `
+          <div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.85rem; text-align: center; font-style: italic;">
+            No VIP names added yet.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = vips.map((v, idx) => `
+        <div class="song-item-row">
+          <div class="song-details">
+            <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--cyber-cyan); font-weight: 700;">${escapeHtml(v.role || 'VIP')}</div>
+            <div class="song-title">${escapeHtml(v.names || '')}</div>
+          </div>
+          <button class="song-delete-btn" onclick="removeVipNameRow(${idx})" title="Remove VIP">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function addVipNameRow() {
+      if (!activePlan) return;
+      const roleInput = document.getElementById('new-vip-role');
+      const namesInput = document.getElementById('new-vip-names');
+
+      const role = roleInput?.value.trim();
+      const names = namesInput?.value.trim();
+
+      if (!names) {
+        alert('Please enter the VIP name(s).');
+        return;
+      }
+
+      activePlan.vip_names_pronunciations = activePlan.vip_names_pronunciations || [];
+      activePlan.vip_names_pronunciations.push({
+        role: role || 'VIP',
+        names: names
+      });
+
+      if (roleInput) roleInput.value = '';
+      if (namesInput) namesInput.value = '';
+
+      renderVipList(activePlan.vip_names_pronunciations);
+      scheduleAutoSave();
+    }
+
+    function removeVipNameRow(idx) {
+      if (!activePlan) return;
+      activePlan.vip_names_pronunciations.splice(idx, 1);
+      renderVipList(activePlan.vip_names_pronunciations);
+      scheduleAutoSave();
+    }
+
+    // =========================================================================
+    // TAB SWITCHING & GIG SHEET RENDER
+    // =========================================================================
+    function switchPortalTab(tabKey) {
+      document.querySelectorAll('.portal-tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.portal-panel').forEach(panel => panel.classList.remove('active'));
+
+      const targetBtn = Array.from(document.querySelectorAll('.portal-tab-btn')).find(b => b.textContent.toLowerCase().includes(tabKey));
+      if (targetBtn) targetBtn.classList.add('active');
+
+      const targetPanel = document.getElementById(`tab-${tabKey}`);
+      if (targetPanel) targetPanel.classList.add('active');
+
+      if (tabKey === 'preview') {
+        renderGigSheetOutput();
+      }
+    }
+
+    function renderGigSheetOutput() {
+      const output = document.getElementById('gig-sheet-output');
+      if (!output || !activePlan) return;
+
+      const moments = activePlan.special_moments || {};
+      const musts = activePlan.must_play_songs || [];
+      const dnps = activePlan.do_not_play_songs || [];
+      const timeline = activePlan.timeline_items || [];
+      const vips = activePlan.vip_names_pronunciations || [];
+
+      output.innerHTML = `
+        <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(0,229,255,0.25); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+            <div>
+              <h3 style="font-family: var(--font-heading); color: #fff; margin: 0 0 0.25rem 0; font-size: 1.35rem;">${escapeHtml(activePlan.client_name)}</h3>
+              <div style="font-size: 0.88rem; color: var(--text-muted);">
+                ${escapeHtml(activePlan.event_type || 'Event')} • ${escapeHtml(activePlan.venue_name || activePlan.venue_city || 'OKC')}
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-weight: 700; color: var(--cyber-cyan); font-size: 1rem;">${activePlan.event_date ? new Date(activePlan.event_date + 'T00:00:00').toLocaleDateString() : 'Date TBD'}</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Lead DJ/MC: DJ Bresh</div>
+            </div>
+          </div>
+
+          <!-- Special Songs -->
+          <h4 style="color: var(--cyber-gold); font-size: 0.95rem; text-transform: uppercase; margin: 0 0 0.65rem 0;">⭐ Key Special Songs</h4>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.65rem; margin-bottom: 1.25rem;">
+            <div style="background: rgba(255,255,255,0.03); padding: 0.6rem; border-radius: 6px;">
+              <small style="color: var(--cyber-cyan); display: block;">Grand Entrance:</small>
+              <strong>${escapeHtml(moments.grand_entrance || 'None specified')}</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); padding: 0.6rem; border-radius: 6px;">
+              <small style="color: var(--cyber-pink); display: block;">First Dance:</small>
+              <strong>${escapeHtml(moments.first_dance || 'None specified')}</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); padding: 0.6rem; border-radius: 6px;">
+              <small style="color: var(--cyber-gold); display: block;">Father / Daughter:</small>
+              <strong>${escapeHtml(moments.parent_dance_1 || 'None specified')}</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); padding: 0.6rem; border-radius: 6px;">
+              <small style="color: var(--cyber-gold); display: block;">Mother / Son:</small>
+              <strong>${escapeHtml(moments.parent_dance_2 || 'None specified')}</strong>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+          <h4 style="color: var(--cyber-cyan); font-size: 0.95rem; text-transform: uppercase; margin: 0 0 0.65rem 0;">⏱️ Timeline & Cues</h4>
+          <div style="margin-bottom: 1.25rem;">
+            ${timeline.map(t => `
+              <div style="display: flex; gap: 1rem; padding: 0.45rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem;">
+                <span style="min-width: 90px; color: var(--cyber-cyan); font-weight: 700;">${escapeHtml(t.time)}</span>
+                <span style="font-weight: 600; color: #fff;">${escapeHtml(t.title)}</span>
+                ${t.notes ? `<span style="color: var(--text-muted); font-style: italic;">— ${escapeHtml(t.notes)}</span>` : ''}
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Must Plays & Ban List -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
+            <div>
+              <h4 style="color: var(--cyber-cyan); font-size: 0.85rem; text-transform: uppercase; margin: 0 0 0.5rem 0;">🔥 Must-Plays (${musts.length})</h4>
+              <ul style="padding-left: 1.2rem; margin: 0; font-size: 0.88rem; color: #cbd5e1;">
+                ${musts.map(m => `<li><strong>${escapeHtml(m.title)}</strong> ${m.artist ? `by ${escapeHtml(m.artist)}` : ''} ${m.note ? `<em>(${escapeHtml(m.note)})</em>` : ''}</li>`).join('')}
+              </ul>
+            </div>
+            <div>
+              <h4 style="color: var(--cyber-red); font-size: 0.85rem; text-transform: uppercase; margin: 0 0 0.5rem 0;">🚫 Strict Do Not Play (${dnps.length})</h4>
+              <ul style="padding-left: 1.2rem; margin: 0; font-size: 0.88rem; color: #f87171;">
+                ${dnps.map(d => `<li><strong>${escapeHtml(d.title)}</strong> ${d.artist ? `(${escapeHtml(d.artist)})` : ''}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // AUTO-SAVE ENGINE
+    // =========================================================================
+    function scheduleAutoSave() {
+      const indicator = document.getElementById('save-status-indicator');
+      const text = document.getElementById('save-status-text');
+      if (indicator && text) {
+        indicator.classList.add('saving');
+        text.textContent = 'Saving changes...';
+      }
+
+      clearTimeout(autoSaveTimeout);
+      autoSaveTimeout = setTimeout(() => {
+        savePlanToDatabase();
+      }, 750);
+    }
+
+    async function forceSavePlan() {
+      clearTimeout(autoSaveTimeout);
+      await savePlanToDatabase(true);
+    }
+
+    async function savePlanToDatabase(showPopup = false) {
+      if (!activePlan || !activePlan.id) return;
+
+      // Harvest current inputs
+      const spotifyUrl = getVal('input-spotify-url');
+      activePlan.spotify_playlist_url = spotifyUrl || null;
+      renderSpotifyEmbed(spotifyUrl);
+
+      activePlan.special_moments = {
+        grand_entrance: getVal('moment-grand-entrance'),
+        first_dance: getVal('moment-first-dance'),
+        parent_dance_1: getVal('moment-parent-1'),
+        parent_dance_2: getVal('moment-parent-2'),
+        cake_cutting: getVal('moment-cake'),
+        last_song: getVal('moment-last-song')
+      };
+
+      activePlan.special_announcements = getVal('input-special-announcements') || null;
+      activePlan.mc_notes = getVal('input-mc-notes') || null;
+      activePlan.last_saved_at = new Date().toISOString();
+
+      try {
+        const { error } = await window.supabaseClient
+          .from('thunderhouse_event_plans')
+          .update({
+            spotify_playlist_url: activePlan.spotify_playlist_url,
+            genres_preferred: activePlan.genres_preferred || [],
+            genres_avoid: activePlan.genres_avoid || [],
+            must_play_songs: activePlan.must_play_songs || [],
+            play_if_possible_songs: activePlan.play_if_possible_songs || [],
+            do_not_play_songs: activePlan.do_not_play_songs || [],
+            special_moments: activePlan.special_moments,
+            timeline_items: activePlan.timeline_items || [],
+            vip_names_pronunciations: activePlan.vip_names_pronunciations || [],
+            special_announcements: activePlan.special_announcements,
+            mc_notes: activePlan.mc_notes,
+            last_saved_at: activePlan.last_saved_at,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', activePlan.id);
+
+        if (error) throw error;
+
+        const indicator = document.getElementById('save-status-indicator');
+        const text = document.getElementById('save-status-text');
+        if (indicator && text) {
+          indicator.classList.remove('saving');
+          text.textContent = 'All changes synced with DJ Bresh';
+        }
+
+        if (showPopup) {
+          alert('⚡ Event plan successfully saved & synced with Thunder House ENT!');
+        }
+      } catch (err) {
+        console.error('Save plan error:', err);
+        const text = document.getElementById('save-status-text');
+        if (text) text.textContent = 'Sync error (retrying...)';
+      }
+    }
+
+    function showPortalError(msg) {
+      document.querySelector('.portal-shell').innerHTML = `
+        <div style="text-align: center; padding: 4rem 1rem;">
+          <div style="font-size: 3rem; color: #f87171; margin-bottom: 1rem;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <h2 style="font-family: var(--font-heading); color: #fff; margin-bottom: 0.75rem;">VIP Event Portal</h2>
+          <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 1.5rem auto;">${escapeHtml(msg)}</p>
+          <a href="index.html" class="btn btn-primary"><i class="fa-solid fa-house"></i> Return to Homepage</a>
+        </div>
+      `;
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

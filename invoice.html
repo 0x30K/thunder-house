@@ -463,6 +463,24 @@
       </p>
     </div>
 
+    <!-- VIP Event & Music Planning Card -->
+    <div id="inv-portal-banner" style="background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(255, 183, 3, 0.08)); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: var(--radius-md); padding: 1.5rem; margin-top: 1.75rem; display: flex; justify-content: space-between; align-items: center; gap: 1.25rem; flex-wrap: wrap;">
+      <div>
+        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); font-weight: 700;">
+          <i class="fa-solid fa-bolt"></i> VIP Client Perk Included
+        </span>
+        <h4 style="font-family: var(--font-heading); color: #fff; margin: 0.25rem 0 0.3rem 0; font-size: 1.2rem;">
+          Event Music & Timeline Hub
+        </h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0; max-width: 520px; line-height: 1.5;">
+          Lock in your must-play songs, paste your Spotify playlist, set your run-of-show timeline cues, and enter VIP pronunciations directly with DJ Bresh.
+        </p>
+      </div>
+      <a id="btn-open-client-portal" href="#" target="_blank" class="btn btn-outline" style="border-color: var(--primary); color: var(--primary); white-space: nowrap; padding: 0.65rem 1.25rem; font-size: 0.88rem;">
+        <i class="fa-solid fa-compact-disc"></i> Open VIP Planning Hub <i class="fa-solid fa-arrow-right" style="font-size: 0.75rem; margin-left: 0.25rem;"></i>
+      </a>
+    </div>
+
     <!-- Notes & Terms -->
     <div class="notes-card" id="inv-notes-block" style="display: none;">
       <strong style="color: #fff; display: block; margin-bottom: 0.35rem;"><i class="fa-solid fa-info-circle"></i> Notes & Terms:</strong>
@@ -635,6 +653,12 @@
         const notesBlock = document.getElementById('inv-notes-block');
         notesBlock.style.display = 'block';
         document.getElementById('inv-display-notes').innerHTML = escapeHtml(inv.notes).replace(/\n/g, '<br>');
+      }
+
+      // VIP Planning Hub button link
+      const portalBtn = document.getElementById('btn-open-client-portal');
+      if (portalBtn && inv.invoice_number) {
+        portalBtn.href = `/portal?invoice=${encodeURIComponent(inv.invoice_number)}`;
       }
     }
 

@@ -1602,9 +1602,14 @@
       </div>
 
       <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-        <button type="button" class="btn btn-outline btn-sm" id="btn-lead-create-invoice" onclick="createInvoiceFromLead(activeInquiryId)" style="border-color: var(--primary); color: var(--primary);">
-          <i class="fa-solid fa-file-invoice-dollar"></i> Generate Custom Invoice
-        </button>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button type="button" class="btn btn-outline btn-sm" id="btn-lead-create-invoice" onclick="createInvoiceFromLead(activeInquiryId)" style="border-color: var(--primary); color: var(--primary);">
+            <i class="fa-solid fa-file-invoice-dollar"></i> Generate Custom Invoice
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" id="btn-lead-open-portal" onclick="openPortalForInquiry(activeInquiryId)" style="border-color: var(--accent-gold); color: var(--accent-gold);">
+            <i class="fa-solid fa-compact-disc"></i> VIP Planning Hub
+          </button>
+        </div>
         <button id="btn-save-notes" class="btn btn-primary btn-sm">
           <i class="fa-solid fa-floppy-disk"></i> Save Notes
         </button>
@@ -3728,6 +3733,9 @@
                 <button class="btn-action-sm" onclick="copyInvoiceLink('${escapeHtml(inv.invoice_number)}')" title="Copy Client Invoice Link">
                   <i class="fa-solid fa-link"></i>
                 </button>
+                <a href="/portal?invoice=${encodeURIComponent(inv.invoice_number)}" target="_blank" class="btn-action-sm" title="Open Client VIP Planning & Music Hub" style="color: var(--accent-gold);">
+                  <i class="fa-solid fa-compact-disc"></i>
+                </a>
                 <button class="btn-action-sm" onclick="dispatchInvoiceEmailPrompt('${inv.id}')" title="Send / Resend Invoice Email to Client" style="color: var(--primary);">
                   <i class="fa-solid fa-paper-plane"></i>
                 </button>
@@ -4329,6 +4337,87 @@
       }).catch(() => {
         prompt('Copy invoice link:', url);
       });
+    }
+
+    function openPortalForInvoice(invNum) {
+      if (!invNum) return;
+      window.open(`/portal?invoice=${encodeURIComponent(invNum)}`, '_blank');
+    }
+
+    function copyPortalLink(invNum) {
+      const url = `${window.location.origin}/portal?invoice=${encodeURIComponent(invNum)}`;
+      navigator.clipboard.writeText(url).then(() => {
+        alert(`⚡ Client VIP Planning Portal Link Copied to Clipboard!\n\n${url}`);
+      }).catch(() => {
+        prompt('Copy VIP Portal URL:', url);
+      });
+    }
+
+    async function openPortalForInquiry(inquiryId) {
+      if (!inquiryId) return;
+      try {
+        // Check if plan already exists for inquiryId
+        const { data: plan } = await window.supabaseClient
+          .from('thunderhouse_event_plans')
+          .select('portal_token')
+          .eq('inquiry_id', inquiryId)
+          .maybeSingle();
+
+        if (plan && plan.portal_token) {
+          window.open(`/portal?token=${encodeURIComponent(plan.portal_token)}`, '_blank');
+          return;
+        }
+
+        // Check if an invoice exists for this inquiry
+        const { data: inv } = await window.supabaseClient
+          .from('thunderhouse_invoices')
+          .select('invoice_number')
+          .eq('inquiry_id', inquiryId)
+          .maybeSingle();
+
+        if (inv && inv.invoice_number) {
+          window.open(`/portal?invoice=${encodeURIComponent(inv.invoice_number)}`, '_blank');
+          return;
+        }
+
+        // Look up the inquiry details to create an event plan
+        const { data: inq } = await window.supabaseClient
+          .from('thunderhouse_inquiries')
+          .select('*')
+          .eq('id', inquiryId)
+          .single();
+
+        if (!inq) {
+          alert('Lead not found.');
+          return;
+        }
+
+        const token = `th-vip-${inq.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Date.now().toString(36)}`;
+        const { data: newPlan, error } = await window.supabaseClient
+          .from('thunderhouse_event_plans')
+          .insert([{
+            portal_token: token,
+            inquiry_id: inq.id,
+            client_name: inq.name,
+            client_email: inq.email,
+            client_phone: inq.phone,
+            event_type: inq.event_type || 'Event',
+            event_date: inq.event_date || null,
+            venue_city: inq.venue_city || 'Oklahoma City, OK',
+            timeline_items: [
+              { time: '5:00 PM', title: 'Cocktail Hour & Guest Arrival', notes: 'Background music' },
+              { time: '6:00 PM', title: 'Grand Entrance & Welcome', notes: 'Mic announcement' },
+              { time: '7:00 PM', title: 'Open Dance Floor', notes: 'High energy' }
+            ]
+          }])
+          .select()
+          .single();
+
+        if (error) throw error;
+        window.open(`/portal?token=${encodeURIComponent(newPlan.portal_token)}`, '_blank');
+      } catch (err) {
+        alert('Could not open VIP portal: ' + err.message);
+      }
     }
 
     function escapeHtml(text) {
