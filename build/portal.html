@@ -818,7 +818,10 @@
         <!-- Dynamically rendered summary -->
       </div>
 
-      <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+      <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end; flex-wrap: wrap;">
+        <a id="btn-view-dj-runofshow" href="gigs.html" target="_blank" class="btn btn-outline" style="border-color: var(--cyber-cyan); color: var(--cyber-cyan);">
+          <i class="fa-solid fa-stopwatch"></i> Live DJ Run of Show
+        </a>
         <button class="btn btn-outline" onclick="window.print()">
           <i class="fa-solid fa-print"></i> Print Clean Copy
         </button>
@@ -950,6 +953,15 @@
       document.getElementById('hero-venue-name').textContent = plan.venue_name || plan.venue_city || 'Oklahoma City, OK';
       if (plan.invoice_number) {
         document.getElementById('hero-invoice-ref').textContent = `Linked to Invoice #${plan.invoice_number} • ${plan.event_type || 'Event'}`;
+      }
+
+      const runOfShowBtn = document.getElementById('btn-view-dj-runofshow');
+      if (runOfShowBtn) {
+        if (plan.portal_token) {
+          runOfShowBtn.href = `gigs.html?token=${encodeURIComponent(plan.portal_token)}`;
+        } else if (plan.id) {
+          runOfShowBtn.href = `gigs.html?id=${encodeURIComponent(plan.id)}`;
+        }
       }
 
       // Countdown & badges (if present)

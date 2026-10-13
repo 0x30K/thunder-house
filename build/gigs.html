@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DJ Run of Show & Gig Pack | Thunder House ENT</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Design System CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    :root {
+      --cyber-cyan: #00e5ff;
+      --cyber-gold: #ffb703;
+      --cyber-pink: #ff2a85;
+      --cyber-green: #10b981;
+      --cyber-red: #ef4444;
+      --cyber-bg: #05070b;
+      --cyber-card: rgba(10, 14, 23, 0.94);
+      --cyber-card-glow: rgba(0, 229, 255, 0.08);
+      --cyber-border: rgba(0, 229, 255, 0.22);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--cyber-bg);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Background Ambient Gradients */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -20%;
+      left: 10%;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(circle, rgba(0, 229, 255, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -20%;
+      right: 5%;
+      width: 60vw;
+      height: 60vw;
+      background: radial-gradient(circle, rgba(255, 183, 3, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .gig-container {
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 5rem 1rem;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Top Sticky Action Bar */
+    .gig-top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(5, 7, 11, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+      padding: 0.75rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-logo-text {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.2), rgba(0, 229, 255, 0.05));
+      border: 1px solid var(--cyber-cyan);
+      color: var(--cyber-cyan);
+      font-size: 0.68rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .select-gig-input {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 0.4rem 0.85rem;
+      border-radius: 8px;
+      outline: none;
+      cursor: pointer;
+      max-width: 220px;
+    }
+
+    .select-gig-input:focus {
+      border-color: var(--cyber-cyan);
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+    }
+
+    .btn-top {
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.4rem 0.75rem;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      color: #e2e8f0;
+    }
+
+    .btn-top:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .btn-top.active-showtime {
+      background: rgba(255, 42, 133, 0.2);
+      border-color: var(--cyber-pink);
+      color: #ff70a6;
+      box-shadow: 0 0 12px rgba(255, 42, 133, 0.35);
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 10px rgba(255, 42, 133, 0.3); }
+      50% { box-shadow: 0 0 20px rgba(255, 42, 133, 0.6); }
+    }
+
+    /* Hero Gig Card */
+    .hero-gig-card {
+      background: var(--cyber-card);
+      border: 1px solid var(--cyber-border);
+      border-radius: 16px;
+      padding: 1.75rem 1.85rem;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.75), 0 0 20px rgba(0, 229, 255, 0.06);
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-gig-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--cyber-cyan), var(--cyber-gold), transparent);
+    }
+
+    .hero-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+
+    .client-title {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 0.35rem 0;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .event-meta-line {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .badge-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-gold {
+      background: rgba(255, 183, 3, 0.15);
+      border: 1px solid rgba(255, 183, 3, 0.4);
+      color: var(--cyber-gold);
+    }
+
+    .badge-cyan {
+      background: rgba(0, 229, 255, 0.15);
+      border: 1px solid rgba(0, 229, 255, 0.4);
+      color: var(--cyber-cyan);
+    }
+
+    .badge-green {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: var(--cyber-green);
+    }
+
+    .hero-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 1rem;
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .stat-box {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .stat-val {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      font-family: var(--font-body);
+    }
+
+    /* Navigation Anchors / Chips Bar */
+    .quick-nav-bar {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.5rem;
+      scrollbar-width: none;
+    }
+
+    .quick-nav-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-chip {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .nav-chip:hover, .nav-chip.active {
+      background: rgba(0, 229, 255, 0.15);
+      border-color: var(--cyber-cyan);
+      color: #fff;
+    }
+
+    /* Section Panels */
+    .section-card {
+      background: var(--cyber-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 1.5rem 1.65rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 0.85rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    /* 1. TIMELINE RUN OF SHOW */
+    .timeline-stream {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .cue-card {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 1.15rem 1.25rem;
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .cue-card:hover {
+      border-color: rgba(0, 229, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .cue-card.active-cue {
+      background: rgba(0, 229, 255, 0.08);
+      border: 2px solid var(--cyber-cyan);
+      box-shadow: 0 0 25px rgba(0, 229, 255, 0.2);
+    }
+
+    .cue-card.passed-cue {
+      opacity: 0.55;
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    .cue-card.passed-cue:hover {
+      opacity: 0.85;
+    }
+
+    .cue-time-badge {
+      font-family: var(--font-mono);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--cyber-cyan);
+      background: rgba(0, 229, 255, 0.08);
+      border: 1px solid rgba(0, 229, 255, 0.25);
+      padding: 0.4rem 0.75rem;
+      border-radius: 8px;
+      min-width: 100px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .cue-content {
+      flex: 1;
+    }
+
+    .cue-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    .cue-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 0;
+    }
+
+    .cue-actions {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .cue-btn {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .cue-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .cue-btn.btn-active-toggle {
+      border-color: var(--cyber-cyan);
+      color: var(--cyber-cyan);
+    }
+
+    .cue-song-cue {
+      background: rgba(255, 183, 3, 0.08);
+      border-left: 3px solid var(--cyber-gold);
+      padding: 0.45rem 0.75rem;
+      border-radius: 0 6px 6px 0;
+      margin: 0.5rem 0 0.35rem 0;
+      font-size: 0.88rem;
+      color: #ffdda1;
+    }
+
+    .cue-notes {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    /* 2. VIP PRONUNCIATION & MIC GUIDE */
+    .vip-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .vip-card {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 1rem 1.15rem;
+      position: relative;
+    }
+
+    .vip-role {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: var(--cyber-pink);
+      letter-spacing: 0.06em;
+      margin-bottom: 0.25rem;
+    }
+
+    .vip-names {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.35rem;
+    }
+
+    .pronounce-phonetic {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      color: var(--cyber-gold);
+      background: rgba(255, 183, 3, 0.08);
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .mc-tip-banner {
+      background: rgba(0, 229, 255, 0.06);
+      border: 1px solid rgba(0, 229, 255, 0.2);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-top: 1.25rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    /* 3. MUSIC VAULT */
+    .moments-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .moment-card {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+    }
+
+    .moment-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--cyber-cyan);
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .moment-song {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .playlist-action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .song-box-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 768px) {
+      .song-box-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .track-tile {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 0.75rem 0.95rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .track-tile.dnp {
+      border-left: 3px solid var(--cyber-red);
+      background: rgba(239, 68, 68, 0.05);
+    }
+
+    .track-tile.must {
+      border-left: 3px solid var(--cyber-cyan);
+    }
+
+    .track-info {
+      flex: 1;
+    }
+
+    .track-name {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .track-artist {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .track-note {
+      font-size: 0.75rem;
+      color: var(--cyber-gold);
+      font-style: italic;
+      margin-top: 0.2rem;
+    }
+
+    /* 4. VENUE & CONTACTS */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .contact-card {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+
+    .contact-role {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      margin-bottom: 0.2rem;
+    }
+
+    .contact-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .contact-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(0, 229, 255, 0.12);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      color: var(--cyber-cyan);
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.4rem 0.85rem;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .contact-btn:hover {
+      background: var(--cyber-cyan);
+      color: #000;
+    }
+
+    /* 5. GEAR CHECKLIST */
+    .gear-item {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.65rem 0.85rem;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s ease;
+    }
+
+    .gear-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .gear-item.checked {
+      opacity: 0.6;
+      border-color: rgba(16, 185, 129, 0.3);
+      background: rgba(16, 185, 129, 0.04);
+    }
+
+    .gear-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--cyber-green);
+      cursor: pointer;
+    }
+
+    .gear-label {
+      font-size: 0.9rem;
+      color: #fff;
+      font-weight: 500;
+    }
+
+    /* 6. SHIFT LOG & COMPLETION */
+    .shift-textarea {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      resize: vertical;
+      min-height: 110px;
+      outline: none;
+      margin-bottom: 1rem;
+    }
+
+    .shift-textarea:focus {
+      border-color: var(--cyber-cyan);
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+    }
+
+    .btn-complete-gig {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border: none;
+      color: #fff;
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      font-weight: 800;
+      padding: 0.85rem 1.75rem;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-complete-gig:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(16, 185, 129, 0.45);
+    }
+
+    /* SHOWTIME HIGH-CONTRAST MODE */
+    body.showtime-mode {
+      background: #000;
+    }
+
+    body.showtime-mode .cue-title {
+      font-size: 1.35rem;
+    }
+
+    body.showtime-mode .cue-time-badge {
+      font-size: 1.25rem;
+      min-width: 115px;
+    }
+
+    body.showtime-mode .cue-card {
+      padding: 1.5rem;
+      border-width: 2px;
+    }
+
+    body.showtime-mode .vip-names {
+      font-size: 1.35rem;
+    }
+
+    body.showtime-mode .pronounce-phonetic {
+      font-size: 1.15rem;
+    }
+
+    /* PRINT STYLESHEET */
+    @media print {
+      body {
+        background: #fff !important;
+        color: #000 !important;
+      }
+      .gig-top-bar, .quick-nav-bar, .top-actions, .cue-actions, .playlist-action-bar, .btn-complete-gig, .modal-overlay {
+        display: none !important;
+      }
+      .gig-container {
+        max-width: 100% !important;
+        padding: 0 !important;
+      }
+      .hero-gig-card, .section-card, .cue-card, .vip-card, .stat-box {
+        background: #fff !important;
+        border: 1px solid #ccc !important;
+        color: #000 !important;
+        box-shadow: none !important;
+        break-inside: avoid;
+      }
+      .client-title, .section-title, .cue-title, .vip-names, .stat-val {
+        color: #000 !important;
+      }
+      .cue-time-badge {
+        color: #000 !important;
+        background: #eee !important;
+        border: 1px solid #aaa !important;
+      }
+      .pronounce-phonetic {
+        color: #000 !important;
+        background: #eee !important;
+      }
+      .track-tile {
+        background: #fff !important;
+        border: 1px solid #ddd !important;
+        color: #000 !important;
+      }
+      .track-name {
+        color: #000 !important;
+      }
+    }
+
+    /* Modal for Quick Adding/Editing Timeline Cues */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    .modal-box {
+      background: #0b101b;
+      border: 1px solid var(--cyber-border);
+      border-radius: 14px;
+      padding: 1.75rem;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
+      position: relative;
+    }
+
+    .form-group-modal {
+      margin-bottom: 1rem;
+    }
+
+    .form-group-modal label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+
+    .modal-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 0.65rem 0.85rem;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .modal-input:focus {
+      border-color: var(--cyber-cyan);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="gig-top-bar">
+    <div class="brand-group">
+      <div class="brand-logo-text">
+        <i class="fa-solid fa-bolt" style="color: var(--cyber-cyan);"></i>
+        THUNDER HOUSE
+      </div>
+      <span class="brand-badge">DJ RUN OF SHOW</span>
+    </div>
+
+    <div class="top-actions">
+      <!-- Gig Selector Dropdown -->
+      <select id="gig-selector" class="select-gig-input" onchange="onSelectGigChange(this.value)" title="Switch Active Gig">
+        <option value="">Loading upcoming gigs...</option>
+      </select>
+
+      <!-- Showtime High Contrast Mode Toggle -->
+      <button type="button" id="btn-showtime-toggle" class="btn-top" onclick="toggleShowtimeMode()" title="Keep screen awake and maximize readability behind the decks">
+        <i class="fa-solid fa-moon"></i> Showtime Mode
+      </button>
+
+      <!-- Print Clean Copy -->
+      <button type="button" class="btn-top" onclick="window.print()" title="Print paper copy for venues with zero cellular reception">
+        <i class="fa-solid fa-print"></i> Print
+      </button>
+
+      <!-- Staff Route Toggle -->
+      <a href="intake.html" class="btn-top" title="Switch to Staff Intake Portal">
+        <i class="fa-solid fa-clipboard-question"></i> Intake
+      </a>
+
+      <!-- Superuser Admin (only visible if logged in as superuser) -->
+      <a href="admin.html" id="link-admin-hub" class="btn-top" style="display: none; border-color: var(--cyber-gold); color: var(--cyber-gold);" title="Admin Management Hub">
+        <i class="fa-solid fa-shield-halved"></i> Admin
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="gig-container">
+
+    <!-- Loading / Fallback Indicator -->
+    <div id="gig-loading-state" style="text-align: center; padding: 4rem 1rem;">
+      <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 2.5rem; color: var(--cyber-cyan); margin-bottom: 1rem;"></i>
+      <h3 style="color: #fff; font-family: var(--font-heading); margin-bottom: 0.5rem;">Loading Gig Brief & Run of Show...</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">Connecting to Thunder House production vault...</p>
+    </div>
+
+    <!-- Active Gig Shell (Populated dynamically) -->
+    <div id="gig-content-shell" style="display: none;">
+
+      <!-- Hero Gig Card -->
+      <section class="hero-gig-card">
+        <div class="hero-header-row">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem;">
+              <span id="hero-event-type-badge" class="badge-pill badge-gold">Wedding Reception</span>
+              <span id="hero-countdown-badge" class="badge-pill badge-cyan">In 37 Days</span>
+              <span id="hero-status-badge" class="badge-pill badge-green">Confirmed</span>
+            </div>
+            <h1 id="hero-client-names" class="client-title">Alexander Vance & Elena Rodriguez</h1>
+            <div class="event-meta-line">
+              <span><i class="fa-regular fa-calendar-check" style="color: var(--cyber-gold);"></i> <strong id="hero-date-str" style="color: #fff;">Nov 20, 2026</strong></span>
+              <span>•</span>
+              <span><i class="fa-solid fa-location-dot" style="color: var(--cyber-cyan);"></i> <span id="hero-venue-name">The Skirvin Hilton OKC</span></span>
+            </div>
+          </div>
+
+          <!-- Quick Map Navigation Button -->
+          <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end;">
+            <a id="btn-maps-nav" href="#" target="_blank" class="btn btn-primary btn-sm" style="background: linear-gradient(135deg, var(--cyber-cyan), #0099ff); color: #000; font-weight: 800; border: none; padding: 0.55rem 1.15rem; border-radius: 8px;">
+              <i class="fa-solid fa-location-arrow"></i> Open GPS Directions
+            </a>
+            <div id="hero-assigned-dj-badge" style="font-size: 0.82rem; color: var(--cyber-gold); font-weight: 600;">
+              🎧 Assigned: <strong id="hero-dj-name">DJ Marcus</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4-Stat Logistics Strip -->
+        <div class="hero-stat-grid">
+          <div class="stat-box">
+            <div class="stat-label"><i class="fa-solid fa-truck-ramp-box" style="color: var(--cyber-cyan);"></i> Load-In Call</div>
+            <div id="stat-load-in" class="stat-val">3:30 PM</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label"><i class="fa-solid fa-sliders" style="color: var(--cyber-gold);"></i> Sound Check</div>
+            <div id="stat-sound-check" class="stat-val">4:30 PM</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label"><i class="fa-solid fa-champagne-glasses" style="color: var(--cyber-pink);"></i> Event Hours</div>
+            <div id="stat-event-hours" class="stat-val">5:00 PM – 11:00 PM</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label"><i class="fa-solid fa-users" style="color: var(--cyber-green);"></i> Guest Count</div>
+            <div id="stat-guest-count" class="stat-val">175 Guests</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quick Section Anchor Chips -->
+      <nav class="quick-nav-bar">
+        <a href="#sec-timeline" class="nav-chip active"><i class="fa-solid fa-clock"></i> Timeline & Cues</a>
+        <a href="#sec-vip" class="nav-chip"><i class="fa-solid fa-microphone"></i> VIP & Pronunciations</a>
+        <a href="#sec-music" class="nav-chip"><i class="fa-solid fa-music"></i> Music & Playlists</a>
+        <a href="#sec-venue" class="nav-chip"><i class="fa-solid fa-building"></i> Venue & Power</a>
+        <a href="#sec-gear" class="nav-chip"><i class="fa-solid fa-toolbox"></i> Gear Pre-Flight</a>
+        <a href="#sec-log" class="nav-chip"><i class="fa-solid fa-clipboard-check"></i> Shift Log</a>
+      </nav>
+
+      <!-- 1. TIMELINE & RUN OF SHOW -->
+      <section id="sec-timeline" class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="fa-solid fa-stopwatch" style="color: var(--cyber-cyan);"></i>
+            Timeline & Live Cues
+          </h2>
+          <button type="button" class="btn btn-outline btn-sm" onclick="openAddCueModal()" style="font-size: 0.8rem; padding: 0.35rem 0.85rem; border-color: var(--cyber-cyan); color: var(--cyber-cyan);">
+            <i class="fa-solid fa-plus"></i> Add Cue
+          </button>
+        </div>
+
+        <div id="timeline-stream-container" class="timeline-stream">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+      <!-- 2. VIP PRONUNCIATIONS & MIC GUIDE -->
+      <section id="sec-vip" class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="fa-solid fa-microphone-lines" style="color: var(--cyber-pink);"></i>
+            VIP Names & Phonetic Pronunciations
+          </h2>
+          <span style="font-size: 0.82rem; color: var(--text-muted);">Grand Entrance & Mic Cues</span>
+        </div>
+
+        <div id="vip-names-container" class="vip-grid">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Special Announcements / MC Guidelines -->
+        <div class="mc-tip-banner">
+          <div style="font-size: 1.5rem; color: var(--cyber-gold);"><i class="fa-solid fa-bullhorn"></i></div>
+          <div>
+            <h4 style="color: #fff; margin: 0 0 0.25rem 0; font-size: 0.95rem;">Key Announcement Instructions:</h4>
+            <p id="mc-announcements-text" style="color: #cbd5e1; font-size: 0.88rem; margin: 0 0 0.5rem 0; line-height: 1.45;">
+              No special announcements logged yet.
+            </p>
+            <div style="font-size: 0.8rem; color: var(--cyber-cyan); font-weight: 600;">
+              ⚡ Thunder House MC Standard: Warm, concise, clear diction. Keep the focus entirely on the couple / client.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. MUSIC VAULT & SPOTIFY -->
+      <section id="sec-music" class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="fa-solid fa-compact-disc" style="color: var(--cyber-gold);"></i>
+            Music Vault & Special Moments
+          </h2>
+          <div id="spotify-app-link-wrap">
+            <!-- Open in Spotify Button -->
+          </div>
+        </div>
+
+        <!-- Special Moments Track Grid -->
+        <h4 style="font-size: 0.85rem; text-transform: uppercase; color: var(--cyber-gold); margin: 0 0 0.65rem 0; letter-spacing: 0.05em;">
+          ⭐ Special Moments Cues
+        </h4>
+        <div id="moments-grid-container" class="moments-grid">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Spotify Embed (if available) -->
+        <div id="spotify-embed-area" style="margin-bottom: 1.5rem; display: none;"></div>
+
+        <!-- Must Plays vs Strict Ban List -->
+        <div class="song-box-col">
+          <!-- Must Play Column -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+              <h4 style="font-size: 0.85rem; text-transform: uppercase; color: var(--cyber-cyan); margin: 0; letter-spacing: 0.05em;">
+                🔥 Must-Play Tracks (<span id="count-must-plays">0</span>)
+              </h4>
+            </div>
+            <div id="list-must-plays">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Do Not Play Column -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+              <h4 style="font-size: 0.85rem; text-transform: uppercase; color: var(--cyber-red); margin: 0; letter-spacing: 0.05em;">
+                🚫 Strict Banned Tracks (<span id="count-do-not-plays">0</span>)
+              </h4>
+            </div>
+            <div id="list-do-not-plays">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. VENUE, POWER & CONTACTS -->
+      <section id="sec-venue" class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="fa-solid fa-map-location-dot" style="color: var(--cyber-cyan);"></i>
+            Venue Intel & Emergency Contacts
+          </h2>
+          <span style="font-size: 0.82rem; color: var(--text-muted);">1-Tap Phone Access</span>
+        </div>
+
+        <div class="contact-grid">
+          <!-- Client Contact -->
+          <div class="contact-card">
+            <div class="contact-role">Client / Decision Maker</div>
+            <div id="contact-client-name" class="contact-name">Alexander Vance</div>
+            <a id="btn-call-client" href="tel:" class="contact-btn">
+              <i class="fa-solid fa-phone"></i> <span id="contact-client-phone">(405) 555-0199</span>
+            </a>
+          </div>
+
+          <!-- Coordinator Contact -->
+          <div class="contact-card">
+            <div class="contact-role">Venue / Event Coordinator</div>
+            <div id="contact-coord-name" class="contact-name">Sarah Jenkins</div>
+            <a id="btn-call-coord" href="tel:" class="contact-btn">
+              <i class="fa-solid fa-phone"></i> <span id="contact-coord-phone">(405) 555-0244</span>
+            </a>
+          </div>
+
+          <!-- Thunder House Dispatch Line -->
+          <div class="contact-card">
+            <div class="contact-role">Thunder House Dispatch Line</div>
+            <div class="contact-name">DJ Bresh (Superuser)</div>
+            <a href="tel:4052596489" class="contact-btn" style="border-color: var(--cyber-gold); color: var(--cyber-gold);">
+              <i class="fa-solid fa-phone"></i> (405) 259-6489
+            </a>
+          </div>
+        </div>
+
+        <!-- Venue Technical Notes -->
+        <div style="background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 1.15rem; margin-top: 1rem;">
+          <h4 style="color: #fff; margin: 0 0 0.5rem 0; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-plug" style="color: var(--cyber-gold);"></i> Power & Setup Instructions:
+          </h4>
+          <p id="venue-power-notes" style="color: #cbd5e1; font-size: 0.88rem; margin: 0 0 0.75rem 0; line-height: 1.5;">
+            Dedicated 20A circuit along North Ballroom wall behind the DJ stage. House sound patch in closet B.
+          </p>
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; font-size: 0.82rem;">
+            <span style="color: var(--text-muted);">Dress Code:</span>
+            <strong id="venue-dress-code" style="color: var(--cyber-cyan);">Formal Black Suit & Tie / Cyber Clean</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. GEAR PRE-FLIGHT CHECKLIST -->
+      <section id="sec-gear" class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="fa-solid fa-toolbox" style="color: var(--cyber-green);"></i>
+            Gear Pre-Flight Checklist
+          </h2>
+          <span style="font-size: 0.82rem; color: var(--text-muted);">Auto-Saved with HQ</span>
+        </div>
+
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0 0 1rem 0;">
+          Check off items during load-in packing. This verifies everything is loaded in the van and ready on site.
+        </p>
+
+        <div id="gear-checklist-container">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+      <!-- 6. DJ SHIFT LOG & EVENT WRAP-UP -->
+      <section id="sec-log" class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="fa-solid fa-clipboard-check" style="color: var(--cyber-cyan);"></i>
+            DJ Shift Log & Wrap-Up
+          </h2>
+          <span id="shift-sync-status" style="font-size: 0.82rem; color: var(--cyber-green);">
+            <i class="fa-solid fa-cloud-check"></i> Changes auto-synced
+          </span>
+        </div>
+
+        <label style="display: block; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.45rem; text-transform: uppercase; font-weight: 700;">
+          On-Site DJ Notes & Event Feedback:
+        </label>
+        <textarea id="input-dj-shift-notes" class="shift-textarea" placeholder="Note crowd energy, coordinator coordination, highlight moments, or any equipment issues..." oninput="onShiftNotesInput()"></textarea>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div id="gig-completed-stamp" style="font-size: 0.85rem; color: var(--cyber-green); font-weight: 600;">
+            <!-- Shown if completed -->
+          </div>
+          <button type="button" id="btn-mark-completed" class="btn-complete-gig" onclick="markGigComplete()">
+            <i class="fa-solid fa-circle-check"></i> Mark Gig Completed & Clock Out
+          </button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Add Cue Modal -->
+  <div id="modal-add-cue" class="modal-overlay">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="color: #fff; font-family: var(--font-heading); margin: 0;">Add Timeline Cue</h3>
+        <button type="button" class="btn-top" onclick="closeAddCueModal()">&times;</button>
+      </div>
+
+      <div class="form-group-modal">
+        <label>Time (e.g. 7:15 PM)</label>
+        <input type="text" id="modal-cue-time" class="modal-input" placeholder="7:15 PM">
+      </div>
+
+      <div class="form-group-modal">
+        <label>Cue Title</label>
+        <input type="text" id="modal-cue-title" class="modal-input" placeholder="First Dance / Cake Cutting">
+      </div>
+
+      <div class="form-group-modal">
+        <label>Song Cue (Optional)</label>
+        <input type="text" id="modal-cue-song" class="modal-input" placeholder="Artist - Track Name">
+      </div>
+
+      <div class="form-group-modal">
+        <label>DJ / Mic Instructions</label>
+        <input type="text" id="modal-cue-notes" class="modal-input" placeholder="Dim house lights, hand mic to Father of Bride">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeAddCueModal()">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="saveNewCue()">Save Cue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+
+  <script>
+    // =========================================================================
+    // STATE & GLOBAL REFS
+    // =========================================================================
+    let allPlans = [];
+    let currentPlan = null;
+    let activeCueIndex = 0;
+    let wakeLock = null;
+    let shiftNotesSaveTimer = null;
+    let currentUser = null;
+
+    // Default Pre-Flight Gear Checklist
+    const DEFAULT_GEAR = [
+      { item: "Pioneer DJ Controller + Flight Case & Power Cord", checked: true },
+      { item: "2x Active 15\" QSC / EV Powered Speakers + Heavy Duty Stands", checked: true },
+      { item: "Dual Handheld Wireless Shure Mic Pack + Fresh AA Batteries", checked: true },
+      { item: "Backup Wired Shure SM58 Mic + 25ft XLR Cable", checked: true },
+      { item: "12x Wireless Battery-Powered Uplights (Pre-set to Warm Gold)", checked: false },
+      { item: "2x Cold Spark Fountains + Granules & Wireless Remote (if booked)", checked: false },
+      { item: "Heavy Duty 50ft Extension Cord + Surge Protection Strip", checked: true },
+      { item: "Clean Black Velvet Table Scrim / DJ Booth Facade", checked: true },
+      { item: "DJ Headphones & 1/4\" Gold Screw-on Adapter", checked: true },
+      { item: "Thunder House Emergency USB Flash Drive (Rekordbox Export)", checked: true }
+    ];
+
+    // =========================================================================
+    // INITIALIZATION
+    // =========================================================================
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Check user auth safely
+      if (window.supabaseClient) {
+        try {
+          const { data: { session }, error: sessErr } = await window.supabaseClient.auth.getSession();
+          if (sessErr) {
+            console.warn('Auth session check notice:', sessErr);
+            localStorage.removeItem('sb-kxoivmflghfgtvawhktt-auth-token');
+          } else if (session && session.user) {
+            currentUser = session.user;
+            // Check staff role
+            const { data: staffData } = await window.supabaseClient
+              .from('thunderhouse_staff')
+              .select('role')
+              .eq('email', session.user.email)
+              .maybeSingle();
+
+            if (staffData && staffData.role === 'superuser') {
+              const adminLink = document.getElementById('link-admin-hub');
+              if (adminLink) adminLink.style.display = 'inline-flex';
+            }
+          }
+        } catch (authErr) {
+          console.warn('Auth init check skipped:', authErr);
+        }
+      }
+
+      // 2. Load all available event plans
+      await loadAllGigs();
+    });
+
+    // =========================================================================
+    // LOAD GIGS
+    // =========================================================================
+    async function loadAllGigs() {
+      const loadingEl = document.getElementById('gig-loading-state');
+      const shellEl = document.getElementById('gig-content-shell');
+
+      try {
+        if (!window.supabaseClient) throw new Error('Database client offline.');
+
+        let { data, error } = await window.supabaseClient
+          .from('thunderhouse_event_plans')
+          .select('*')
+          .order('event_date', { ascending: true });
+
+        // If error is related to invalid JWT in localStorage, clear stale auth token and retry once
+        if (error && (String(error.message || '').includes('JWT') || error.code === 'PGRST301' || error.status === 401)) {
+          console.warn('Stale auth token detected. Clearing and retrying with anon key...', error);
+          localStorage.removeItem('sb-kxoivmflghfgtvawhktt-auth-token');
+          const retryRes = await window.supabaseClient
+            .from('thunderhouse_event_plans')
+            .select('*')
+            .order('event_date', { ascending: true });
+          data = retryRes.data;
+          error = retryRes.error;
+        }
+
+        if (error) throw error;
+
+        allPlans = data || [];
+
+        if (allPlans.length === 0) {
+          loadingEl.innerHTML = `
+            <div style="font-size: 2.5rem; color: var(--cyber-gold); margin-bottom: 1rem;"><i class="fa-solid fa-calendar-xmark"></i></div>
+            <h3 style="color: #fff; font-family: var(--font-heading); margin-bottom: 0.5rem;">No Active Gigs Found</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">No upcoming event plans are currently logged in the system.</p>
+            <a href="intake.html" class="btn btn-primary" style="margin-top: 1rem;"><i class="fa-solid fa-plus"></i> Submit New Client Intake</a>
+          `;
+          return;
+        }
+
+        // Populate dropdown
+        const selector = document.getElementById('gig-selector');
+        selector.innerHTML = allPlans.map(p => {
+          const dStr = p.event_date ? new Date(p.event_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'TBD';
+          return `<option value="${p.id}">${dStr} — ${escapeHtml(p.client_name)} (${escapeHtml(p.event_type || 'Event')})</option>`;
+        }).join('');
+
+        // Determine which gig to select
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramId = urlParams.get('id');
+        const paramToken = urlParams.get('token');
+        const paramInvoice = urlParams.get('invoice');
+
+        let matched = null;
+        if (paramId) matched = allPlans.find(p => p.id === paramId);
+        else if (paramToken) matched = allPlans.find(p => p.portal_token === paramToken);
+        else if (paramInvoice) matched = allPlans.find(p => p.invoice_number === paramInvoice);
+
+        if (!matched) matched = allPlans[0];
+
+        selector.value = matched.id;
+        renderActiveGig(matched);
+
+        loadingEl.style.display = 'none';
+        shellEl.style.display = 'block';
+
+      } catch (err) {
+        console.error('Error loading gigs:', err);
+        loadingEl.innerHTML = `
+          <div style="font-size: 2.5rem; color: var(--cyber-red); margin-bottom: 1rem;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <h3 style="color: #fff; font-family: var(--font-heading); margin-bottom: 0.5rem;">Unable to Load Gig Vault</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">${escapeHtml(err.message)}</p>
+        `;
+      }
+    }
+
+    function onSelectGigChange(planId) {
+      const plan = allPlans.find(p => p.id === planId);
+      if (plan) {
+        renderActiveGig(plan);
+        // Update URL cleanly without reloading
+        const url = new URL(window.location);
+        url.searchParams.set('id', plan.id);
+        window.history.replaceState({}, '', url);
+      }
+    }
+
+    // =========================================================================
+    // RENDER ACTIVE GIG
+    // =========================================================================
+    function renderActiveGig(plan) {
+      currentPlan = plan;
+
+      // 1. Hero Elements
+      document.getElementById('hero-client-names').textContent = plan.client_name;
+      document.getElementById('hero-event-type-badge').textContent = plan.event_type || 'Event';
+      document.getElementById('hero-venue-name').textContent = plan.venue_name || plan.venue_city || 'Oklahoma City, OK';
+
+      const djName = plan.assigned_dj_name || 'DJ Marcus';
+      document.getElementById('hero-dj-name').textContent = djName;
+
+      // Date & Countdown
+      if (plan.event_date) {
+        const dObj = new Date(plan.event_date + 'T00:00:00');
+        document.getElementById('hero-date-str').textContent = dObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+
+        const now = new Date();
+        const diffDays = Math.ceil((dObj - now) / (1000 * 60 * 60 * 24));
+        const badge = document.getElementById('hero-countdown-badge');
+        if (diffDays === 0) {
+          badge.textContent = '⚡ TONIGHT IS SHOWTIME!';
+          badge.className = 'badge-pill badge-pink';
+        } else if (diffDays > 0) {
+          badge.textContent = `In ${diffDays} Days`;
+          badge.className = 'badge-pill badge-cyan';
+        } else {
+          badge.textContent = 'Event Completed';
+          badge.className = 'badge-pill badge-green';
+        }
+      }
+
+      // Status
+      document.getElementById('hero-status-badge').textContent = plan.status || 'Confirmed';
+
+      // Maps Navigation Link
+      const mapsQuery = encodeURIComponent(`${plan.venue_name || ''} ${plan.venue_address || plan.venue_city || 'Oklahoma City, OK'}`);
+      document.getElementById('btn-maps-nav').href = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
+
+      // Stat Strip
+      document.getElementById('stat-load-in').textContent = plan.load_in_time || '3:30 PM';
+      document.getElementById('stat-sound-check').textContent = plan.sound_check_time || '4:30 PM';
+      document.getElementById('stat-guest-count').textContent = plan.guest_count ? `${plan.guest_count} Guests` : '150+ Guests';
+
+      // 2. Timeline Run of Show
+      renderTimeline(plan.timeline_items || []);
+
+      // 3. VIP Names & Pronunciations
+      renderVipNames(plan.vip_names_pronunciations || []);
+      const announcementsEl = document.getElementById('mc-announcements-text');
+      announcementsEl.textContent = plan.special_announcements || plan.mc_notes || 'No special announcements recorded by client.';
+
+      // 4. Music Vault
+      renderSpecialMoments(plan.special_moments || {});
+      renderMusicLists(plan.must_play_songs || [], plan.do_not_play_songs || []);
+      renderSpotifyEmbed(plan.spotify_playlist_url);
+
+      // 5. Contacts & Venue
+      document.getElementById('contact-client-name').textContent = plan.client_name;
+      document.getElementById('contact-client-phone').textContent = plan.client_phone || 'Call Client';
+      document.getElementById('btn-call-client').href = plan.client_phone ? `tel:${plan.client_phone.replace(/[^0-9]/g, '')}` : '#';
+
+      document.getElementById('contact-coord-name').textContent = plan.coordinator_name || 'Venue Coordinator';
+      document.getElementById('contact-coord-phone').textContent = plan.coordinator_phone || 'Call Venue';
+      document.getElementById('btn-call-coord').href = plan.coordinator_phone ? `tel:${plan.coordinator_phone.replace(/[^0-9]/g, '')}` : '#';
+
+      document.getElementById('venue-power-notes').textContent = plan.power_notes || 'Dedicated 20A circuit along North Ballroom wall behind the DJ stage. House sound patch in closet B.';
+      document.getElementById('venue-dress-code').textContent = plan.dress_code || 'Formal Black Suit & Tie / Cyber Clean';
+
+      // 6. Gear Checklist
+      const gearList = (plan.gear_checklist && plan.gear_checklist.length > 0) ? plan.gear_checklist : DEFAULT_GEAR;
+      renderGearChecklist(gearList);
+
+      // 7. Shift Notes
+      document.getElementById('input-dj-shift-notes').value = plan.dj_shift_notes || '';
+      const stampEl = document.getElementById('gig-completed-stamp');
+      const compBtn = document.getElementById('btn-mark-completed');
+      if (plan.completed_at) {
+        const compDate = new Date(plan.completed_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        stampEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Shift completed at ${compDate}`;
+        compBtn.style.opacity = '0.7';
+        compBtn.innerHTML = '<i class="fa-solid fa-check-double"></i> Gig Marked Completed';
+      } else {
+        stampEl.innerHTML = '';
+        compBtn.style.opacity = '1';
+        compBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Mark Gig Completed & Clock Out';
+      }
+    }
+
+    // =========================================================================
+    // 1. TIMELINE RUN OF SHOW RENDER
+    // =========================================================================
+    function renderTimeline(items) {
+      const container = document.getElementById('timeline-stream-container');
+      if (!items || items.length === 0) {
+        container.innerHTML = `
+          <div style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 1.5rem; font-style: italic;">
+            No timeline items added yet. Click "+ Add Cue" above to schedule event milestones.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = items.map((item, idx) => {
+        const isActive = (idx === activeCueIndex);
+        const isPassed = (idx < activeCueIndex);
+
+        let cardClass = 'cue-card';
+        if (isActive) cardClass += ' active-cue';
+        else if (isPassed) cardClass += ' passed-cue';
+
+        return `
+          <div class="${cardClass}" id="cue-row-${idx}">
+            <div class="cue-time-badge">${escapeHtml(item.time || 'TBD')}</div>
+            <div class="cue-content">
+              <div class="cue-title-row">
+                <h3 class="cue-title">${escapeHtml(item.title || 'Cue Item')}</h3>
+                <div class="cue-actions">
+                  <button type="button" class="cue-btn ${isActive ? 'btn-active-toggle' : ''}" onclick="setActiveCue(${idx})">
+                    ${isActive ? '<i class="fa-solid fa-circle-dot" style="color: var(--cyber-cyan);"></i> ACTIVE' : '<i class="fa-regular fa-circle"></i> Set Active'}
+                  </button>
+                  <button type="button" class="cue-btn" onclick="deleteCue(${idx})" title="Remove cue">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
+              </div>
+
+              ${item.song_cue ? `
+                <div class="cue-song-cue">
+                  <i class="fa-solid fa-music"></i> <strong>Song:</strong> ${escapeHtml(item.song_cue)}
+                </div>
+              ` : ''}
+
+              ${item.notes ? `
+                <p class="cue-notes">${escapeHtml(item.notes)}</p>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setActiveCue(idx) {
+      activeCueIndex = idx;
+      if (currentPlan) {
+        renderTimeline(currentPlan.timeline_items || []);
+      }
+    }
+
+    function deleteCue(idx) {
+      if (!currentPlan || !currentPlan.timeline_items) return;
+      if (!confirm('Remove this timeline cue?')) return;
+
+      currentPlan.timeline_items.splice(idx, 1);
+      renderTimeline(currentPlan.timeline_items);
+      saveTimelineToDatabase();
+    }
+
+    function openAddCueModal() {
+      document.getElementById('modal-cue-time').value = '';
+      document.getElementById('modal-cue-title').value = '';
+      document.getElementById('modal-cue-song').value = '';
+      document.getElementById('modal-cue-notes').value = '';
+      document.getElementById('modal-add-cue').style.display = 'flex';
+    }
+
+    function closeAddCueModal() {
+      document.getElementById('modal-add-cue').style.display = 'none';
+    }
+
+    function saveNewCue() {
+      if (!currentPlan) return;
+      const time = document.getElementById('modal-cue-time').value.trim();
+      const title = document.getElementById('modal-cue-title').value.trim();
+      const song = document.getElementById('modal-cue-song').value.trim();
+      const notes = document.getElementById('modal-cue-notes').value.trim();
+
+      if (!title) {
+        alert('Please enter a cue title.');
+        return;
+      }
+
+      currentPlan.timeline_items = currentPlan.timeline_items || [];
+      currentPlan.timeline_items.push({
+        time: time || 'TBD',
+        title: title,
+        song_cue: song || null,
+        notes: notes || null
+      });
+
+      renderTimeline(currentPlan.timeline_items);
+      closeAddCueModal();
+      saveTimelineToDatabase();
+    }
+
+    async function saveTimelineToDatabase() {
+      if (!currentPlan || !currentPlan.id) return;
+      try {
+        await window.supabaseClient
+          .from('thunderhouse_event_plans')
+          .update({
+            timeline_items: currentPlan.timeline_items,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', currentPlan.id);
+      } catch (err) {
+        console.error('Error saving timeline:', err);
+      }
+    }
+
+    // =========================================================================
+    // 2. VIP NAMES & PRONUNCIATIONS
+    // =========================================================================
+    function renderVipNames(vips) {
+      const container = document.getElementById('vip-names-container');
+      if (!vips || vips.length === 0) {
+        container.innerHTML = `
+          <div style="color: var(--text-muted); font-size: 0.88rem; padding: 1rem; text-align: center; font-style: italic; grid-column: 1 / -1;">
+            No VIP phonetic names added yet.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = vips.map(v => {
+        // Extract bracketed pronunciation if present (e.g. Elena [el-AY-nuh])
+        const raw = v.names || '';
+        const match = raw.match(/\[(.*?)\]/);
+        let phonetic = match ? match[1] : '';
+        let cleanName = raw.replace(/\[(.*?)\]/g, '').trim();
+
+        return `
+          <div class="vip-card">
+            <div class="vip-role">${escapeHtml(v.role || 'VIP / Bridal Party')}</div>
+            <div class="vip-names">${escapeHtml(cleanName)}</div>
+            ${phonetic ? `
+              <div class="pronounce-phonetic">
+                <i class="fa-solid fa-volume-high"></i> PRONOUNCED: ${escapeHtml(phonetic)}
+              </div>
+            ` : `
+              <div style="font-size: 0.78rem; color: var(--text-muted); font-style: italic;">Standard pronunciation</div>
+            `}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // =========================================================================
+    // 3. MUSIC VAULT
+    // =========================================================================
+    function renderSpecialMoments(moments) {
+      const container = document.getElementById('moments-grid-container');
+      const items = [
+        { label: "Grand Entrance", val: moments.grand_entrance, icon: "fa-door-open" },
+        { label: "First Dance", val: moments.first_dance, icon: "fa-heart" },
+        { label: "Father / Daughter", val: moments.parent_dance_1, icon: "fa-person-dress" },
+        { label: "Mother / Son", val: moments.parent_dance_2, icon: "fa-user-tie" },
+        { label: "Cake Cutting", val: moments.cake_cutting, icon: "fa-cake-candles" },
+        { label: "Grand Finale Song", val: moments.last_song, icon: "fa-fire" }
+      ];
+
+      container.innerHTML = items.map(m => `
+        <div class="moment-card">
+          <div class="moment-label"><i class="fa-solid ${m.icon}"></i> ${m.label}</div>
+          <div class="moment-song">${escapeHtml(m.val || 'Not Specified')}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderMusicLists(musts, dnps) {
+      document.getElementById('count-must-plays').textContent = musts.length;
+      document.getElementById('count-do-not-plays').textContent = dnps.length;
+
+      const mustContainer = document.getElementById('list-must-plays');
+      if (musts.length === 0) {
+        mustContainer.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">No specific must-plays.</div>';
+      } else {
+        mustContainer.innerHTML = musts.map(s => `
+          <div class="track-tile must">
+            <div class="track-info">
+              <div class="track-name">${escapeHtml(s.title)}</div>
+              ${s.artist ? `<div class="track-artist">by ${escapeHtml(s.artist)}</div>` : ''}
+              ${s.note ? `<div class="track-note"><i class="fa-solid fa-comment-dots"></i> ${escapeHtml(s.note)}</div>` : ''}
+            </div>
+            <i class="fa-solid fa-fire" style="color: var(--cyber-cyan);"></i>
+          </div>
+        `).join('');
+      }
+
+      const dnpContainer = document.getElementById('list-do-not-plays');
+      if (dnps.length === 0) {
+        dnpContainer.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">No banned tracks.</div>';
+      } else {
+        dnpContainer.innerHTML = dnps.map(s => `
+          <div class="track-tile dnp">
+            <div class="track-info">
+              <div class="track-name" style="color: #fca5a5;">${escapeHtml(s.title)}</div>
+              ${s.artist ? `<div class="track-artist">${escapeHtml(s.artist)}</div>` : ''}
+              ${s.note ? `<div class="track-note" style="color: var(--cyber-red);">${escapeHtml(s.note)}</div>` : ''}
+            </div>
+            <i class="fa-solid fa-ban" style="color: var(--cyber-red);"></i>
+          </div>
+        `).join('');
+      }
+    }
+
+    function renderSpotifyEmbed(url) {
+      const container = document.getElementById('spotify-embed-area');
+      const actionWrap = document.getElementById('spotify-app-link-wrap');
+
+      if (!url || !url.includes('spotify.com/playlist/')) {
+        container.style.display = 'none';
+        container.innerHTML = '';
+        actionWrap.innerHTML = '';
+        return;
+      }
+
+      const match = url.match(/playlist\/([a-zA-Z0-9]+)/);
+      if (match && match[1]) {
+        const playlistId = match[1];
+        actionWrap.innerHTML = `
+          <a href="spotify:playlist:${playlistId}" class="btn-top" style="border-color: #1db954; color: #1db954;" title="Open directly in native Spotify App">
+            <i class="fa-brands fa-spotify"></i> Launch Spotify App
+          </a>
+        `;
+
+        container.style.display = 'block';
+        container.innerHTML = `
+          <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        `;
+      }
+    }
+
+    // =========================================================================
+    // 5. GEAR CHECKLIST
+    // =========================================================================
+    function renderGearChecklist(gear) {
+      const container = document.getElementById('gear-checklist-container');
+      container.innerHTML = gear.map((g, idx) => `
+        <label class="gear-item ${g.checked ? 'checked' : ''}">
+          <input type="checkbox" ${g.checked ? 'checked' : ''} onchange="toggleGearItem(${idx}, this.checked)">
+          <span class="gear-label">${escapeHtml(g.item)}</span>
+        </label>
+      `).join('');
+    }
+
+    async function toggleGearItem(index, isChecked) {
+      if (!currentPlan) return;
+      currentPlan.gear_checklist = currentPlan.gear_checklist || DEFAULT_GEAR;
+      if (currentPlan.gear_checklist[index]) {
+        currentPlan.gear_checklist[index].checked = isChecked;
+      }
+
+      renderGearChecklist(currentPlan.gear_checklist);
+
+      try {
+        await window.supabaseClient
+          .from('thunderhouse_event_plans')
+          .update({
+            gear_checklist: currentPlan.gear_checklist,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', currentPlan.id);
+      } catch (err) {
+        console.error('Error updating gear checklist:', err);
+      }
+    }
+
+    // =========================================================================
+    // 6. SHIFT LOG & COMPLETION
+    // =========================================================================
+    function onShiftNotesInput() {
+      const statusEl = document.getElementById('shift-sync-status');
+      if (statusEl) statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Syncing...';
+
+      clearTimeout(shiftNotesSaveTimer);
+      shiftNotesSaveTimer = setTimeout(async () => {
+        if (!currentPlan) return;
+        const notes = document.getElementById('input-dj-shift-notes').value;
+        currentPlan.dj_shift_notes = notes;
+
+        try {
+          await window.supabaseClient
+            .from('thunderhouse_event_plans')
+            .update({
+              dj_shift_notes: notes,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', currentPlan.id);
+
+          if (statusEl) statusEl.innerHTML = '<i class="fa-solid fa-cloud-check"></i> Changes auto-synced';
+        } catch (err) {
+          console.error('Error saving shift notes:', err);
+          if (statusEl) statusEl.innerHTML = '<span style="color: var(--cyber-red);">Sync error</span>';
+        }
+      }, 750);
+    }
+
+    async function markGigComplete() {
+      if (!currentPlan) return;
+      if (!confirm(`Mark "${currentPlan.client_name}" gig as successfully completed and clock out?`)) return;
+
+      const nowIso = new Date().toISOString();
+      const compBtn = document.getElementById('btn-mark-completed');
+      compBtn.disabled = true;
+
+      try {
+        const { error } = await window.supabaseClient
+          .from('thunderhouse_event_plans')
+          .update({
+            status: 'Completed',
+            completed_at: nowIso,
+            updated_at: nowIso
+          })
+          .eq('id', currentPlan.id);
+
+        if (error) throw error;
+
+        currentPlan.status = 'Completed';
+        currentPlan.completed_at = nowIso;
+
+        const stampEl = document.getElementById('gig-completed-stamp');
+        const compDate = new Date(nowIso).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        stampEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Shift completed at ${compDate}`;
+        compBtn.style.opacity = '0.7';
+        compBtn.innerHTML = '<i class="fa-solid fa-check-double"></i> Gig Marked Completed';
+
+        alert('⚡ Awesome work! Gig shift officially marked completed and logged with Thunder House ENT HQ.');
+      } catch (err) {
+        alert('Error completing gig: ' + err.message);
+        compBtn.disabled = false;
+      }
+    }
+
+    // =========================================================================
+    // SHOWTIME WAKE LOCK & HIGH CONTRAST MODE
+    // =========================================================================
+    async function toggleShowtimeMode() {
+      const btn = document.getElementById('btn-showtime-toggle');
+      document.body.classList.toggle('showtime-mode');
+      const isShowtime = document.body.classList.contains('showtime-mode');
+
+      if (isShowtime) {
+        btn.classList.add('active-showtime');
+        btn.innerHTML = '<i class="fa-solid fa-fire"></i> Showtime Active';
+        // Request Screen Wake Lock
+        try {
+          if ('wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+          }
+        } catch (err) {
+          console.warn('WakeLock not supported or denied:', err);
+        }
+      } else {
+        btn.classList.remove('active-showtime');
+        btn.innerHTML = '<i class="fa-solid fa-moon"></i> Showtime Mode';
+        if (wakeLock) {
+          wakeLock.release().then(() => { wakeLock = null; });
+        }
+      }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

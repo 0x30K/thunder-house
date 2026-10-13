@@ -5,6 +5,8 @@
     { "source": "/login", "destination": "/login.html" },
     { "source": "/invoice", "destination": "/invoice.html" },
     { "source": "/portal", "destination": "/portal.html" },
-    { "source": "/intake", "destination": "/intake.html" }
+    { "source": "/intake", "destination": "/intake.html" },
+    { "source": "/gigs", "destination": "/gigs.html" },
+    { "source": "/runofshow", "destination": "/gigs.html" }
   ]
 }

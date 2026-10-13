@@ -880,6 +880,12 @@
           </label>
           <span id="admin-autosend-badge-status" style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted);">OFF (Review)</span>
         </div>
+      <a href="gigs.html" target="_blank" class="btn btn-outline btn-sm" style="border-color: var(--primary); color: var(--primary);" title="Open DJ Run of Show & Gig Pack">
+        <i class="fa-solid fa-stopwatch"></i> Run of Show
+      </a>
+      <a href="intake.html" target="_blank" class="btn btn-outline btn-sm" title="Open Staff Client Intake Portal">
+        <i class="fa-solid fa-clipboard-question"></i> Intake
+      </a>
       <a href="index.html" class="btn btn-outline btn-sm" target="_blank">
         <i class="fa-solid fa-arrow-up-right-from-square"></i> View Website
       </a>
@@ -3789,6 +3795,9 @@
                 </button>
                 <a href="/portal?invoice=${encodeURIComponent(inv.invoice_number)}" target="_blank" class="btn-action-sm" title="Open Client VIP Planning & Music Hub" style="color: var(--accent-gold);">
                   <i class="fa-solid fa-compact-disc"></i>
+                </a>
+                <a href="/gigs?invoice=${encodeURIComponent(inv.invoice_number)}" target="_blank" class="btn-action-sm" title="Open DJ Run of Show & Gig Pack" style="color: var(--primary);">
+                  <i class="fa-solid fa-stopwatch"></i>
                 </a>
                 <button class="btn-action-sm" onclick="dispatchInvoiceEmailPrompt('${inv.id}')" title="Send / Resend Invoice Email to Client" style="color: var(--primary);">
                   <i class="fa-solid fa-paper-plane"></i>
