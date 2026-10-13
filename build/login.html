@@ -134,7 +134,18 @@
       if (window.supabaseClient) {
         const { data: { session } } = await window.supabaseClient.auth.getSession();
         if (session) {
-          window.location.href = 'admin.html';
+          let targetUrl = 'admin.html';
+          try {
+            const { data: member } = await window.supabaseClient
+              .from('thunderhouse_team')
+              .select('role')
+              .eq('email', session.user.email)
+              .maybeSingle();
+            if (member && member.role !== 'superuser') {
+              targetUrl = 'intake.html';
+            }
+          } catch (e) {}
+          window.location.href = targetUrl;
           return;
         }
       }
@@ -163,7 +174,21 @@
           if (error) throw error;
 
           if (data.session) {
-            window.location.href = 'admin.html';
+            let targetUrl = 'admin.html';
+            try {
+              const { data: member } = await window.supabaseClient
+                .from('thunderhouse_team')
+                .select('role')
+                .eq('email', email)
+                .maybeSingle();
+
+              if (member && member.role !== 'superuser') {
+                targetUrl = 'intake.html';
+              }
+            } catch (roleErr) {
+              console.warn('Role lookup notice:', roleErr);
+            }
+            window.location.href = targetUrl;
           }
         } catch (err) {
           errorDiv.style.display = 'block';

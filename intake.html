@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Client Intake & Discovery Guide | Thunder House ENT</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Custom Design System Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    :root {
+      --cyber-cyan: #00e5ff;
+      --cyber-gold: #ffb703;
+      --cyber-pink: #ff2a85;
+      --cyber-bg: #05070b;
+      --cyber-card: rgba(10, 14, 23, 0.92);
+      --cyber-border: rgba(0, 229, 255, 0.2);
+    }
+
+    body {
+      background-color: var(--cyber-bg);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem 1rem 3rem 1rem;
+    }
+
+    .intake-container {
+      max-width: 820px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Top Bar */
+    .intake-nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .staff-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      color: var(--cyber-cyan);
+      font-weight: 600;
+    }
+
+    /* Main Card */
+    .intake-card {
+      background: var(--cyber-card);
+      border: 1px solid var(--cyber-border);
+      border-radius: var(--radius-lg);
+      padding: 2.25rem 2.5rem;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 229, 255, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .intake-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--cyber-cyan), var(--cyber-gold), transparent);
+    }
+
+    /* Header */
+    .intake-header {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 1.5rem;
+    }
+
+    .intake-header img {
+      height: 52px;
+      width: auto;
+    }
+
+    .intake-header h1 {
+      font-family: var(--font-heading);
+      font-size: 1.65rem;
+      color: #fff;
+      margin: 0 0 0.25rem 0;
+    }
+
+    .intake-header p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      margin: 0;
+    }
+
+    /* Progress Stepper */
+    .progress-bar-wrap {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyber-cyan), var(--cyber-gold));
+      width: 20%;
+      transition: width 0.3s ease;
+    }
+
+    .step-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .step-labels .active {
+      color: var(--cyber-cyan);
+    }
+
+    /* Question Prompt Box (Conversational Guidance for Rookie DJ) */
+    .dj-prompt-box {
+      background: rgba(255, 183, 3, 0.08);
+      border-left: 3px solid var(--cyber-gold);
+      border-radius: 0 8px 8px 0;
+      padding: 0.85rem 1.15rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.88rem;
+      color: #fed7aa;
+      line-height: 1.5;
+    }
+
+    .dj-prompt-box strong {
+      color: var(--cyber-gold);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    /* Wizard Steps */
+    .wizard-step {
+      display: none;
+    }
+
+    .wizard-step.active {
+      display: block;
+      animation: fadeInStep 0.25s ease;
+    }
+
+    @keyframes fadeInStep {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Form Fields */
+    .intake-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .intake-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      margin-bottom: 0.45rem;
+    }
+
+    .intake-input, .intake-select, .intake-textarea {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-md);
+      padding: 0.8rem 1rem;
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .intake-input:focus, .intake-select:focus, .intake-textarea:focus {
+      outline: none;
+      border-color: var(--cyber-cyan);
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.25);
+      background: rgba(0, 0, 0, 0.65);
+    }
+
+    /* Event Type Cards */
+    .event-type-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .event-type-pill {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+      padding: 1rem 0.75rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .event-type-pill:hover {
+      border-color: rgba(0, 229, 255, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .event-type-pill.active {
+      background: rgba(0, 229, 255, 0.12);
+      border-color: var(--cyber-cyan);
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+    }
+
+    .event-type-pill i {
+      font-size: 1.5rem;
+      color: var(--cyber-cyan);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .event-type-pill span {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    /* Package Selector Cards */
+    .package-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .pkg-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pkg-card:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .pkg-card.active {
+      background: rgba(0, 229, 255, 0.1);
+      border-color: var(--cyber-cyan);
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.15);
+    }
+
+    .pkg-price {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--cyber-gold);
+      margin-top: 0.35rem;
+    }
+
+    /* Add-Ons List */
+    .addon-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.85rem 1.15rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      margin-bottom: 0.65rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .addon-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .addon-item.active {
+      background: rgba(255, 183, 3, 0.08);
+      border-color: var(--cyber-gold);
+    }
+
+    /* Live Quote Drawer */
+    .quote-summary-box {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .quote-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      padding: 0.3rem 0;
+      color: #cbd5e1;
+    }
+
+    .quote-row.total {
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      margin-top: 0.5rem;
+      padding-top: 0.75rem;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .quote-row.deposit {
+      color: var(--cyber-gold);
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    /* Wizard Nav Buttons */
+    .wizard-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="intake-container">
+    <!-- Top Nav -->
+    <div class="intake-nav-bar">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <span class="staff-badge">
+          <i class="fa-solid fa-user-tie"></i> <span id="staff-name-display">Loading staff info...</span>
+        </span>
+        <span class="staff-badge" style="background: rgba(255, 183, 3, 0.1); border-color: rgba(255, 183, 3, 0.3); color: var(--cyber-gold);" id="review-mode-indicator">
+          <i class="fa-solid fa-clipboard-check"></i> Manager Review Active
+        </span>
+      </div>
+      <div>
+        <button class="btn btn-outline btn-sm" onclick="handleLogout()" style="font-size: 0.8rem; border-color: rgba(255,255,255,0.2);">
+          <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="intake-card">
+      <div class="intake-header">
+        <img src="assets/images/branding/Thunder House Logo-PNG.png" alt="Thunder House ENT">
+        <div>
+          <h1>Client Discovery & Intake Guide</h1>
+          <p>Follow the guided questions below during your consultation. Pricing and timeline will calculate automatically.</p>
+        </div>
+      </div>
+
+      <!-- Stepper Progress Bar -->
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="stepper-fill"></div>
+      </div>
+      <div class="step-labels">
+        <span id="label-step-1" class="active">1. Client</span>
+        <span id="label-step-2">2. Event</span>
+        <span id="label-step-3">3. Questions</span>
+        <span id="label-step-4">4. Production</span>
+        <span id="label-step-5">5. Review</span>
+      </div>
+
+      <form id="intake-form" onsubmit="return false;">
+        <!-- STEP 1: CLIENT BASICS -->
+        <div class="wizard-step active" id="step-1">
+          <div class="dj-prompt-box">
+            <strong><i class="fa-solid fa-comment-dots"></i> How to ask naturally:</strong>
+            "Hey! Thanks so much for taking time to connect with Thunder House. I'd love to grab your contact info so we can hold your date on our master calendar."
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="intake-group">
+              <label class="intake-label">Client Full Name *</label>
+              <input type="text" id="intake-client-name" class="intake-input" placeholder="e.g. Sarah Mitchell" required>
+            </div>
+            <div class="intake-group">
+              <label class="intake-label">Client Email Address *</label>
+              <input type="email" id="intake-client-email" class="intake-input" placeholder="e.g. sarah@example.com" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="intake-group">
+              <label class="intake-label">Client Mobile Phone</label>
+              <input type="tel" id="intake-client-phone" class="intake-input" placeholder="e.g. (405) 555-0199">
+            </div>
+            <div class="intake-group">
+              <label class="intake-label">How Did You Hear About Us?</label>
+              <select id="intake-source" class="intake-select">
+                <option value="Google Search">Google Search / Maps</option>
+                <option value="Instagram / TikTok">Instagram / Social Media</option>
+                <option value="Venue Recommendation">Venue Preferred Vendor List</option>
+                <option value="Word of Mouth">Friend / Family Referral</option>
+                <option value="Saw us at an event">Saw Thunder House at Another Event</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: THE EVENT LOGISTICS -->
+        <div class="wizard-step" id="step-2">
+          <div class="dj-prompt-box">
+            <strong><i class="fa-solid fa-comment-dots"></i> Conversational Guide:</strong>
+            "Tell me about the venue and date you guys are planning for! Is it indoors, or will there be an outdoor patio/courtyard section?"
+          </div>
+
+          <div class="intake-group">
+            <label class="intake-label">Select Event Type *</label>
+            <div class="event-type-grid">
+              <div class="event-type-pill active" onclick="selectEventType('Wedding', this)">
+                <i class="fa-solid fa-rings-wedding"></i>
+                <span>Wedding</span>
+              </div>
+              <div class="event-type-pill" onclick="selectEventType('Corporate', this)">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>Corporate Gala</span>
+              </div>
+              <div class="event-type-pill" onclick="selectEventType('School', this)">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>School / Prom</span>
+              </div>
+              <div class="event-type-pill" onclick="selectEventType('Party', this)">
+                <i class="fa-solid fa-champagne-glasses"></i>
+                <span>Party / Birthday</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 1rem;">
+            <div class="intake-group">
+              <label class="intake-label">Event Date *</label>
+              <input type="date" id="intake-event-date" class="intake-input" required>
+            </div>
+            <div class="intake-group">
+              <label class="intake-label">Estimated Guest Count</label>
+              <input type="number" id="intake-guest-count" class="intake-input" placeholder="e.g. 150">
+            </div>
+            <div class="intake-group">
+              <label class="intake-label">City / Region</label>
+              <input type="text" id="intake-venue-city" class="intake-input" value="Oklahoma City, OK">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 1rem;">
+            <div class="intake-group">
+              <label class="intake-label">Venue Name / Location</label>
+              <input type="text" id="intake-venue-name" class="intake-input" placeholder="e.g. The Skirvin, Omni, Southwind Hills">
+            </div>
+            <div class="intake-group">
+              <label class="intake-label">Start Time</label>
+              <input type="text" id="intake-start-time" class="intake-input" placeholder="e.g. 5:00 PM">
+            </div>
+            <div class="intake-group">
+              <label class="intake-label">End Time</label>
+              <input type="text" id="intake-end-time" class="intake-input" placeholder="e.g. 10:30 PM">
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: DYNAMIC QUESTIONS (BRANCHING) -->
+        <div class="wizard-step" id="step-3">
+          <!-- WEDDING QUESTIONS -->
+          <div id="branch-wedding">
+            <div class="dj-prompt-box">
+              <strong><i class="fa-solid fa-heart"></i> Wedding Focus Questions:</strong>
+              "Weddings have lots of moving pieces! Do you need us handling the ceremony audio, or is our setup strictly for the cocktail hour and reception party?"
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="intake-group">
+                <label class="intake-label">Ceremony Audio Needed?</label>
+                <select id="q-wedding-ceremony" class="intake-select">
+                  <option value="Yes - Lapel Mic & Ceremony Music Needed">Yes — Lapel Mic for Officiant + Prelude/Processional</option>
+                  <option value="No - Reception Only">No — Reception Party Only</option>
+                  <option value="Ceremony is at Separate Church">Ceremony at Separate Church / Off-site</option>
+                </select>
+              </div>
+              <div class="intake-group">
+                <label class="intake-label">Cocktail Hour Location</label>
+                <select id="q-wedding-cocktail" class="intake-select">
+                  <option value="Same Main Ballroom">In Same Main Ballroom</option>
+                  <option value="Separate Foyer / Outdoor Patio (Secondary Audio)">Separate Patio / Foyer (Needs Wireless Audio)</option>
+                  <option value="No Cocktail Music Needed">No Cocktail Music</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="intake-group">
+                <label class="intake-label">Grand Entrance Style</label>
+                <select id="q-wedding-entrance" class="intake-select">
+                  <option value="High Energy Club Hype">High Energy Club Hype (Get the room on their feet!)</option>
+                  <option value="Classic & Elegant">Classic & Elegant</option>
+                  <option value="Fun & Lighthearted">Fun & Lighthearted</option>
+                </select>
+              </div>
+              <div class="intake-group">
+                <label class="intake-label">Wedding Coordinator / Planner</label>
+                <input type="text" id="q-wedding-coordinator" class="intake-input" placeholder="Planner name & cell (if applicable)">
+              </div>
+            </div>
+          </div>
+
+          <!-- CORPORATE QUESTIONS -->
+          <div id="branch-corporate" style="display: none;">
+            <div class="dj-prompt-box">
+              <strong><i class="fa-solid fa-briefcase"></i> Corporate Focus Questions:</strong>
+              "Will leadership be giving presentations or award announcements? We provide pristine wireless roaming microphones and audio patching for video presentations."
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="intake-group">
+                <label class="intake-label">Microphones for Presentations</label>
+                <select id="q-corp-mics" class="intake-select">
+                  <option value="2 Wireless Handhelds + Podium">2 Wireless Handhelds for Keynotes</option>
+                  <option value="Lapel / Headset Mic Needed">Lapel / Wireless Lavalier Needed</option>
+                  <option value="Background Music Only">No Presentation Mics — Just Ambient Music</option>
+                </select>
+              </div>
+              <div class="intake-group">
+                <label class="intake-label">Brand Theme Colors for Uplighting</label>
+                <input type="text" id="q-corp-colors" class="intake-input" placeholder="e.g. Navy Blue & Gold">
+              </div>
+            </div>
+          </div>
+
+          <!-- SCHOOL DANCE QUESTIONS -->
+          <div id="branch-school" style="display: none;">
+            <div class="dj-prompt-box">
+              <strong><i class="fa-solid fa-graduation-cap"></i> School / Prom Focus:</strong>
+              "We strictly enforce clean radio edits and keep the dance floor packed with high-energy trending club edits that students love."
+            </div>
+            <div class="intake-group">
+              <label class="intake-label">Clean Radio Edits Strictly Required?</label>
+              <select id="q-school-clean" class="intake-select">
+                <option value="Yes - 100% Clean Radio Edits Only">Yes — 100% Clean Radio Edits Only</option>
+                <option value="Radio Edits with Chaperone Approval">Radio Edits with Chaperone Approval</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- GENERAL PARTY QUESTIONS -->
+          <div id="branch-party" style="display: none;">
+            <div class="dj-prompt-box">
+              <strong><i class="fa-solid fa-champagne-glasses"></i> Private Celebration Focus:</strong>
+              "What milestone are we celebrating? We'll make sure the guest of honor gets the spotlight and the playlist matches their favorite era."
+            </div>
+            <div class="intake-group">
+              <label class="intake-label">Milestone Celebration</label>
+              <input type="text" id="q-party-milestone" class="intake-input" placeholder="e.g. 50th Birthday, Sweet 16, Anniversary Gala">
+            </div>
+          </div>
+
+          <div class="intake-group" style="margin-top: 1rem;">
+            <label class="intake-label">Crowd Music Direction & Vibe</label>
+            <textarea id="intake-vibe-notes" class="intake-textarea" rows="2" placeholder="e.g. Loves 2000s R&B and pop throwbacks. Strictly no line dances. Wants high-energy late night dancing."></textarea>
+          </div>
+        </div>
+
+        <!-- STEP 4: PACKAGES & HIGH-MARGIN UPSELLS -->
+        <div class="wizard-step" id="step-4">
+          <div class="dj-prompt-box">
+            <strong><i class="fa-solid fa-bullhorn"></i> How to pitch add-ons naturally:</strong>
+            "Most of our clients pair their DJ package with our wireless uplighting or cold spark machines—they take photos from ordinary to absolute stadium-level."
+          </div>
+
+          <label class="intake-label">Select Base Entertainment Package</label>
+          <div class="package-grid">
+            <div class="pkg-card" onclick="selectPackage('The Classic (3-Hour)', 750, this)">
+              <strong style="color: #fff;">The Classic</strong>
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">3 Hours • Pro Audio & DJ/MC</div>
+              <div class="pkg-price">$750</div>
+            </div>
+            <div class="pkg-card active" onclick="selectPackage('The Thunder Experience (4-Hour)', 950, this)">
+              <strong style="color: var(--cyber-cyan);">The Thunder Experience</strong>
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">4 Hours • Dance Lighting + Sound</div>
+              <div class="pkg-price">$950</div>
+            </div>
+            <div class="pkg-card" onclick="selectPackage('All-Day VIP Production (6-Hour)', 1400, this)">
+              <strong style="color: var(--cyber-gold);">All-Day VIP Production</strong>
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">6 Hours • Full Day + Uplights</div>
+              <div class="pkg-price">$1,400</div>
+            </div>
+          </div>
+
+          <label class="intake-label" style="margin-top: 1.5rem;">Select Production Add-Ons & Visual FX</label>
+          <div id="addons-list">
+            <div class="addon-item" onclick="toggleAddon('Cold Spark Machines (2 Units)', 200, this)">
+              <div>
+                <strong style="color: #fff;"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--cyber-gold);"></i> Cold Spark Pyrotechnics (2 Units)</strong>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Indoor/outdoor safe cold fireworks for grand entrance & final dance</div>
+              </div>
+              <span style="font-weight: 700; color: var(--cyber-gold); font-size: 0.95rem;">+$200</span>
+            </div>
+
+            <div class="addon-item" onclick="toggleAddon('Intelligent Wireless Uplighting (8 Units)', 250, this)">
+              <div>
+                <strong style="color: #fff;"><i class="fa-solid fa-lightbulb" style="color: var(--cyber-cyan);"></i> Intelligent Architectural Uplighting (8 Units)</strong>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Custom RGB room wash synced to wedding or corporate theme colors</div>
+              </div>
+              <span style="font-weight: 700; color: var(--cyber-cyan); font-size: 0.95rem;">+$250</span>
+            </div>
+
+            <div class="addon-item" onclick="toggleAddon('Dancing on a Cloud (Dry Ice Low Fog)', 350, this)">
+              <div>
+                <strong style="color: #fff;"><i class="fa-solid fa-cloud" style="color: #e2e8f0;"></i> Dancing on a Cloud (Low-Lying Fog)</strong>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Pure dry ice cloud effect covering dance floor for first dance photos</div>
+              </div>
+              <span style="font-weight: 700; color: #fff; font-size: 0.95rem;">+$350</span>
+            </div>
+
+            <div class="addon-item" onclick="toggleAddon('Extra Showtime Hour', 150, this)">
+              <div>
+                <strong style="color: #fff;"><i class="fa-solid fa-clock-rotate-left" style="color: var(--cyber-cyan);"></i> Extra Showtime Hour (+1 Hr)</strong>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Extended after-party performance</div>
+              </div>
+              <span style="font-weight: 700; color: var(--cyber-cyan); font-size: 0.95rem;">+$150</span>
+            </div>
+          </div>
+
+          <!-- Live Quote Box -->
+          <div class="quote-summary-box">
+            <div class="quote-row">
+              <span>Base Package (<span id="summary-pkg-name">The Thunder Experience</span>):</span>
+              <span id="summary-pkg-rate">$950.00</span>
+            </div>
+            <div class="quote-row" id="summary-addons-row" style="display: none;">
+              <span>Add-Ons Total:</span>
+              <span id="summary-addons-rate">$0.00</span>
+            </div>
+            <div class="quote-row total">
+              <span>Total Quoted:</span>
+              <span id="summary-total-rate" style="color: var(--cyber-cyan);">$950.00</span>
+            </div>
+            <div class="quote-row deposit">
+              <span>Date Reservation Deposit (Due to Lock):</span>
+              <span id="summary-deposit-rate">$500.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 5: REVIEW & DISPATCH -->
+        <div class="wizard-step" id="step-5">
+          <div class="dj-prompt-box" style="border-left-color: var(--cyber-cyan); background: rgba(0, 229, 255, 0.08); color: #bae6fd;">
+            <strong><i class="fa-solid fa-clipboard-check"></i> Final Review & Submission:</strong>
+            Double-check the client's name, email, and package. When you submit, this consultation is recorded under your staff profile.
+          </div>
+
+          <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; line-height: 1.6;">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem; margin-bottom: 0.75rem;">
+              <div>
+                <strong style="font-size: 1.15rem; color: #fff;" id="rev-client-name">--</strong>
+                <div style="font-size: 0.85rem; color: var(--text-muted);" id="rev-client-contact">--</div>
+              </div>
+              <div style="text-align: right;">
+                <span class="staff-badge" id="rev-event-type">Wedding</span>
+                <div style="font-size: 0.82rem; color: var(--cyber-cyan); font-weight: 700; margin-top: 0.25rem;" id="rev-event-date">--</div>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.88rem;">
+              <div>
+                <span style="color: var(--text-muted); display: block;">Venue:</span>
+                <strong id="rev-venue-info" style="color: #fff;">--</strong>
+              </div>
+              <div>
+                <span style="color: var(--text-muted); display: block;">Quoted Investment:</span>
+                <strong id="rev-total-info" style="color: var(--cyber-gold); font-size: 1.05rem;">$950.00</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="intake-group">
+            <label class="intake-label">Internal DJ Notes for Management (Private)</label>
+            <textarea id="intake-internal-notes" class="intake-textarea" rows="3" placeholder="Notes on client personality, special equipment instructions, load-in requirements, or special pricing agreements..."></textarea>
+          </div>
+
+          <!-- Dispatch Notice Box -->
+          <div id="dispatch-notice-box" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 1rem; margin-top: 1rem; display: flex; gap: 0.75rem; align-items: flex-start;">
+            <i class="fa-solid fa-shield-halved" style="color: #34d399; font-size: 1.25rem; margin-top: 0.15rem;"></i>
+            <div style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.5;">
+              <strong style="color: #34d399; display: block; margin-bottom: 0.2rem;" id="dispatch-notice-title">Manager Review Active</strong>
+              <span id="dispatch-notice-desc">
+                This intake will be sent directly to management. Once approved by Superuser, the client will receive their welcome email and deposit payment link.
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="wizard-actions">
+          <button type="button" class="btn btn-outline" id="btn-wizard-prev" onclick="goToPreviousStep()" style="display: none;">
+            <i class="fa-solid fa-arrow-left"></i> Previous Step
+          </button>
+          <div style="margin-left: auto; display: flex; gap: 0.75rem;">
+            <button type="button" class="btn btn-primary" id="btn-wizard-next" onclick="goToNextStep()">
+              Next Step <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <button type="button" class="btn btn-primary" id="btn-wizard-submit" onclick="submitIntakeForm()" style="display: none; background: linear-gradient(135deg, var(--cyber-cyan), #00b4d8); color: #000; font-weight: 800;">
+              <i class="fa-solid fa-paper-plane"></i> Submit Client Intake
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+
+  <script>
+    // =========================================================================
+    // STATE MANAGEMENT
+    // =========================================================================
+    let currentStep = 1;
+    const totalSteps = 5;
+
+    let currentUser = null;
+    let autoSendActive = false;
+
+    let selectedEventType = 'Wedding';
+    let selectedPackage = { name: 'The Thunder Experience (4-Hour)', rate: 950 };
+    let selectedAddons = [];
+
+    // =========================================================================
+    // INIT & AUTH VERIFICATION
+    // =========================================================================
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!window.supabaseClient) {
+        alert('Database client failed to connect.');
+        return;
+      }
+
+      // Check session
+      const { data: { session } } = await window.supabaseClient.auth.getSession();
+      if (!session) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      currentUser = session.user;
+      const staffDisplay = document.getElementById('staff-name-display');
+
+      // Fetch team member info
+      const { data: member } = await window.supabaseClient
+        .from('thunderhouse_team')
+        .select('*')
+        .eq('email', currentUser.email)
+        .maybeSingle();
+
+      const consultantName = member ? member.name : (currentUser.email.split('@')[0]);
+      if (staffDisplay) {
+        staffDisplay.textContent = `Consultant: ${consultantName}`;
+      }
+
+      // Check Auto-Send Settings
+      const { data: settingData } = await window.supabaseClient
+        .from('thunderhouse_site_settings')
+        .select('value')
+        .eq('key', 'intake_settings')
+        .maybeSingle();
+
+      if (settingData && settingData.value && settingData.value.auto_send_enabled) {
+        autoSendActive = true;
+        const revBadge = document.getElementById('review-mode-indicator');
+        if (revBadge) {
+          revBadge.innerHTML = `<i class="fa-solid fa-bolt"></i> Auto-Send Mode Active`;
+          revBadge.style.color = 'var(--cyber-cyan)';
+          revBadge.style.borderColor = 'rgba(0, 229, 255, 0.4)';
+          revBadge.style.background = 'rgba(0, 229, 255, 0.12)';
+        }
+
+        const noticeTitle = document.getElementById('dispatch-notice-title');
+        const noticeDesc = document.getElementById('dispatch-notice-desc');
+        if (noticeTitle) noticeTitle.textContent = '⚡ Instant Auto-Send Active';
+        if (noticeDesc) noticeDesc.textContent = 'Upon submission, the client will immediately receive their branded welcome email and the Square deposit link to lock in their date.';
+      }
+
+      // Set default date to 30 days from now
+      const defaultD = new Date();
+      defaultD.setDate(defaultD.getDate() + 30);
+      const dateInput = document.getElementById('intake-event-date');
+      if (dateInput) dateInput.value = defaultD.toISOString().slice(0, 10);
+    });
+
+    // =========================================================================
+    // STEP NAVIGATION
+    // =========================================================================
+    function updateStepUI() {
+      // Progress bar fill
+      const fillPct = (currentStep / totalSteps) * 100;
+      document.getElementById('stepper-fill').style.width = `${fillPct}%`;
+
+      // Labels
+      for (let i = 1; i <= totalSteps; i++) {
+        const lbl = document.getElementById(`label-step-1`.replace('1', i));
+        if (lbl) {
+          if (i <= currentStep) lbl.classList.add('active');
+          else lbl.classList.remove('active');
+        }
+      }
+
+      // Panels
+      document.querySelectorAll('.wizard-step').forEach(panel => panel.classList.remove('active'));
+      const activePanel = document.getElementById(`step-${currentStep}`);
+      if (activePanel) activePanel.classList.add('active');
+
+      // Buttons
+      document.getElementById('btn-wizard-prev').style.display = currentStep > 1 ? 'inline-flex' : 'none';
+      if (currentStep === totalSteps) {
+        document.getElementById('btn-wizard-next').style.display = 'none';
+        document.getElementById('btn-wizard-submit').style.display = 'inline-flex';
+        populateReviewStep();
+      } else {
+        document.getElementById('btn-wizard-next').style.display = 'inline-flex';
+        document.getElementById('btn-wizard-submit').style.display = 'none';
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goToNextStep() {
+      // Validate Step 1
+      if (currentStep === 1) {
+        const name = document.getElementById('intake-client-name').value.trim();
+        const email = document.getElementById('intake-client-email').value.trim();
+        if (!name || !email) {
+          alert('Please enter both the client name and email address.');
+          return;
+        }
+      }
+      // Validate Step 2
+      if (currentStep === 2) {
+        const date = document.getElementById('intake-event-date').value;
+        if (!date) {
+          alert('Please select the event date.');
+          return;
+        }
+      }
+
+      if (currentStep < totalSteps) {
+        currentStep++;
+        updateStepUI();
+      }
+    }
+
+    function goToPreviousStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        updateStepUI();
+      }
+    }
+
+    // =========================================================================
+    // EVENT TYPE SELECTION & BRANCHING
+    // =========================================================================
+    function selectEventType(type, el) {
+      selectedEventType = type;
+      document.querySelectorAll('.event-type-pill').forEach(p => p.classList.remove('active'));
+      if (el) el.classList.add('active');
+
+      // Toggle questions in step 3
+      document.getElementById('branch-wedding').style.display = type === 'Wedding' ? 'block' : 'none';
+      document.getElementById('branch-corporate').style.display = type === 'Corporate' ? 'block' : 'none';
+      document.getElementById('branch-school').style.display = type === 'School' ? 'block' : 'none';
+      document.getElementById('branch-party').style.display = type === 'Party' ? 'block' : 'none';
+    }
+
+    // =========================================================================
+    // PACKAGES & ADD-ONS PRICING
+    // =========================================================================
+    function selectPackage(name, rate, el) {
+      selectedPackage = { name, rate };
+      document.querySelectorAll('.pkg-card').forEach(c => c.classList.remove('active'));
+      if (el) el.classList.add('active');
+      recalculateQuote();
+    }
+
+    function toggleAddon(name, rate, el) {
+      const idx = selectedAddons.findIndex(a => a.name === name);
+      if (idx > -1) {
+        selectedAddons.splice(idx, 1);
+        if (el) el.classList.remove('active');
+      } else {
+        selectedAddons.push({ name, rate });
+        if (el) el.classList.add('active');
+      }
+      recalculateQuote();
+    }
+
+    function recalculateQuote() {
+      const pkgRate = parseFloat(selectedPackage.rate || 0);
+      const addonsTotal = selectedAddons.reduce((sum, a) => sum + parseFloat(a.rate || 0), 0);
+      const grandTotal = pkgRate + addonsTotal;
+      const deposit = Math.min(grandTotal, 500);
+
+      document.getElementById('summary-pkg-name').textContent = selectedPackage.name;
+      document.getElementById('summary-pkg-rate').textContent = `$${pkgRate.toFixed(2)}`;
+
+      const addonsRow = document.getElementById('summary-addons-row');
+      if (addonsTotal > 0) {
+        addonsRow.style.display = 'flex';
+        document.getElementById('summary-addons-rate').textContent = `+$${addonsTotal.toFixed(2)}`;
+      } else {
+        addonsRow.style.display = 'none';
+      }
+
+      document.getElementById('summary-total-rate').textContent = `$${grandTotal.toFixed(2)}`;
+      document.getElementById('summary-deposit-rate').textContent = `$${deposit.toFixed(2)}`;
+    }
+
+    // =========================================================================
+    // POPULATE REVIEW STEP
+    // =========================================================================
+    function populateReviewStep() {
+      const clientName = document.getElementById('intake-client-name').value.trim();
+      const clientEmail = document.getElementById('intake-client-email').value.trim();
+      const clientPhone = document.getElementById('intake-client-phone').value.trim();
+      const eventDate = document.getElementById('intake-event-date').value;
+      const venueName = document.getElementById('intake-venue-name').value.trim() || 'Venue TBD';
+      const venueCity = document.getElementById('intake-venue-city').value.trim() || 'Oklahoma City, OK';
+
+      document.getElementById('rev-client-name').textContent = clientName || 'Client Name';
+      const contactStr = [clientEmail, clientPhone].filter(Boolean).join(' • ');
+      document.getElementById('rev-client-contact').textContent = contactStr || 'No contact provided';
+      document.getElementById('rev-event-type').textContent = selectedEventType;
+      document.getElementById('rev-event-date').textContent = eventDate ? new Date(eventDate + 'T00:00:00').toLocaleDateString() : 'Date TBD';
+      document.getElementById('rev-venue-info').textContent = `${venueName} (${venueCity})`;
+
+      const pkgRate = parseFloat(selectedPackage.rate || 0);
+      const addonsTotal = selectedAddons.reduce((sum, a) => sum + parseFloat(a.rate || 0), 0);
+      const grandTotal = pkgRate + addonsTotal;
+      document.getElementById('rev-total-info').textContent = `$${grandTotal.toFixed(2)}`;
+    }
+
+    // =========================================================================
+    // SUBMISSION HANDLER
+    // =========================================================================
+    async function submitIntakeForm() {
+      const submitBtn = document.getElementById('btn-wizard-submit');
+      const origText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting Intake...';
+
+      try {
+        const clientName = document.getElementById('intake-client-name').value.trim();
+        const clientEmail = document.getElementById('intake-client-email').value.trim();
+        const clientPhone = document.getElementById('intake-client-phone').value.trim();
+        const source = document.getElementById('intake-source').value;
+
+        const eventDate = document.getElementById('intake-event-date').value;
+        const guestCount = parseInt(document.getElementById('intake-guest-count').value) || null;
+        const venueName = document.getElementById('intake-venue-name').value.trim();
+        const venueCity = document.getElementById('intake-venue-city').value.trim();
+        const startTime = document.getElementById('intake-start-time').value.trim();
+        const endTime = document.getElementById('intake-end-time').value.trim();
+
+        const vibeNotes = document.getElementById('intake-vibe-notes').value.trim();
+        const internalNotes = document.getElementById('intake-internal-notes').value.trim();
+
+        // Harvest event-specific details
+        const details = {};
+        if (selectedEventType === 'Wedding') {
+          details.ceremony = document.getElementById('q-wedding-ceremony').value;
+          details.cocktail = document.getElementById('q-wedding-cocktail').value;
+          details.entrance = document.getElementById('q-wedding-entrance').value;
+          details.coordinator = document.getElementById('q-wedding-coordinator').value.trim();
+        } else if (selectedEventType === 'Corporate') {
+          details.mics = document.getElementById('q-corp-mics').value;
+          details.brandColors = document.getElementById('q-corp-colors').value.trim();
+        } else if (selectedEventType === 'School') {
+          details.cleanEdits = document.getElementById('q-school-clean').value;
+        } else if (selectedEventType === 'Party') {
+          details.milestone = document.getElementById('q-party-milestone').value.trim();
+        }
+
+        const pkgRate = parseFloat(selectedPackage.rate || 0);
+        const addonsTotal = selectedAddons.reduce((sum, a) => sum + parseFloat(a.rate || 0), 0);
+        const totalQuoted = pkgRate + addonsTotal;
+        const depositRequested = Math.min(totalQuoted, 500);
+
+        // Consultant Info
+        const consultantName = document.getElementById('staff-name-display').textContent.replace('Consultant: ', '').trim();
+        const consultantId = currentUser ? currentUser.id : null;
+        const consultantEmail = currentUser ? currentUser.email : null;
+
+        // 1. Create Inquiry in leads table
+        const { data: inqData, error: inqErr } = await window.supabaseClient
+          .from('thunderhouse_inquiries')
+          .insert([{
+            name: clientName,
+            email: clientEmail,
+            phone: clientPhone,
+            event_type: selectedEventType,
+            event_date: eventDate,
+            guest_count: guestCount,
+            venue_city: venueCity,
+            message: `[DJ Intake Consultation] Package: ${selectedPackage.name}. Addons: ${selectedAddons.map(a => a.name).join(', ') || 'None'}. Vibe: ${vibeNotes}`,
+            notes: `Consultation conducted by ${consultantName}. Internal: ${internalNotes}`,
+            status: 'Contacted',
+            consultant_id: consultantId,
+            consultant_name: consultantName
+          }])
+          .select()
+          .single();
+
+        const inqId = inqData ? inqData.id : null;
+
+        // 2. Create Intake Record
+        const intakePayload = {
+          consultant_id: consultantId,
+          consultant_name: consultantName,
+          consultant_email: consultantEmail,
+          client_name: clientName,
+          client_email: clientEmail,
+          client_phone: clientPhone,
+          event_type: selectedEventType,
+          event_date: eventDate,
+          venue_name: venueName,
+          venue_city: venueCity,
+          guest_count: guestCount,
+          start_time: startTime,
+          end_time: endTime,
+          base_package: selectedPackage.name,
+          base_package_rate: pkgRate,
+          selected_addons: selectedAddons,
+          total_quoted: totalQuoted,
+          deposit_requested: depositRequested,
+          event_details: details,
+          vibe_notes: vibeNotes,
+          internal_dj_notes: internalNotes,
+          inquiry_id: inqId,
+          status: autoSendActive ? 'Auto-Dispatched' : 'Pending Review'
+        };
+
+        const { data: intakeRec, error: intakeErr } = await window.supabaseClient
+          .from('thunderhouse_intakes')
+          .insert([intakePayload])
+          .select()
+          .single();
+
+        if (intakeErr) throw intakeErr;
+
+        // 3. If Auto-Send Active: Generate Invoice + Dispatch
+        if (autoSendActive) {
+          const invNum = `TH-INV-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
+          const lineItems = [
+            { description: selectedPackage.name, quantity: 1, rate: pkgRate, amount: pkgRate }
+          ];
+          selectedAddons.forEach(a => {
+            lineItems.push({ description: a.name, quantity: 1, rate: a.rate, amount: a.rate });
+          });
+
+          // Generate Square link
+          let sqLink = null;
+          try {
+            const sqRes = await fetch('https://kxoivmflghfgtvawhktt.supabase.co/functions/v1/square-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                action: 'create_payment_link',
+                invoice_data: {
+                  invoice_number: invNum,
+                  client_name: clientName,
+                  client_email: clientEmail,
+                  total_amount: totalQuoted,
+                  balance_due: depositRequested
+                }
+              })
+            });
+            const sqData = await sqRes.json();
+            if (sqData.success) sqLink = sqData.payment_link;
+          } catch (e) {
+            console.warn('Square auto-link notice:', e);
+          }
+
+          // Insert invoice
+          const { data: invCreated } = await window.supabaseClient
+            .from('thunderhouse_invoices')
+            .insert([{
+              invoice_number: invNum,
+              inquiry_id: inqId,
+              client_name: clientName,
+              client_email: clientEmail,
+              client_phone: clientPhone,
+              event_date: eventDate,
+              venue_city: venueCity,
+              issue_date: new Date().toISOString().slice(0, 10),
+              due_date: new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10),
+              status: 'Sent',
+              square_payment_link: sqLink,
+              items: lineItems,
+              subtotal: totalQuoted,
+              total_amount: totalQuoted,
+              deposit_requested: depositRequested,
+              balance_due: totalQuoted,
+              notes: `Date reservation deposit of $${depositRequested.toFixed(2)} holds event date. Quoted by ${consultantName}.`,
+              consultant_id: consultantId,
+              consultant_name: consultantName
+            }])
+            .select()
+            .single();
+
+          // Link invoice back to intake
+          if (invCreated) {
+            await window.supabaseClient
+              .from('thunderhouse_intakes')
+              .update({ invoice_id: invCreated.id, invoice_number: invNum })
+              .eq('id', intakeRec.id);
+          }
+        }
+
+        // Show Success
+        renderSuccessScreen(clientName, autoSendActive);
+      } catch (err) {
+        alert('Error saving intake: ' + err.message);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = origText;
+      }
+    }
+
+    function renderSuccessScreen(clientName, wasAutoDispatched) {
+      document.querySelector('.intake-card').innerHTML = `
+        <div style="text-align: center; padding: 3rem 1.5rem;">
+          <div style="font-size: 3.5rem; color: #10b981; margin-bottom: 1rem;">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+          <h2 style="font-family: var(--font-heading); color: #fff; font-size: 1.85rem; margin-bottom: 0.5rem;">
+            Consultation Intake Completed!
+          </h2>
+          <p style="color: var(--text-muted); font-size: 1rem; max-width: 520px; margin: 0 auto 1.75rem auto; line-height: 1.6;">
+            ${wasAutoDispatched
+              ? `Great job! <strong>${escapeHtml(clientName)}</strong>'s consultation has been recorded, and their welcome confirmation and deposit invoice have been automatically dispatched.`
+              : `Great job! <strong>${escapeHtml(clientName)}</strong>'s consultation has been saved and queued for <strong>Manager Review</strong>. Superuser will review before dispatching.`}
+          </p>
+          <div style="display: flex; justify-content: center; gap: 1rem;">
+            <button class="btn btn-primary" onclick="window.location.reload()">
+              <i class="fa-solid fa-plus"></i> Start Next Client Intake
+            </button>
+            <button class="btn btn-outline" onclick="handleLogout()">
+              <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    async function handleLogout() {
+      if (window.supabaseClient) {
+        await window.supabaseClient.auth.signOut();
+      }
+      window.location.href = 'login.html';
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+  </script>
+</body>
+</html>

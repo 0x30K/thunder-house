@@ -869,6 +869,17 @@
             <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live Site
           </a>
         </div>
+        <!-- Superuser DJ Auto-Send Switch -->
+        <div id="admin-autosend-toggle-wrap" style="display: none; align-items: center; gap: 0.65rem; background: rgba(255, 183, 3, 0.08); border: 1px solid rgba(255, 183, 3, 0.35); padding: 0.35rem 0.85rem; border-radius: var(--radius-full);">
+          <span style="font-size: 0.78rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+            <i class="fa-solid fa-bolt" style="color: var(--accent-gold);"></i> DJ Auto-Send:
+          </span>
+          <label class="th-toggle-switch" style="width: 36px; height: 18px; position: relative; display: inline-block; margin: 0;">
+            <input type="checkbox" id="admin-autosend-switch" onchange="toggleAdminAutoSendMode(this.checked)" style="opacity: 0; width: 0; height: 0;">
+            <span class="th-toggle-slider" style="position: absolute; cursor: pointer; inset: 0; background: rgba(255,255,255,0.2); border-radius: 20px; transition: .3s;"></span>
+          </label>
+          <span id="admin-autosend-badge-status" style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted);">OFF (Review)</span>
+        </div>
       <a href="index.html" class="btn btn-outline btn-sm" target="_blank">
         <i class="fa-solid fa-arrow-up-right-from-square"></i> View Website
       </a>
@@ -924,7 +935,23 @@
     </div>
 
     
-        <!-- Main Dashboard Tabs -->
+        <!-- Pending DJ Intakes Alert Banner -->
+    <div id="pending-intakes-banner" style="display: none; background: rgba(255, 183, 3, 0.08); border: 1px solid rgba(255, 183, 3, 0.4); border-radius: var(--radius-md); padding: 0.95rem 1.35rem; margin-bottom: 1.5rem; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.85rem; box-shadow: 0 4px 20px rgba(255, 183, 3, 0.08);">
+      <div style="display: flex; align-items: center; gap: 0.85rem;">
+        <i class="fa-solid fa-bell fa-shake" style="color: var(--accent-gold); font-size: 1.35rem;"></i>
+        <div>
+          <strong style="color: #fff; font-size: 0.98rem; display: block;">DJ Consultations Awaiting Your Review</strong>
+          <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.15rem;">
+            <span id="pending-intakes-count" style="color: var(--accent-gold); font-weight: 700;">0</span> consultation(s) submitted by your team waiting for pricing approval.
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-outline btn-sm" onclick="openPendingIntakesModal()" style="border-color: var(--accent-gold); color: var(--accent-gold); font-size: 0.82rem; padding: 0.4rem 0.85rem;">
+        <i class="fa-solid fa-list-check"></i> Review Consultations
+      </button>
+    </div>
+
+    <!-- Main Dashboard Tabs -->
     <div class="admin-tab-nav">
       <button class="tab-nav-btn active" id="tab-btn-inquiries" onclick="switchDashboardTab('inquiries')">
         <i class="fa-solid fa-list-check"></i> Inquiries & Leads (<span id="inquiries-badge-count">0</span>)
@@ -1973,6 +2000,41 @@
     </div>
   </div>
 
+  <!-- Pending DJ Intakes List Modal -->
+  <div id="pending-intakes-modal" class="detail-modal-overlay">
+    <div class="detail-card" style="max-width: 850px; width: 95%;">
+      <button class="modal-close-btn" onclick="closePendingIntakesModal()">&times;</button>
+      <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <h3 style="font-size: 1.45rem; color: #fff; margin: 0 0 0.25rem 0;">
+            <i class="fa-solid fa-clipboard-user" style="color: var(--accent-gold);"></i> DJ Client Consultations Awaiting Review
+          </h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+            Review quotes and event questionnaires submitted by your team before client emails & invoices are dispatched.
+          </p>
+        </div>
+      </div>
+
+      <div id="pending-intakes-list-container" style="max-height: 480px; overflow-y: auto;">
+        <!-- Populated by JS -->
+      </div>
+
+      <div style="margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem; display: flex; justify-content: flex-end;">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closePendingIntakesModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Individual Intake Review & Approval Modal -->
+  <div id="intake-review-detail-modal" class="detail-modal-overlay">
+    <div class="detail-card" style="max-width: 780px; width: 95%;">
+      <button class="modal-close-btn" onclick="closeIntakeReviewDetailModal()">&times;</button>
+      <div id="intake-detail-content">
+        <!-- Populated dynamically by JS -->
+      </div>
+    </div>
+  </div>
+
   <!-- Supabase CDN Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
@@ -2125,6 +2187,12 @@
         };
       }
 
+      // Non-superuser staff are restricted to the DJ Intake & Discovery Portal
+      if (!currentUserState.isSuperuser) {
+        window.location.href = 'intake.html';
+        return;
+      }
+
       // Update Header email & role badge
       const emailEl = document.getElementById('admin-user-email');
       if (emailEl) emailEl.textContent = currentUserState.email;
@@ -2132,35 +2200,21 @@
       const roleBadge = document.getElementById('admin-role-badge');
       if (roleBadge) {
         roleBadge.style.display = 'inline-flex';
-        if (currentUserState.isSuperuser) {
-          roleBadge.className = 'badge-role superuser';
-          roleBadge.innerHTML = '<i class="fa-solid fa-crown"></i> Superuser';
-        } else {
-          roleBadge.className = 'badge-role user';
-          roleBadge.innerHTML = '<i class="fa-solid fa-user-tie"></i> Staff User';
-        }
+        roleBadge.className = 'badge-role superuser';
+        roleBadge.innerHTML = '<i class="fa-solid fa-crown"></i> Superuser';
       }
 
       // Show/Hide Staff Tab
       const staffTabBtn = document.getElementById('tab-btn-staff');
-      if (staffTabBtn) {
-        if (currentUserState.isSuperuser) {
-          staffTabBtn.style.display = 'inline-flex';
-        } else {
-          staffTabBtn.style.display = 'none';
-        }
-      }
+      if (staffTabBtn) staffTabBtn.style.display = 'inline-flex';
 
       // Show/Hide Emails Tab
       const emailsTabBtn = document.getElementById('tab-btn-emails');
-      if (emailsTabBtn) {
-        if (currentUserState.isSuperuser) {
-          emailsTabBtn.style.display = 'inline-flex';
-        } else {
-          emailsTabBtn.style.display = 'none';
-        }
-      }
+      if (emailsTabBtn) emailsTabBtn.style.display = 'inline-flex';
+
       initAdminEditModeControls();
+      initAdminAutoSendControls();
+      loadPendingIntakes();
     }
 
     // =========================================================================
@@ -4418,6 +4472,461 @@
       } catch (err) {
         alert('Could not open VIP portal: ' + err.message);
       }
+    }
+
+    // =========================================================================
+    // DJ CLIENT INTAKE & AUTO-SEND MANAGEMENT
+    // =========================================================================
+    let allPendingIntakes = [];
+
+    async function initAdminAutoSendControls() {
+      const wrap = document.getElementById('admin-autosend-toggle-wrap');
+      const sw = document.getElementById('admin-autosend-switch');
+      const badge = document.getElementById('admin-autosend-badge-status');
+
+      if (!wrap || !currentUserState.isSuperuser) return;
+      wrap.style.display = 'inline-flex';
+
+      try {
+        const { data } = await window.supabaseClient
+          .from('thunderhouse_site_settings')
+          .select('value')
+          .eq('key', 'intake_settings')
+          .maybeSingle();
+
+        const isAuto = data && data.value && data.value.auto_send_enabled === true;
+        if (sw) sw.checked = isAuto;
+        if (badge) {
+          badge.textContent = isAuto ? 'ON (Instant)' : 'OFF (Review)';
+          badge.style.color = isAuto ? 'var(--primary)' : 'var(--text-muted)';
+        }
+      } catch (err) {
+        console.warn('Auto-send settings fetch notice:', err);
+      }
+    }
+
+    async function toggleAdminAutoSendMode(isChecked) {
+      const badge = document.getElementById('admin-autosend-badge-status');
+      if (badge) {
+        badge.textContent = isChecked ? 'ON (Instant)' : 'OFF (Review)';
+        badge.style.color = isChecked ? 'var(--primary)' : 'var(--text-muted)';
+      }
+
+      try {
+        const { error } = await window.supabaseClient
+          .from('thunderhouse_site_settings')
+          .upsert({
+            key: 'intake_settings',
+            value: { auto_send_enabled: isChecked },
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'key' });
+
+        if (error) throw error;
+        alert(`⚡ DJ Client Intake Mode Updated:\n\n${isChecked ? 'INSTANT AUTO-SEND ACTIVE: Intakes will automatically generate invoices and email clients immediately.' : 'MANAGER REVIEW ACTIVE: All intakes from DJs will be queued for your approval first.'}`);
+      } catch (err) {
+        alert('Failed to update Auto-Send setting: ' + err.message);
+      }
+    }
+
+    async function loadPendingIntakes() {
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('thunderhouse_intakes')
+          .select('*')
+          .eq('status', 'Pending Review')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        allPendingIntakes = data || [];
+
+        const banner = document.getElementById('pending-intakes-banner');
+        const countEl = document.getElementById('pending-intakes-count');
+
+        if (banner && countEl) {
+          countEl.textContent = allPendingIntakes.length;
+          banner.style.display = allPendingIntakes.length > 0 ? 'flex' : 'none';
+        }
+      } catch (err) {
+        console.warn('Pending intakes load notice:', err);
+      }
+    }
+
+    function openPendingIntakesModal() {
+      const modal = document.getElementById('pending-intakes-modal');
+      const container = document.getElementById('pending-intakes-list-container');
+      if (!modal || !container) return;
+
+      if (allPendingIntakes.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+            <i class="fa-solid fa-circle-check" style="font-size: 2.5rem; color: #10b981; margin-bottom: 0.75rem; display: block;"></i>
+            <h4 style="color: #fff; margin: 0 0 0.35rem 0;">All Caught Up!</h4>
+            <p style="margin: 0; font-size: 0.88rem;">No DJ consultations awaiting review right now.</p>
+          </div>
+        `;
+      } else {
+        container.innerHTML = allPendingIntakes.map(item => {
+          const total = parseFloat(item.total_quoted || 0);
+          const dateStr = item.event_date ? new Date(item.event_date + 'T00:00:00').toLocaleDateString() : 'Date TBD';
+          const submittedAt = item.created_at ? new Date(item.created_at).toLocaleDateString() : 'Recent';
+
+          return `
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); padding: 1.15rem 1.25rem; margin-bottom: 0.85rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                  <strong style="color: #fff; font-size: 1.05rem;">${escapeHtml(item.client_name)}</strong>
+                  <span class="badge-role user" style="font-size: 0.72rem; padding: 0.15rem 0.5rem;"><i class="fa-solid fa-user-tie"></i> ${escapeHtml(item.consultant_name || 'Staff')}</span>
+                  <span class="status-badge" style="background: rgba(255,183,3,0.12); color: var(--accent-gold); border: 1px solid rgba(255,183,3,0.3); font-size: 0.72rem;">${escapeHtml(item.event_type)}</span>
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-muted);">
+                  <span><i class="fa-regular fa-calendar"></i> ${dateStr}</span> • 
+                  <span><i class="fa-solid fa-location-dot"></i> ${escapeHtml(item.venue_name || item.venue_city || 'OKC')}</span> • 
+                  <span>Package: <strong style="color: #cbd5e1;">${escapeHtml(item.base_package || 'Custom')}</strong></span>
+                </div>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="text-align: right;">
+                  <div style="font-weight: 800; color: var(--primary); font-size: 1.15rem;">$${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                  <small style="color: var(--text-muted); font-size: 0.75rem;">Submitted ${submittedAt}</small>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="openIntakeReviewDetail('${item.id}')" style="padding: 0.45rem 0.95rem; font-size: 0.82rem;">
+                  <i class="fa-solid fa-eye"></i> Review & Approve
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      modal.classList.add('active');
+    }
+
+    function closePendingIntakesModal() {
+      const modal = document.getElementById('pending-intakes-modal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function openIntakeReviewDetail(intakeId) {
+      const item = allPendingIntakes.find(i => i.id === intakeId);
+      if (!item) return;
+
+      closePendingIntakesModal();
+
+      const modal = document.getElementById('intake-review-detail-modal');
+      const content = document.getElementById('intake-detail-content');
+      if (!modal || !content) return;
+
+      const total = parseFloat(item.total_quoted || 0);
+      const deposit = parseFloat(item.deposit_requested || 500);
+      const dateStr = item.event_date ? new Date(item.event_date + 'T00:00:00').toLocaleDateString() : 'Date TBD';
+
+      const addons = Array.isArray(item.selected_addons) ? item.selected_addons : [];
+      const details = item.event_details || {};
+
+      content.innerHTML = `
+        <div style="margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <span style="font-size: 0.78rem; text-transform: uppercase; color: var(--accent-gold); font-weight: 700; letter-spacing: 0.05em;">
+                <i class="fa-solid fa-clipboard-user"></i> Consultation Review
+              </span>
+              <h2 style="color: #fff; font-family: var(--font-heading); margin: 0.2rem 0 0.3rem 0; font-size: 1.6rem;">${escapeHtml(item.client_name)}</h2>
+              <div style="font-size: 0.85rem; color: var(--text-muted);">
+                ${item.client_email ? `<a href="mailto:${item.client_email}" style="color: var(--primary); text-decoration: none;"><i class="fa-solid fa-envelope"></i> ${escapeHtml(item.client_email)}</a>` : ''}
+                ${item.client_phone ? ` • <a href="tel:${item.client_phone}" style="color: #cbd5e1; text-decoration: none;"><i class="fa-solid fa-phone"></i> ${escapeHtml(item.client_phone)}</a>` : ''}
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <span class="badge-role user" style="font-size: 0.8rem; padding: 0.25rem 0.75rem;"><i class="fa-solid fa-user-tie"></i> Interviewed by: <strong>${escapeHtml(item.consultant_name || 'Staff')}</strong></span>
+              <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;">Status: <strong style="color: var(--accent-gold);">Pending Review</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event & Logistics Summary -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; background: rgba(0,0,0,0.4); padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem; font-size: 0.88rem;">
+          <div>
+            <span style="color: var(--text-muted); display: block; font-size: 0.78rem; text-transform: uppercase;">Event Type:</span>
+            <strong style="color: #fff;">${escapeHtml(item.event_type)}</strong>
+          </div>
+          <div>
+            <span style="color: var(--text-muted); display: block; font-size: 0.78rem; text-transform: uppercase;">Event Date:</span>
+            <strong style="color: var(--primary);">${dateStr}</strong>
+          </div>
+          <div>
+            <span style="color: var(--text-muted); display: block; font-size: 0.78rem; text-transform: uppercase;">Venue:</span>
+            <strong style="color: #fff;">${escapeHtml(item.venue_name || item.venue_city || 'OKC')}</strong>
+          </div>
+          <div>
+            <span style="color: var(--text-muted); display: block; font-size: 0.78rem; text-transform: uppercase;">Guest Count / Time:</span>
+            <strong style="color: #fff;">${item.guest_count || '--'} guests • ${item.start_time || ''} - ${item.end_time || ''}</strong>
+          </div>
+        </div>
+
+        <!-- Dynamic Questions Answered -->
+        <h4 style="color: var(--primary); font-size: 0.95rem; text-transform: uppercase; margin: 0 0 0.5rem 0;">📋 Event Questionnaire Responses</h4>
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem; font-size: 0.85rem; line-height: 1.6;">
+          ${Object.entries(details).length > 0 ? Object.entries(details).map(([k, v]) => `
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.04); padding: 0.35rem 0;">
+              <span style="color: var(--text-muted); text-transform: capitalize;">${escapeHtml(k.replace(/([A-Z])/g, ' $1'))}:</span>
+              <strong style="color: #fff;">${escapeHtml(String(v))}</strong>
+            </div>
+          `).join('') : '<div style="color: var(--text-muted); font-style: italic;">No specific questions recorded.</div>'}
+
+          ${item.vibe_notes ? `
+            <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed rgba(255,255,255,0.1);">
+              <span style="color: var(--accent-gold); font-weight: 700;">Music & Vibe Notes:</span>
+              <p style="margin: 0.25rem 0 0 0; color: #cbd5e1;">${escapeHtml(item.vibe_notes)}</p>
+            </div>
+          ` : ''}
+
+          ${item.internal_dj_notes ? `
+            <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed rgba(255,255,255,0.1);">
+              <span style="color: #ff99bb; font-weight: 700;">DJ's Notes for Management:</span>
+              <p style="margin: 0.25rem 0 0 0; color: #ffb3cc;">${escapeHtml(item.internal_dj_notes)}</p>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- Quoted Investment Breakdown -->
+        <h4 style="color: var(--accent-gold); font-size: 0.95rem; text-transform: uppercase; margin: 0 0 0.5rem 0;">💰 Quoted Package & Add-Ons</h4>
+        <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,183,3,0.25); border-radius: 8px; padding: 1.15rem; margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 0.95rem;">
+            <strong style="color: #fff;">${escapeHtml(item.base_package || 'Base Package')}</strong>
+            <span style="color: #fff; font-weight: 700;">$${parseFloat(item.base_package_rate || 0).toFixed(2)}</span>
+          </div>
+
+          ${addons.map(a => `
+            <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; font-size: 0.88rem; color: #cbd5e1; border-bottom: 1px solid rgba(255,255,255,0.04);">
+              <span>+ ${escapeHtml(a.name)}</span>
+              <span style="color: var(--accent-gold);">+$${parseFloat(a.rate || 0).toFixed(2)}</span>
+            </div>
+          `).join('')}
+
+          <div style="display: flex; justify-content: space-between; padding-top: 0.75rem; font-size: 1.25rem; font-weight: 800;">
+            <span style="color: #fff;">Total Quoted Investment:</span>
+            <span style="color: var(--primary);">$${total.toFixed(2)}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--accent-gold); font-weight: 700; margin-top: 0.25rem;">
+            <span>Date Lock Deposit Required:</span>
+            <span>$${deposit.toFixed(2)}</span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="rejectIntake('${item.id}')" style="border-color: #ff4d6d; color: #ff99bb;">
+            <i class="fa-solid fa-xmark"></i> Reject Consultation
+          </button>
+          <div style="display: flex; gap: 0.75rem;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="openIntakeInInvoiceBuilder('${item.id}')" style="border-color: var(--primary); color: var(--primary);">
+              <i class="fa-solid fa-pen-to-square"></i> Edit in Invoice Builder
+            </button>
+            <button type="button" class="btn btn-primary" id="btn-approve-intake-${item.id}" onclick="approveIntake('${item.id}')" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: 800; border: none;">
+              <i class="fa-solid fa-check-double"></i> Approve & Dispatch to Client
+            </button>
+          </div>
+        </div>
+      `;
+
+      modal.classList.add('active');
+    }
+
+    function closeIntakeReviewDetailModal() {
+      const modal = document.getElementById('intake-review-detail-modal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    async function approveIntake(intakeId) {
+      const item = allPendingIntakes.find(i => i.id === intakeId);
+      if (!item) return;
+
+      const approveBtn = document.getElementById(`btn-approve-intake-${item.id}`);
+      const origText = approveBtn ? approveBtn.innerHTML : '';
+      if (approveBtn) {
+        approveBtn.disabled = true;
+        approveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating Invoice & Link...';
+      }
+
+      try {
+        const invNum = `TH-INV-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
+        const total = parseFloat(item.total_quoted || 0);
+        const deposit = parseFloat(item.deposit_requested || 500);
+
+        const lineItems = [
+          { description: item.base_package || 'DJ/MC Performance', quantity: 1, rate: item.base_package_rate || total, amount: item.base_package_rate || total }
+        ];
+
+        const addons = Array.isArray(item.selected_addons) ? item.selected_addons : [];
+        addons.forEach(a => {
+          lineItems.push({ description: a.name, quantity: 1, rate: a.rate, amount: a.rate });
+        });
+
+        // 1. Generate Square payment link
+        let sqLink = null;
+        try {
+          const sqRes = await fetch('https://kxoivmflghfgtvawhktt.supabase.co/functions/v1/square-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'create_payment_link',
+              invoice_data: {
+                invoice_number: invNum,
+                client_name: item.client_name,
+                client_email: item.client_email,
+                total_amount: total,
+                balance_due: deposit
+              }
+            })
+          });
+          const sqData = await sqRes.json();
+          if (sqData.success) sqLink = sqData.payment_link;
+        } catch (sqErr) {
+          console.warn('Square auto-link generation notice:', sqErr);
+        }
+
+        // 2. Insert Invoice
+        const { data: invCreated, error: invErr } = await window.supabaseClient
+          .from('thunderhouse_invoices')
+          .insert([{
+            invoice_number: invNum,
+            inquiry_id: item.inquiry_id,
+            client_name: item.client_name,
+            client_email: item.client_email,
+            client_phone: item.client_phone,
+            event_date: item.event_date,
+            venue_city: item.venue_name ? `${item.venue_name} (${item.venue_city})` : item.venue_city,
+            issue_date: new Date().toISOString().slice(0, 10),
+            due_date: new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10),
+            status: 'Sent',
+            square_payment_link: sqLink,
+            items: lineItems,
+            subtotal: total,
+            total_amount: total,
+            deposit_requested: deposit,
+            balance_due: total,
+            notes: `Approved by Superuser. Date lock deposit of $${deposit.toFixed(2)} secures calendar date. Consultation by ${item.consultant_name || 'Staff'}.`,
+            consultant_id: item.consultant_id,
+            consultant_name: item.consultant_name
+          }])
+          .select()
+          .single();
+
+        if (invErr) throw invErr;
+
+        // 3. Create VIP Planning Portal Plan record
+        const token = `th-vip-${invNum.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+        await window.supabaseClient
+          .from('thunderhouse_event_plans')
+          .insert([{
+            portal_token: token,
+            invoice_number: invNum,
+            inquiry_id: item.inquiry_id,
+            client_name: item.client_name,
+            client_email: item.client_email,
+            client_phone: item.client_phone,
+            event_type: item.event_type,
+            event_date: item.event_date,
+            venue_name: item.venue_name,
+            venue_city: item.venue_city,
+            guest_count: item.guest_count,
+            timeline_items: [
+              { time: item.start_time || '5:00 PM', title: 'Cocktail Hour & Guest Arrival', notes: 'Background music' },
+              { time: '6:30 PM', title: 'Grand Entrance & Welcome', notes: 'Mic announcement' },
+              { time: item.end_time || '10:30 PM', title: 'Grand Finale & Send-Off', notes: 'High energy' }
+            ]
+          }])
+          .select()
+          .maybeSingle();
+
+        // 4. Update Intake Record to Approved
+        await window.supabaseClient
+          .from('thunderhouse_intakes')
+          .update({
+            status: 'Approved',
+            invoice_id: invCreated.id,
+            invoice_number: invNum,
+            approved_by: currentUserState.email,
+            approved_at: new Date().toISOString()
+          })
+          .eq('id', item.id);
+
+        // 5. Send Email via Resend Edge Function
+        try {
+          await fetch('https://kxoivmflghfgtvawhktt.supabase.co/functions/v1/send-booking-confirmation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'invoice_dispatched',
+              invoice_number: invNum,
+              client_name: item.client_name,
+              client_email: item.client_email,
+              event_date: item.event_date,
+              total_amount: total,
+              balance_due: deposit,
+              square_payment_link: sqLink,
+              invoice_url: `${window.location.origin}/invoice?num=${encodeURIComponent(invNum)}`
+            })
+          });
+        } catch (emailErr) {
+          console.warn('Confirmation email dispatch notice:', emailErr);
+        }
+
+        // Close modal, reload data
+        closeIntakeReviewDetailModal();
+        await loadPendingIntakes();
+        await loadInquiries();
+        await loadInvoices();
+
+        alert(`⚡ Consultation Approved Successfully!\n\nInvoice #${invNum} ($${total.toFixed(2)}) has been created and dispatched to ${item.client_name}.\nAttributed to: ${item.consultant_name || 'Staff'}`);
+      } catch (err) {
+        alert('Failed to approve consultation: ' + err.message);
+        if (approveBtn) {
+          approveBtn.disabled = false;
+          approveBtn.innerHTML = origText;
+        }
+      }
+    }
+
+    async function rejectIntake(intakeId) {
+      if (!confirm('Are you sure you want to reject and archive this consultation?')) return;
+      try {
+        const { error } = await window.supabaseClient
+          .from('thunderhouse_intakes')
+          .update({ status: 'Rejected', updated_at: new Date().toISOString() })
+          .eq('id', intakeId);
+
+        if (error) throw error;
+        closeIntakeReviewDetailModal();
+        await loadPendingIntakes();
+        alert('Consultation archived.');
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    function openIntakeInInvoiceBuilder(intakeId) {
+      const item = allPendingIntakes.find(i => i.id === intakeId);
+      if (!item) return;
+
+      closeIntakeReviewDetailModal();
+
+      openCreateInvoiceModal({
+        client_name: item.client_name,
+        client_email: item.client_email,
+        client_phone: item.client_phone,
+        event_date: item.event_date,
+        venue_city: item.venue_name ? `${item.venue_name} (${item.venue_city})` : item.venue_city,
+        inquiry_id: item.inquiry_id,
+        consultant_id: item.consultant_id,
+        consultant_name: item.consultant_name,
+        notes: `Consultation by ${item.consultant_name || 'Staff'}. Base Package: ${item.base_package}.`,
+        line_items: [
+          { description: item.base_package || 'DJ/MC Performance', details: '', quantity: 1, rate: parseFloat(item.base_package_rate || item.total_quoted || 0) },
+          ...(Array.isArray(item.selected_addons) ? item.selected_addons.map(a => ({ description: a.name, details: '', quantity: 1, rate: parseFloat(a.rate || 0) })) : [])
+        ]
+      });
     }
 
     function escapeHtml(text) {
