@@ -783,7 +783,62 @@
       border: 1px solid rgba(0, 229, 255, 0.3);
       color: var(--primary);
     }
-    
+
+    /* =========================================================================
+       INVOICING SYSTEM & BILLING STYLES
+       ========================================================================= */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.25rem 0.7rem;
+      border-radius: var(--radius-full);
+      letter-spacing: 0.04em;
+    }
+    .status-badge.paid {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+    .status-badge.sent {
+      background: rgba(0, 229, 255, 0.12);
+      border: 1px solid rgba(0, 229, 255, 0.35);
+      color: var(--primary);
+    }
+    .status-badge.draft {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-muted);
+    }
+    .status-badge.overdue {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #f87171;
+    }
+    .inv-item-row {
+      display: grid;
+      grid-template-columns: 2.2fr 1.6fr 0.8fr 1.1fr 1.1fr 38px;
+      gap: 0.65rem;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 0.4rem 0.5rem;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      transition: all 0.2s ease;
+    }
+    .inv-item-row:hover {
+      border-color: rgba(0, 229, 255, 0.2);
+      background: rgba(255, 255, 255, 0.04);
+    }
+    @media (max-width: 768px) {
+      .inv-item-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -874,6 +929,9 @@
       <button class="tab-nav-btn active" id="tab-btn-inquiries" onclick="switchDashboardTab('inquiries')">
         <i class="fa-solid fa-list-check"></i> Inquiries & Leads (<span id="inquiries-badge-count">0</span>)
       </button>
+      <button class="tab-nav-btn" id="tab-btn-invoices" onclick="switchDashboardTab('invoices')">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Invoices & Billing (<span id="invoices-badge-count">0</span>)
+      </button>
       <button class="tab-nav-btn" id="tab-btn-calendar" onclick="switchDashboardTab('calendar')">
         <i class="fa-solid fa-calendar-days"></i> Booking & Availability Calendar
       </button>
@@ -939,6 +997,100 @@
       </table>
     </div><!-- End .table-card -->
   </div><!-- End #view-inquiries -->
+
+  <!-- Tab: Invoices & Billing View -->
+  <div id="view-invoices" class="tab-view" style="display: none;">
+    <!-- Invoices KPI Cards -->
+    <div class="kpi-grid" style="margin-bottom: 1.75rem;">
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-title">Total Invoiced</div>
+          <div id="inv-kpi-total" class="kpi-value" style="color: #fff;">$0.00</div>
+        </div>
+        <div class="kpi-icon" style="background: rgba(0, 229, 255, 0.1); color: var(--primary);">
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-title">Paid / Collected</div>
+          <div id="inv-kpi-paid" class="kpi-value" style="color: #10b981;">$0.00</div>
+        </div>
+        <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-title">Outstanding Due</div>
+          <div id="inv-kpi-balance" class="kpi-value" style="color: var(--accent-gold);">$0.00</div>
+        </div>
+        <div class="kpi-icon" style="background: rgba(255, 183, 3, 0.1); color: var(--accent-gold);">
+          <i class="fa-solid fa-hourglass-half"></i>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-title">Total Invoices</div>
+          <div id="inv-kpi-count" class="kpi-value" style="color: var(--primary);">0</div>
+        </div>
+        <div class="kpi-icon" style="background: rgba(0, 229, 255, 0.1); color: var(--primary);">
+          <i class="fa-solid fa-receipt"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Invoices Toolbar -->
+    <div class="dashboard-toolbar">
+      <div class="filter-tabs">
+        <button class="filter-btn active" data-inv-status="All" onclick="filterInvoicesByStatus('All', this)">All Invoices</button>
+        <button class="filter-btn" data-inv-status="Sent" onclick="filterInvoicesByStatus('Sent', this)">Sent</button>
+        <button class="filter-btn" data-inv-status="Paid" onclick="filterInvoicesByStatus('Paid', this)">Paid</button>
+        <button class="filter-btn" data-inv-status="Draft" onclick="filterInvoicesByStatus('Draft', this)">Draft</button>
+        <button class="filter-btn" data-inv-status="Overdue" onclick="filterInvoicesByStatus('Overdue', this)">Overdue</button>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="inv-search-input" class="form-control" placeholder="Search invoice #, client, email..." oninput="renderInvoicesTable()">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openCreateInvoiceModal()">
+          <i class="fa-solid fa-plus"></i> Create Invoice
+        </button>
+        <button class="btn btn-outline btn-sm" onclick="loadInvoices()" aria-label="Refresh Invoices">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Invoices Data Table -->
+    <div class="table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Invoice # & Issue Date</th>
+            <th>Client Details</th>
+            <th>Event Info</th>
+            <th>Total & Balance</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="invoices-tbody">
+          <tr>
+            <td colspan="6" class="empty-state">
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              <p>Loading invoices from Supabase...</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div><!-- End Invoices .table-card -->
+  </div><!-- End #view-invoices -->
 
     <!-- Tab 2: Availability & Booking Calendar View -->
     <div id="view-calendar" class="tab-view" style="display: none;">
@@ -1449,7 +1601,10 @@
         <textarea id="modal-lead-notes" class="form-control" rows="3" placeholder="Add notes on phone calls, deposit status, song requests..."></textarea>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+        <button type="button" class="btn btn-outline btn-sm" id="btn-lead-create-invoice" onclick="createInvoiceFromLead(activeInquiryId)" style="border-color: var(--primary); color: var(--primary);">
+          <i class="fa-solid fa-file-invoice-dollar"></i> Generate Custom Invoice
+        </button>
         <button id="btn-save-notes" class="btn btn-primary btn-sm">
           <i class="fa-solid fa-floppy-disk"></i> Save Notes
         </button>
@@ -1613,6 +1768,201 @@
     </div>
   </div>
 
+  <!-- Custom Invoice Builder & Editor Modal -->
+  <div id="invoice-editor-modal" class="detail-modal-overlay">
+    <div class="detail-card" style="max-width: 920px; width: 95%;">
+      <button class="modal-close-btn" onclick="closeInvoiceModal()">&times;</button>
+      <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div class="kpi-icon" style="background: rgba(0, 229, 255, 0.15); color: var(--primary); width: 44px; height: 44px; font-size: 1.25rem;">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+          </div>
+          <div>
+            <h3 id="inv-modal-title" style="font-size: 1.45rem; color: #fff; margin: 0;">Create Custom Invoice</h3>
+            <span style="font-size: 0.82rem; color: var(--text-muted);">Invoice client with custom pricing, reason, and line items</span>
+          </div>
+        </div>
+        <div>
+          <select id="inv-lead-selector" class="form-select" onchange="autoFillInvoiceFromLead(this.value)" style="max-width: 280px; font-size: 0.82rem;">
+            <option value="">-- Quick Autofill from Lead --</option>
+          </select>
+        </div>
+      </div>
+
+      <form id="invoice-editor-form" onsubmit="event.preventDefault();">
+        <input type="hidden" id="inv-edit-id" value="">
+        <input type="hidden" id="inv-edit-inquiry-id" value="">
+
+        <!-- Row 1: Invoice Meta & Dates -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+          <div class="form-group">
+            <label class="form-label">Invoice Number *</label>
+            <input type="text" id="inv-number-input" class="form-control" required placeholder="INV-2026-001">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Issue Date</label>
+            <input type="date" id="inv-issue-date-input" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Due Date</label>
+            <input type="date" id="inv-due-date-input" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Invoice Status</label>
+            <select id="inv-status-input" class="form-select">
+              <option value="Draft">Draft</option>
+              <option value="Sent" selected>Sent</option>
+              <option value="Paid">Paid</option>
+              <option value="Overdue">Overdue</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Row 2: Client & Event Details -->
+        <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1.25rem; margin-bottom: 1.5rem;">
+          <h4 style="font-size: 0.9rem; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 1rem 0;">
+            <i class="fa-solid fa-user-check"></i> Client & Event Details
+          </h4>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Client Name *</label>
+              <input type="text" id="inv-client-name" class="form-control" required placeholder="e.g. Sarah Jenkins">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Client Email *</label>
+              <input type="email" id="inv-client-email" class="form-control" required placeholder="client@example.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Client Phone</label>
+              <input type="tel" id="inv-client-phone" class="form-control" placeholder="(405) 555-0199">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Event Date</label>
+              <input type="date" id="inv-event-date" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">City / Venue</label>
+              <input type="text" id="inv-venue-city" class="form-control" placeholder="e.g. Oklahoma City, OK">
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 3: Line Items Builder (Any custom price & reason) -->
+        <div style="margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <h4 style="font-size: 0.9rem; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">
+                <i class="fa-solid fa-list-ol"></i> Line Items & Custom Charges
+              </h4>
+              <span style="font-size: 0.78rem; color: var(--text-muted);">Bill for any custom reason, package, travel, overtime, or pricing</span>
+            </div>
+            <!-- Preset Buttons -->
+            <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+              <button type="button" class="preset-slot-btn" onclick="addInvoiceItemPreset('Thunder Party', 'Up to 4 hours complete DJ/MC setup & lighting', 700)"><i class="fa-solid fa-plus"></i> Party ($700)</button>
+              <button type="button" class="preset-slot-btn" onclick="addInvoiceItemPreset('Thunder Basic', 'Up to 3 hours sound & microphone', 500)"><i class="fa-solid fa-plus"></i> Basic ($500)</button>
+              <button type="button" class="preset-slot-btn" onclick="addInvoiceItemPreset('Thunder Premium', 'Up to 6 hours premium sound & light show', 900)"><i class="fa-solid fa-plus"></i> Premium ($900)</button>
+              <button type="button" class="preset-slot-btn" onclick="addInvoiceItemPreset('Overtime / Extra Hour', 'Additional event hour beyond standard package', 100)"><i class="fa-solid fa-plus"></i> Extra Hr ($100)</button>
+              <button type="button" class="preset-slot-btn" onclick="addInvoiceItemPreset('Travel Mileage Outside OKC', 'Travel fee beyond 30-mile standard metro radius', 50)"><i class="fa-solid fa-plus"></i> Travel ($50)</button>
+              <button type="button" class="preset-slot-btn" onclick="addInvoiceItemPreset('Date Reservation Deposit', 'Non-refundable retainer to lock in calendar date', 200)"><i class="fa-solid fa-plus"></i> Deposit ($200)</button>
+            </div>
+          </div>
+
+          <!-- Items Header & List Container -->
+          <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); overflow: hidden;">
+            <div style="display: grid; grid-template-columns: 2.2fr 1.6fr 0.8fr 1.1fr 1.1fr 38px; gap: 0.65rem; padding: 0.65rem 1rem; background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border-subtle); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em;">
+              <div>Reason / Description *</div>
+              <div>Subtext / Details</div>
+              <div style="text-align: center;">Qty</div>
+              <div style="text-align: right;">Rate ($) *</div>
+              <div style="text-align: right;">Amount ($)</div>
+              <div></div>
+            </div>
+            <div id="inv-items-container" style="padding: 0.5rem 1rem;">
+              <!-- Dynamic Rows inserted here -->
+            </div>
+            <div style="padding: 0.75rem 1rem; background: rgba(255,255,255,0.02); border-top: 1px solid var(--border-subtle);">
+              <button type="button" class="btn btn-outline btn-sm" onclick="addInvoiceItemRow()" style="color: var(--primary); border-color: rgba(0, 229, 255, 0.3);">
+                <i class="fa-solid fa-plus"></i> Add Custom Line Item
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 4: Financial Calculations & Terms -->
+        <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 1.5rem; margin-bottom: 1.75rem;">
+          <div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label class="form-label"><i class="fa-solid fa-credit-card"></i> Square Payment Link (Optional)</label>
+              <input type="url" id="inv-square-link" class="form-control" placeholder="https://square.link/u/... (Square checkout or payment link)">
+              <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                Clients will see a direct "Pay via Square" button on their invoice page and in invoice emails.
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label"><i class="fa-solid fa-pen-nib"></i> Notes & Payment Terms for Client</label>
+              <textarea id="inv-notes-input" class="form-control" rows="3" placeholder="e.g. Deposit required to reserve date. Remaining balance due on the day of the event. Thank you for booking Thunder House ENT!"></textarea>
+            </div>
+          </div>
+
+          <!-- Totals Card -->
+          <div style="background: rgba(0, 229, 255, 0.04); border: 1px solid rgba(0, 229, 255, 0.25); border-radius: var(--radius-sm); padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 0.5rem; color: var(--text-muted);">
+                <span>Subtotal:</span>
+                <strong id="inv-calc-subtotal" style="color: #fff;">$0.00</strong>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--text-muted);">
+                <span>Discount ($):</span>
+                <input type="number" id="inv-calc-discount" class="form-control" value="0" min="0" step="any" oninput="recalcInvoiceTotals()" style="width: 100px; text-align: right; padding: 0.25rem 0.5rem; font-size: 0.85rem;">
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; margin-bottom: 0.75rem; color: var(--text-muted);">
+                <span>Tax ($):</span>
+                <input type="number" id="inv-calc-tax" class="form-control" value="0" min="0" step="any" oninput="recalcInvoiceTotals()" style="width: 100px; text-align: right; padding: 0.25rem 0.5rem; font-size: 0.85rem;">
+              </div>
+
+              <div style="display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.65rem; margin-bottom: 0.75rem;">
+                <span style="font-weight: 700; color: #fff;">Total Amount:</span>
+                <strong id="inv-calc-total" style="font-size: 1.2rem; color: var(--primary); font-weight: 800;">$0.00</strong>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; margin-bottom: 0.5rem; color: #10b981;">
+                <span>Amount Paid ($):</span>
+                <input type="number" id="inv-calc-paid" class="form-control" value="0" min="0" step="any" oninput="recalcInvoiceTotals()" style="width: 100px; text-align: right; padding: 0.25rem 0.5rem; font-size: 0.85rem; border-color: rgba(16, 185, 129, 0.4); color: #34d399;">
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-top: 2px solid rgba(255, 183, 3, 0.3); padding-top: 0.75rem; margin-top: 0.5rem;">
+              <span style="font-weight: 800; color: var(--accent-gold); font-size: 1rem;">Balance Due:</span>
+              <strong id="inv-calc-balance" style="font-size: 1.35rem; color: var(--accent-gold); font-weight: 800;">$0.00</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Actions Footer -->
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; border-top: 1px solid var(--border-subtle); padding-top: 1.25rem; flex-wrap: wrap;">
+          <div id="inv-modal-danger-actions">
+            <!-- Delete button populated when editing existing invoice -->
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline" onclick="closeInvoiceModal()">Cancel</button>
+            <button type="button" class="btn btn-outline" onclick="saveInvoice('Draft')" style="border-color: rgba(255,255,255,0.2);">
+              <i class="fa-solid fa-file-signature"></i> Save Draft
+            </button>
+            <button type="button" class="btn btn-primary" id="btn-save-invoice" onclick="saveInvoice('Sent', false)">
+              <i class="fa-solid fa-floppy-disk"></i> Save Invoice
+            </button>
+            <button type="button" class="btn btn-primary" id="btn-save-send-invoice" onclick="saveInvoice('Sent', true)" style="background: linear-gradient(135deg, #00e5ff, #0099ff); color: #07090e; font-weight: 800;">
+              <i class="fa-solid fa-paper-plane"></i> Save & Send Email
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Supabase CDN Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
@@ -1696,6 +2046,12 @@
         if (btn) btn.classList.add('active');
         const view = document.getElementById('view-inquiries');
         if (view) view.style.display = 'block';
+      } else if (tabName === 'invoices') {
+        const btn = document.getElementById('tab-btn-invoices');
+        if (btn) btn.classList.add('active');
+        const view = document.getElementById('view-invoices');
+        if (view) view.style.display = 'block';
+        loadInvoices();
       } else if (tabName === 'calendar') {
         const btn = document.getElementById('tab-btn-calendar');
         if (btn) btn.classList.add('active');
@@ -2853,6 +3209,7 @@
 
       // Load data
       loadInquiries();
+      loadInvoices();
 
       // Filter tabs
       document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -3081,6 +3438,14 @@
         if (e.target === detailModal) detailModal.classList.remove('active');
       });
 
+      // Close Invoice Editor modal on overlay click
+      const invModal = document.getElementById('invoice-editor-modal');
+      if (invModal) {
+        invModal.addEventListener('click', (e) => {
+          if (e.target === invModal) invModal.classList.remove('active');
+        });
+      }
+
       // Save Notes
       document.getElementById('btn-save-notes').addEventListener('click', async () => {
         if (!activeInquiryId) return;
@@ -3193,6 +3558,688 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+    }
+
+    // =========================================================================
+    // INVOICING & CUSTOM BILLING SYSTEM STATE & LOGIC
+    // =========================================================================
+    let allInvoices = [];
+    let currentInvoiceFilter = 'All';
+    let editingInvoiceId = null;
+
+    async function loadInvoices() {
+      const tbody = document.getElementById('invoices-tbody');
+      if (!tbody) return;
+      
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="empty-state">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <p>Fetching invoices from Supabase...</p>
+          </td>
+        </tr>
+      `;
+
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('thunderhouse_invoices')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        allInvoices = data || [];
+        updateInvoiceKPIs();
+        renderInvoicesTable();
+      } catch (err) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty-state" style="color: var(--secondary);">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <p>Error loading invoices: ${err.message}</p>
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    function updateInvoiceKPIs() {
+      const totalCount = allInvoices.length;
+      const countEl = document.getElementById('invoices-badge-count');
+      if (countEl) countEl.textContent = totalCount;
+
+      const totalInvoiced = allInvoices.reduce((sum, inv) => sum + (parseFloat(inv.total_amount) || 0), 0);
+      const totalPaid = allInvoices.reduce((sum, inv) => sum + (parseFloat(inv.amount_paid) || 0), 0);
+      const totalBalance = allInvoices.reduce((sum, inv) => {
+        if (inv.status === 'Paid') return sum;
+        const bal = parseFloat(inv.balance_due !== undefined ? inv.balance_due : ((inv.total_amount || 0) - (inv.amount_paid || 0)));
+        return sum + Math.max(0, bal);
+      }, 0);
+
+      const kpiTotal = document.getElementById('inv-kpi-total');
+      const kpiPaid = document.getElementById('inv-kpi-paid');
+      const kpiBalance = document.getElementById('inv-kpi-balance');
+      const kpiCount = document.getElementById('inv-kpi-count');
+
+      if (kpiTotal) kpiTotal.textContent = `$${totalInvoiced.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      if (kpiPaid) kpiPaid.textContent = `$${totalPaid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      if (kpiBalance) kpiBalance.textContent = `$${totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      if (kpiCount) kpiCount.textContent = totalCount;
+    }
+
+    function filterInvoicesByStatus(status, btnEl) {
+      document.querySelectorAll('#view-invoices .filter-btn').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      currentInvoiceFilter = status;
+      renderInvoicesTable();
+    }
+
+    function renderInvoicesTable() {
+      const tbody = document.getElementById('invoices-tbody');
+      if (!tbody) return;
+
+      const searchInput = document.getElementById('inv-search-input');
+      const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+      let filtered = allInvoices;
+
+      if (currentInvoiceFilter !== 'All') {
+        filtered = filtered.filter(inv => (inv.status || 'Sent').toLowerCase() === currentInvoiceFilter.toLowerCase());
+      }
+
+      if (searchTerm) {
+        filtered = filtered.filter(inv => {
+          return (
+            (inv.invoice_number && inv.invoice_number.toLowerCase().includes(searchTerm)) ||
+            (inv.client_name && inv.client_name.toLowerCase().includes(searchTerm)) ||
+            (inv.client_email && inv.client_email.toLowerCase().includes(searchTerm)) ||
+            (inv.client_phone && inv.client_phone.toLowerCase().includes(searchTerm)) ||
+            (inv.venue_city && inv.venue_city.toLowerCase().includes(searchTerm))
+          );
+        });
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty-state">
+              <i class="fa-solid fa-file-invoice"></i>
+              <p>No invoices found matching current filter.</p>
+              <button class="btn btn-primary btn-sm" onclick="openCreateInvoiceModal()" style="margin-top: 0.75rem;">
+                <i class="fa-solid fa-plus"></i> Create New Invoice
+              </button>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(inv => {
+        const issueDateStr = inv.issue_date || (inv.created_at ? new Date(inv.created_at).toLocaleDateString() : 'N/A');
+        const dueDateStr = inv.due_date ? `Due: ${inv.due_date}` : 'Due on receipt';
+        const total = parseFloat(inv.total_amount || 0);
+        const paid = parseFloat(inv.amount_paid || 0);
+        const balance = parseFloat(inv.balance_due !== undefined ? inv.balance_due : (total - paid));
+        const status = (inv.status || 'Sent').toLowerCase();
+
+        return `
+          <tr data-inv-id="${inv.id}">
+            <td>
+              <div style="font-weight: 700; color: #fff; font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem;">
+                <i class="fa-solid fa-bolt" style="color: var(--primary); font-size: 0.75rem;"></i>
+                <a href="/invoice?num=${encodeURIComponent(inv.invoice_number)}" target="_blank" style="color: #fff; text-decoration: underline; text-underline-offset: 3px;" title="Open Public Invoice">
+                  ${escapeHtml(inv.invoice_number)}
+                </a>
+              </div>
+              <small style="color: var(--text-muted); font-size: 0.78rem;">Issued: ${issueDateStr} • ${dueDateStr}</small>
+            </td>
+            <td class="client-name-cell">
+              <strong>${escapeHtml(inv.client_name)}</strong>
+              <div class="client-contact-links">
+                ${inv.client_email ? `<a href="mailto:${inv.client_email}"><i class="fa-solid fa-envelope"></i> ${escapeHtml(inv.client_email)}</a>` : ''}
+                ${inv.client_phone ? `<a href="tel:${inv.client_phone}"><i class="fa-solid fa-phone"></i> ${escapeHtml(inv.client_phone)}</a>` : ''}
+              </div>
+            </td>
+            <td>
+              <div style="color: #fff; font-weight: 500;">${inv.event_date || 'Flexible Date'}</div>
+              <small style="color: var(--text-muted);">${escapeHtml(inv.venue_city || 'Oklahoma City, OK')}</small>
+            </td>
+            <td>
+              <div style="font-weight: 800; color: #fff; font-size: 0.95rem;">$${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+              ${balance > 0 && inv.status !== 'Paid' ? `
+                <small style="color: var(--accent-gold); font-weight: 700;">Bal: $${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</small>
+              ` : `
+                <small style="color: #10b981; font-weight: 700;"><i class="fa-solid fa-check"></i> Paid in Full</small>
+              `}
+            </td>
+            <td>
+              <span class="status-badge ${status}">${escapeHtml(inv.status || 'Sent')}</span>
+            </td>
+            <td>
+              <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
+                <a href="/invoice?num=${encodeURIComponent(inv.invoice_number)}" target="_blank" class="btn-action-sm" title="View Public Invoice Link">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+                <button class="btn-action-sm" onclick="copyInvoiceLink('${escapeHtml(inv.invoice_number)}')" title="Copy Client Invoice Link">
+                  <i class="fa-solid fa-link"></i>
+                </button>
+                <button class="btn-action-sm" onclick="dispatchInvoiceEmailPrompt('${inv.id}')" title="Send / Resend Invoice Email to Client" style="color: var(--primary);">
+                  <i class="fa-solid fa-paper-plane"></i>
+                </button>
+                ${inv.status !== 'Paid' ? `
+                  <button class="btn-action-sm" onclick="markInvoiceAsPaid('${inv.id}')" title="Quick Mark as Paid" style="color: #10b981;">
+                    <i class="fa-solid fa-circle-check"></i>
+                  </button>
+                ` : ''}
+                <button class="btn-action-sm" onclick="openEditInvoiceModal('${inv.id}')" title="Edit Invoice Details & Line Items">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button class="btn-action-sm" onclick="deleteInvoice('${inv.id}')" title="Delete Invoice" style="color: #ff99bb;">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openCreateInvoiceModal(prefillData = null) {
+      editingInvoiceId = null;
+      document.getElementById('invoice-editor-form').reset();
+      document.getElementById('inv-edit-id').value = '';
+      document.getElementById('inv-edit-inquiry-id').value = '';
+      document.getElementById('inv-modal-title').textContent = 'Create Custom Invoice';
+      document.getElementById('inv-modal-danger-actions').innerHTML = '';
+
+      populateInvoiceLeadSelector();
+
+      // Auto-generate invoice number
+      const currentYear = new Date().getFullYear();
+      const existingSeq = allInvoices.length + 1;
+      const invNum = `INV-${currentYear}-${String(existingSeq).padStart(3, '0')}`;
+      document.getElementById('inv-number-input').value = invNum;
+
+      // Dates
+      const today = new Date().toISOString().slice(0, 10);
+      document.getElementById('inv-issue-date-input').value = today;
+      const due = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+      document.getElementById('inv-due-date-input').value = due;
+      document.getElementById('inv-status-input').value = 'Sent';
+
+      const container = document.getElementById('inv-items-container');
+      container.innerHTML = '';
+
+      if (prefillData) {
+        if (prefillData.inquiry_id) document.getElementById('inv-edit-inquiry-id').value = prefillData.inquiry_id;
+        if (prefillData.client_name) document.getElementById('inv-client-name').value = prefillData.client_name;
+        if (prefillData.client_email) document.getElementById('inv-client-email').value = prefillData.client_email;
+        if (prefillData.client_phone) document.getElementById('inv-client-phone').value = prefillData.client_phone;
+        if (prefillData.event_date) document.getElementById('inv-event-date').value = prefillData.event_date;
+        if (prefillData.venue_city) document.getElementById('inv-venue-city').value = prefillData.venue_city;
+        if (prefillData.notes) document.getElementById('inv-notes-input').value = prefillData.notes;
+
+        if (Array.isArray(prefillData.items) && prefillData.items.length > 0) {
+          prefillData.items.forEach(it => addInvoiceItemRow(it));
+        } else {
+          const rate = parseFloat(prefillData.estimated_total) || 700;
+          const pkg = prefillData.package_name || 'Thunder House DJ & MC Event Package';
+          addInvoiceItemRow({
+            description: pkg,
+            details: 'Includes full sound system, wireless mic, and lighting setup',
+            quantity: 1,
+            rate: rate
+          });
+        }
+      } else {
+        addInvoiceItemRow({
+          description: 'Thunder Party DJ Package',
+          details: 'Up to 4 hours complete event sound & light show',
+          quantity: 1,
+          rate: 700
+        });
+      }
+
+      recalcInvoiceTotals();
+      document.getElementById('invoice-editor-modal').classList.add('active');
+    }
+
+    function openEditInvoiceModal(id) {
+      const inv = allInvoices.find(i => i.id === id);
+      if (!inv) return;
+
+      editingInvoiceId = id;
+      document.getElementById('invoice-editor-form').reset();
+      document.getElementById('inv-edit-id').value = inv.id;
+      document.getElementById('inv-edit-inquiry-id').value = inv.inquiry_id || '';
+      document.getElementById('inv-modal-title').textContent = `Edit Invoice ${inv.invoice_number}`;
+
+      populateInvoiceLeadSelector(inv.inquiry_id);
+
+      document.getElementById('inv-number-input').value = inv.invoice_number || '';
+      document.getElementById('inv-issue-date-input').value = inv.issue_date || (inv.created_at ? inv.created_at.slice(0, 10) : '');
+      document.getElementById('inv-due-date-input').value = inv.due_date || '';
+      document.getElementById('inv-status-input').value = inv.status || 'Sent';
+
+      document.getElementById('inv-client-name').value = inv.client_name || '';
+      document.getElementById('inv-client-email').value = inv.client_email || '';
+      document.getElementById('inv-client-phone').value = inv.client_phone || '';
+      document.getElementById('inv-event-date').value = inv.event_date || '';
+      document.getElementById('inv-venue-city').value = inv.venue_city || '';
+
+      document.getElementById('inv-square-link').value = inv.square_payment_link || '';
+      document.getElementById('inv-notes-input').value = inv.notes || '';
+
+      document.getElementById('inv-calc-discount').value = inv.discount || 0;
+      document.getElementById('inv-calc-tax').value = inv.tax || 0;
+      document.getElementById('inv-calc-paid').value = inv.amount_paid || 0;
+
+      const container = document.getElementById('inv-items-container');
+      container.innerHTML = '';
+      const items = Array.isArray(inv.items) && inv.items.length > 0 ? inv.items : [
+        { description: 'Thunder House Event DJ Service', details: '', quantity: 1, rate: inv.total_amount || 0 }
+      ];
+      items.forEach(it => addInvoiceItemRow(it));
+
+      document.getElementById('inv-modal-danger-actions').innerHTML = `
+        <button type="button" class="btn btn-outline btn-sm" style="border-color: #ef4444; color: #f87171;" onclick="deleteInvoice('${inv.id}')">
+          <i class="fa-solid fa-trash"></i> Delete Invoice
+        </button>
+      `;
+
+      recalcInvoiceTotals();
+      document.getElementById('invoice-editor-modal').classList.add('active');
+    }
+
+    function closeInvoiceModal() {
+      document.getElementById('invoice-editor-modal').classList.remove('active');
+    }
+
+    function populateInvoiceLeadSelector(selectedInquiryId = null) {
+      const select = document.getElementById('inv-lead-selector');
+      if (!select) return;
+
+      select.innerHTML = '<option value="">-- Quick Autofill from Lead --</option>';
+      allInquiries.forEach(lead => {
+        const opt = document.createElement('option');
+        opt.value = lead.id;
+        const total = parseFloat(lead.estimated_total) ? ` ($${parseFloat(lead.estimated_total).toLocaleString()})` : '';
+        opt.textContent = `${lead.client_name} - ${lead.package_name || 'Inquiry'}${total}`;
+        if (selectedInquiryId && lead.id === selectedInquiryId) {
+          opt.selected = true;
+        }
+        select.appendChild(opt);
+      });
+    }
+
+    function autoFillInvoiceFromLead(leadId) {
+      if (!leadId) return;
+      const lead = allInquiries.find(i => i.id === leadId);
+      if (!lead) return;
+
+      document.getElementById('inv-edit-inquiry-id').value = lead.id;
+      if (lead.client_name) document.getElementById('inv-client-name').value = lead.client_name;
+      if (lead.client_email) document.getElementById('inv-client-email').value = lead.client_email;
+      if (lead.client_phone) document.getElementById('inv-client-phone').value = lead.client_phone;
+      if (lead.event_date) document.getElementById('inv-event-date').value = lead.event_date;
+      if (lead.venue_city) document.getElementById('inv-venue-city').value = lead.venue_city;
+
+      const container = document.getElementById('inv-items-container');
+      container.innerHTML = '';
+      
+      const pkg = lead.package_name || 'Thunder Party Package';
+      const total = parseFloat(lead.estimated_total) || 700;
+
+      addInvoiceItemRow({
+        description: pkg,
+        details: 'Selected event package and sound setup',
+        quantity: 1,
+        rate: total
+      });
+
+      if (lead.extra_hours > 0) {
+        addInvoiceItemRow({
+          description: `Overtime: Extra Hours (${lead.extra_hours} hrs)`,
+          details: 'Hourly overtime extension beyond package time',
+          quantity: lead.extra_hours,
+          rate: 100
+        });
+      }
+
+      if (lead.travel_miles > 0) {
+        addInvoiceItemRow({
+          description: `Travel Mileage Fee (${lead.travel_miles} miles)`,
+          details: 'Travel outside standard 30-mile metro radius',
+          quantity: lead.travel_miles,
+          rate: 1
+        });
+      }
+
+      recalcInvoiceTotals();
+    }
+
+    function createInvoiceFromLead(leadId) {
+      const lead = allInquiries.find(i => i.id === leadId);
+      if (!lead) return;
+
+      const detailModal = document.getElementById('detail-modal');
+      if (detailModal) detailModal.classList.remove('active');
+
+      openCreateInvoiceModal({
+        inquiry_id: lead.id,
+        client_name: lead.client_name,
+        client_email: lead.client_email,
+        client_phone: lead.client_phone,
+        event_date: lead.event_date,
+        venue_city: lead.venue_city,
+        package_name: lead.package_name,
+        estimated_total: lead.estimated_total,
+        notes: lead.notes || (lead.message ? `Client Request: ${lead.message}` : '')
+      });
+    }
+
+    function addInvoiceItemRow(item = { description: '', details: '', quantity: 1, rate: 0 }) {
+      const container = document.getElementById('inv-items-container');
+      if (!container) return;
+
+      const desc = escapeHtml(item.description || '');
+      const details = escapeHtml(item.details || '');
+      const qty = item.quantity !== undefined ? item.quantity : 1;
+      const rate = item.rate !== undefined ? parseFloat(item.rate) : 0;
+      const amount = (qty * rate).toFixed(2);
+
+      const row = document.createElement('div');
+      row.className = 'inv-item-row';
+      row.innerHTML = `
+        <input type="text" class="form-control inv-item-desc" placeholder="Reason / Description (e.g. Thunder Party)" value="${desc}" required oninput="recalcInvoiceTotals()">
+        <input type="text" class="form-control inv-item-details" placeholder="Subtext / Details" value="${details}">
+        <input type="number" class="form-control inv-item-qty" value="${qty}" min="1" step="1" style="text-align: center;" oninput="recalcInvoiceTotals()">
+        <input type="number" class="form-control inv-item-rate" value="${rate}" min="0" step="any" placeholder="0.00" style="text-align: right;" oninput="recalcInvoiceTotals()">
+        <div class="inv-item-amount" style="text-align: right; font-weight: 700; color: #fff;">$${amount}</div>
+        <button type="button" class="btn-action-sm" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3); padding: 0.35rem 0.5rem;" onclick="removeInvoiceItemRow(this)" title="Remove item">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      `;
+
+      container.appendChild(row);
+      recalcInvoiceTotals();
+    }
+
+    function addInvoiceItemPreset(desc, details, rate) {
+      addInvoiceItemRow({
+        description: desc,
+        details: details,
+        quantity: 1,
+        rate: rate
+      });
+    }
+
+    function removeInvoiceItemRow(btn) {
+      const row = btn.closest('.inv-item-row');
+      if (row) {
+        row.remove();
+        recalcInvoiceTotals();
+      }
+    }
+
+    function recalcInvoiceTotals() {
+      const rows = document.querySelectorAll('#inv-items-container .inv-item-row');
+      let subtotal = 0;
+
+      rows.forEach(r => {
+        const qtyInput = r.querySelector('.inv-item-qty');
+        const rateInput = r.querySelector('.inv-item-rate');
+        const amountDisplay = r.querySelector('.inv-item-amount');
+
+        const qty = parseFloat(qtyInput ? qtyInput.value : 1) || 0;
+        const rate = parseFloat(rateInput ? rateInput.value : 0) || 0;
+        const lineTotal = qty * rate;
+        subtotal += lineTotal;
+
+        if (amountDisplay) {
+          amountDisplay.textContent = `$${lineTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+      });
+
+      const discount = parseFloat(document.getElementById('inv-calc-discount')?.value || 0) || 0;
+      const tax = parseFloat(document.getElementById('inv-calc-tax')?.value || 0) || 0;
+      const paid = parseFloat(document.getElementById('inv-calc-paid')?.value || 0) || 0;
+
+      const total = Math.max(0, subtotal - discount + tax);
+      const balance = Math.max(0, total - paid);
+
+      const subtotalEl = document.getElementById('inv-calc-subtotal');
+      const totalEl = document.getElementById('inv-calc-total');
+      const balanceEl = document.getElementById('inv-calc-balance');
+
+      if (subtotalEl) subtotalEl.textContent = `$${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      if (totalEl) totalEl.textContent = `$${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      if (balanceEl) balanceEl.textContent = `$${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    async function saveInvoice(statusToSet = null, andSendEmail = false) {
+      const invoiceNumber = document.getElementById('inv-number-input').value.trim();
+      const clientName = document.getElementById('inv-client-name').value.trim();
+      const clientEmail = document.getElementById('inv-client-email').value.trim();
+
+      if (!invoiceNumber) {
+        alert('Please provide an Invoice Number (e.g. INV-2026-001).');
+        return;
+      }
+      if (!clientName) {
+        alert('Please enter the client name.');
+        return;
+      }
+      if (!clientEmail || !clientEmail.includes('@')) {
+        alert('Please enter a valid client email address.');
+        return;
+      }
+
+      const rows = document.querySelectorAll('#inv-items-container .inv-item-row');
+      const items = [];
+      let subtotal = 0;
+
+      rows.forEach(r => {
+        const desc = r.querySelector('.inv-item-desc')?.value.trim();
+        const details = r.querySelector('.inv-item-details')?.value.trim();
+        const qty = parseFloat(r.querySelector('.inv-item-qty')?.value) || 1;
+        const rate = parseFloat(r.querySelector('.inv-item-rate')?.value) || 0;
+        const lineTotal = qty * rate;
+
+        if (desc) {
+          subtotal += lineTotal;
+          items.push({
+            description: desc,
+            details: details || '',
+            quantity: qty,
+            rate: rate,
+            amount: lineTotal
+          });
+        }
+      });
+
+      if (items.length === 0) {
+        alert('Please add at least one line item or reason for this invoice.');
+        return;
+      }
+
+      const discount = parseFloat(document.getElementById('inv-calc-discount')?.value || 0) || 0;
+      const tax = parseFloat(document.getElementById('inv-calc-tax')?.value || 0) || 0;
+      const paid = parseFloat(document.getElementById('inv-calc-paid')?.value || 0) || 0;
+      const totalAmount = Math.max(0, subtotal - discount + tax);
+      const balanceDue = Math.max(0, totalAmount - paid);
+
+      let status = statusToSet || document.getElementById('inv-status-input').value || 'Sent';
+      if (balanceDue === 0 && totalAmount > 0) {
+        status = 'Paid';
+      }
+
+      const payload = {
+        invoice_number: invoiceNumber,
+        inquiry_id: document.getElementById('inv-edit-inquiry-id').value || null,
+        client_name: clientName,
+        client_email: clientEmail,
+        client_phone: document.getElementById('inv-client-phone').value.trim() || null,
+        event_date: document.getElementById('inv-event-date').value || null,
+        venue_city: document.getElementById('inv-venue-city').value.trim() || null,
+        issue_date: document.getElementById('inv-issue-date-input').value || new Date().toISOString().slice(0, 10),
+        due_date: document.getElementById('inv-due-date-input').value || null,
+        status: status,
+        square_payment_link: document.getElementById('inv-square-link').value.trim() || null,
+        notes: document.getElementById('inv-notes-input').value.trim() || null,
+        items: items,
+        subtotal: subtotal,
+        discount: discount,
+        tax: tax,
+        total_amount: totalAmount,
+        amount_paid: paid,
+        balance_due: balanceDue,
+        updated_at: new Date().toISOString()
+      };
+
+      const saveBtn = andSendEmail ? document.getElementById('btn-save-send-invoice') : document.getElementById('btn-save-invoice');
+      const origText = saveBtn ? saveBtn.innerHTML : '';
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+      }
+
+      try {
+        let savedInvoice = null;
+        if (editingInvoiceId) {
+          payload.id = editingInvoiceId;
+          const { data, error } = await window.supabaseClient
+            .from('thunderhouse_invoices')
+            .update(payload)
+            .eq('id', editingInvoiceId)
+            .select()
+            .single();
+
+          if (error) throw error;
+          savedInvoice = data;
+        } else {
+          payload.created_by = currentUserState.id || null;
+          const { data, error } = await window.supabaseClient
+            .from('thunderhouse_invoices')
+            .insert([payload])
+            .select()
+            .single();
+
+          if (error) throw error;
+          savedInvoice = data;
+        }
+
+        if (andSendEmail) {
+          if (saveBtn) saveBtn.innerHTML = '<i class="fa-solid fa-paper-plane fa-fade"></i> Dispatching Email...';
+          await dispatchInvoiceEmailDirect(savedInvoice);
+        }
+
+        closeInvoiceModal();
+        await loadInvoices();
+        alert(`Invoice #${invoiceNumber} successfully saved${andSendEmail ? ' and emailed to client' : ''}!`);
+      } catch (err) {
+        alert('Failed to save invoice: ' + err.message);
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = origText;
+        }
+      }
+    }
+
+    async function dispatchInvoiceEmailDirect(inv) {
+      const res = await fetch('https://kxoivmflghfgtvawhktt.supabase.co/functions/v1/send-booking-confirmation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'invoice',
+          is_invoice: true,
+          invoice_data: inv
+        })
+      });
+
+      const result = await res.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to dispatch email');
+      }
+      return result;
+    }
+
+    async function dispatchInvoiceEmailPrompt(invoiceId) {
+      const inv = allInvoices.find(i => i.id === invoiceId);
+      if (!inv) return;
+
+      if (!confirm(`Send official invoice #${inv.invoice_number} to client ${inv.client_name} (${inv.client_email})?`)) {
+        return;
+      }
+
+      try {
+        await dispatchInvoiceEmailDirect(inv);
+        alert(`Success! Invoice #${inv.invoice_number} email sent to ${inv.client_email}.`);
+      } catch (err) {
+        alert('Failed to dispatch invoice email: ' + err.message);
+      }
+    }
+
+    async function markInvoiceAsPaid(id) {
+      const inv = allInvoices.find(i => i.id === id);
+      if (!inv) return;
+
+      if (!confirm(`Mark Invoice #${inv.invoice_number} for ${inv.client_name} as Paid in full ($${parseFloat(inv.total_amount).toFixed(2)})?`)) {
+        return;
+      }
+
+      try {
+        const { error } = await window.supabaseClient
+          .from('thunderhouse_invoices')
+          .update({
+            status: 'Paid',
+            amount_paid: inv.total_amount,
+            balance_due: 0,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', id);
+
+        if (error) throw error;
+
+        await loadInvoices();
+        alert(`Invoice #${inv.invoice_number} marked as Paid!`);
+      } catch (err) {
+        alert('Failed to update invoice: ' + err.message);
+      }
+    }
+
+    async function deleteInvoice(id) {
+      const inv = allInvoices.find(i => i.id === id);
+      const num = inv ? inv.invoice_number : '';
+
+      if (!confirm(`Are you sure you want to delete invoice ${num}? This cannot be undone.`)) {
+        return;
+      }
+
+      try {
+        const { error } = await window.supabaseClient
+          .from('thunderhouse_invoices')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+
+        closeInvoiceModal();
+        await loadInvoices();
+        alert(`Invoice deleted successfully.`);
+      } catch (err) {
+        alert('Failed to delete invoice: ' + err.message);
+      }
+    }
+
+    function copyInvoiceLink(invoiceNum) {
+      const url = `${window.location.origin}/invoice?num=${encodeURIComponent(invoiceNum)}`;
+      navigator.clipboard.writeText(url).then(() => {
+        alert(`Invoice public link copied to clipboard:\n${url}`);
+      }).catch(() => {
+        prompt('Copy invoice link:', url);
+      });
     }
 
     function escapeHtml(text) {
