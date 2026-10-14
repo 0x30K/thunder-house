@@ -289,11 +289,19 @@
       <a href="index.html" class="btn btn-outline btn-sm">
         <i class="fa-solid fa-arrow-left"></i> Thunder House ENT
       </a>
-      <div style="display: flex; gap: 0.65rem;">
+      <div style="display: flex; gap: 0.65rem; align-items: center; flex-wrap: wrap;">
+        <a id="btn-top-contract" href="#" target="_blank" class="btn btn-outline btn-sm" style="border-color: var(--primary); color: var(--primary);">
+          <i class="fa-solid fa-file-signature"></i> Performance Contract
+        </a>
         <button onclick="window.print()" class="btn btn-outline btn-sm">
           <i class="fa-solid fa-print"></i> Print / Save PDF
         </button>
       </div>
+    </div>
+
+    <!-- Contract Status Alert Banner (Hidden in Print) -->
+    <div id="invoice-contract-banner" class="btn-print-hide" style="display: none; border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: 1.75rem; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <!-- Populated dynamically: pending or signed -->
     </div>
 
     <!-- Invoice Header -->
@@ -659,6 +667,74 @@
       const portalBtn = document.getElementById('btn-open-client-portal');
       if (portalBtn && inv.invoice_number) {
         portalBtn.href = `/portal?invoice=${encodeURIComponent(inv.invoice_number)}`;
+      }
+
+      // Check & Render Contract Status Banner
+      checkAndRenderContractBanner(inv);
+    }
+
+    async function checkAndRenderContractBanner(inv) {
+      const banner = document.getElementById('invoice-contract-banner');
+      const topBtn = document.getElementById('btn-top-contract');
+      if (topBtn && inv.invoice_number) {
+        topBtn.href = `/contract?invoice=${encodeURIComponent(inv.invoice_number)}`;
+      }
+
+      if (!banner) return;
+
+      try {
+        const { data: contract } = await window.supabaseClient
+          .from('thunderhouse_contracts')
+          .select('id, status, signed_at, contract_token')
+          .eq('invoice_number', inv.invoice_number)
+          .maybeSingle();
+
+        const isSigned = (contract && contract.status === 'Signed') || (inv.contract_status === 'Signed');
+
+        banner.style.display = 'flex';
+        if (isSigned) {
+          banner.style.background = 'rgba(16, 185, 129, 0.12)';
+          banner.style.border = '1px solid rgba(16, 185, 129, 0.4)';
+          banner.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <i class="fa-solid fa-circle-check" style="color: #10b981; font-size: 1.35rem;"></i>
+              <div>
+                <strong style="color: #fff; font-size: 0.95rem; display: block;">Entertainment Agreement Legally Executed</strong>
+                <span style="font-size: 0.82rem; color: #a7f3d0;">Your performance contract is signed and legally binding under Oklahoma law.</span>
+              </div>
+            </div>
+            <a href="/contract?invoice=${encodeURIComponent(inv.invoice_number)}" target="_blank" class="btn btn-outline btn-sm" style="border-color: #10b981; color: #34d399; font-size: 0.82rem;">
+              <i class="fa-solid fa-file-contract"></i> View Signed Contract
+            </a>
+          `;
+          if (topBtn) {
+            topBtn.innerHTML = '<i class="fa-solid fa-check-double" style="color: #10b981;"></i> Contract Executed';
+            topBtn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+            topBtn.style.color = '#34d399';
+          }
+        } else {
+          banner.style.background = 'rgba(255, 183, 3, 0.1)';
+          banner.style.border = '1px solid rgba(255, 183, 3, 0.4)';
+          banner.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <i class="fa-solid fa-signature fa-beat" style="color: var(--accent-gold); font-size: 1.35rem;"></i>
+              <div>
+                <strong style="color: #fff; font-size: 0.95rem; display: block;">Step 1: Entertainment Services Agreement Required</strong>
+                <span style="font-size: 0.82rem; color: #fde68a;">Please review and digitally sign your event contract prior to or upon deposit payment.</span>
+              </div>
+            </div>
+            <a href="/contract?invoice=${encodeURIComponent(inv.invoice_number)}" target="_blank" class="btn btn-primary btn-sm" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #000; font-weight: 800; border: none; font-size: 0.82rem;">
+              <i class="fa-solid fa-pen-nib"></i> Review & Sign Contract
+            </a>
+          `;
+          if (topBtn) {
+            topBtn.innerHTML = '<i class="fa-solid fa-file-signature"></i> Sign Contract';
+            topBtn.style.borderColor = 'var(--accent-gold)';
+            topBtn.style.color = 'var(--accent-gold)';
+          }
+        }
+      } catch (err) {
+        console.warn('Contract banner load notice:', err);
       }
     }
 

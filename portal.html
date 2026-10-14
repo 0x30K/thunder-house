@@ -819,6 +819,9 @@
       </div>
 
       <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end; flex-wrap: wrap;">
+        <a id="btn-view-contract" href="contract.html" target="_blank" class="btn btn-outline" style="border-color: var(--cyber-gold); color: var(--cyber-gold);">
+          <i class="fa-solid fa-file-signature"></i> Event Contract
+        </a>
         <a id="btn-view-dj-runofshow" href="gigs.html" target="_blank" class="btn btn-outline" style="border-color: var(--cyber-cyan); color: var(--cyber-cyan);">
           <i class="fa-solid fa-stopwatch"></i> Live DJ Run of Show
         </a>
@@ -962,6 +965,11 @@
         } else if (plan.id) {
           runOfShowBtn.href = `gigs.html?id=${encodeURIComponent(plan.id)}`;
         }
+      }
+
+      const contractBtn = document.getElementById('btn-view-contract');
+      if (contractBtn && plan.invoice_number) {
+        contractBtn.href = `contract.html?invoice=${encodeURIComponent(plan.invoice_number)}`;
       }
 
       // Countdown & badges (if present)

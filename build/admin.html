@@ -3784,6 +3784,17 @@
             </td>
             <td>
               <span class="status-badge ${status}">${escapeHtml(inv.status || 'Sent')}</span>
+              <div style="margin-top: 0.3rem;">
+                ${inv.contract_status === 'Signed' ? `
+                  <span style="font-size: 0.72rem; color: #10b981; font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
+                    <i class="fa-solid fa-circle-check"></i> Contract Signed
+                  </span>
+                ` : `
+                  <span style="font-size: 0.72rem; color: var(--accent-gold); font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem;">
+                    <i class="fa-solid fa-signature"></i> Contract Pending
+                  </span>
+                `}
+              </div>
             </td>
             <td>
               <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
@@ -3793,6 +3804,9 @@
                 <button class="btn-action-sm" onclick="copyInvoiceLink('${escapeHtml(inv.invoice_number)}')" title="Copy Client Invoice Link">
                   <i class="fa-solid fa-link"></i>
                 </button>
+                <a href="/contract?invoice=${encodeURIComponent(inv.invoice_number)}" target="_blank" class="btn-action-sm" title="Open Legal Performance Contract & E-Signature" style="color: var(--accent-gold);">
+                  <i class="fa-solid fa-file-signature"></i>
+                </a>
                 <a href="/portal?invoice=${encodeURIComponent(inv.invoice_number)}" target="_blank" class="btn-action-sm" title="Open Client VIP Planning & Music Hub" style="color: var(--accent-gold);">
                   <i class="fa-solid fa-compact-disc"></i>
                 </a>

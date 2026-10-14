@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Entertainment Services Agreement | Thunder House ENT</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800;900&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Design System CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    :root {
+      --cyber-cyan: #00e5ff;
+      --cyber-gold: #ffb703;
+      --cyber-pink: #ff2a85;
+      --cyber-green: #10b981;
+      --cyber-red: #ef4444;
+      --cyber-bg: #05070b;
+      --cyber-card: rgba(10, 14, 23, 0.95);
+      --cyber-border: rgba(0, 229, 255, 0.22);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-cursive: 'Dancing Script', cursive;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--cyber-bg);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Background Ambient Gradients */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -15%;
+      left: 10%;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(circle, rgba(0, 229, 255, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -15%;
+      right: 5%;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(circle, rgba(255, 183, 3, 0.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .contract-shell {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 5rem 1rem;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Top Action Bar */
+    .contract-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .brand-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .brand-back-link:hover {
+      color: var(--cyber-cyan);
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 0.65rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* Main Legal Document Card */
+    .document-card {
+      background: var(--cyber-card);
+      border: 1px solid var(--cyber-border);
+      border-radius: 16px;
+      padding: 2.5rem 2.75rem;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 229, 255, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .document-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--cyber-cyan), var(--cyber-gold), transparent);
+    }
+
+    /* Header Section */
+    .doc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 2rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .doc-brand img {
+      height: 52px;
+      margin-bottom: 0.65rem;
+    }
+
+    .doc-brand-meta {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .doc-title-meta {
+      text-align: right;
+    }
+
+    .doc-title {
+      font-family: var(--font-heading);
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 0.35rem 0;
+      letter-spacing: 0.02em;
+    }
+
+    .doc-subtitle {
+      font-size: 0.88rem;
+      color: var(--cyber-gold);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.65rem;
+    }
+
+    .doc-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      letter-spacing: 0.06em;
+    }
+
+    .doc-status-badge.pending {
+      background: rgba(255, 183, 3, 0.15);
+      border: 1px solid rgba(255, 183, 3, 0.4);
+      color: var(--cyber-gold);
+    }
+
+    .doc-status-badge.signed {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: var(--cyber-green);
+    }
+
+    /* Quick Summary Grid */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .summary-item label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    .summary-item strong {
+      font-size: 1.05rem;
+      color: #fff;
+      display: block;
+    }
+
+    .summary-item small {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Legal Articles */
+    .legal-content {
+      line-height: 1.65;
+      font-size: 0.92rem;
+      color: #cbd5e1;
+    }
+
+    .legal-article {
+      margin-bottom: 1.75rem;
+    }
+
+    .article-title {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 0 0 0.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      letter-spacing: 0.02em;
+    }
+
+    .article-num {
+      color: var(--cyber-cyan);
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+    }
+
+    .legal-p {
+      margin: 0 0 0.65rem 0;
+      text-align: justify;
+    }
+
+    .legal-list {
+      margin: 0 0 0.75rem 0;
+      padding-left: 1.5rem;
+    }
+
+    .legal-list li {
+      margin-bottom: 0.35rem;
+    }
+
+    .clause-highlight {
+      background: rgba(0, 229, 255, 0.06);
+      border-left: 3px solid var(--cyber-cyan);
+      padding: 0.75rem 1rem;
+      border-radius: 0 8px 8px 0;
+      margin: 0.75rem 0;
+      color: #e2e8f0;
+      font-size: 0.88rem;
+    }
+
+    /* Financial Breakdown Box */
+    .financial-box {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(0, 229, 255, 0.25);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin: 1.25rem 0;
+    }
+
+    .fin-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.45rem 0;
+      font-size: 0.92rem;
+    }
+
+    .fin-row:not(:last-child) {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .fin-row.total-bold {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #fff;
+      border-top: 1px solid rgba(0, 229, 255, 0.3);
+      padding-top: 0.65rem;
+      margin-top: 0.35rem;
+    }
+
+    .fin-row.deposit-bold {
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: var(--cyber-gold);
+    }
+
+    /* E-Signature Execution Block */
+    .signature-section {
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid var(--cyber-border);
+      border-radius: 14px;
+      padding: 2rem;
+      margin-top: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    .sig-section-title {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 0.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .sig-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 0.65rem;
+    }
+
+    .sig-tab-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-muted);
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .sig-tab-btn.active {
+      background: rgba(0, 229, 255, 0.15);
+      border-color: var(--cyber-cyan);
+      color: #fff;
+    }
+
+    /* Draw Pad */
+    .canvas-wrap {
+      background: #000;
+      border: 2px dashed rgba(0, 229, 255, 0.35);
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+      touch-action: none;
+    }
+
+    canvas#sig-canvas {
+      width: 100%;
+      height: 180px;
+      display: block;
+      cursor: crosshair;
+    }
+
+    .canvas-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgba(255, 255, 255, 0.15);
+      font-size: 0.95rem;
+      pointer-events: none;
+      user-select: none;
+      font-family: var(--font-body);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    /* Type Signature Input */
+    .type-sig-wrap {
+      display: none;
+      margin-bottom: 1rem;
+    }
+
+    .type-sig-preview {
+      background: #000;
+      border: 2px solid rgba(0, 229, 255, 0.35);
+      border-radius: 10px;
+      padding: 1.5rem 1.25rem;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-cursive);
+      font-size: 3rem;
+      color: var(--cyber-cyan);
+      text-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+      margin-top: 0.75rem;
+      user-select: none;
+    }
+
+    /* Form Fields for Signer */
+    .signer-fields-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin: 1.25rem 0;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .field-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .field-input {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 0.65rem 0.85rem;
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 0.92rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .field-input:focus {
+      border-color: var(--cyber-cyan);
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+    }
+
+    /* Checkbox Consent */
+    .consent-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin: 1.25rem 0 1.75rem 0;
+      padding: 0.85rem 1rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+    }
+
+    .consent-box input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--cyber-green);
+      margin-top: 0.15rem;
+      cursor: pointer;
+    }
+
+    .consent-text {
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      line-height: 1.45;
+    }
+
+    /* Dual Signature Presentation Grid (Once Signed) */
+    .dual-sig-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    @media (max-width: 640px) {
+      .dual-sig-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .sig-party-card {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+
+    .sig-party-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: var(--cyber-cyan);
+      margin-bottom: 0.5rem;
+    }
+
+    .sig-render-box {
+      height: 100px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.65rem;
+      overflow: hidden;
+    }
+
+    .sig-render-img {
+      max-height: 80px;
+      max-width: 90%;
+      filter: drop-shadow(0 0 4px var(--cyber-cyan));
+    }
+
+    .sig-typed-font {
+      font-family: var(--font-cursive);
+      font-size: 2.2rem;
+      color: var(--cyber-cyan);
+    }
+
+    .sig-meta-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Post-Sign Celebration Action Card */
+    .post-sign-card {
+      display: none;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(5, 7, 11, 0.95));
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 14px;
+      padding: 1.75rem;
+      margin-top: 2rem;
+      text-align: center;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(16, 185, 129, 0.15);
+    }
+
+    /* Print Stylesheet */
+    @media print {
+      body {
+        background: #fff !important;
+        color: #000 !important;
+        padding: 0 !important;
+      }
+      .contract-top-bar, .sig-tabs, .canvas-wrap, .type-sig-wrap, .consent-box, #btn-submit-signature, .btn-print-hide, .post-sign-card {
+        display: none !important;
+      }
+      .contract-shell {
+        max-width: 100% !important;
+        padding: 0 !important;
+      }
+      .document-card {
+        background: #fff !important;
+        color: #000 !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+      }
+      .doc-title, .article-title, .summary-item strong, .fin-row.total-bold, .legal-content {
+        color: #000 !important;
+      }
+      .doc-status-badge {
+        border: 1px solid #000 !important;
+        color: #000 !important;
+        background: transparent !important;
+      }
+      .summary-grid, .financial-box, .sig-party-card {
+        background: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #000 !important;
+      }
+      .clause-highlight {
+        background: #f1f5f9 !important;
+        border-left: 3px solid #000 !important;
+        color: #000 !important;
+      }
+      .sig-render-img {
+        filter: invert(1) !important;
+      }
+      .sig-typed-font {
+        color: #000 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="contract-shell">
+
+    <!-- Top Action Bar -->
+    <header class="contract-top-bar btn-print-hide">
+      <a href="index.html" class="brand-back-link">
+        <i class="fa-solid fa-arrow-left"></i> Thunder House ENT
+      </a>
+
+      <div class="top-actions">
+        <!-- Link to Linked Invoice -->
+        <a id="btn-top-invoice-link" href="#" target="_blank" class="btn btn-outline btn-sm" style="display: none; border-color: rgba(255,255,255,0.2);">
+          <i class="fa-solid fa-file-invoice-dollar"></i> View Invoice
+        </a>
+
+        <!-- Link to VIP Portal -->
+        <a id="btn-top-portal-link" href="#" target="_blank" class="btn btn-outline btn-sm" style="display: none; border-color: var(--cyber-gold); color: var(--cyber-gold);">
+          <i class="fa-solid fa-compact-disc"></i> VIP Music Hub
+        </a>
+
+        <!-- Print Clean Copy -->
+        <button type="button" class="btn btn-outline btn-sm" onclick="window.print()">
+          <i class="fa-solid fa-print"></i> Print / Save PDF
+        </button>
+      </div>
+    </header>
+
+    <!-- Loading State -->
+    <div id="contract-loading-state" style="text-align: center; padding: 4rem 1rem;">
+      <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 2.5rem; color: var(--cyber-cyan); margin-bottom: 1rem;"></i>
+      <h3 style="color: #fff; font-family: var(--font-heading); margin-bottom: 0.5rem;">Loading Entertainment Agreement...</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">Retrieving contract terms from legal vault...</p>
+    </div>
+
+    <!-- Main Contract Document -->
+    <main id="contract-content-card" class="document-card" style="display: none;">
+
+      <!-- Document Header -->
+      <section class="doc-header">
+        <div class="doc-brand">
+          <img src="assets/images/branding/Thunder House Logo-PNG.png" alt="Thunder House ENT">
+          <div class="doc-brand-meta">
+            <strong>Thunder House Entertainment LLC</strong><br>
+            Oklahoma City, OK • (405) 555-0199<br>
+            booking@thunderhouseent.com • thunderhouseent.com
+          </div>
+        </div>
+
+        <div class="doc-title-meta">
+          <h1 class="doc-title">SERVICE AGREEMENT</h1>
+          <div class="doc-subtitle">Professional Event DJ & Entertainment</div>
+          <div>
+            <span id="doc-status-badge" class="doc-status-badge pending">
+              <i class="fa-solid fa-signature"></i> PENDING SIGNATURE
+            </span>
+          </div>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.45rem; font-family: var(--font-mono);" id="doc-token-ref">
+            REF: TH-AGR-2026-001
+          </div>
+        </div>
+      </section>
+
+      <!-- Quick Summary Strip -->
+      <section class="summary-grid">
+        <div class="summary-item">
+          <label><i class="fa-solid fa-user-check" style="color: var(--cyber-cyan);"></i> Client / Host</label>
+          <strong id="sum-client-name">Loading...</strong>
+          <small id="sum-client-contact">--</small>
+        </div>
+        <div class="summary-item">
+          <label><i class="fa-solid fa-calendar-day" style="color: var(--cyber-gold);"></i> Event Date</label>
+          <strong id="sum-event-date">--</strong>
+          <small id="sum-event-hours">5:00 PM – 11:00 PM</small>
+        </div>
+        <div class="summary-item">
+          <label><i class="fa-solid fa-location-dot" style="color: var(--cyber-pink);"></i> Venue Location</label>
+          <strong id="sum-venue-name">--</strong>
+          <small id="sum-venue-city">Oklahoma City, OK</small>
+        </div>
+        <div class="summary-item">
+          <label><i class="fa-solid fa-receipt" style="color: var(--cyber-green);"></i> Investment Total</label>
+          <strong id="sum-total-amount" style="color: var(--cyber-green);">$0.00</strong>
+          <small id="sum-deposit-due">Deposit: $0.00</small>
+        </div>
+      </section>
+
+      <!-- Legal Agreement Body -->
+      <article class="legal-content">
+
+        <div class="legal-p" style="font-size: 0.95rem; color: #fff; margin-bottom: 1.5rem;">
+          This <strong>Entertainment Services Agreement</strong> (the "Agreement") is entered into and made effective as of the date of execution by and between <strong>Thunder House Entertainment LLC</strong> ("DJ / Company"), and the individual(s) or organization specified above ("Client").
+        </div>
+
+        <!-- Article 1: Performance Schedule -->
+        <div class="legal-article">
+          <h2 class="article-title"><span class="article-num">01.</span> Scope of Services & Performance Schedule</h2>
+          <p class="legal-p">
+            Company agrees to provide professional disc jockey (DJ), master of ceremonies (MC), and sound reproduction services for Client's event. Load-in and setup shall commence approximately ninety (90) minutes prior to guest arrival. Sound checks and system calibration will conclude prior to the scheduled event start time.
+          </p>
+          <div class="clause-highlight">
+            <strong>Agreed Showtime Hours:</strong> <span id="clause-schedule-hours">5:00 PM to 11:00 PM</span> on <strong id="clause-event-date">November 20, 2026</strong>. Additional overtime requested by Client on-site shall be billed at <strong>$150.00 per hour</strong> (or fraction thereof), subject to venue curfew and DJ availability.
+          </div>
+        </div>
+
+        <!-- Article 2: Financial Terms & Retainer -->
+        <div class="legal-article">
+          <h2 class="article-title"><span class="article-num">02.</span> Compensation, Date Retainer & Balance Schedule</h2>
+          <p class="legal-p">
+            In consideration of the entertainment services, sound reinforcement, and lighting packages contracted, Client agrees to the financial investment detailed below:
+          </p>
+
+          <div class="financial-box">
+            <div class="fin-row">
+              <span id="fin-package-label">Base Entertainment Package</span>
+              <strong id="fin-package-amount">$0.00</strong>
+            </div>
+            <div id="fin-addons-container">
+              <!-- Dynamically populated add-on line items -->
+            </div>
+            <div class="fin-row total-bold">
+              <span>Total Contract Price:</span>
+              <span id="fin-total-amount" style="color: #fff;">$0.00</span>
+            </div>
+            <div class="fin-row deposit-bold">
+              <span>Initial Date-Lock Retainer (Due Upon Signing):</span>
+              <span id="fin-deposit-amount">$0.00</span>
+            </div>
+            <div class="fin-row">
+              <span>Remaining Event Balance:</span>
+              <span id="fin-balance-due" style="font-weight: 700; color: #cbd5e1;">$0.00</span>
+            </div>
+          </div>
+
+          <p class="legal-p">
+            <strong>Retainer:</strong> The Initial Date-Lock Retainer is non-refundable and constitutes reservation of the specific date, pre-production planning, and mutual commitment. The remaining balance is due seven (7) business days prior to showtime.
+          </p>
+        </div>
+
+        <!-- Article 3: Venue, Power & Outdoor Weather Protection -->
+        <div class="legal-article">
+          <h2 class="article-title"><span class="article-num">03.</span> Venue Environment, Power & Weather Protection</h2>
+          <p class="legal-p">
+            Client is responsible for coordinating facility access and technical power provisions with the designated venue:
+          </p>
+          <ul class="legal-list">
+            <li><strong>Electrical Power:</strong> Client guarantees one (1) dedicated 120-volt, 20-amp grounded AC electrical circuit located within twenty-five (25) feet of the DJ booth setup area.</li>
+            <li><strong>Outdoor Events & Shelter:</strong> If any portion of the performance is held outdoors, Client must provide a waterproof, overhead covered shelter with three (3) enclosed sides (e.g. canopy tent or pavilion) to protect sensitive computer, lighting, and audio equipment from direct sunlight, thermal overheating, high winds, and moisture/rain.</li>
+            <li><strong>Inclement Weather:</strong> DJ reserves the right to suspend or cease operation if electrical equipment is threatened by precipitation, condensation, or direct heat until safe shelter is provided. No refunds are issued for weather interruptions.</li>
+          </ul>
+        </div>
+
+        <!-- Article 4: Guest Conduct & Equipment Damage Liability -->
+        <div class="legal-article">
+          <h2 class="article-title"><span class="article-num">04.</span> Equipment Protection & Guest Conduct Indemnity</h2>
+          <p class="legal-p">
+            Client acknowledges that all equipment, including sound systems, DJ controllers, microphones, lighting fixtures, and special effects units (cold sparks/fog), represent high-value professional assets. Client assumes full financial liability for any damage, loss, theft, or liquid spills caused to Company's equipment by event attendees, guests, or venue staff during the contracted period.
+          </p>
+        </div>
+
+        <!-- Article 5: Cancellation & Rescheduling Policy -->
+        <div class="legal-article">
+          <h2 class="article-title"><span class="article-num">05.</span> Cancellation & Rescheduling Terms</h2>
+          <p class="legal-p">
+            Should Client cancel this Agreement more than thirty (30) days prior to the event, the initial retainer shall be retained by Company as liquidated damages and all further obligations cease. If Client cancels within thirty (30) days of the event, the full remaining contract balance shall become immediately due and payable, acknowledging that Company has turned down other potential bookings for this date.
+          </p>
+          <p class="legal-p">
+            In the event of an unavoidable emergency requiring date rescheduling, Company will apply 100% of the paid retainer to any mutually open date within twelve (12) calendar months of the original event date.
+          </p>
+        </div>
+
+        <!-- Article 6: Roster Guarantee & Substitute Performer -->
+        <div class="legal-article">
+          <h2 class="article-title"><span class="article-num">06.</span> Performance Roster & Backup DJ Guarantee</h2>
+          <p class="legal-p">
+            Thunder House ENT operates a certified, vetted DJ roster. In the extraordinary and unforeseen event of severe illness, accident, or hospitalization of the assigned lead DJ, Company guarantees a replacement DJ of equal or higher experience from its certified staff. All music preferences, must-play tracks, and timeline instructions stored in the VIP Client Portal shall transfer seamlessly to ensure an uninterrupted performance.
+          </p>
+        </div>
+
+        <!-- Article 7: Media Release & Photography -->
+        <div class="legal-article">
+          <h2 class="article-title"><span class="article-num">07.</span> Media Release for Promotional Showcase</h2>
+          <p class="legal-p">
+            Client grants Company permission to capture brief video clips and photographs of the dance floor, lighting, and crowd atmosphere for promotional portfolio and social media use. No guest names or sensitive identifying details will be published without prior consent.
+          </p>
+        </div>
+
+        <!-- Article 8: Governing Law & Electronic Signatures -->
+        <div class="legal-article">
+          <h2 class="article-title"><span class="article-num">08.</span> Governing Law & Electronic Execution (UETA)</h2>
+          <p class="legal-p">
+            This Agreement shall be governed by and construed in accordance with the laws of the State of Oklahoma. The parties agree that this Agreement may be executed by electronic signature pursuant to the Uniform Electronic Transactions Act (UETA) and the federal E-SIGN Act, each of which shall be deemed an original and legally binding execution.
+          </p>
+        </div>
+
+      </article>
+
+      <!-- Dual Signature Display (Shown when signed) -->
+      <section id="dual-signature-block" class="dual-sig-grid" style="display: none;">
+        <!-- Thunder House Counter-Signature -->
+        <div class="sig-party-card">
+          <div class="sig-party-title"><i class="fa-solid fa-shield-halved"></i> Authorized Provider Signature</div>
+          <div class="sig-render-box">
+            <span class="sig-typed-font" style="color: var(--cyber-gold);">DJ Bresh</span>
+          </div>
+          <div class="sig-meta-text">
+            <strong>Thunder House Entertainment LLC</strong><br>
+            Executive Producer & Lead Performer<br>
+            Verified Provider Digital Seal • Oklahoma City, OK
+          </div>
+        </div>
+
+        <!-- Client Signature Display -->
+        <div class="sig-party-card">
+          <div class="sig-party-title"><i class="fa-solid fa-circle-check" style="color: var(--cyber-green);"></i> Client E-Signature Execution</div>
+          <div class="sig-render-box" id="client-sig-display-box">
+            <!-- Signature Image or Typed Font inserted dynamically -->
+          </div>
+          <div class="sig-meta-text">
+            <strong id="client-signed-name-display">Client Name</strong><br>
+            <span id="client-signed-capacity">Authorized Host / Client</span><br>
+            <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--cyber-cyan);" id="client-signed-timestamp">--</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Interactive Signing Section (Shown when pending) -->
+      <section id="interactive-signature-section" class="signature-section btn-print-hide">
+        <h3 class="sig-section-title">
+          <i class="fa-solid fa-file-signature" style="color: var(--cyber-cyan);"></i>
+          Client Electronic Signature
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 1.25rem 0;">
+          Please sign below using your finger, stylus, mouse, or typed name to legally execute this contract.
+        </p>
+
+        <!-- Signature Mode Tabs -->
+        <div class="sig-tabs">
+          <button type="button" class="sig-tab-btn active" id="tab-btn-draw" onclick="switchSigMode('draw')">
+            <i class="fa-solid fa-pen"></i> Draw Signature
+          </button>
+          <button type="button" class="sig-tab-btn" id="tab-btn-type" onclick="switchSigMode('type')">
+            <i class="fa-solid fa-keyboard"></i> Type Legal Name
+          </button>
+          <button type="button" class="btn-top" id="btn-clear-sig" onclick="clearSignatureCanvas()" style="margin-left: auto; font-size: 0.78rem;">
+            <i class="fa-solid fa-rotate-left"></i> Clear
+          </button>
+        </div>
+
+        <!-- Mode 1: Drawing Canvas -->
+        <div id="wrap-draw-sig">
+          <div class="canvas-wrap">
+            <canvas id="sig-canvas"></canvas>
+            <div id="canvas-watermark" class="canvas-watermark">
+              <i class="fa-solid fa-pen-nib"></i> Sign Here with Finger or Mouse
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode 2: Typed Signature -->
+        <div id="wrap-type-sig" class="type-sig-wrap">
+          <div class="field-group">
+            <label class="field-label">Type Your Full Legal Name:</label>
+            <input type="text" id="input-typed-sig" class="field-input" placeholder="e.g. Alexander Vance" oninput="updateTypedPreview(this.value)">
+          </div>
+          <div class="type-sig-preview" id="typed-sig-preview">
+            Signature Preview
+          </div>
+        </div>
+
+        <!-- Signer Identity Fields -->
+        <div class="signer-fields-grid">
+          <div class="field-group">
+            <label class="field-label">Signer Legal Name *</label>
+            <input type="text" id="input-signer-name" class="field-input" placeholder="Your Full Legal Name" required>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Signer Role / Title *</label>
+            <input type="text" id="input-signer-title" class="field-input" value="Client / Authorized Host" placeholder="e.g. Groom / Bride / Corporate Rep">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Signer Email *</label>
+            <input type="email" id="input-signer-email" class="field-input" placeholder="email@example.com" required>
+          </div>
+        </div>
+
+        <!-- Legal Consent Checkbox -->
+        <label class="consent-box">
+          <input type="checkbox" id="checkbox-consent">
+          <span class="consent-text">
+            <strong>Mandatory Legal Certification:</strong> By checking this box, I declare under penalty of perjury that I have carefully read and voluntarily agreed to all terms, cancellation clauses, weather requirements, and liability policies of this Entertainment Services Agreement. I certify that I am at least eighteen (18) years of age with full legal capacity to enter into binding agreements.
+          </span>
+        </label>
+
+        <!-- Submit Button -->
+        <button type="button" id="btn-submit-signature" class="btn btn-primary btn-block" onclick="executeContractSignature()" style="background: linear-gradient(135deg, var(--cyber-cyan), #0099ff); color: #000; font-weight: 800; font-size: 1.05rem; padding: 1rem; border: none; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 229, 255, 0.35);">
+          <i class="fa-solid fa-file-contract"></i> Sign & Legally Execute Agreement
+        </button>
+      </section>
+
+      <!-- Post-Signing Celebration & Next Steps Card -->
+      <section id="post-sign-card" class="post-sign-card btn-print-hide">
+        <div style="font-size: 2.5rem; color: var(--cyber-green); margin-bottom: 0.75rem;">
+          <i class="fa-solid fa-circle-check fa-bounce"></i>
+        </div>
+        <h3 style="color: #fff; font-family: var(--font-heading); font-size: 1.5rem; margin: 0 0 0.5rem 0;">
+          Agreement Legally Executed! 🎉
+        </h3>
+        <p style="color: #cbd5e1; font-size: 0.92rem; max-width: 600px; margin: 0 auto 1.5rem auto;">
+          Your signature has been registered and certified under Oklahoma law. The final step to lock in your calendar date is securing your deposit.
+        </p>
+
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <!-- Pay Deposit Button -->
+          <a id="btn-pay-deposit-post" href="#" target="_blank" class="btn btn-primary" style="background: linear-gradient(135deg, var(--cyber-gold), #d97706); color: #000; font-weight: 800; border: none; padding: 0.75rem 1.5rem;">
+            <i class="fa-solid fa-credit-card"></i> Pay Date Retainer (<span id="post-deposit-amount">$500.00</span>)
+          </a>
+
+          <!-- Open VIP Music Hub -->
+          <a id="btn-open-vip-post" href="#" target="_blank" class="btn btn-outline" style="border-color: var(--cyber-cyan); color: var(--cyber-cyan); padding: 0.75rem 1.25rem;">
+            <i class="fa-solid fa-compact-disc"></i> Open VIP Music Hub
+          </a>
+
+          <!-- Download / Print -->
+          <button type="button" class="btn btn-outline" onclick="window.print()" style="padding: 0.75rem 1.25rem;">
+            <i class="fa-solid fa-print"></i> Print Clean PDF
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+
+  <script>
+    // =========================================================================
+    // STATE & REFS
+    // =========================================================================
+    let currentContract = null;
+    let linkedInvoice = null;
+    let signatureMode = 'draw'; // 'draw' or 'type'
+    let isDrawing = false;
+    let canvas, ctx;
+    let hasDrawn = false;
+
+    // =========================================================================
+    // INITIALIZATION
+    // =========================================================================
+    document.addEventListener('DOMContentLoaded', async () => {
+      initCanvas();
+      await loadContractData();
+    });
+
+    // =========================================================================
+    // CANVAS DRAW ENGINE
+    // =========================================================================
+    function initCanvas() {
+      canvas = document.getElementById('sig-canvas');
+      if (!canvas) return;
+      ctx = canvas.getContext('2d');
+
+      // Adjust canvas resolution for high-DPI screens
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      // Drawing Event Listeners (Mouse & Touch)
+      canvas.addEventListener('mousedown', startDrawing);
+      canvas.addEventListener('mousemove', draw);
+      canvas.addEventListener('mouseup', stopDrawing);
+      canvas.addEventListener('mouseleave', stopDrawing);
+
+      canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent('mousedown', {
+          clientX: touch.clientX,
+          clientY: touch.clientY
+        });
+        canvas.dispatchEvent(mouseEvent);
+      }, { passive: false });
+
+      canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent('mousemove', {
+          clientX: touch.clientX,
+          clientY: touch.clientY
+        });
+        canvas.dispatchEvent(mouseEvent);
+      }, { passive: false });
+
+      canvas.addEventListener('touchend', (e) => {
+        const mouseEvent = new MouseEvent('mouseup', {});
+        canvas.dispatchEvent(mouseEvent);
+      });
+    }
+
+    function resizeCanvas() {
+      if (!canvas || !ctx) return;
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      ctx.strokeStyle = '#00e5ff';
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+    }
+
+    function startDrawing(e) {
+      isDrawing = true;
+      hasDrawn = true;
+      const watermark = document.getElementById('canvas-watermark');
+      if (watermark) watermark.style.display = 'none';
+
+      const rect = canvas.getBoundingClientRect();
+      ctx.beginPath();
+      ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    }
+
+    function draw(e) {
+      if (!isDrawing) return;
+      const rect = canvas.getBoundingClientRect();
+      ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+      ctx.stroke();
+    }
+
+    function stopDrawing() {
+      if (isDrawing) {
+        ctx.closePath();
+        isDrawing = false;
+      }
+    }
+
+    function clearSignatureCanvas() {
+      if (!canvas || !ctx) return;
+      const dpr = window.devicePixelRatio || 1;
+      ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
+      hasDrawn = false;
+      const watermark = document.getElementById('canvas-watermark');
+      if (watermark) watermark.style.display = 'block';
+
+      const typedInput = document.getElementById('input-typed-sig');
+      if (typedInput) typedInput.value = '';
+      updateTypedPreview('');
+    }
+
+    function switchSigMode(mode) {
+      signatureMode = mode;
+      document.getElementById('tab-btn-draw').classList.toggle('active', mode === 'draw');
+      document.getElementById('tab-btn-type').classList.toggle('active', mode === 'type');
+
+      document.getElementById('wrap-draw-sig').style.display = (mode === 'draw') ? 'block' : 'none';
+      document.getElementById('wrap-type-sig').style.display = (mode === 'type') ? 'block' : 'none';
+
+      if (mode === 'draw') {
+        resizeCanvas();
+      }
+    }
+
+    function updateTypedPreview(text) {
+      const preview = document.getElementById('typed-sig-preview');
+      if (!preview) return;
+      preview.textContent = text.trim() ? text : 'Signature Preview';
+    }
+
+    // =========================================================================
+    // LOAD CONTRACT & INVOICE DATA
+    // =========================================================================
+    async function loadContractData() {
+      const loadingEl = document.getElementById('contract-loading-state');
+      const cardEl = document.getElementById('contract-content-card');
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramToken = urlParams.get('token');
+      const paramInvoice = urlParams.get('invoice');
+      const paramId = urlParams.get('id');
+
+      if (!paramToken && !paramInvoice && !paramId) {
+        loadingEl.innerHTML = `
+          <div style="font-size: 2.5rem; color: var(--cyber-red); margin-bottom: 1rem;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <h3 style="color: #fff; font-family: var(--font-heading); margin-bottom: 0.5rem;">No Contract Specified</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Please access this agreement using the verified link sent in your booking dispatch or invoice.</p>
+          <a href="index.html" class="btn btn-primary" style="margin-top: 1rem;"><i class="fa-solid fa-house"></i> Return to Homepage</a>
+        `;
+        return;
+      }
+
+      try {
+        if (!window.supabaseClient) throw new Error('Database client offline.');
+
+        let query = window.supabaseClient.from('thunderhouse_contracts').select('*');
+        if (paramToken) query = query.eq('contract_token', paramToken);
+        else if (paramInvoice) query = query.eq('invoice_number', paramInvoice);
+        else if (paramId) query = query.eq('id', paramId);
+
+        let { data, error } = await query.maybeSingle();
+
+        // Stale JWT fallback
+        if (error && (String(error.message || '').includes('JWT') || error.code === 'PGRST301' || error.status === 401)) {
+          localStorage.removeItem('sb-kxoivmflghfgtvawhktt-auth-token');
+          const retryRes = await query.maybeSingle();
+          data = retryRes.data;
+          error = retryRes.error;
+        }
+
+        if (error) throw error;
+
+        // If no contract found but an invoice number was provided, auto-create a contract draft!
+        if (!data && paramInvoice) {
+          data = await autoCreateContractFromInvoice(paramInvoice);
+        }
+
+        if (!data) {
+          loadingEl.innerHTML = `
+            <div style="font-size: 2.5rem; color: var(--cyber-gold); margin-bottom: 1rem;"><i class="fa-solid fa-file-circle-question"></i></div>
+            <h3 style="color: #fff; font-family: var(--font-heading); margin-bottom: 0.5rem;">Contract Not Found</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">No entertainment agreement found for the requested reference.</p>
+          `;
+          return;
+        }
+
+        currentContract = data;
+
+        // Fetch linked invoice details for Square link
+        if (currentContract.invoice_number) {
+          const { data: invData } = await window.supabaseClient
+            .from('thunderhouse_invoices')
+            .select('*')
+            .eq('invoice_number', currentContract.invoice_number)
+            .maybeSingle();
+          linkedInvoice = invData;
+        }
+
+        renderContract(currentContract);
+        loadingEl.style.display = 'none';
+        cardEl.style.display = 'block';
+
+      } catch (err) {
+        console.error('Error loading contract:', err);
+        loadingEl.innerHTML = `
+          <div style="font-size: 2.5rem; color: var(--cyber-red); margin-bottom: 1rem;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <h3 style="color: #fff; font-family: var(--font-heading); margin-bottom: 0.5rem;">Error Loading Agreement</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">${escapeHtml(err.message)}</p>
+        `;
+      }
+    }
+
+    async function autoCreateContractFromInvoice(invNum) {
+      const { data: inv } = await window.supabaseClient
+        .from('thunderhouse_invoices')
+        .select('*')
+        .eq('invoice_number', invNum)
+        .maybeSingle();
+
+      if (!inv) return null;
+
+      // Also grab event plan if available
+      const { data: plan } = await window.supabaseClient
+        .from('thunderhouse_event_plans')
+        .select('*')
+        .eq('invoice_number', invNum)
+        .maybeSingle();
+
+      const token = `th-contract-${invNum.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+      const total = parseFloat(inv.total_amount || 0);
+      const deposit = parseFloat(inv.deposit_requested || (total * 0.3));
+      const balance = total - deposit;
+
+      // Extract add-on descriptions from invoice items
+      const items = inv.items || [];
+      const packageItem = items[0] ? items[0].description : 'Custom Entertainment Experience';
+      const addOns = items.slice(1).map(i => `${i.description} (${i.quantity || 1}x)`);
+
+      const newContract = {
+        contract_token: token,
+        invoice_number: inv.invoice_number,
+        inquiry_id: inv.inquiry_id,
+        client_name: inv.client_name,
+        client_email: inv.client_email,
+        client_phone: inv.client_phone,
+        client_address: inv.venue_city || 'Oklahoma City, OK',
+        event_type: plan ? plan.event_type : 'Event Celebration',
+        event_date: inv.event_date,
+        event_start_time: '5:00 PM',
+        event_end_time: '11:00 PM',
+        venue_name: plan ? plan.venue_name : inv.venue_city,
+        venue_address: plan ? plan.venue_address : inv.venue_city,
+        total_amount: total,
+        deposit_amount: deposit,
+        balance_due: balance,
+        overtime_rate: 150.00,
+        package_name: packageItem,
+        included_addons: addOns,
+        status: 'Pending Signature'
+      };
+
+      const { data: created, error } = await window.supabaseClient
+        .from('thunderhouse_contracts')
+        .insert([newContract])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Failed to auto-create contract:', error);
+        return null;
+      }
+
+      return created;
+    }
+
+    // =========================================================================
+    // RENDER CONTRACT
+    // =========================================================================
+    function renderContract(contract) {
+      const isSigned = (contract.status === 'Signed');
+
+      // Top links
+      if (contract.invoice_number) {
+        const invBtn = document.getElementById('btn-top-invoice-link');
+        invBtn.href = `invoice.html?num=${encodeURIComponent(contract.invoice_number)}`;
+        invBtn.style.display = 'inline-flex';
+      }
+
+      const portalBtn = document.getElementById('btn-top-portal-link');
+      if (contract.invoice_number) {
+        portalBtn.href = `portal.html?invoice=${encodeURIComponent(contract.invoice_number)}`;
+        portalBtn.style.display = 'inline-flex';
+      }
+
+      // Status Badge
+      const statusBadge = document.getElementById('doc-status-badge');
+      if (isSigned) {
+        statusBadge.className = 'doc-status-badge signed';
+        statusBadge.innerHTML = '<i class="fa-solid fa-check-double"></i> EXECUTED & LEGALLY BINDING';
+      } else {
+        statusBadge.className = 'doc-status-badge pending';
+        statusBadge.innerHTML = '<i class="fa-solid fa-signature"></i> PENDING CLIENT SIGNATURE';
+      }
+
+      // Header Ref
+      document.getElementById('doc-token-ref').textContent = `CONTRACT REF: ${contract.contract_token.toUpperCase()}`;
+
+      // Summary Strip
+      document.getElementById('sum-client-name').textContent = contract.client_name;
+      document.getElementById('sum-client-contact').textContent = `${contract.client_email || ''} ${contract.client_phone ? `• ${contract.client_phone}` : ''}`;
+
+      if (contract.event_date) {
+        const dObj = new Date(contract.event_date + 'T00:00:00');
+        document.getElementById('sum-event-date').textContent = dObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+        document.getElementById('clause-event-date').textContent = dObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      }
+
+      const startTime = contract.event_start_time || '5:00 PM';
+      const endTime = contract.event_end_time || '11:00 PM';
+      document.getElementById('sum-event-hours').textContent = `${startTime} – ${endTime}`;
+      document.getElementById('clause-schedule-hours').textContent = `${startTime} to ${endTime}`;
+
+      document.getElementById('sum-venue-name').textContent = contract.venue_name || 'Designated Venue';
+      document.getElementById('sum-venue-city').textContent = contract.venue_address || contract.client_address || 'Oklahoma City, OK';
+
+      const totalVal = parseFloat(contract.total_amount || 0);
+      const depositVal = parseFloat(contract.deposit_amount || (totalVal * 0.3));
+      const balanceVal = parseFloat(contract.balance_due !== undefined ? contract.balance_due : (totalVal - depositVal));
+
+      document.getElementById('sum-total-amount').textContent = `$${totalVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      document.getElementById('sum-deposit-due').textContent = `Deposit: $${depositVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+      // Financial Breakdown
+      document.getElementById('fin-package-label').textContent = contract.package_name || 'Base DJ & Entertainment Package';
+      document.getElementById('fin-package-amount').textContent = `$${(totalVal - (contract.included_addons ? contract.included_addons.length * 150 : 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+      const addonsWrap = document.getElementById('fin-addons-container');
+      if (contract.included_addons && Array.isArray(contract.included_addons) && contract.included_addons.length > 0) {
+        addonsWrap.innerHTML = contract.included_addons.map(a => `
+          <div class="fin-row" style="color: var(--text-muted); font-size: 0.85rem;">
+            <span><i class="fa-solid fa-plus" style="color: var(--cyber-cyan); font-size: 0.72rem;"></i> ${escapeHtml(a)}</span>
+            <span style="color: #cbd5e1;">Included</span>
+          </div>
+        `).join('');
+      } else {
+        addonsWrap.innerHTML = '';
+      }
+
+      document.getElementById('fin-total-amount').textContent = `$${totalVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      document.getElementById('fin-deposit-amount').textContent = `$${depositVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      document.getElementById('fin-balance-due').textContent = `$${balanceVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+      // Pre-fill Signer inputs
+      document.getElementById('input-signer-name').value = contract.client_name;
+      document.getElementById('input-signer-email').value = contract.client_email || '';
+      document.getElementById('input-typed-sig').value = contract.client_name;
+      updateTypedPreview(contract.client_name);
+
+      // Section visibility based on status
+      const interactiveSec = document.getElementById('interactive-signature-section');
+      const dualSigBlock = document.getElementById('dual-signature-block');
+      const postCard = document.getElementById('post-sign-card');
+
+      if (isSigned) {
+        interactiveSec.style.display = 'none';
+        dualSigBlock.style.display = 'grid';
+
+        // Render Client Signature
+        const sigDisplayBox = document.getElementById('client-sig-display-box');
+        if (contract.signature_type === 'typed' || !contract.signature_data.startsWith('data:image')) {
+          sigDisplayBox.innerHTML = `<span class="sig-typed-font">${escapeHtml(contract.signer_name || contract.signature_data)}</span>`;
+        } else {
+          sigDisplayBox.innerHTML = `<img src="${contract.signature_data}" alt="Client Signature" class="sig-render-img">`;
+        }
+
+        document.getElementById('client-signed-name-display').textContent = contract.signer_name || contract.client_name;
+        document.getElementById('client-signed-capacity').textContent = contract.signer_title || 'Client / Authorized Signer';
+
+        const signedDate = contract.signed_at ? new Date(contract.signed_at).toLocaleString('en-US', {
+          dateStyle: 'medium',
+          timeStyle: 'short'
+        }) : 'Verified';
+        document.getElementById('client-signed-timestamp').textContent = `CERTIFIED: ${signedDate}`;
+
+        // Setup Post-Sign Actions
+        postCard.style.display = 'block';
+        document.getElementById('post-deposit-amount').textContent = `$${depositVal.toFixed(2)}`;
+
+        const payBtn = document.getElementById('btn-pay-deposit-post');
+        if (linkedInvoice && linkedInvoice.square_payment_link) {
+          payBtn.href = linkedInvoice.square_payment_link;
+        } else if (contract.invoice_number) {
+          payBtn.href = `invoice.html?num=${encodeURIComponent(contract.invoice_number)}`;
+        }
+
+        const openVipBtn = document.getElementById('btn-open-vip-post');
+        if (contract.invoice_number) {
+          openVipBtn.href = `portal.html?invoice=${encodeURIComponent(contract.invoice_number)}`;
+        }
+
+      } else {
+        interactiveSec.style.display = 'block';
+        dualSigBlock.style.display = 'none';
+        postCard.style.display = 'none';
+      }
+    }
+
+    // =========================================================================
+    // EXECUTE SIGNATURE
+    // =========================================================================
+    async function executeContractSignature() {
+      if (!currentContract) return;
+
+      const consentCheck = document.getElementById('checkbox-consent');
+      if (!consentCheck.checked) {
+        alert('Please verify and check the mandatory legal certification checkbox to proceed.');
+        consentCheck.focus();
+        return;
+      }
+
+      const signerName = document.getElementById('input-signer-name').value.trim();
+      const signerTitle = document.getElementById('input-signer-title').value.trim();
+      const signerEmail = document.getElementById('input-signer-email').value.trim();
+
+      if (!signerName || !signerEmail) {
+        alert('Please provide your full legal name and contact email.');
+        return;
+      }
+
+      let sigData = '';
+      if (signatureMode === 'draw') {
+        if (!hasDrawn) {
+          alert('Please draw your signature in the signature box, or switch to "Type Legal Name".');
+          return;
+        }
+        sigData = canvas.toDataURL('image/png');
+      } else {
+        const typedVal = document.getElementById('input-typed-sig').value.trim();
+        if (!typedVal) {
+          alert('Please type your legal name for the signature preview.');
+          return;
+        }
+        sigData = typedVal;
+      }
+
+      const submitBtn = document.getElementById('btn-submit-signature');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Certifying & Recording Digital Signature...';
+
+      const nowIso = new Date().toISOString();
+      const userAgent = navigator.userAgent;
+
+      try {
+        // 1. Update Thunderhouse Contracts
+        const { error: contractErr } = await window.supabaseClient
+          .from('thunderhouse_contracts')
+          .update({
+            status: 'Signed',
+            signer_name: signerName,
+            signer_title: signerTitle,
+            signature_data: sigData,
+            signature_type: signatureMode,
+            signed_at: nowIso,
+            signer_user_agent: userAgent,
+            updated_at: nowIso
+          })
+          .eq('id', currentContract.id);
+
+        if (contractErr) throw contractErr;
+
+        // 2. Update linked invoice contract_status
+        if (currentContract.invoice_number) {
+          await window.supabaseClient
+            .from('thunderhouse_invoices')
+            .update({
+              contract_status: 'Signed',
+              contract_signed_at: nowIso,
+              updated_at: nowIso
+            })
+            .eq('invoice_number', currentContract.invoice_number);
+        }
+
+        // 3. Update local state & re-render
+        currentContract.status = 'Signed';
+        currentContract.signer_name = signerName;
+        currentContract.signer_title = signerTitle;
+        currentContract.signature_data = sigData;
+        currentContract.signature_type = signatureMode;
+        currentContract.signed_at = nowIso;
+
+        renderContract(currentContract);
+
+        // Smooth scroll down to celebration card
+        const postCard = document.getElementById('post-sign-card');
+        if (postCard) {
+          postCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+      } catch (err) {
+        console.error('Error executing contract:', err);
+        alert('Failed to record signature: ' + err.message);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-file-contract"></i> Sign & Legally Execute Agreement';
+      }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
