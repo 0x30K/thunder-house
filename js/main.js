@@ -849,7 +849,7 @@ function initBookingForms() {
 
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Securing Your Date & Sending Confirmation...';
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting Date Hold Request...';
       }
 
       const quote = window.currentQuote || {
@@ -912,7 +912,7 @@ function initBookingForms() {
       }
 
       if (modal) modal.classList.remove('active');
-      showToast(`🎉 Reservation locked in for ${clientName}! Confirmation email sent to ${clientEmail}.`);
+      showToast(`📅 Date hold request received for ${clientName}! Check ${clientEmail} for confirmation.`);
       modalBookingForm.reset();
     });
   }
@@ -938,7 +938,7 @@ function openBookingModalWithQuote(quote) {
         <div>
           <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
             <strong style="color: #fff; font-size: 1.1rem;">${currentQuoteData.package}</strong>
-            <span class="badge-pill" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; background: rgba(0,229,255,0.15); color: var(--primary);">Quote Locked</span>
+            <span class="badge-pill" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; background: rgba(0,229,255,0.15); color: var(--primary);">Estimated Quote</span>
           </div>
           <div style="font-size: 0.84rem; color: var(--text-light);">
             Base Rate: $${currentQuoteData.basePrice.toLocaleString()} 
