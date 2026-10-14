@@ -104,11 +104,11 @@
         </p>
 
         <div class="hero-actions">
-          <a href="#packages" class="btn btn-primary btn-lg">
-            <i class="fa-solid fa-tags"></i> View Event Packages
+          <a href="#calculator" class="btn btn-primary btn-lg">
+            <i class="fa-solid fa-calendar-check"></i> Check Your Date & Get Quote
           </a>
-          <a href="#calculator" class="btn btn-outline btn-lg">
-            <i class="fa-solid fa-calculator"></i> Calculate Instant Quote
+          <a href="#packages" class="btn btn-outline btn-lg">
+            <i class="fa-solid fa-tags"></i> See Packages & Pricing
           </a>
         </div>
 
@@ -414,7 +414,12 @@
             <li><i class="fa-solid fa-check"></i> Basic Announcements</li>
             <li><i class="fa-solid fa-check"></i> Setup & Teardown Included</li>
           </ul>
-          <a href="#calculator" class="btn btn-outline" style="width: 100%;">Select Basic</a>
+          <button type="button" class="btn btn-outline btn-select-package-direct" data-package="Thunder Basic" data-price="500" data-hours="3" style="width: 100%;">
+            <i class="fa-solid fa-calendar-check"></i> Hold This Date ($500)
+          </button>
+          <a href="#calculator" class="package-calc-hint" style="display: block; text-align: center; margin-top: 0.6rem; font-size: 0.78rem; color: var(--text-muted); text-decoration: none;">
+            <i class="fa-solid fa-sliders"></i> Customize with add-ons & travel
+          </a>
         </div>
 
         <!-- Package 2: THUNDER PARTY -->
@@ -434,7 +439,12 @@
             <li><i class="fa-solid fa-check"></i> Introductions & Host Coordination</li>
             <li><i class="fa-solid fa-check"></i> Setup & Teardown Included</li>
           </ul>
-          <a href="#calculator" class="btn btn-primary" style="width: 100%;">Select Party</a>
+          <button type="button" class="btn btn-primary btn-select-package-direct" data-package="Thunder Party" data-price="700" data-hours="4" style="width: 100%;">
+            <i class="fa-solid fa-calendar-check"></i> Hold This Date ($700)
+          </button>
+          <a href="#calculator" class="package-calc-hint" style="display: block; text-align: center; margin-top: 0.6rem; font-size: 0.78rem; color: var(--text-muted); text-decoration: none;">
+            <i class="fa-solid fa-sliders"></i> Customize with add-ons & travel
+          </a>
         </div>
 
         <!-- Package 3: THUNDER PREMIUM -->
@@ -453,7 +463,12 @@
             <li><i class="fa-solid fa-check"></i> Event Timeline Coordination</li>
             <li><i class="fa-solid fa-check"></i> Extended 6-Hour Coverage</li>
           </ul>
-          <a href="#calculator" class="btn btn-outline" style="width: 100%;">Select Premium</a>
+          <button type="button" class="btn btn-outline btn-select-package-direct" data-package="Thunder Premium" data-price="900" data-hours="6" style="width: 100%;">
+            <i class="fa-solid fa-calendar-check"></i> Hold This Date ($900)
+          </button>
+          <a href="#calculator" class="package-calc-hint" style="display: block; text-align: center; margin-top: 0.6rem; font-size: 0.78rem; color: var(--text-muted); text-decoration: none;">
+            <i class="fa-solid fa-sliders"></i> Customize with add-ons & travel
+          </a>
         </div>
 
         <!-- Package 4: THUNDER ALL-NIGHT -->
@@ -472,7 +487,12 @@
             <li><i class="fa-solid fa-check"></i> Grand Introductions & Timeline Coordination</li>
             <li><i class="fa-solid fa-check"></i> Complete 8-Hour All-Night Coverage</li>
           </ul>
-          <a href="#calculator" class="btn btn-gold" style="width: 100%;">Select All-Night</a>
+          <button type="button" class="btn btn-gold btn-select-package-direct" data-package="Thunder All-Night" data-price="1200" data-hours="8" style="width: 100%;">
+            <i class="fa-solid fa-calendar-check"></i> Hold This Date ($1,200)
+          </button>
+          <a href="#calculator" class="package-calc-hint" style="display: block; text-align: center; margin-top: 0.6rem; font-size: 0.78rem; color: var(--text-muted); text-decoration: none;">
+            <i class="fa-solid fa-sliders"></i> Customize with add-ons & travel
+          </a>
         </div>
       </div>
 
@@ -899,67 +919,37 @@
           </div>
         </div>
 
-        <!-- Contact Form -->
+        <!-- Contact Form (Unified Gateway: Lane 2 for Quick Questions) -->
         <div class="contact-form-card">
-          <div class="badge-pill badge-gold" style="margin-bottom: 0.75rem;"><i class="fa-solid fa-paper-plane"></i> Have Questions or Ready to Book?</div>
-          <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: #fff;">Direct Booking Inquiry</h3>
+          <div class="badge-pill badge-gold" style="margin-bottom: 0.75rem;"><i class="fa-solid fa-comments"></i> Have Questions?</div>
+          <h3 style="font-size: 1.5rem; margin-bottom: 0.35rem; color: #fff;">Quick Question or Consultation</h3>
           <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.5rem;">
-            Ready to check availability or ask us a question? Click below to open our live calendar, or send a direct message.
+            Not ready to hold a date yet, or have questions about custom music, travel, or timing? Drop us a note below or text us directly at <a href="tel:4052832533" style="color: var(--primary); font-weight: 600;">(405) 283-2533</a>. We respond same-day!
           </p>
 
-          <div style="background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.25); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; text-align: center;">
-            <p style="color: #fff; font-weight: 600; margin-bottom: 0.75rem; font-size: 0.95rem;">
-              Want to see available dates and request a date hold immediately?
-            </p>
-            <button type="button" id="btn-open-cal-modal-from-contact" class="btn btn-primary btn-lg" style="width: 100%;">
-              <i class="fa-solid fa-calendar-check"></i> View Live Calendar & Request Date Hold
-            </button>
-          </div>
-
           <form id="main-contact-form">
-            <div class="form-grid-2">
+            <div class="form-grid-2" style="margin-bottom: 1rem;">
               <div class="form-group">
                 <label class="form-label">Your Name *</label>
                 <input type="text" id="contact-name" class="form-control" placeholder="e.g. Michael Smith" required>
               </div>
               <div class="form-group">
-                <label class="form-label">Phone Number *</label>
-                <input type="tel" id="contact-phone" class="form-control" placeholder="e.g. (405) 283-2533" required>
+                <label class="form-label">Phone or Email *</label>
+                <input type="text" id="contact-phone" class="form-control" placeholder="e.g. (405) 283-2533 or michael@example.com" required>
               </div>
             </div>
 
-            <div class="form-grid-2" style="margin-bottom: 1.25rem;">
-              <div class="form-group" style="grid-column: 1 / -1;">
-                <label class="form-label">Email Address *</label>
-                <input type="email" id="contact-email" class="form-control" placeholder="e.g. michael@example.com" required>
-              </div>
+            <div class="form-group full-width" style="margin-bottom: 1.25rem;">
+              <label class="form-label">What's on your mind? (Event type, music preferences, or questions) *</label>
+              <textarea id="contact-message" class="form-control" rows="3" placeholder="Tell us about your event, ask about specific music or dates, or anything else..." required></textarea>
             </div>
 
-            <div class="form-grid-2">
-              <div class="form-group">
-                <label class="form-label">City / Venue Location</label>
-                <input type="text" id="contact-venue" class="form-control" placeholder="e.g. Oklahoma City / Edmond / Norman" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Interested Package</label>
-                <select id="contact-event-type" class="form-select" required>
-                  <option value="Thunder Party ($700)">Thunder Party (Up to 4h - $700)</option>
-                  <option value="Thunder Basic ($500)">Thunder Basic (Up to 3h - $500)</option>
-                  <option value="Thunder Premium ($900)">Thunder Premium (Up to 6h - $900)</option>
-                  <option value="Thunder All-Night ($1,200)">Thunder All-Night (Up to 8h - $1,200)</option>
-                  <option value="Custom Event">Custom Package / Quote</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-group full-width">
-              <label class="form-label">Tell Us About Your Event & Musical Preferences</label>
-              <textarea id="contact-message" class="form-control" rows="3" placeholder="Share your estimated hours, special moments, or any questions for us..."></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-outline btn-lg" style="width: 100%;">
-              <i class="fa-solid fa-paper-plane"></i> Send Direct Inquiry
+            <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+              <i class="fa-solid fa-paper-plane"></i> Send Direct Message
             </button>
+            <div style="text-align: center; margin-top: 0.75rem; font-size: 0.78rem; color: var(--text-muted);">
+              Looking to check available dates & hold a spot? Use our <a href="#calculator" style="color: var(--primary);">Instant Quote & Date Hold</a> above!
+            </div>
           </form>
         </div>
       </div>
@@ -1040,8 +1030,21 @@
         </div>
         <h3 style="font-size: 1.6rem; margin-bottom: 0.4rem; color: #fff;">Request a Date Hold & Quote</h3>
         <p style="font-size: 0.88rem; color: var(--text-muted); max-width: 600px; margin: 0 auto;">
-          Choose an available glowing date and time slot below to submit a temporary date hold request. Dates are officially confirmed and locked in once the retainer deposit is received.
+          Choose an available glowing date below or select flexible dates to hold your spot. No deposit is charged right now.
         </p>
+      </div>
+
+      <!-- Stepper Navigation Header -->
+      <div class="modal-stepper-header">
+        <div class="modal-step-indicator active" id="modal-tab-step-1">
+          <span class="step-num">1</span>
+          <span class="step-title">Choose Date & Time</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="modal-step-indicator" id="modal-tab-step-2">
+          <span class="step-num">2</span>
+          <span class="step-title">Contact & Event Details</span>
+        </div>
       </div>
 
       <!-- Quote Summary (Package, Total, Add-ons) -->
@@ -1050,107 +1053,158 @@
       </div>
 
       <form id="modal-booking-form">
-        <div class="modal-booking-grid">
-          <!-- Left Column: Interactive Availability Calendar & Time Slots -->
-          <div class="modal-calendar-col">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem;">
-              <label class="form-label" style="margin: 0; font-size: 0.95rem; color: #fff; font-weight: 700;">
-                <i class="fa-solid fa-calendar-check" style="color: var(--primary);"></i> 1. Choose Event Date & Time
-              </label>
-              <div style="display: flex; gap: 0.75rem; font-size: 0.75rem; color: var(--text-muted);">
-                <span style="display: flex; align-items: center; gap: 0.3rem;"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary); display: inline-block; box-shadow: 0 0 6px var(--primary);"></span> Available</span>
-                <span style="display: flex; align-items: center; gap: 0.3rem;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444; display: inline-block;"></span> Booked</span>
-              </div>
+        <!-- STEP 1: Date & Time Picker + Flexible Option -->
+        <div id="modal-step-panel-1" class="modal-step-panel active">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem;">
+            <label class="form-label" style="margin: 0; font-size: 0.95rem; color: #fff; font-weight: 700;">
+              <i class="fa-solid fa-calendar-check" style="color: var(--primary);"></i> Select Your Preferred Date & Time
+            </label>
+            <div style="display: flex; gap: 0.75rem; font-size: 0.75rem; color: var(--text-muted);">
+              <span style="display: flex; align-items: center; gap: 0.3rem;"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary); display: inline-block; box-shadow: 0 0 6px var(--primary);"></span> Available</span>
+              <span style="display: flex; align-items: center; gap: 0.3rem;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444; display: inline-block;"></span> Booked</span>
             </div>
-
-            <div class="client-calendar-layout modal-cal-layout">
-              <!-- Month Grid -->
-              <div class="client-cal-card">
-                <div class="client-cal-header">
-                  <button type="button" class="btn-cal-nav" id="btn-pub-prev-month" aria-label="Previous Month"><i class="fa-solid fa-chevron-left"></i></button>
-                  <span class="client-cal-title" id="pub-cal-month-title">Loading Calendar...</span>
-                  <button type="button" class="btn-cal-nav" id="btn-pub-next-month" aria-label="Next Month"><i class="fa-solid fa-chevron-right"></i></button>
-                </div>
-
-                <div class="client-cal-weekdays">
-                  <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-                </div>
-
-                <div class="client-cal-days" id="pub-cal-days-grid">
-                  <!-- Days dynamically rendered via JS from Supabase availability -->
-                </div>
-              </div>
-
-              <!-- Time Panel -->
-              <div class="client-time-panel">
-                <div class="time-panel-header">
-                  <h4 id="time-panel-date-label"><i class="fa-regular fa-clock" style="color: var(--primary);"></i> Available Times</h4>
-                  <p id="time-panel-sub-label">Click a glowing date on the calendar to pick your time slot.</p>
-                </div>
-
-                <div class="time-slots-container" id="pub-time-slots-container">
-                  <div class="empty-time-state">
-                    <i class="fa-solid fa-calendar-days" style="font-size: 1.8rem; color: rgba(255,255,255,0.15); margin-bottom: 0.4rem; display: block;"></i>
-                    <span>Click any available date</span>
-                  </div>
-                </div>
-
-                <!-- Chosen Date/Time Pill -->
-                <div id="booking-confirmation-pill" class="booking-selection-pill" style="display: none; margin-top: 0.75rem;">
-                  <i class="fa-solid fa-circle-check"></i>
-                  <div>
-                    <strong id="pill-selected-date" style="display: block; font-size: 0.88rem; color: #fff;"></strong>
-                    <span id="pill-selected-time" style="font-size: 0.8rem; color: var(--primary); font-weight: 600;"></span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Hidden Date/Time Values -->
-            <input type="hidden" id="modal-event-date" name="event_date" required>
-            <input type="hidden" id="modal-event-time" name="event_time">
           </div>
 
-          <!-- Right Column: Client Contact Information -->
-          <div class="modal-contact-col">
-            <label class="form-label" style="font-size: 0.95rem; color: #fff; font-weight: 700; margin-bottom: 0.75rem; display: block;">
-              <i class="fa-solid fa-user-check" style="color: var(--accent-gold);"></i> 2. Your Event & Contact Details
+          <div class="client-calendar-layout modal-cal-layout">
+            <!-- Month Grid -->
+            <div class="client-cal-card">
+              <div class="client-cal-header">
+                <button type="button" class="btn-cal-nav" id="btn-pub-prev-month" aria-label="Previous Month"><i class="fa-solid fa-chevron-left"></i></button>
+                <span class="client-cal-title" id="pub-cal-month-title">Loading Calendar...</span>
+                <button type="button" class="btn-cal-nav" id="btn-pub-next-month" aria-label="Next Month"><i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+
+              <div class="client-cal-weekdays">
+                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+              </div>
+
+              <div class="client-cal-days" id="pub-cal-days-grid">
+                <!-- Days dynamically rendered via JS from Supabase availability -->
+              </div>
+            </div>
+
+            <!-- Time Panel -->
+            <div class="client-time-panel">
+              <div class="time-panel-header">
+                <h4 id="time-panel-date-label"><i class="fa-regular fa-clock" style="color: var(--primary);"></i> Available Times</h4>
+                <p id="time-panel-sub-label">Click a glowing date on the calendar to pick your time slot.</p>
+              </div>
+
+              <div class="time-slots-container" id="pub-time-slots-container">
+                <div class="empty-time-state">
+                  <i class="fa-solid fa-calendar-days" style="font-size: 1.8rem; color: rgba(255,255,255,0.15); margin-bottom: 0.4rem; display: block;"></i>
+                  <span>Click any available date</span>
+                </div>
+              </div>
+
+              <!-- Chosen Date/Time Pill -->
+              <div id="booking-confirmation-pill" class="booking-selection-pill" style="display: none; margin-top: 0.75rem;">
+                <i class="fa-solid fa-circle-check"></i>
+                <div>
+                  <strong id="pill-selected-date" style="display: block; font-size: 0.88rem; color: #fff;"></strong>
+                  <span id="pill-selected-time" style="font-size: 0.8rem; color: var(--primary); font-weight: 600;"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Flexible Date Drawer -->
+          <div class="flexible-date-toggle-box">
+            <label class="flexible-checkbox-label" for="chk-flexible-date">
+              <input type="checkbox" id="chk-flexible-date">
+              <span><strong>My event dates are flexible or undecided yet</strong></span>
             </label>
-
-            <div class="form-group" style="margin-bottom: 0.85rem;">
-              <label class="form-label">Full Name *</label>
-              <input type="text" id="modal-client-name" class="form-control" placeholder="e.g. Jessica Rivera" required>
-            </div>
-
-            <div class="form-grid-2" style="margin-bottom: 0.85rem; gap: 0.75rem;">
-              <div class="form-group">
-                <label class="form-label">Email Address *</label>
-                <input type="email" id="modal-client-email" class="form-control" placeholder="e.g. jessica@example.com" required>
+            <div id="flexible-options-drawer" style="display: none; margin-top: 0.85rem; padding-top: 0.85rem; border-top: 1px dashed rgba(255,255,255,0.1);">
+              <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.65rem;">
+                Select your estimated target timeframe and preferred day so we can hold tentative availability for you:
+              </p>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
+                <div>
+                  <label class="form-label" style="font-size: 0.78rem;">Estimated Season / Year</label>
+                  <select id="flexible-season-select" class="form-select">
+                    <option value="Spring 2027">Spring 2027 (Mar - May)</option>
+                    <option value="Summer 2027">Summer 2027 (Jun - Aug)</option>
+                    <option value="Fall 2026">Fall 2026 (Sep - Nov)</option>
+                    <option value="Winter 2026 / Early 2027">Winter 2026 / Early 2027</option>
+                    <option value="Late 2027 / 2028">Late 2027 / 2028</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 0.78rem;">Preferred Day of Week</label>
+                  <select id="flexible-day-pref" class="form-select">
+                    <option value="Saturday Evening">Saturday Evening</option>
+                    <option value="Friday Evening">Friday Evening</option>
+                    <option value="Sunday Afternoon / Evening">Sunday Afternoon / Evening</option>
+                    <option value="Weekday">Weekday</option>
+                    <option value="Any Day / Flexible">Any Day / Flexible</option>
+                  </select>
+                </div>
               </div>
-              <div class="form-group">
-                <label class="form-label">Phone Number *</label>
-                <input type="tel" id="modal-client-phone" class="form-control" placeholder="e.g. (405) 283-2533" required>
-              </div>
             </div>
+          </div>
 
-            <div class="form-group" style="margin-bottom: 0.85rem;">
-              <label class="form-label">City / Venue Location *</label>
-              <input type="text" id="modal-client-venue" class="form-control" placeholder="e.g. Oklahoma City / Edmond / Norman" required>
-            </div>
+          <!-- Hidden Date/Time Values -->
+          <input type="hidden" id="modal-event-date" name="event_date">
+          <input type="hidden" id="modal-event-time" name="event_time">
 
-            <div class="form-group" style="margin-bottom: 1.25rem;">
-              <label class="form-label">Special Requests / Musical Notes</label>
-              <textarea id="modal-client-notes" class="form-control" rows="2" placeholder="Tell us about your event style, music favorites, or questions..."></textarea>
-            </div>
-
-            <button type="submit" id="btn-modal-submit-booking" class="btn btn-primary btn-lg" style="width: 100%;">
-              <i class="fa-solid fa-paper-plane"></i> Submit Date Hold Request
+          <!-- Step 1 Navigation -->
+          <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+            <button type="button" id="btn-modal-next-step" class="btn btn-primary btn-lg" style="min-width: 250px;">
+              <span>Continue to Contact Details</span> <i class="fa-solid fa-arrow-right" style="margin-left: 0.5rem;"></i>
             </button>
+          </div>
+        </div>
 
-            <div style="margin-top: 0.75rem; text-align: center; font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-              <i class="fa-solid fa-shield-halved" style="color: var(--primary);"></i>
-              <span>No deposit charged right now • Places a complimentary date hold while we review details</span>
+        <!-- STEP 2: Contact & Venue Details -->
+        <div id="modal-step-panel-2" class="modal-step-panel">
+          <div style="background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem;">
+              <i class="fa-solid fa-calendar-check" style="color: var(--primary);"></i>
+              <span id="step2-summary-date" style="color: #fff; font-weight: 600;">Date Selected</span>
             </div>
+            <button type="button" id="btn-step2-change-date" style="background: none; border: none; color: var(--primary); font-size: 0.8rem; cursor: pointer; text-decoration: underline;">
+              Change Date
+            </button>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label">Full Name *</label>
+            <input type="text" id="modal-client-name" class="form-control" placeholder="e.g. Jessica Rivera" required>
+          </div>
+
+          <div class="form-grid-2" style="margin-bottom: 0.85rem; gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label">Email Address *</label>
+              <input type="email" id="modal-client-email" class="form-control" placeholder="e.g. jessica@example.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number *</label>
+              <input type="tel" id="modal-client-phone" class="form-control" placeholder="e.g. (405) 283-2533" required>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label">City / Venue Location *</label>
+            <input type="text" id="modal-client-venue" class="form-control" placeholder="e.g. Oklahoma City / Edmond / Norman" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label">Special Requests / Musical Notes</label>
+            <textarea id="modal-client-notes" class="form-control" rows="2" placeholder="Tell us about your event style, music favorites, or questions..."></textarea>
+          </div>
+
+          <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+            <button type="button" id="btn-modal-prev-step" class="btn btn-outline" style="min-width: 140px;">
+              <i class="fa-solid fa-arrow-left" style="margin-right: 0.4rem;"></i> Back
+            </button>
+            <button type="submit" id="btn-modal-submit-booking" class="btn btn-primary btn-lg" style="flex: 1;">
+              <i class="fa-solid fa-paper-plane" style="margin-right: 0.4rem;"></i> Submit Date Hold Request
+            </button>
+          </div>
+
+          <div style="margin-top: 0.85rem; text-align: center; font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            <i class="fa-solid fa-shield-halved" style="color: var(--primary);"></i>
+            <span>No deposit charged right now • Places a complimentary date hold while we review details</span>
           </div>
         </div>
       </form>

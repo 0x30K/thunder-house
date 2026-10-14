@@ -1843,7 +1843,7 @@ textarea.form-control {
 }
 
 .modal-card.modal-card-lg {
-  max-width: 1060px;
+  max-width: 980px;
   width: 95vw;
   max-height: 92vh;
   overflow-y: auto;
@@ -1852,11 +1852,126 @@ textarea.form-control {
   scrollbar-color: var(--primary) var(--bg-surface);
 }
 
+/* Modal 2-Step Stepper Navigation */
+.modal-stepper-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modal-step-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  opacity: 0.45;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  color: #fff;
+  cursor: pointer;
+}
+
+.modal-step-indicator.active {
+  opacity: 1;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.modal-step-indicator.completed {
+  opacity: 0.85;
+  color: #22c55e;
+}
+
+.modal-step-indicator .step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.modal-step-indicator.active .step-num {
+  background: var(--primary);
+  color: #000;
+  border-color: var(--primary);
+  box-shadow: 0 0 10px var(--primary);
+}
+
+.modal-step-indicator.completed .step-num {
+  background: #22c55e;
+  color: #000;
+  border-color: #22c55e;
+}
+
+.step-divider {
+  width: 40px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.modal-step-panel {
+  display: none;
+  animation: fadeInStep 0.3s ease forwards;
+}
+
+.modal-step-panel.active {
+  display: block;
+}
+
+@keyframes fadeInStep {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Flexible Date Box */
+.flexible-date-toggle-box {
+  background: rgba(0, 229, 255, 0.04);
+  border: 1px dashed rgba(0, 229, 255, 0.3);
+  border-radius: 10px;
+  padding: 1rem 1.15rem;
+  margin-top: 1rem;
+  transition: all 0.2s ease;
+}
+
+.flexible-date-toggle-box:hover {
+  border-color: var(--primary);
+  background: rgba(0, 229, 255, 0.07);
+}
+
+.flexible-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+  color: #fff;
+  font-size: 0.92rem;
+  user-select: none;
+}
+
+.flexible-checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.package-calc-hint:hover {
+  color: var(--primary) !important;
+}
+
 .modal-booking-grid {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 1.75rem;
-  align-items: start;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
 }
 
 .modal-cal-layout {
@@ -1865,12 +1980,13 @@ textarea.form-control {
 }
 
 @media (max-width: 920px) {
-  .modal-booking-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
   .modal-card.modal-card-lg {
-    padding: 1.5rem;
+    padding: 1.25rem;
+    max-height: 95vh;
+  }
+  .modal-stepper-header {
+    gap: 0.5rem;
+    font-size: 0.8rem;
   }
 }
 

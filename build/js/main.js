@@ -754,15 +754,146 @@ function initBookingForms() {
 
   initBookingCalendar();
 
-  // CTA button from Contact section to open modal
-  const openCalBtnFromContact = document.getElementById('btn-open-cal-modal-from-contact');
-  if (openCalBtnFromContact) {
-    openCalBtnFromContact.addEventListener('click', () => {
-      openBookingModalWithQuote(window.currentQuote);
+  // =========================================================================
+  // MODAL 2-STEP STEPPER & FLEXIBLE DATE LOGIC
+  // =========================================================================
+  const stepPanel1 = document.getElementById('modal-step-panel-1');
+  const stepPanel2 = document.getElementById('modal-step-panel-2');
+  const stepTab1 = document.getElementById('modal-tab-step-1');
+  const stepTab2 = document.getElementById('modal-tab-step-2');
+  const btnNextStep = document.getElementById('btn-modal-next-step');
+  const btnPrevStep = document.getElementById('btn-modal-prev-step');
+  const btnStep2ChangeDate = document.getElementById('btn-step2-change-date');
+  const chkFlexibleDate = document.getElementById('chk-flexible-date');
+  const flexibleDrawer = document.getElementById('flexible-options-drawer');
+  const flexibleSeasonSelect = document.getElementById('flexible-season-select');
+  const flexibleDayPref = document.getElementById('flexible-day-pref');
+  const step2SummaryDate = document.getElementById('step2-summary-date');
+
+  function goToModalStep(step) {
+    if (step === 1) {
+      if (stepPanel1) stepPanel1.classList.add('active');
+      if (stepPanel2) stepPanel2.classList.remove('active');
+      if (stepTab1) {
+        stepTab1.classList.add('active');
+        stepTab1.classList.remove('completed');
+      }
+      if (stepTab2) {
+        stepTab2.classList.remove('active', 'completed');
+      }
+    } else if (step === 2) {
+      const isFlexible = chkFlexibleDate && chkFlexibleDate.checked;
+      const modalDateInput = document.getElementById('modal-event-date');
+      const hasCalendarDate = pubSelectedDate || (modalDateInput && modalDateInput.value);
+
+      if (!isFlexible && !hasCalendarDate) {
+        showToast('⚠️ Please select an available date on the calendar, or check "My event dates are flexible"!');
+        return false;
+      }
+
+      // Update Step 2 preview
+      if (step2SummaryDate) {
+        if (isFlexible) {
+          const season = flexibleSeasonSelect ? flexibleSeasonSelect.value : 'Flexible 2026/2027';
+          const dayPref = flexibleDayPref ? flexibleDayPref.value : 'Any Day';
+          step2SummaryDate.textContent = `Flexible Date: ${season} • ${dayPref}`;
+          if (modalDateInput) modalDateInput.value = `Flexible: ${season} (${dayPref})`;
+        } else {
+          const [year, month, day] = (pubSelectedDate || modalDateInput.value).split('-');
+          const d = new Date(year, parseInt(month) - 1, day);
+          const dayFormatted = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+          step2SummaryDate.textContent = `${dayFormatted} ${pubSelectedTime ? `(${pubSelectedTime})` : ''}`;
+        }
+      }
+
+      if (stepPanel1) stepPanel1.classList.remove('active');
+      if (stepPanel2) stepPanel2.classList.add('active');
+      if (stepTab1) {
+        stepTab1.classList.remove('active');
+        stepTab1.classList.add('completed');
+      }
+      if (stepTab2) {
+        stepTab2.classList.add('active');
+      }
+    }
+    return true;
+  }
+
+  window.goToModalStep = goToModalStep;
+
+  if (btnNextStep) {
+    btnNextStep.addEventListener('click', () => goToModalStep(2));
+  }
+  if (btnPrevStep) {
+    btnPrevStep.addEventListener('click', () => goToModalStep(1));
+  }
+  if (btnStep2ChangeDate) {
+    btnStep2ChangeDate.addEventListener('click', () => goToModalStep(1));
+  }
+  if (stepTab1) {
+    stepTab1.addEventListener('click', () => goToModalStep(1));
+  }
+
+  // Flexible Date Checkbox & Drawer
+  if (chkFlexibleDate) {
+    chkFlexibleDate.addEventListener('change', () => {
+      const modalDateInput = document.getElementById('modal-event-date');
+      if (chkFlexibleDate.checked) {
+        if (flexibleDrawer) flexibleDrawer.style.display = 'block';
+        const season = flexibleSeasonSelect ? flexibleSeasonSelect.value : 'Flexible Season';
+        const dayPref = flexibleDayPref ? flexibleDayPref.value : 'Any Day';
+        if (modalDateInput) modalDateInput.value = `Flexible: ${season} (${dayPref})`;
+      } else {
+        if (flexibleDrawer) flexibleDrawer.style.display = 'none';
+        if (modalDateInput) modalDateInput.value = pubSelectedDate || '';
+      }
     });
   }
 
-  // 1. Direct Contact Form Submission
+  if (flexibleSeasonSelect && chkFlexibleDate) {
+    flexibleSeasonSelect.addEventListener('change', () => {
+      if (chkFlexibleDate.checked) {
+        const modalDateInput = document.getElementById('modal-event-date');
+        const season = flexibleSeasonSelect.value;
+        const dayPref = flexibleDayPref ? flexibleDayPref.value : 'Any Day';
+        if (modalDateInput) modalDateInput.value = `Flexible: ${season} (${dayPref})`;
+      }
+    });
+  }
+
+  if (flexibleDayPref && chkFlexibleDate) {
+    flexibleDayPref.addEventListener('change', () => {
+      if (chkFlexibleDate.checked) {
+        const modalDateInput = document.getElementById('modal-event-date');
+        const season = flexibleSeasonSelect ? flexibleSeasonSelect.value : 'Flexible Season';
+        const dayPref = flexibleDayPref.value;
+        if (modalDateInput) modalDateInput.value = `Flexible: ${season} (${dayPref})`;
+      }
+    });
+  }
+
+  // Direct Package Card Buttons -> Opens Date Hold Modal Directly
+  document.querySelectorAll('.btn-select-package-direct').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const pkgName = btn.getAttribute('data-package') || 'Thunder Party';
+      const price = parseInt(btn.getAttribute('data-price'), 10) || 700;
+      const hours = parseInt(btn.getAttribute('data-hours'), 10) || 4;
+
+      window.currentQuote = {
+        package: `${pkgName} (${hours}h)`,
+        basePrice: price,
+        total: price,
+        extraHours: 0,
+        travelMiles: 0,
+        addons: []
+      };
+
+      openBookingModalWithQuote(window.currentQuote);
+    });
+  });
+
+  // 1. Direct Contact Form Submission (Lightweight Lane 2)
   if (mainContactForm) {
     mainContactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -770,35 +901,36 @@ function initBookingForms() {
       const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending Inquiry...';
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending Message...';
       }
 
-      const name = document.getElementById('contact-name').value;
-      const email = document.getElementById('contact-email').value;
-      const phone = document.getElementById('contact-phone').value;
-      const selectedPkg = document.getElementById('contact-event-type') ? document.getElementById('contact-event-type').value : 'General Inquiry';
-      const venue = document.getElementById('contact-venue') ? document.getElementById('contact-venue').value : 'Oklahoma City';
-      const message = document.getElementById('contact-message') ? document.getElementById('contact-message').value : '';
+      const name = document.getElementById('contact-name').value.trim();
+      const contactInfo = document.getElementById('contact-phone').value.trim();
+      const message = document.getElementById('contact-message') ? document.getElementById('contact-message').value.trim() : '';
+
+      const isEmail = contactInfo.includes('@');
+      const email = isEmail ? contactInfo : '';
+      const phone = !isEmail ? contactInfo : '';
 
       // Save to Supabase database
       if (window.supabaseClient) {
         try {
           await window.supabaseClient.from('thunderhouse_inquiries').insert([{
             full_name: name,
-            email: email,
-            phone: phone,
-            package_name: selectedPkg,
-            venue_location: venue,
+            email: email || 'provided_via_phone',
+            phone: phone || contactInfo,
+            package_name: 'Direct Consultation Question',
+            venue_location: 'OKC Metro',
             notes: message,
             status: 'new',
-            source: 'website_contact_form'
+            source: 'website_quick_question'
           }]);
         } catch (err) {
           console.warn('Supabase inquiry save note:', err);
         }
       }
 
-      // Dispatch confirmation email
+      // Dispatch notification email
       try {
         await fetch('https://kxoivmflghfgtvawhktt.supabase.co/functions/v1/send-booking-confirmation', {
           method: 'POST',
@@ -806,9 +938,9 @@ function initBookingForms() {
           body: JSON.stringify({
             client_name: name,
             client_email: email,
-            client_phone: phone,
-            venue_city: venue,
-            package_name: selectedPkg,
+            client_phone: phone || contactInfo,
+            venue_city: 'Oklahoma City',
+            package_name: 'Direct Question / Message',
             notes: message
           })
         });
@@ -821,12 +953,12 @@ function initBookingForms() {
         submitBtn.innerHTML = originalBtnHtml;
       }
 
-      showToast(`Thank you ${name}! Your booking inquiry has been received. A confirmation has been sent to ${email}.`);
+      showToast(`Thank you ${name}! Your message has been sent. We'll get back to you today!`);
       mainContactForm.reset();
     });
   }
 
-  // 2. Modal Final Booking & Quote Confirmation Submission
+  // 2. Modal Final Booking & Quote Confirmation Submission (Lane 1)
   if (modalBookingForm) {
     modalBookingForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -839,11 +971,22 @@ function initBookingForms() {
       const clientVenue = document.getElementById('modal-client-venue') ? document.getElementById('modal-client-venue').value.trim() : 'Oklahoma City';
       const clientNotes = document.getElementById('modal-client-notes') ? document.getElementById('modal-client-notes').value.trim() : '';
       
-      const eventDate = document.getElementById('modal-event-date') ? document.getElementById('modal-event-date').value : pubSelectedDate;
-      const eventTime = document.getElementById('modal-event-time') ? document.getElementById('modal-event-time').value : (pubSelectedTime || 'Flexible / Full Event');
+      const modalDateInput = document.getElementById('modal-event-date');
+      const isFlexible = chkFlexibleDate && chkFlexibleDate.checked;
+      let eventDate = modalDateInput ? modalDateInput.value : pubSelectedDate;
+      if (isFlexible) {
+        const season = flexibleSeasonSelect ? flexibleSeasonSelect.value : 'Flexible 2026/2027';
+        const dayPref = flexibleDayPref ? flexibleDayPref.value : 'Any Day';
+        eventDate = `Flexible: ${season} (${dayPref})`;
+      }
+
+      const eventTime = isFlexible 
+        ? 'Flexible / Full Event' 
+        : (document.getElementById('modal-event-time') ? document.getElementById('modal-event-time').value : (pubSelectedTime || 'Flexible / Full Event'));
 
       if (!eventDate) {
         showToast('⚠️ Please select an available event date on the calendar first!');
+        goToModalStep(1);
         return;
       }
 
@@ -914,6 +1057,7 @@ function initBookingForms() {
       if (modal) modal.classList.remove('active');
       showToast(`📅 Date hold request received for ${clientName}! Check ${clientEmail} for confirmation.`);
       modalBookingForm.reset();
+      goToModalStep(1);
     });
   }
 }
@@ -922,6 +1066,10 @@ function openBookingModalWithQuote(quote) {
   const modal = document.getElementById('booking-modal');
   const modalSummaryDetails = document.getElementById('modal-summary-details');
   if (!modal) return;
+
+  if (typeof window.goToModalStep === 'function') {
+    window.goToModalStep(1);
+  }
 
   const currentQuoteData = quote || window.currentQuote || {
     package: 'Thunder Party (4h)',
@@ -970,6 +1118,10 @@ function openBookingModalWithData(data) {
   const modal = document.getElementById('booking-modal');
   const modalSummaryDetails = document.getElementById('modal-summary-details');
   if (!modal) return;
+
+  if (typeof window.goToModalStep === 'function') {
+    window.goToModalStep(1);
+  }
 
   if (modalSummaryDetails) {
     modalSummaryDetails.innerHTML = `
