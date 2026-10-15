@@ -128,7 +128,7 @@ Deno.serve(async (req: Request) => {
             </td>
             <td style="padding: 10px 8px; text-align: center; color: #cbd5e1;">${escapeHtml(String(qty))}</td>
             <td style="padding: 10px 8px; text-align: right; color: #cbd5e1;">$${rate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td style="padding: 10px 8px; text-align: right; color: #00e5ff; font-weight: 700;">$${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td style="padding: 10px 8px; text-align: right; color: #3d86ff; font-weight: 700;">$${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
           </tr>
         `;
       }).join("");
@@ -162,7 +162,7 @@ ${invoiceUrl}
 ${squareLink ? `\nPAY DIRECTLY VIA SQUARE:\n${squareLink}\n` : ""}
 
 Thunder House ENT • Oklahoma City, OK
-Phone: (405) 555-0199
+Phone: (405) 283-2533
 Email: ${smtpUser}`;
 
       // Rich Cyber Dark-Mode HTML
@@ -174,11 +174,11 @@ Email: ${smtpUser}`;
   <title>Invoice ${escapeHtml(invoiceNumber)} | Thunder House ENT</title>
 </head>
 <body style="margin: 0; padding: 30px 15px; background-color: #05070b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #f8fafc;">
-  <div style="background-color: #07090e; color: #f8fafc; padding: 35px 28px; border-radius: 16px; max-width: 620px; margin: 0 auto; border: 1px solid #00e5ff; box-shadow: 0 15px 45px rgba(0,0,0,0.8), 0 0 30px rgba(0, 229, 255, 0.15);">
+  <div style="background-color: #07090e; color: #f8fafc; padding: 35px 28px; border-radius: 16px; max-width: 620px; margin: 0 auto; border: 1px solid #3d86ff; box-shadow: 0 15px 45px rgba(0,0,0,0.8), 0 0 30px rgba(30, 111, 255, 0.15);">
 
     <!-- Branding Header -->
     <div style="text-align: center; margin-bottom: 26px;">
-      <h1 style="color: #00e5ff; margin: 0 0 6px 0; font-size: 28px; letter-spacing: 1.5px; font-weight: 800;">THUNDER HOUSE ENT</h1>
+      <h1 style="color: #3d86ff; margin: 0 0 6px 0; font-size: 28px; letter-spacing: 1.5px; font-weight: 800;">THUNDER HOUSE ENT</h1>
       <div style="display: inline-block; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #ffb703; font-weight: 700; padding: 4px 14px; border-radius: 20px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
         OKC Event DJ & MC Services • Professional Invoicing
       </div>
@@ -216,13 +216,13 @@ Email: ${smtpUser}`;
     </div>
 
     <!-- Items Table -->
-    <div style="background: rgba(0, 229, 255, 0.03); border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 10px; padding: 18px; margin-bottom: 22px;">
-      <h3 style="color: #00e5ff; font-size: 13px; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px;">
+    <div style="background: rgba(30, 111, 255, 0.03); border: 1px solid rgba(30, 111, 255, 0.2); border-radius: 10px; padding: 18px; margin-bottom: 22px;">
+      <h3 style="color: #3d86ff; font-size: 13px; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 0.5px;">
         Itemized Breakdown
       </h3>
       <table style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
         <thead>
-          <tr style="border-bottom: 1px solid rgba(0, 229, 255, 0.25); color: #94a3b8; font-size: 11px; text-transform: uppercase;">
+          <tr style="border-bottom: 1px solid rgba(30, 111, 255, 0.25); color: #94a3b8; font-size: 11px; text-transform: uppercase;">
             <th style="text-align: left; padding: 6px 8px;">Description</th>
             <th style="text-align: center; padding: 6px 8px; width: 45px;">Qty</th>
             <th style="text-align: right; padding: 6px 8px; width: 85px;">Rate</th>
@@ -247,18 +247,18 @@ Email: ${smtpUser}`;
 
     ${notes ? `
     <!-- Notes / Terms -->
-    <div style="background: rgba(255, 255, 255, 0.02); border-left: 3px solid #00e5ff; border-radius: 4px; padding: 12px 14px; margin-bottom: 22px;">
+    <div style="background: rgba(255, 255, 255, 0.02); border-left: 3px solid #3d86ff; border-radius: 4px; padding: 12px 14px; margin-bottom: 22px;">
       <strong style="color: #fff; font-size: 12.5px; display: block; margin-bottom: 4px;">Notes & Instructions:</strong>
       <p style="color: #94a3b8; font-size: 12.5px; line-height: 1.5; margin: 0;">${escapeHtml(notes).replace(/\n/g, "<br>")}</p>
     </div>` : ""}
 
     <!-- Action Buttons -->
     <div style="text-align: center; margin-bottom: 26px;">
-      <a href="${escapeHtml(invoiceUrl)}" target="_blank" style="display: inline-block; background: #00e5ff; color: #07090e; font-weight: 800; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 30px; box-shadow: 0 0 25px rgba(0, 229, 255, 0.4); text-transform: uppercase; letter-spacing: 0.5px; margin: 6px;">
+      <a href="${escapeHtml(invoiceUrl)}" target="_blank" style="display: inline-block; background: #1e6fff; color: #ffffff; font-weight: 800; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 30px; box-shadow: 0 0 25px rgba(30, 111, 255, 0.4); text-transform: uppercase; letter-spacing: 0.5px; margin: 6px;">
         ⚡ View & Print Invoice Online
       </a>
       ${squareLink ? `
-      <a href="${escapeHtml(squareLink)}" target="_blank" style="display: inline-block; background: #ffb703; color: #07090e; font-weight: 800; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 30px; box-shadow: 0 0 25px rgba(255, 183, 3, 0.4); text-transform: uppercase; letter-spacing: 0.5px; margin: 6px;">
+      <a href="${escapeHtml(squareLink)}" target="_blank" style="display: inline-block; background: #ff3d1f; color: #ffffff; font-weight: 800; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 30px; box-shadow: 0 0 25px rgba(255, 61, 31, 0.45); text-transform: uppercase; letter-spacing: 0.5px; margin: 6px;">
         💳 Pay Balance via Square
       </a>` : ""}
     </div>
@@ -266,7 +266,7 @@ Email: ${smtpUser}`;
     <!-- Contact & Footer -->
     <div style="text-align: center; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 12px; color: #64748b; line-height: 1.6;">
       <strong style="color: #94a3b8;">Thunder House ENT</strong> • Oklahoma City, OK<br>
-      Email: <a href="mailto:${smtpUser}" style="color: #00e5ff; text-decoration: none;">${smtpUser}</a> • Website: <a href="https://www.thunderhouseent.com" style="color: #00e5ff; text-decoration: none;">thunderhouseent.com</a><br>
+      Email: <a href="mailto:${smtpUser}" style="color: #3d86ff; text-decoration: none;">${smtpUser}</a> • Website: <a href="https://www.thunderhouseent.com" style="color: #3d86ff; text-decoration: none;">thunderhouseent.com</a><br>
       <span style="font-size: 11px; color: #475569;">Questions regarding this invoice? Reply directly to this email.</span>
     </div>
   </div>
@@ -329,7 +329,7 @@ RESERVATION SUMMARY:
 WHAT HAPPENS NEXT:
 Our team will review your timeline and reach out within 2 hours to confirm all details. No deposit is required until you are 100% satisfied with your custom timeline.
 
-If you have questions, reply directly to this email or call us at (800) 555-THUNDER.
+If you have questions, reply directly to this email or call us at (405) 283-2533.
 
 Thunder House ENT • Oklahoma City, OK
 Website: https://www.thunderhouseent.com
@@ -343,10 +343,10 @@ Email: booking@thunderhouseent.com`;
   <title>Thunder House ENT Reservation</title>
 </head>
 <body style="margin: 0; padding: 30px 15px; background-color: #05070b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #f8fafc;">
-  <div style="background-color: #07090e; color: #f8fafc; padding: 35px 30px; border-radius: 16px; max-width: 600px; margin: 0 auto; border: 1px solid #00e5ff; box-shadow: 0 15px 45px rgba(0,0,0,0.8), 0 0 30px rgba(0, 229, 255, 0.15);">
+  <div style="background-color: #07090e; color: #f8fafc; padding: 35px 30px; border-radius: 16px; max-width: 600px; margin: 0 auto; border: 1px solid #3d86ff; box-shadow: 0 15px 45px rgba(0,0,0,0.8), 0 0 30px rgba(30, 111, 255, 0.15);">
 
     <div style="text-align: center; margin-bottom: 28px;">
-      <h1 style="color: #00e5ff; margin: 0 0 6px 0; font-size: 28px; letter-spacing: 1.5px; font-weight: 800;">THUNDER HOUSE ENT</h1>
+      <h1 style="color: #3d86ff; margin: 0 0 6px 0; font-size: 28px; letter-spacing: 1.5px; font-weight: 800;">THUNDER HOUSE ENT</h1>
       <div style="display: inline-block; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #ffb703; font-weight: 700; padding: 4px 14px; border-radius: 20px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
         OKC Event DJ & MC Services • Father & Son Duo
       </div>
@@ -361,8 +361,8 @@ Email: booking@thunderhouseent.com`;
       </p>
     </div>
 
-    <div style="background: rgba(0, 229, 255, 0.04); border: 1px solid rgba(0, 229, 255, 0.25); border-radius: 10px; padding: 22px; margin-bottom: 22px;">
-      <h3 style="color: #00e5ff; font-size: 15px; margin: 0 0 16px 0; border-bottom: 1px solid rgba(0, 229, 255, 0.2); padding-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">
+    <div style="background: rgba(30, 111, 255, 0.04); border: 1px solid rgba(30, 111, 255, 0.25); border-radius: 10px; padding: 22px; margin-bottom: 22px;">
+      <h3 style="color: #3d86ff; font-size: 15px; margin: 0 0 16px 0; border-bottom: 1px solid rgba(30, 111, 255, 0.2); padding-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">
         Reservation Summary
       </h3>
       <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #cbd5e1;">
@@ -376,7 +376,7 @@ Email: booking@thunderhouseent.com`;
         </tr>
         <tr>
           <td style="padding: 7px 0; color: #94a3b8;">Reserved Hours:</td>
-          <td style="font-weight: 700; color: #00e5ff; text-align: right;">${escapeHtml(eventTimeText)}</td>
+          <td style="font-weight: 700; color: #3d86ff; text-align: right;">${escapeHtml(eventTimeText)}</td>
         </tr>
         <tr>
           <td style="padding: 7px 0; color: #94a3b8;">Venue / City:</td>
@@ -397,7 +397,7 @@ Email: booking@thunderhouseent.com`;
 
     <div style="text-align: center; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 12px; color: #64748b; line-height: 1.6;">
       <strong style="color: #94a3b8;">Thunder House ENT</strong> • Oklahoma City, OK<br>
-      Phone: (800) 555-THUNDER • Email: <a href="mailto:${smtpUser}" style="color: #00e5ff; text-decoration: none;">${smtpUser}</a><br>
+      Phone: (405) 283-2533 • Email: <a href="mailto:${smtpUser}" style="color: #3d86ff; text-decoration: none;">${smtpUser}</a><br>
       <span style="font-size: 11px; color: #475569;">You received this email because you locked in an event quote at thunderhouseent.com.</span>
     </div>
   </div>
@@ -432,10 +432,10 @@ Notes: ${notes || "None"}
 
     const adminHtml = `
       <div style="font-family: sans-serif; padding: 20px; background: #0f172a; color: #f8fafc; border-radius: 8px;">
-        <h2 style="color: #00e5ff; margin-top: 0;">New Booking Inquiry Locked In</h2>
+        <h2 style="color: #3d86ff; margin-top: 0;">New Booking Inquiry Locked In</h2>
         <p><strong>Client:</strong> ${escapeHtml(client_name)}</p>
-        <p><strong>Email:</strong> <a href="mailto:${escapeHtml(client_email)}" style="color: #00e5ff;">${escapeHtml(client_email)}</a></p>
-        <p><strong>Phone:</strong> <a href="tel:${escapeHtml(client_phone)}" style="color: #00e5ff;">${escapeHtml(client_phone)}</a></p>
+        <p><strong>Email:</strong> <a href="mailto:${escapeHtml(client_email)}" style="color: #3d86ff;">${escapeHtml(client_email)}</a></p>
+        <p><strong>Phone:</strong> <a href="tel:${escapeHtml(client_phone)}" style="color: #3d86ff;">${escapeHtml(client_phone)}</a></p>
         <p><strong>Date & Time:</strong> ${escapeHtml(eventDateText)} (${escapeHtml(eventTimeText)})</p>
         <p><strong>Venue / City:</strong> ${escapeHtml(venueText)}</p>
         <p><strong>Package:</strong> ${escapeHtml(pkgText)}</p>
