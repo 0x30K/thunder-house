@@ -78,3 +78,22 @@ export function invoiceNumberFromNote(note?: string | null): string | null {
   const m = /Invoice #([A-Za-z0-9-]+)/.exec(note || "");
   return m ? m[1] : null;
 }
+
+/**
+ * Before taking a retainer: is the event date still free for this client?
+ * Returns a message if it's locked for another invoice or held for a different client.
+ */
+export async function dateConflict(supabase: any, inv: any): Promise<string | null> {
+  if (!inv.event_date) return null;
+  const { data: day } = await supabase
+    .from("thunderhouse_availability").select("*").eq("date", inv.event_date).maybeSingle();
+  if (!day) return null;
+  if (day.status === "booked" && day.locked_invoice_number && day.locked_invoice_number !== inv.invoice_number) {
+    return "Sorry, this date has already been booked by another client. Please contact Thunder House ENT about other dates.";
+  }
+  const holdActive = day.status === "held" && day.hold_expires_at && new Date(day.hold_expires_at) > new Date();
+  if (holdActive && (day.hold_email || "").toLowerCase() !== (inv.client_email || "").toLowerCase()) {
+    return "This date is currently on hold for another client. Please contact Thunder House ENT.";
+  }
+  return null;
+}

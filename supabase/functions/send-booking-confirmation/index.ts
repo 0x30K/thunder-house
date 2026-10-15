@@ -314,9 +314,19 @@ Email: ${smtpUser}`;
     const venueText = venue_city || "Oklahoma City, OK";
     const pkgText = package_name || "Thunder House DJ Package";
 
+    // Hold wording follows the superuser setting; don't promise a hold the calendar couldn't place
+    const { data: bookingCfg } = await supabase
+      .from("thunderhouse_site_settings").select("value").eq("key", "booking_settings").maybeSingle();
+    const holdHours = parseInt(bookingCfg?.value?.hold_hours, 10) || 72;
+    const holdSentence = payload.held === true
+      ? `We have received your event details and are holding your requested date for ${holdHours} hours.`
+      : !event_date
+        ? `We have received your message and will get back to you within 24 hours.`
+        : `We have received your event details. Your requested date isn't open to hold right now, so we'll reach out with the closest options.`;
+
     const clientPlainText = `Hi ${client_name},
 
-Thank you for locking in your quote with Thunder House ENT! We have received your event details and are holding your requested date for 72 hours.
+Thank you for locking in your quote with Thunder House ENT! ${holdSentence}
 
 RESERVATION SUMMARY:
 - Client Name: ${client_name}
@@ -357,7 +367,7 @@ Email: booking@thunderhouseent.com`;
         ⚡ Booking Request Received!
       </h2>
       <p style="color: #cbd5e1; font-size: 15px; line-height: 1.55; margin: 0;">
-        Hi <strong>${escapeHtml(client_name)}</strong>, thank you for locking in your quote with Thunder House ENT! We have received your event details and are holding your requested date for 72 hours.
+        Hi <strong>${escapeHtml(client_name)}</strong>, thank you for locking in your quote with Thunder House ENT! ${holdSentence}
       </p>
     </div>
 

@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { amountDueNow, recordSquarePayment } from "../_shared/payments.ts";
+import { amountDueNow, dateConflict, recordSquarePayment } from "../_shared/payments.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -80,6 +80,10 @@ Deno.serve(async (req: Request) => {
       if (due.stage === "retainer" && inv.contract_status !== "Signed") {
         throw new Error("Please sign your performance agreement before paying the retainer.");
       }
+      if (due.stage === "retainer") {
+        const conflict = await dateConflict(supabase, inv);
+        if (conflict) throw new Error(conflict);
+      }
 
       const clientName = inv.client_name || "Valued Client";
       const clientEmail = (inv.client_email || "").trim();
@@ -142,6 +146,10 @@ Deno.serve(async (req: Request) => {
       if (due.stage === "paid" || due.due <= 0) throw new Error("This invoice is already paid in full.");
       if (due.stage === "retainer" && inv.contract_status !== "Signed") {
         throw new Error("Please sign your performance agreement before paying the retainer.");
+      }
+      if (due.stage === "retainer") {
+        const conflict = await dateConflict(supabase, inv);
+        if (conflict) throw new Error(conflict);
       }
 
       const isValidEmail = client_email && client_email.includes("@") && !client_email.endsWith("example.com");

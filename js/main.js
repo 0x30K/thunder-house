@@ -582,10 +582,7 @@ function initBookingForms() {
   async function fetchPublicAvailability() {
     if (window.supabaseClient) {
       try {
-        const { data, error } = await window.supabaseClient
-          .from('thunderhouse_availability')
-          .select('date, status, time_slots')
-          .order('date', { ascending: true });
+        const { data, error } = await window.supabaseClient.rpc('public_availability');
 
         if (!error && data) {
           pubAvailabilityList = data;
@@ -647,6 +644,10 @@ function initBookingForms() {
           cell.addEventListener('click', () => selectPublicBookingDate(dateStr, record));
         } else if (record && record.status === 'booked') {
           cell.classList.add('booked');
+        } else if (record && record.status === 'held') {
+          // another client's date hold: not bookable until it expires
+          cell.classList.add('booked', 'held');
+          cell.title = 'On hold for another client';
         }
       }
 
@@ -986,23 +987,27 @@ function initBookingForms() {
         addons: []
       };
 
-      // Save to Supabase database
+      // Save to Supabase database (also places the date hold)
+      let holdResult = null;
       if (window.supabaseClient) {
         try {
-          await window.supabaseClient.from('thunderhouse_inquiries').insert([{
-            full_name: clientName,
-            email: clientEmail,
-            phone: clientPhone,
-            event_date: eventDate,
-            event_time: eventTime,
-            venue_location: clientVenue,
-            package_name: quote.package || 'Thunder House Package',
-            addons: quote.addons || [],
-            estimated_total: quote.total || 0,
-            notes: clientNotes,
-            status: 'new',
-            source: 'quote_calculator_modal'
-          }]);
+          const { data, error } = await window.supabaseClient.rpc('submit_quote_request', {
+            p: {
+              full_name: clientName,
+              email: clientEmail,
+              phone: clientPhone,
+              event_date: eventDate,
+              event_time: eventTime,
+              venue_location: clientVenue,
+              package_name: quote.package || 'Thunder House Package',
+              addons: (quote.addons || []).map(a => typeof a === 'string' ? a : (a.name || a.label || JSON.stringify(a))),
+              estimated_total: quote.total || 0,
+              notes: clientNotes,
+              source: 'quote_calculator_modal'
+            }
+          });
+          if (error) throw error;
+          holdResult = data;
         } catch (err) {
           console.warn('Supabase quote save note:', err);
         }
@@ -1022,7 +1027,9 @@ function initBookingForms() {
             venue_city: clientVenue,
             package_name: quote.package,
             estimated_total: quote.total,
-            notes: clientNotes
+            notes: clientNotes,
+            held: holdResult ? holdResult.held === true : false,
+            hold_hours: holdResult ? holdResult.hold_hours : null
           })
         });
         const emailResult = await emailResponse.json();
@@ -1037,7 +1044,14 @@ function initBookingForms() {
       }
 
       if (modal) modal.classList.remove('active');
-      showToast(`📅 Date hold request received for ${clientName}! Check ${clientEmail} for confirmation.`);
+      if (holdResult && holdResult.held) {
+        showToast(`📅 Your date is held for ${holdResult.hold_hours} hours, ${clientName}! Check ${clientEmail} for next steps.`);
+      } else if (holdResult && holdResult.reason === 'date_unavailable') {
+        showToast(`Thanks ${clientName}! That date was just taken, so we'll reach out with nearby options.`);
+      } else {
+        showToast(`Request received, ${clientName}! Check ${clientEmail} for confirmation.`);
+      }
+      fetchPublicAvailability();
       modalBookingForm.reset();
       goToModalStep(1);
     });
@@ -1169,3 +1183,19 @@ function showToast(message) {
     setTimeout(() => toast.remove(), 400);
   }, 4500);
 }
+
+// Show the current date-hold length (superuser setting) wherever the page mentions it
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!window.supabaseClient || !document.querySelector('.th-hold-hours')) return;
+  try {
+    const { data } = await window.supabaseClient
+      .from('thunderhouse_site_settings')
+      .select('value')
+      .eq('key', 'booking_settings')
+      .maybeSingle();
+    const hours = data && data.value && parseInt(data.value.hold_hours, 10);
+    if (hours > 0) document.querySelectorAll('.th-hold-hours').forEach(el => { el.textContent = hours; });
+  } catch (err) {
+    console.warn('Hold length notice:', err);
+  }
+});

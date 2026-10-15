@@ -2306,6 +2306,12 @@ textarea.form-control {
   text-decoration: line-through;
   cursor: not-allowed;
 }
+/* held for another client: not bookable, but shown softer than booked */
+.pub-day-cell.held {
+  color: var(--accent-gold);
+  text-decoration: none;
+  opacity: 0.45;
+}
 .pub-day-cell.empty {
   background: transparent;
   border-color: transparent;

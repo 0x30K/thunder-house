@@ -513,6 +513,17 @@
       background: rgba(255, 255, 255, 0.08);
       color: var(--text-muted);
     }
+    .cal-day-pill.held {
+      background: rgba(255, 183, 3, 0.18);
+      color: var(--accent-gold);
+    }
+    .legend-dot.legend-held { background: var(--accent-gold); }
+    .hold-panel {
+      background: rgba(255, 183, 3, 0.08); border: 1px solid rgba(255, 183, 3, 0.4);
+      border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-bottom: 1.25rem; color: #fde68a; font-size: 0.88rem;
+    }
+    .hold-panel strong { color: #fff; }
+    .hold-panel .hold-actions { display: flex; gap: 0.5rem; margin-top: 0.65rem; flex-wrap: wrap; }
     .cal-slots-mini-wrap {
       display: flex;
       flex-direction: column;
@@ -1151,11 +1162,19 @@
 
           <div class="cal-legend">
             <div class="legend-item"><span class="legend-dot legend-avail"></span> Available</div>
+            <div class="legend-item"><span class="legend-dot legend-held"></span> On hold</div>
             <div class="legend-item"><span class="legend-dot legend-booked"></span> Booked</div>
             <div class="legend-item"><span class="legend-dot legend-off"></span> Blocked / Off</div>
           </div>
 
-          <div style="display: flex; gap: 0.75rem;">
+          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+            <!-- Superuser only: how long a website quote holds a date -->
+            <div id="hold-hours-setting" style="display: none; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--text-muted);" title="How long a website quote blocks the date before the $200 retainer is paid">
+              <i class="fa-solid fa-hourglass-half" style="color: var(--accent-gold);"></i> Date hold:
+              <input type="number" id="hold-hours-input" min="1" max="720" step="1" class="form-control" style="width: 72px; padding: 0.25rem 0.4rem;">
+              hours
+              <button class="btn btn-outline btn-sm" onclick="saveHoldHours()">Save</button>
+            </div>
             <button class="btn btn-primary btn-sm" onclick="quickSetMonthWeekends()">
               <i class="fa-solid fa-wand-magic-sparkles"></i> Mark Month Weekends Available
             </button>
@@ -1548,6 +1567,10 @@
           <span id="date-editor-sub" style="font-size: 0.85rem; color: var(--text-muted);">Configure times for clients to book</span>
         </div>
       </div>
+
+      <!-- Active date hold (from a website quote) -->
+      <div id="date-hold-panel" class="hold-panel" style="display: none;"></div>
+      <input type="radio" name="date-status-choice" value="held" id="status-rad-held" style="display: none;">
 
       <!-- Status Radio Buttons -->
       <div class="form-group" style="margin-bottom: 1.25rem;">
@@ -3021,11 +3044,15 @@
         let statusText = '';
         let pillClass = '';
 
+        const hold = holdInfo(record);
         if (bookedLead || (record && record.status === 'booked')) {
           cell.classList.add('booked');
-          statusText = 'Booked';
+          statusText = record && record.locked_invoice_number ? 'Locked' : 'Booked';
           pillClass = 'booked';
-        } else if (record && record.status === 'available') {
+        } else if (hold && hold.active) {
+          statusText = `Held · ${hold.hoursLeft}h`;
+          pillClass = 'held';
+        } else if (record && (record.status === 'available' || (hold && !hold.active))) {
           cell.classList.add('available');
           statusText = 'Available';
           pillClass = 'avail';
@@ -3081,9 +3108,26 @@
       document.getElementById('date-editor-sub').textContent = `Date: ${dateStr}`;
 
       const status = record ? record.status : 'available';
-      if (status === 'available') document.getElementById('status-rad-available').checked = true;
-      else if (status === 'booked') document.getElementById('status-rad-booked').checked = true;
-      else document.getElementById('status-rad-blocked').checked = true;
+      const hold = holdInfo(record);
+      const holdPanel = document.getElementById('date-hold-panel');
+      if (hold && hold.active) {
+        // keep the hold when saving unless another status is picked
+        document.getElementById('status-rad-held').checked = true;
+        holdPanel.style.display = 'block';
+        holdPanel.innerHTML = `
+          <i class="fa-solid fa-hourglass-half"></i> <strong>On hold for ${escapeHtml(record.hold_name || 'a client')}</strong>
+          ${record.hold_email ? `(<a href="mailto:${escapeHtml(record.hold_email)}" style="color:#fde68a;">${escapeHtml(record.hold_email)}</a>)` : ''}<br>
+          Expires ${escapeHtml(hold.expiresText)} (${hold.hoursLeft}h left) unless the $200 retainer is paid.
+          <div class="hold-actions">
+            <button type="button" class="btn btn-outline btn-sm" onclick="extendDateHold(24)"><i class="fa-solid fa-plus"></i> Extend 24h</button>
+            <button type="button" class="btn btn-outline btn-sm" style="border-color: #ef4444; color: #f87171;" onclick="releaseDateHold()"><i class="fa-solid fa-unlock"></i> Release hold</button>
+          </div>`;
+      } else {
+        holdPanel.style.display = 'none';
+        if (status === 'booked') document.getElementById('status-rad-booked').checked = true;
+        else if (status === 'blocked') document.getElementById('status-rad-blocked').checked = true;
+        else document.getElementById('status-rad-available').checked = true;  // includes expired holds
+      }
 
       if (record && record.time_slots && record.time_slots.length > 0) {
         editingSlots = [...record.time_slots];
@@ -3096,6 +3140,59 @@
       updatePresetButtonHighlights();
 
       document.getElementById('date-editor-modal').classList.add('active');
+    }
+
+    // Is this day held by a website quote, and for how long?
+    function holdInfo(record) {
+      if (!record || record.status !== 'held' || !record.hold_expires_at) return null;
+      const ms = new Date(record.hold_expires_at) - new Date();
+      return {
+        active: ms > 0,
+        hoursLeft: Math.max(0, Math.ceil(ms / 3600000)),
+        expiresText: new Date(record.hold_expires_at).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+      };
+    }
+
+    async function releaseDateHold() {
+      if (!editingDateStr || !confirm('Release this hold? The date opens up for booking again right away.')) return;
+      const { error } = await window.supabaseClient.from('thunderhouse_availability').update({
+        status: 'available', hold_expires_at: null, hold_name: null, hold_email: null, hold_inquiry_id: null,
+        updated_at: new Date().toISOString()
+      }).eq('date', editingDateStr);
+      if (error) return alert('Could not release hold: ' + error.message);
+      closeDateEditor();
+      await loadAvailability();
+    }
+
+    async function extendDateHold(hours) {
+      const record = allAvailability.find(a => a.date === editingDateStr);
+      if (!record) return;
+      const from = Math.max(Date.now(), new Date(record.hold_expires_at || Date.now()).getTime());
+      const { error } = await window.supabaseClient.from('thunderhouse_availability').update({
+        hold_expires_at: new Date(from + hours * 3600000).toISOString(), updated_at: new Date().toISOString()
+      }).eq('date', editingDateStr);
+      if (error) return alert('Could not extend hold: ' + error.message);
+      await loadAvailability();
+      openDateEditor(editingDateStr);
+    }
+
+    async function initHoldHoursSetting() {
+      const wrap = document.getElementById('hold-hours-setting');
+      if (!wrap || !currentUserState.isSuperuser) return;
+      wrap.style.display = 'inline-flex';
+      const { data } = await window.supabaseClient
+        .from('thunderhouse_site_settings').select('value').eq('key', 'booking_settings').maybeSingle();
+      document.getElementById('hold-hours-input').value = (data && data.value && data.value.hold_hours) || 72;
+    }
+
+    async function saveHoldHours() {
+      const hours = parseInt(document.getElementById('hold-hours-input').value, 10);
+      if (!(hours >= 1 && hours <= 720)) return alert('Please enter between 1 and 720 hours (30 days).');
+      const { error } = await window.supabaseClient.from('thunderhouse_site_settings').upsert({
+        key: 'booking_settings', value: { hold_hours: hours }, updated_at: new Date().toISOString()
+      }, { onConflict: 'key' });
+      if (error) return alert('Could not save: ' + error.message);
+      alert(`⏳ Date holds now last ${hours} hours.\n\nNew website quotes use this right away. Holds already placed keep their current expiry (use Extend in the date editor to change one).`);
     }
 
     function closeDateEditor() {
@@ -4524,6 +4621,7 @@
 
       if (!wrap || !currentUserState.isSuperuser) return;
       wrap.style.display = 'inline-flex';
+      initHoldHoursSetting();
 
       try {
         const { data } = await window.supabaseClient
