@@ -844,6 +844,8 @@
     // STATE & DEFAULTS
     // =========================================================================
     let activePlan = null;
+    // how this client opened the portal: random plan token, or invoice number + secret client key
+    let portalAccess = { token: null, invoice: null, key: null };
     let autoSaveTimeout = null;
 
     const GENRES_LIST = [
@@ -865,9 +867,9 @@
       const urlParams = new URLSearchParams(window.location.search);
       const token = urlParams.get('token');
       const invoice = urlParams.get('invoice');
-      const id = urlParams.get('id');
+      const key = urlParams.get('key');
 
-      if (!token && !invoice && !id) {
+      if (!token && !(invoice && key)) {
         showPortalError('No event portal token or invoice specified. Please use the link provided in your Thunder House ENT confirmation.');
         return;
       }
@@ -878,66 +880,18 @@
       }
 
       try {
-        let query = window.supabaseClient.from('thunderhouse_event_plans').select('*');
-        if (token) {
-          query = query.eq('portal_token', token);
-        } else if (invoice) {
-          query = query.eq('invoice_number', invoice);
-        } else if (id) {
-          query = query.eq('id', id);
-        }
-
-        const { data, error } = await query.maybeSingle();
+        portalAccess = { token: token || null, invoice: invoice || null, key: key || null };
+        // the server checks the secret link and creates the plan on first visit
+        const { data, error } = await window.supabaseClient.rpc('client_get_plan', {
+          p_token: portalAccess.token, p_invoice: portalAccess.invoice, p_key: portalAccess.key
+        });
 
         if (error) throw error;
 
         if (!data) {
-          // If accessing via invoice number, create an initial plan record if invoice exists
-          if (invoice) {
-            const { data: invData } = await window.supabaseClient
-              .from('thunderhouse_invoices')
-              .select('*')
-              .eq('invoice_number', invoice)
-              .maybeSingle();
-
-            if (invData) {
-              const newPlan = {
-                portal_token: `th-vip-${invoice.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
-                invoice_number: invData.invoice_number,
-                client_name: invData.client_name,
-                client_email: invData.client_email,
-                client_phone: invData.client_phone,
-                event_date: invData.event_date,
-                venue_name: invData.venue_city,
-                event_type: 'Event',
-                must_play_songs: [],
-                play_if_possible_songs: [],
-                do_not_play_songs: [],
-                special_moments: {},
-                timeline_items: [
-                  { time: '5:00 PM', title: 'Cocktail Hour & Guest Arrival', notes: 'Background music' },
-                  { time: '6:00 PM', title: 'Grand Entrance & Welcome', notes: 'Mic announcement' },
-                  { time: '7:00 PM', title: 'Open Dance Floor', notes: 'High energy' }
-                ],
-                vip_names_pronunciations: []
-              };
-
-              const { data: createdPlan, error: createErr } = await window.supabaseClient
-                .from('thunderhouse_event_plans')
-                .insert([newPlan])
-                .select()
-                .single();
-
-              if (!createErr && createdPlan) {
-                renderPortal(createdPlan);
-                return;
-              }
-            }
-          }
-          showPortalError('Event plan not found. Please verify the URL or contact booking@thunderhouseent.com.');
+          showPortalError('This planning link is not valid or has expired. Please use the latest link from Thunder House ENT, or contact booking@thunderhouseent.com.');
           return;
         }
-
         renderPortal(data);
       } catch (err) {
         showPortalError('Error loading event plan: ' + err.message);
@@ -958,18 +912,15 @@
         document.getElementById('hero-invoice-ref').textContent = `Linked to Invoice #${plan.invoice_number} • ${plan.event_type || 'Event'}`;
       }
 
+      // The DJ run-of-show page is staff-only (it needs a staff login)
       const runOfShowBtn = document.getElementById('btn-view-dj-runofshow');
-      if (runOfShowBtn) {
-        if (plan.portal_token) {
-          runOfShowBtn.href = `gigs.html?token=${encodeURIComponent(plan.portal_token)}`;
-        } else if (plan.id) {
-          runOfShowBtn.href = `gigs.html?id=${encodeURIComponent(plan.id)}`;
-        }
-      }
+      if (runOfShowBtn) runOfShowBtn.style.display = 'none';
 
       const contractBtn = document.getElementById('btn-view-contract');
-      if (contractBtn && plan.invoice_number) {
-        contractBtn.href = `contract.html?invoice=${encodeURIComponent(plan.invoice_number)}`;
+      if (contractBtn && plan.invoice_number && plan.client_key) {
+        contractBtn.href = `contract.html?invoice=${encodeURIComponent(plan.invoice_number)}&key=${encodeURIComponent(plan.client_key)}`;
+      } else if (contractBtn) {
+        contractBtn.style.display = 'none';
       }
 
       // Countdown & badges (if present)
@@ -1489,9 +1440,11 @@
       activePlan.last_saved_at = new Date().toISOString();
 
       try {
-        const { error } = await window.supabaseClient
-          .from('thunderhouse_event_plans')
-          .update({
+        const { error } = await window.supabaseClient.rpc('client_save_plan', {
+          p_token: portalAccess.token,
+          p_invoice: portalAccess.invoice,
+          p_key: portalAccess.key,
+          p_data: {
             spotify_playlist_url: activePlan.spotify_playlist_url,
             genres_preferred: activePlan.genres_preferred || [],
             genres_avoid: activePlan.genres_avoid || [],
@@ -1502,11 +1455,9 @@
             timeline_items: activePlan.timeline_items || [],
             vip_names_pronunciations: activePlan.vip_names_pronunciations || [],
             special_announcements: activePlan.special_announcements,
-            mc_notes: activePlan.mc_notes,
-            last_saved_at: activePlan.last_saved_at,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', activePlan.id);
+            mc_notes: activePlan.mc_notes
+          }
+        });
 
         if (error) throw error;
 

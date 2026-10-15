@@ -509,11 +509,12 @@
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const urlParams = new URLSearchParams(window.location.search);
-      const invoiceId = urlParams.get('id');
       const invoiceNum = urlParams.get('num');
+      const invoiceKey = urlParams.get('key');
+      window.invoiceKey = invoiceKey;
 
-      if (!invoiceId && !invoiceNum) {
-        showError('No invoice ID or invoice number specified in link.');
+      if (!invoiceNum || !invoiceKey) {
+        showError('This invoice link is incomplete. Please use the link sent by Thunder House ENT.');
         return;
       }
 
@@ -523,40 +524,20 @@
       }
 
       try {
-        let query = window.supabaseClient.from('thunderhouse_invoices').select('*');
-        if (invoiceId) {
-          query = query.eq('id', invoiceId);
-        } else {
-          query = query.eq('invoice_number', invoiceNum);
-        }
-
-        const { data, error } = await query.maybeSingle();
+        // The server checks the secret link and returns only this client's invoice
+        const { data, error } = await window.supabaseClient.rpc('client_get_invoice', {
+          p_invoice: invoiceNum, p_key: invoiceKey
+        });
 
         if (error) throw error;
         if (!data) {
-          showError('Invoice not found. Please verify the link or contact Thunder House ENT.');
+          showError('This invoice link is not valid or has expired. Please contact Thunder House ENT.');
           return;
         }
 
-        // Check if returning from a successful hosted Square checkout
+        // Returning from Square checkout: payment status is updated by Thunder House (not by the browser)
         if (urlParams.get('paid') === 'true' && data.status !== 'Paid') {
-          try {
-            await window.supabaseClient
-              .from('thunderhouse_invoices')
-              .update({
-                status: 'Paid',
-                amount_paid: data.total_amount,
-                balance_due: 0,
-                payment_method: 'Square Hosted Checkout',
-                updated_at: new Date().toISOString()
-              })
-              .eq('id', data.id);
-            data.status = 'Paid';
-            data.amount_paid = data.total_amount;
-            data.balance_due = 0;
-          } catch (e) {
-            console.warn('Status update notice:', e);
-          }
+          data.notes = '✅ Payment submitted. Thank you! Your receipt is on its way from Square, and this invoice will update once Thunder House ENT confirms it.' + (data.notes ? '\n\n' + data.notes : '');
         }
 
         renderInvoice(data);
@@ -666,7 +647,7 @@
       // VIP Planning Hub button link
       const portalBtn = document.getElementById('btn-open-client-portal');
       if (portalBtn && inv.invoice_number) {
-        portalBtn.href = `/portal?invoice=${encodeURIComponent(inv.invoice_number)}`;
+        portalBtn.href = `/portal?invoice=${encodeURIComponent(inv.invoice_number)}&key=${encodeURIComponent(window.invoiceKey || '')}`;
       }
 
       // Check & Render Contract Status Banner
@@ -677,17 +658,13 @@
       const banner = document.getElementById('invoice-contract-banner');
       const topBtn = document.getElementById('btn-top-contract');
       if (topBtn && inv.invoice_number) {
-        topBtn.href = `/contract?invoice=${encodeURIComponent(inv.invoice_number)}`;
+        topBtn.href = `/contract?invoice=${encodeURIComponent(inv.invoice_number)}&key=${encodeURIComponent(window.invoiceKey || '')}`;
       }
 
       if (!banner) return;
 
       try {
-        const { data: contract } = await window.supabaseClient
-          .from('thunderhouse_contracts')
-          .select('id, status, signed_at, contract_token')
-          .eq('invoice_number', inv.invoice_number)
-          .maybeSingle();
+        const contract = inv.contract || null; // returned by client_get_invoice
 
         const isSigned = (contract && contract.status === 'Signed') || (inv.contract_status === 'Signed');
 
@@ -703,7 +680,7 @@
                 <span style="font-size: 0.82rem; color: #a7f3d0;">Your performance contract is signed and legally binding under Oklahoma law.</span>
               </div>
             </div>
-            <a href="/contract?invoice=${encodeURIComponent(inv.invoice_number)}" target="_blank" class="btn btn-outline btn-sm" style="border-color: #10b981; color: #34d399; font-size: 0.82rem;">
+            <a href="/contract?invoice=${encodeURIComponent(inv.invoice_number)}&key=${encodeURIComponent(window.invoiceKey || '')}" target="_blank" class="btn btn-outline btn-sm" style="border-color: #10b981; color: #34d399; font-size: 0.82rem;">
               <i class="fa-solid fa-file-contract"></i> View Signed Contract
             </a>
           `;
@@ -723,7 +700,7 @@
                 <span style="font-size: 0.82rem; color: #fde68a;">Please review and digitally sign your event contract prior to or upon deposit payment.</span>
               </div>
             </div>
-            <a href="/contract?invoice=${encodeURIComponent(inv.invoice_number)}" target="_blank" class="btn btn-primary btn-sm" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #000; font-weight: 800; border: none; font-size: 0.82rem;">
+            <a href="/contract?invoice=${encodeURIComponent(inv.invoice_number)}&key=${encodeURIComponent(window.invoiceKey || '')}" target="_blank" class="btn btn-primary btn-sm" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #000; font-weight: 800; border: none; font-size: 0.82rem;">
               <i class="fa-solid fa-pen-nib"></i> Review & Sign Contract
             </a>
           `;

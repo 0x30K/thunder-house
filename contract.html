@@ -964,6 +964,7 @@
     // =========================================================================
     let currentContract = null;
     let linkedInvoice = null;
+    let contractKey = null; // secret client key from the link
     let signatureMode = 'draw'; // 'draw' or 'type'
     let isDrawing = false;
     let canvas, ctx;
@@ -1099,11 +1100,11 @@
       const cardEl = document.getElementById('contract-content-card');
 
       const urlParams = new URLSearchParams(window.location.search);
-      const paramToken = urlParams.get('token');
       const paramInvoice = urlParams.get('invoice');
-      const paramId = urlParams.get('id');
+      const paramKey = urlParams.get('key');
+      contractKey = paramKey;
 
-      if (!paramToken && !paramInvoice && !paramId) {
+      if (!paramInvoice || !paramKey) {
         loadingEl.innerHTML = `
           <div style="font-size: 2.5rem; color: var(--cyber-red); margin-bottom: 1rem;"><i class="fa-solid fa-triangle-exclamation"></i></div>
           <h3 style="color: #fff; font-family: var(--font-heading); margin-bottom: 0.5rem;">No Contract Specified</h3>
@@ -1116,48 +1117,23 @@
       try {
         if (!window.supabaseClient) throw new Error('Database client offline.');
 
-        let query = window.supabaseClient.from('thunderhouse_contracts').select('*');
-        if (paramToken) query = query.eq('contract_token', paramToken);
-        else if (paramInvoice) query = query.eq('invoice_number', paramInvoice);
-        else if (paramId) query = query.eq('id', paramId);
-
-        let { data, error } = await query.maybeSingle();
-
-        // Stale JWT fallback
-        if (error && (String(error.message || '').includes('JWT') || error.code === 'PGRST301' || error.status === 401)) {
-          localStorage.removeItem('sb-kxoivmflghfgtvawhktt-auth-token');
-          const retryRes = await query.maybeSingle();
-          data = retryRes.data;
-          error = retryRes.error;
-        }
-
+        // The server checks the secret link, and drafts the agreement from the invoice on first visit
+        const { data, error } = await window.supabaseClient.rpc('client_get_contract', {
+          p_invoice: paramInvoice, p_key: paramKey
+        });
         if (error) throw error;
-
-        // If no contract found but an invoice number was provided, auto-create a contract draft!
-        if (!data && paramInvoice) {
-          data = await autoCreateContractFromInvoice(paramInvoice);
-        }
 
         if (!data) {
           loadingEl.innerHTML = `
             <div style="font-size: 2.5rem; color: var(--cyber-gold); margin-bottom: 1rem;"><i class="fa-solid fa-file-circle-question"></i></div>
             <h3 style="color: #fff; font-family: var(--font-heading); margin-bottom: 0.5rem;">Contract Not Found</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">No entertainment agreement found for the requested reference.</p>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">This agreement link is not valid or has expired. Please use the latest link from Thunder House ENT.</p>
           `;
           return;
         }
 
         currentContract = data;
-
-        // Fetch linked invoice details for Square link
-        if (currentContract.invoice_number) {
-          const { data: invData } = await window.supabaseClient
-            .from('thunderhouse_invoices')
-            .select('*')
-            .eq('invoice_number', currentContract.invoice_number)
-            .maybeSingle();
-          linkedInvoice = invData;
-        }
+        linkedInvoice = data.invoice || null;
 
         renderContract(currentContract);
         loadingEl.style.display = 'none';
@@ -1173,69 +1149,6 @@
       }
     }
 
-    async function autoCreateContractFromInvoice(invNum) {
-      const { data: inv } = await window.supabaseClient
-        .from('thunderhouse_invoices')
-        .select('*')
-        .eq('invoice_number', invNum)
-        .maybeSingle();
-
-      if (!inv) return null;
-
-      // Also grab event plan if available
-      const { data: plan } = await window.supabaseClient
-        .from('thunderhouse_event_plans')
-        .select('*')
-        .eq('invoice_number', invNum)
-        .maybeSingle();
-
-      const token = `th-contract-${invNum.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
-      const total = parseFloat(inv.total_amount || 0);
-      const deposit = parseFloat(inv.deposit_requested || (total * 0.3));
-      const balance = total - deposit;
-
-      // Extract add-on descriptions from invoice items
-      const items = inv.items || [];
-      const packageItem = items[0] ? items[0].description : 'Custom Entertainment Experience';
-      const addOns = items.slice(1).map(i => `${i.description} (${i.quantity || 1}x)`);
-
-      const newContract = {
-        contract_token: token,
-        invoice_number: inv.invoice_number,
-        inquiry_id: inv.inquiry_id,
-        client_name: inv.client_name,
-        client_email: inv.client_email,
-        client_phone: inv.client_phone,
-        client_address: inv.venue_city || 'Oklahoma City, OK',
-        event_type: plan ? plan.event_type : 'Event Celebration',
-        event_date: inv.event_date,
-        event_start_time: '5:00 PM',
-        event_end_time: '11:00 PM',
-        venue_name: plan ? plan.venue_name : inv.venue_city,
-        venue_address: plan ? plan.venue_address : inv.venue_city,
-        total_amount: total,
-        deposit_amount: deposit,
-        balance_due: balance,
-        overtime_rate: 150.00,
-        package_name: packageItem,
-        included_addons: addOns,
-        status: 'Pending Signature'
-      };
-
-      const { data: created, error } = await window.supabaseClient
-        .from('thunderhouse_contracts')
-        .insert([newContract])
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Failed to auto-create contract:', error);
-        return null;
-      }
-
-      return created;
-    }
-
     // =========================================================================
     // RENDER CONTRACT
     // =========================================================================
@@ -1245,13 +1158,13 @@
       // Top links
       if (contract.invoice_number) {
         const invBtn = document.getElementById('btn-top-invoice-link');
-        invBtn.href = `invoice.html?num=${encodeURIComponent(contract.invoice_number)}`;
+        invBtn.href = `invoice.html?num=${encodeURIComponent(contract.invoice_number)}${contractKey ? '&key=' + encodeURIComponent(contractKey) : ''}`;
         invBtn.style.display = 'inline-flex';
       }
 
       const portalBtn = document.getElementById('btn-top-portal-link');
       if (contract.invoice_number) {
-        portalBtn.href = `portal.html?invoice=${encodeURIComponent(contract.invoice_number)}`;
+        portalBtn.href = `portal.html?invoice=${encodeURIComponent(contract.invoice_number)}${contractKey ? '&key=' + encodeURIComponent(contractKey) : ''}`;
         portalBtn.style.display = 'inline-flex';
       }
 
@@ -1353,12 +1266,12 @@
         if (linkedInvoice && linkedInvoice.square_payment_link) {
           payBtn.href = linkedInvoice.square_payment_link;
         } else if (contract.invoice_number) {
-          payBtn.href = `invoice.html?num=${encodeURIComponent(contract.invoice_number)}`;
+          payBtn.href = `invoice.html?num=${encodeURIComponent(contract.invoice_number)}${contractKey ? '&key=' + encodeURIComponent(contractKey) : ''}`;
         }
 
         const openVipBtn = document.getElementById('btn-open-vip-post');
         if (contract.invoice_number) {
-          openVipBtn.href = `portal.html?invoice=${encodeURIComponent(contract.invoice_number)}`;
+          openVipBtn.href = `portal.html?invoice=${encodeURIComponent(contract.invoice_number)}${contractKey ? '&key=' + encodeURIComponent(contractKey) : ''}`;
         }
 
       } else {
@@ -1414,34 +1327,18 @@
       const userAgent = navigator.userAgent;
 
       try {
-        // 1. Update Thunderhouse Contracts
-        const { error: contractErr } = await window.supabaseClient
-          .from('thunderhouse_contracts')
-          .update({
-            status: 'Signed',
-            signer_name: signerName,
-            signer_title: signerTitle,
-            signature_data: sigData,
-            signature_type: signatureMode,
-            signed_at: nowIso,
-            signer_user_agent: userAgent,
-            updated_at: nowIso
-          })
-          .eq('id', currentContract.id);
+        // Record the signature on the server (also marks the linked invoice as signed)
+        const { error: contractErr } = await window.supabaseClient.rpc('client_sign_contract', {
+          p_invoice: currentContract.invoice_number,
+          p_key: contractKey,
+          p_signer_name: signerName,
+          p_signer_title: signerTitle,
+          p_signature_data: sigData,
+          p_signature_type: signatureMode,
+          p_user_agent: userAgent
+        });
 
         if (contractErr) throw contractErr;
-
-        // 2. Update linked invoice contract_status
-        if (currentContract.invoice_number) {
-          await window.supabaseClient
-            .from('thunderhouse_invoices')
-            .update({
-              contract_status: 'Signed',
-              contract_signed_at: nowIso,
-              updated_at: nowIso
-            })
-            .eq('invoice_number', currentContract.invoice_number);
-        }
 
         // 3. Update local state & re-render
         currentContract.status = 'Signed';

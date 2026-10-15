@@ -1100,28 +1100,6 @@
             lineItems.push({ description: a.name, quantity: 1, rate: a.rate, amount: a.rate });
           });
 
-          // Generate Square link
-          let sqLink = null;
-          try {
-            const sqRes = await fetch('https://kxoivmflghfgtvawhktt.supabase.co/functions/v1/square-payment', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                action: 'create_payment_link',
-                invoice_data: {
-                  invoice_number: invNum,
-                  client_name: clientName,
-                  client_email: clientEmail,
-                  total_amount: totalQuoted,
-                  balance_due: depositRequested
-                }
-              })
-            });
-            const sqData = await sqRes.json();
-            if (sqData.success) sqLink = sqData.payment_link;
-          } catch (e) {
-            console.warn('Square auto-link notice:', e);
-          }
 
           // Insert invoice
           const { data: invCreated } = await window.supabaseClient
@@ -1137,7 +1115,6 @@
               issue_date: new Date().toISOString().slice(0, 10),
               due_date: new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10),
               status: 'Sent',
-              square_payment_link: sqLink,
               items: lineItems,
               subtotal: totalQuoted,
               total_amount: totalQuoted,
@@ -1149,6 +1126,22 @@
             }])
             .select()
             .single();
+
+          // Square payment link (created after the invoice exists so the return link carries its key)
+          let sqLink = null;
+          if (invCreated && invCreated.id) {
+            try {
+              const sqRes = await fetch('https://kxoivmflghfgtvawhktt.supabase.co/functions/v1/square-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'create_payment_link', invoice_id: invCreated.id })
+              });
+              const sqData = await sqRes.json();
+              if (sqData.success) sqLink = sqData.payment_link;
+            } catch (sqErr) {
+              console.warn('Square auto-link generation notice:', sqErr);
+            }
+          }
 
           // Link invoice back to intake
           if (invCreated) {

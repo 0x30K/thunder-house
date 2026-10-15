@@ -3634,6 +3634,12 @@
     // INVOICING & CUSTOM BILLING SYSTEM STATE & LOGIC
     // =========================================================================
     let allInvoices = [];
+    // Client links (invoice / contract / portal) must carry the invoice's secret client_key
+    function invKey(invNum) {
+      const i = allInvoices.find(x => x.invoice_number === invNum);
+      return i && i.client_key ? `&key=${encodeURIComponent(i.client_key)}` : '';
+    }
+    const randomPortalToken = () => 'th-' + crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '');
     let currentInvoiceFilter = 'All';
     let editingInvoiceId = null;
 
@@ -3757,7 +3763,7 @@
             <td>
               <div style="font-weight: 700; color: #fff; font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem;">
                 <i class="fa-solid fa-bolt" style="color: var(--primary); font-size: 0.75rem;"></i>
-                <a href="/invoice?num=${encodeURIComponent(inv.invoice_number)}" target="_blank" style="color: #fff; text-decoration: underline; text-underline-offset: 3px;" title="Open Public Invoice">
+                <a href="/invoice?num=${encodeURIComponent(inv.invoice_number)}${invKey(inv.invoice_number)}" target="_blank" style="color: #fff; text-decoration: underline; text-underline-offset: 3px;" title="Open Public Invoice">
                   ${escapeHtml(inv.invoice_number)}
                 </a>
               </div>
@@ -3798,16 +3804,16 @@
             </td>
             <td>
               <div style="display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap;">
-                <a href="/invoice?num=${encodeURIComponent(inv.invoice_number)}" target="_blank" class="btn-action-sm" title="View Public Invoice Link">
+                <a href="/invoice?num=${encodeURIComponent(inv.invoice_number)}${invKey(inv.invoice_number)}" target="_blank" class="btn-action-sm" title="View Public Invoice Link">
                   <i class="fa-solid fa-arrow-up-right-from-square"></i>
                 </a>
                 <button class="btn-action-sm" onclick="copyInvoiceLink('${escapeHtml(inv.invoice_number)}')" title="Copy Client Invoice Link">
                   <i class="fa-solid fa-link"></i>
                 </button>
-                <a href="/contract?invoice=${encodeURIComponent(inv.invoice_number)}" target="_blank" class="btn-action-sm" title="Open Legal Performance Contract & E-Signature" style="color: var(--accent-gold);">
+                <a href="/contract?invoice=${encodeURIComponent(inv.invoice_number)}${invKey(inv.invoice_number)}" target="_blank" class="btn-action-sm" title="Open Legal Performance Contract & E-Signature" style="color: var(--accent-gold);">
                   <i class="fa-solid fa-file-signature"></i>
                 </a>
-                <a href="/portal?invoice=${encodeURIComponent(inv.invoice_number)}" target="_blank" class="btn-action-sm" title="Open Client VIP Planning & Music Hub" style="color: var(--accent-gold);">
+                <a href="/portal?invoice=${encodeURIComponent(inv.invoice_number)}${invKey(inv.invoice_number)}" target="_blank" class="btn-action-sm" title="Open Client VIP Planning & Music Hub" style="color: var(--accent-gold);">
                   <i class="fa-solid fa-compact-disc"></i>
                 </a>
                 <a href="/gigs?invoice=${encodeURIComponent(inv.invoice_number)}" target="_blank" class="btn-action-sm" title="Open DJ Run of Show & Gig Pack" style="color: var(--primary);">
@@ -4408,7 +4414,7 @@
     }
 
     function copyInvoiceLink(invoiceNum) {
-      const url = `${window.location.origin}/invoice?num=${encodeURIComponent(invoiceNum)}`;
+      const url = `${window.location.origin}/invoice?num=${encodeURIComponent(invoiceNum)}${invKey(invoiceNum)}`;
       navigator.clipboard.writeText(url).then(() => {
         alert(`Invoice public link copied to clipboard:\n${url}`);
       }).catch(() => {
@@ -4418,11 +4424,11 @@
 
     function openPortalForInvoice(invNum) {
       if (!invNum) return;
-      window.open(`/portal?invoice=${encodeURIComponent(invNum)}`, '_blank');
+      window.open(`/portal?invoice=${encodeURIComponent(invNum)}${invKey(invNum)}`, '_blank');
     }
 
     function copyPortalLink(invNum) {
-      const url = `${window.location.origin}/portal?invoice=${encodeURIComponent(invNum)}`;
+      const url = `${window.location.origin}/portal?invoice=${encodeURIComponent(invNum)}${invKey(invNum)}`;
       navigator.clipboard.writeText(url).then(() => {
         alert(`⚡ Client VIP Planning Portal Link Copied to Clipboard!\n\n${url}`);
       }).catch(() => {
@@ -4448,12 +4454,12 @@
         // Check if an invoice exists for this inquiry
         const { data: inv } = await window.supabaseClient
           .from('thunderhouse_invoices')
-          .select('invoice_number')
+          .select('invoice_number, client_key')
           .eq('inquiry_id', inquiryId)
           .maybeSingle();
 
         if (inv && inv.invoice_number) {
-          window.open(`/portal?invoice=${encodeURIComponent(inv.invoice_number)}`, '_blank');
+          window.open(`/portal?invoice=${encodeURIComponent(inv.invoice_number)}&key=${encodeURIComponent(inv.client_key)}`, '_blank');
           return;
         }
 
@@ -4469,7 +4475,7 @@
           return;
         }
 
-        const token = `th-vip-${inq.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Date.now().toString(36)}`;
+        const token = randomPortalToken();
         const { data: newPlan, error } = await window.supabaseClient
           .from('thunderhouse_event_plans')
           .insert([{
@@ -4786,28 +4792,6 @@
           lineItems.push({ description: a.name, quantity: 1, rate: a.rate, amount: a.rate });
         });
 
-        // 1. Generate Square payment link
-        let sqLink = null;
-        try {
-          const sqRes = await fetch('https://kxoivmflghfgtvawhktt.supabase.co/functions/v1/square-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: 'create_payment_link',
-              invoice_data: {
-                invoice_number: invNum,
-                client_name: item.client_name,
-                client_email: item.client_email,
-                total_amount: total,
-                balance_due: deposit
-              }
-            })
-          });
-          const sqData = await sqRes.json();
-          if (sqData.success) sqLink = sqData.payment_link;
-        } catch (sqErr) {
-          console.warn('Square auto-link generation notice:', sqErr);
-        }
 
         // 2. Insert Invoice
         const { data: invCreated, error: invErr } = await window.supabaseClient
@@ -4823,7 +4807,6 @@
             issue_date: new Date().toISOString().slice(0, 10),
             due_date: new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10),
             status: 'Sent',
-            square_payment_link: sqLink,
             items: lineItems,
             subtotal: total,
             total_amount: total,
@@ -4838,8 +4821,24 @@
 
         if (invErr) throw invErr;
 
+        // Square payment link (created after the invoice exists so the return link carries its key)
+        let sqLink = null;
+        if (invCreated && invCreated.id) {
+          try {
+            const sqRes = await fetch('https://kxoivmflghfgtvawhktt.supabase.co/functions/v1/square-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'create_payment_link', invoice_id: invCreated.id })
+            });
+            const sqData = await sqRes.json();
+            if (sqData.success) sqLink = sqData.payment_link;
+          } catch (sqErr) {
+            console.warn('Square auto-link generation notice:', sqErr);
+          }
+        }
+
         // 3. Create VIP Planning Portal Plan record
-        const token = `th-vip-${invNum.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+        const token = randomPortalToken();
         await window.supabaseClient
           .from('thunderhouse_event_plans')
           .insert([{
@@ -4889,7 +4888,7 @@
               total_amount: total,
               balance_due: deposit,
               square_payment_link: sqLink,
-              invoice_url: `${window.location.origin}/invoice?num=${encodeURIComponent(invNum)}`
+              invoice_url: `${window.location.origin}/invoice?num=${encodeURIComponent(invNum)}&key=${encodeURIComponent(invCreated.client_key)}`
             })
           });
         } catch (emailErr) {

@@ -1280,7 +1280,13 @@
           if (sessErr) {
             console.warn('Auth session check notice:', sessErr);
             localStorage.removeItem('sb-kxoivmflghfgtvawhktt-auth-token');
-          } else if (session && session.user) {
+          }
+          // The run of show holds client contacts and venue details: staff login required
+          if (!session || !session.user) {
+            window.location.href = 'login.html';
+            return;
+          }
+          if (session && session.user) {
             currentUser = session.user;
             // Check staff role
             const { data: staffData } = await window.supabaseClient
