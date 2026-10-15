@@ -521,7 +521,6 @@ function initFaqAccordion() {
    5. BOOKING & INQUIRY FORMS + MODAL
    ========================================================================== */
 function initBookingForms() {
-  const quickStripForm = document.getElementById('quick-booking-form');
   const mainContactForm = document.getElementById('main-contact-form');
   const modal = document.getElementById('booking-modal');
   const modalClose = document.getElementById('modal-close-btn');
@@ -536,23 +535,6 @@ function initBookingForms() {
 
     modal.addEventListener('click', (e) => {
       if (e.target === modal) modal.classList.remove('active');
-    });
-  }
-
-  // Quick Hero Strip Form
-  if (quickStripForm) {
-    quickStripForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const eventType = document.getElementById('strip-event-type').value;
-      const date = document.getElementById('strip-event-date').value;
-      const location = document.getElementById('strip-location').value;
-
-      openBookingModalWithData({
-        eventType: eventType || 'DJ Entertainment Event',
-        date: date || 'Flexible Date',
-        location: location || 'TBD Venue / City',
-        note: 'Quick Availability Check'
-      });
     });
   }
 
