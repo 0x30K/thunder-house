@@ -818,6 +818,12 @@
       border: 1px solid rgba(239, 68, 68, 0.4);
       color: #f87171;
     }
+    /* "Retainer Paid" / "Partially Paid": date locked, balance still open */
+    .status-badge.retainer, .status-badge.partially {
+      background: rgba(255, 183, 3, 0.12);
+      border: 1px solid rgba(255, 183, 3, 0.4);
+      color: var(--accent-gold);
+    }
     .inv-item-row {
       display: grid;
       grid-template-columns: 2.2fr 1.6fr 0.8fr 1.1fr 1.1fr 38px;
@@ -1850,6 +1856,8 @@
             <select id="inv-status-input" class="form-select">
               <option value="Draft">Draft</option>
               <option value="Sent" selected>Sent</option>
+              <option value="Retainer Paid">Retainer Paid (date locked)</option>
+              <option value="Partially Paid">Partially Paid</option>
               <option value="Paid">Paid</option>
               <option value="Overdue">Overdue</option>
             </select>
@@ -1944,7 +1952,7 @@
 
             <div class="form-group">
               <label class="form-label"><i class="fa-solid fa-pen-nib"></i> Notes & Payment Terms for Client</label>
-              <textarea id="inv-notes-input" class="form-control" rows="3" placeholder="e.g. Deposit required to reserve date. Remaining balance due on the day of the event. Thank you for booking Thunder House ENT!"></textarea>
+              <textarea id="inv-notes-input" class="form-control" rows="3" placeholder="e.g. A $200 non-refundable retainer locks your date. Remaining balance due 14 days before the event. Thank you for booking Thunder House ENT!"></textarea>
             </div>
           </div>
 
@@ -2471,7 +2479,7 @@
       tagline: "OKC Event DJ & MC Services • Father & Son Duo",
       heading: "Booking Request Received!",
       intro: "Hi <strong>{client_name}</strong>, thank you for locking in your quote with Thunder House ENT! We have received your event reservation details and temporarily held your requested date on our schedule.",
-      next_steps: "<strong>What's Next?</strong> Our team will review your timeline and reach out within 2 hours to confirm all details. No deposit is required until you are 100% satisfied with your custom timeline.",
+      next_steps: "<strong>What's Next?</strong> Your date is held for 72 hours while we confirm the details. To lock it in, sign your agreement and pay a $200 non-refundable retainer (applied to your total). The balance is due 14 days before your event.",
       footer: "<strong>Thunder House ENT</strong> • Oklahoma City, OK<br>Phone: (405) 283-2533 • Email: <a href=\"mailto:{sender_email}\" style=\"color: #00e5ff; text-decoration: none;\">{sender_email}</a><br><span style=\"font-size: 11px; color: #475569;\">You received this email because you requested a date hold and quote at thunderhouseent.com.</span>"
     };
 
@@ -4272,6 +4280,7 @@
         discount: discount,
         tax: tax,
         total_amount: totalAmount,
+        deposit_requested: Math.min(200, totalAmount),
         amount_paid: paid,
         balance_due: balanceDue,
         updated_at: new Date().toISOString()
@@ -4647,7 +4656,7 @@
       if (!modal || !content) return;
 
       const total = parseFloat(item.total_quoted || 0);
-      const deposit = parseFloat(item.deposit_requested || 500);
+      const deposit = parseFloat(item.deposit_requested || 200);
       const dateStr = item.event_date ? new Date(item.event_date + 'T00:00:00').toLocaleDateString() : 'Date TBD';
 
       const addons = Array.isArray(item.selected_addons) ? item.selected_addons : [];
@@ -4738,7 +4747,7 @@
             <span style="color: var(--primary);">$${total.toFixed(2)}</span>
           </div>
           <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--accent-gold); font-weight: 700; margin-top: 0.25rem;">
-            <span>Date Lock Deposit Required:</span>
+            <span>Date-Lock Retainer Required:</span>
             <span>$${deposit.toFixed(2)}</span>
           </div>
         </div>
@@ -4781,7 +4790,7 @@
       try {
         const invNum = `TH-INV-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
         const total = parseFloat(item.total_quoted || 0);
-        const deposit = parseFloat(item.deposit_requested || 500);
+        const deposit = parseFloat(item.deposit_requested || 200);
 
         const lineItems = [
           { description: item.base_package || 'DJ/MC Performance', quantity: 1, rate: item.base_package_rate || total, amount: item.base_package_rate || total }
@@ -4812,7 +4821,7 @@
             total_amount: total,
             deposit_requested: deposit,
             balance_due: total,
-            notes: `Approved by Superuser. Date lock deposit of $${deposit.toFixed(2)} secures calendar date. Consultation by ${item.consultant_name || 'Staff'}.`,
+            notes: `A $${deposit.toFixed(2)} non-refundable retainer locks your date (applied to your total). Remaining balance due 14 days before the event. Consultation by ${item.consultant_name || 'Staff'}.`,
             consultant_id: item.consultant_id,
             consultant_name: item.consultant_name
           }])

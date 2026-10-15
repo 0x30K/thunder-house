@@ -681,8 +681,8 @@
               <span id="summary-total-rate" style="color: var(--cyber-cyan);">$950.00</span>
             </div>
             <div class="quote-row deposit">
-              <span>Date Reservation Deposit (Due to Lock):</span>
-              <span id="summary-deposit-rate">$500.00</span>
+              <span>Date-Lock Retainer (non-refundable):</span>
+              <span id="summary-deposit-rate">$200.00</span>
             </div>
           </div>
         </div>
@@ -822,7 +822,7 @@
         const noticeTitle = document.getElementById('dispatch-notice-title');
         const noticeDesc = document.getElementById('dispatch-notice-desc');
         if (noticeTitle) noticeTitle.textContent = '⚡ Instant Auto-Send Active';
-        if (noticeDesc) noticeDesc.textContent = 'Upon submission, the client will immediately receive their branded welcome email and the Square deposit link to lock in their date.';
+        if (noticeDesc) noticeDesc.textContent = 'Upon submission, the client will immediately receive their branded welcome email and the Square link for the $200 retainer that locks in their date.';
       }
 
       // Set default date to 30 days from now
@@ -941,7 +941,7 @@
       const pkgRate = parseFloat(selectedPackage.rate || 0);
       const addonsTotal = selectedAddons.reduce((sum, a) => sum + parseFloat(a.rate || 0), 0);
       const grandTotal = pkgRate + addonsTotal;
-      const deposit = Math.min(grandTotal, 500);
+      const deposit = Math.min(grandTotal, 200);
 
       document.getElementById('summary-pkg-name').textContent = selectedPackage.name;
       document.getElementById('summary-pkg-rate').textContent = `$${pkgRate.toFixed(2)}`;
@@ -1026,7 +1026,7 @@
         const pkgRate = parseFloat(selectedPackage.rate || 0);
         const addonsTotal = selectedAddons.reduce((sum, a) => sum + parseFloat(a.rate || 0), 0);
         const totalQuoted = pkgRate + addonsTotal;
-        const depositRequested = Math.min(totalQuoted, 500);
+        const depositRequested = Math.min(totalQuoted, 200);
 
         // Consultant Info
         const consultantName = document.getElementById('staff-name-display').textContent.replace('Consultant: ', '').trim();
@@ -1120,7 +1120,7 @@
               total_amount: totalQuoted,
               deposit_requested: depositRequested,
               balance_due: totalQuoted,
-              notes: `Date reservation deposit of $${depositRequested.toFixed(2)} holds event date. Quoted by ${consultantName}.`,
+              notes: `A $${depositRequested.toFixed(2)} non-refundable retainer locks your date (applied to your total). Remaining balance due 14 days before the event. Quoted by ${consultantName}.`,
               consultant_id: consultantId,
               consultant_name: consultantName
             }])

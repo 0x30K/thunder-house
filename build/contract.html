@@ -755,7 +755,7 @@
           </div>
 
           <p class="legal-p">
-            <strong>Retainer:</strong> The Initial Date-Lock Retainer is non-refundable and constitutes reservation of the specific date, pre-production planning, and mutual commitment. The remaining balance is due seven (7) business days prior to showtime.
+            <strong>Retainer:</strong> The Initial Date-Lock Retainer is non-refundable and constitutes reservation of the specific date, pre-production planning, and mutual commitment. The remaining balance is due fourteen (14) days prior to the event date.
           </p>
         </div>
 
@@ -929,13 +929,13 @@
           Agreement Legally Executed! 🎉
         </h3>
         <p style="color: #cbd5e1; font-size: 0.92rem; max-width: 600px; margin: 0 auto 1.5rem auto;">
-          Your signature has been registered and certified under Oklahoma law. The final step to lock in your calendar date is securing your deposit.
+          Your signature has been registered and certified under Oklahoma law. The final step to lock in your calendar date is your date-lock retainer.
         </p>
 
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
           <!-- Pay Deposit Button -->
           <a id="btn-pay-deposit-post" href="#" target="_blank" class="btn btn-primary" style="background: linear-gradient(135deg, var(--cyber-gold), #d97706); color: #000; font-weight: 800; border: none; padding: 0.75rem 1.5rem;">
-            <i class="fa-solid fa-credit-card"></i> Pay Date Retainer (<span id="post-deposit-amount">$500.00</span>)
+            <i class="fa-solid fa-credit-card"></i> Pay Date Retainer (<span id="post-deposit-amount">$200.00</span>)
           </a>
 
           <!-- Open VIP Music Hub -->
@@ -1200,7 +1200,7 @@
       document.getElementById('sum-venue-city').textContent = contract.venue_address || contract.client_address || 'Oklahoma City, OK';
 
       const totalVal = parseFloat(contract.total_amount || 0);
-      const depositVal = parseFloat(contract.deposit_amount || (totalVal * 0.3));
+      const depositVal = parseFloat(contract.deposit_amount || Math.min(200, totalVal));
       const balanceVal = parseFloat(contract.balance_due !== undefined ? contract.balance_due : (totalVal - depositVal));
 
       document.getElementById('sum-total-amount').textContent = `$${totalVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -1262,11 +1262,10 @@
         postCard.style.display = 'block';
         document.getElementById('post-deposit-amount').textContent = `$${depositVal.toFixed(2)}`;
 
+        // The invoice page charges exactly what's due (the retainer now, the balance later)
         const payBtn = document.getElementById('btn-pay-deposit-post');
-        if (linkedInvoice && linkedInvoice.square_payment_link) {
-          payBtn.href = linkedInvoice.square_payment_link;
-        } else if (contract.invoice_number) {
-          payBtn.href = `invoice.html?num=${encodeURIComponent(contract.invoice_number)}${contractKey ? '&key=' + encodeURIComponent(contractKey) : ''}`;
+        if (contract.invoice_number) {
+          payBtn.href = `invoice.html?num=${encodeURIComponent(contract.invoice_number)}${contractKey ? '&key=' + encodeURIComponent(contractKey) : ''}#inv-payment-section`;
         }
 
         const openVipBtn = document.getElementById('btn-open-vip-post');

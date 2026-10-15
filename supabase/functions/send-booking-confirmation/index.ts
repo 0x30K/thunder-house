@@ -316,7 +316,7 @@ Email: ${smtpUser}`;
 
     const clientPlainText = `Hi ${client_name},
 
-Thank you for locking in your quote with Thunder House ENT! We have received your event reservation details and temporarily held your requested date on our schedule.
+Thank you for locking in your quote with Thunder House ENT! We have received your event details and are holding your requested date for 72 hours.
 
 RESERVATION SUMMARY:
 - Client Name: ${client_name}
@@ -327,7 +327,7 @@ RESERVATION SUMMARY:
 - Estimated Investment: ${formattedTotal}
 
 WHAT HAPPENS NEXT:
-Our team will review your timeline and reach out within 2 hours to confirm all details. No deposit is required until you are 100% satisfied with your custom timeline.
+We'll reach out within 24 hours to confirm the details. To lock in your date, sign your performance agreement and pay a $200 non-refundable retainer (applied to your total). The remaining balance is due 14 days before your event.
 
 If you have questions, reply directly to this email or call us at (405) 283-2533.
 
@@ -357,7 +357,7 @@ Email: booking@thunderhouseent.com`;
         ⚡ Booking Request Received!
       </h2>
       <p style="color: #cbd5e1; font-size: 15px; line-height: 1.55; margin: 0;">
-        Hi <strong>${escapeHtml(client_name)}</strong>, thank you for locking in your quote with Thunder House ENT! We have received your event reservation details and temporarily held your requested date on our schedule.
+        Hi <strong>${escapeHtml(client_name)}</strong>, thank you for locking in your quote with Thunder House ENT! We have received your event details and are holding your requested date for 72 hours.
       </p>
     </div>
 
@@ -391,7 +391,7 @@ Email: booking@thunderhouseent.com`;
 
     <div style="background: rgba(34, 197, 94, 0.08); border-left: 3px solid #22c55e; border-radius: 4px; padding: 14px 16px; margin-bottom: 24px;">
       <p style="color: #86efac; font-size: 13.5px; line-height: 1.5; margin: 0;">
-        <strong>What's Next?</strong> Our team will review your timeline and reach out within 2 hours to confirm all details. No deposit is required until you are 100% satisfied with your custom timeline.
+        <strong>What's Next?</strong> We'll reach out within 24 hours to confirm the details. To lock in your date, sign your performance agreement and pay a $200 non-refundable retainer (applied to your total). The remaining balance is due 14 days before your event.
       </p>
     </div>
 
