@@ -8,6 +8,7 @@
     { "source": "/intake", "destination": "/intake.html" },
     { "source": "/gigs", "destination": "/gigs.html" },
     { "source": "/runofshow", "destination": "/gigs.html" },
-    { "source": "/contract", "destination": "/contract.html" }
+    { "source": "/contract", "destination": "/contract.html" },
+    { "source": "/thank-you", "destination": "/thank-you.html" }
   ]
 }

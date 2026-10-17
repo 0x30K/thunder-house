@@ -1043,6 +1043,18 @@ function initBookingForms() {
         submitBtn.innerHTML = originalBtnHtml;
       }
 
+      // Show the full thank-you page. Details travel in sessionStorage, never in the URL.
+      try {
+        sessionStorage.setItem('th_quote_result', JSON.stringify({
+          name: clientName, email: clientEmail, date: eventDate, time: eventTime,
+          package: quote.package, total: quote.total,
+          held: !!(holdResult && holdResult.held), hours: holdResult ? holdResult.hold_hours : null,
+          reason: holdResult ? holdResult.reason : null, at: Date.now()
+        }));
+        window.location.href = '/thank-you';
+        return;
+      } catch (e) { /* storage blocked: fall back to the quick message below */ }
+
       if (modal) modal.classList.remove('active');
       if (holdResult && holdResult.held) {
         showToast(`📅 Your date is held for ${holdResult.hold_hours} hours, ${clientName}! Check ${clientEmail} for next steps.`);

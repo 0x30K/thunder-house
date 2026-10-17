@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thank You | Thunder House ENT</title>
+  <meta name="robots" content="noindex">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Custom Design System Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/images/branding/Thunder House Logo-PNG.png">
+
+  <style>
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 15% 0%, rgba(0, 229, 255, 0.14), transparent 55%),
+        radial-gradient(ellipse at 85% 100%, rgba(255, 0, 85, 0.12), transparent 55%),
+        var(--bg-main);
+    }
+    .ty-wrap { max-width: 760px; margin: 0 auto; padding: 3rem 1rem 4rem; }
+    .ty-logo { display: block; margin: 0 auto 2rem; width: 150px; }
+    .ty-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+    .ty-icon {
+      width: 76px; height: 76px; margin: 0 auto 1.25rem; border-radius: 50%;
+      display: grid; place-items: center; font-size: 2rem;
+      background: rgba(0, 229, 255, 0.12); color: var(--primary); box-shadow: var(--shadow-neon);
+    }
+    .ty-card.warn .ty-icon { background: rgba(255, 183, 3, 0.12); color: var(--accent-gold); box-shadow: var(--shadow-gold); }
+    .ty-card h1 { font-family: var(--font-heading); font-size: clamp(1.8rem, 5vw, 2.5rem); margin: 0 0 0.75rem; }
+    .ty-lead { color: var(--text-light); font-size: 1.08rem; line-height: 1.6; margin: 0 auto 1.75rem; max-width: 560px; }
+    .ty-hold {
+      display: inline-flex; flex-direction: column; gap: 0.25rem;
+      border: 1px solid var(--border-gold); background: rgba(255, 183, 3, 0.08);
+      border-radius: var(--radius-md); padding: 1rem 1.5rem; margin-bottom: 2rem;
+    }
+    .ty-hold .label { color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; }
+    .ty-hold .date { font-family: var(--font-heading); font-size: 1.35rem; color: #fff; }
+    .ty-hold .until { color: var(--accent-gold); font-weight: 600; }
+    .ty-summary { color: var(--text-muted); font-size: 0.92rem; margin: -1rem 0 2rem; }
+    .ty-steps { text-align: left; display: grid; gap: 1rem; margin: 0 0 2.25rem; padding: 0; list-style: none; }
+    .ty-steps li {
+      display: flex; gap: 1rem; align-items: flex-start;
+      background: var(--bg-glass); border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md); padding: 1rem 1.15rem;
+    }
+    .ty-steps .num {
+      flex: 0 0 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+      background: rgba(0, 229, 255, 0.12); color: var(--primary); font-weight: 800;
+    }
+    .ty-steps b { display: block; color: #fff; margin-bottom: 0.2rem; }
+    .ty-steps span { color: var(--text-light); font-size: 0.94rem; line-height: 1.5; }
+    .ty-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+    .ty-contact { margin-top: 2rem; color: var(--text-muted); font-size: 0.92rem; }
+    .ty-contact a { color: var(--primary); text-decoration: none; }
+    @media (max-width: 560px) { .ty-card { padding: 2rem 1.15rem; } }
+  </style>
+</head>
+<body>
+  <main class="ty-wrap">
+    <a href="/"><img class="ty-logo" src="assets/images/branding/Thunder House Logo-PNG.png" alt="Thunder House ENT"></a>
+
+    <div class="ty-card" id="ty-card">
+      <div class="ty-icon" id="ty-icon"><i class="fa-solid fa-check"></i></div>
+      <h1 id="ty-title">Thank you!</h1>
+      <p class="ty-lead" id="ty-lead">We got your request and will be in touch soon.</p>
+
+      <div id="ty-hold-box"></div>
+      <div class="ty-summary" id="ty-summary"></div>
+
+      <ul class="ty-steps" id="ty-steps">
+        <li><div class="num">1</div><div><b>Check your email</b><span id="ty-email-line">A confirmation is on its way. If you don't see it in a few minutes, check your spam folder.</span></div></li>
+        <li><div class="num">2</div><div><b>We'll send your agreement &amp; invoice</b><span>Our family will review your details and email your performance agreement and invoice.</span></div></li>
+        <li><div class="num">3</div><div><b>Sign &amp; pay the $200 retainer to lock your date</b><span id="ty-lock-line">Your date is officially yours once the agreement is signed and the $200 retainer is paid. The remaining balance is due 14 days before your event.</span></div></li>
+        <li><div class="num">4</div><div><b>Plan your music</b><span>You'll get a private planning portal for your must-play songs, do-not-play list and special moments.</span></div></li>
+      </ul>
+
+      <div class="ty-actions">
+        <a href="/" class="btn btn-primary"><i class="fa-solid fa-house"></i> Back to Homepage</a>
+        <a href="tel:4052832533" class="btn btn-outline"><i class="fa-solid fa-phone"></i> Call (405) 283-2533</a>
+      </div>
+
+      <p class="ty-contact">Questions? Email <a href="mailto:booking@thunderhouseent.com">booking@thunderhouseent.com</a> or DM <a href="https://instagram.com/thunderhouseent" target="_blank" rel="noopener">@thunderhouseent</a></p>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      // The quote form leaves a short summary here (never in the URL) right before it sends people to this page.
+      let d = null;
+      try { d = JSON.parse(sessionStorage.getItem('th_quote_result') || 'null'); } catch (e) { d = null; }
+      if (!d) return; // someone opened /thank-you directly: the generic message is fine
+
+      const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      const first = (d.name || '').trim().split(/\s+/)[0];
+      const isDate = /^\d{4}-\d{2}-\d{2}$/.test(d.date || '');
+      const prettyDate = isDate
+        ? new Date(d.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+        : (d.date || '');
+
+      document.getElementById('ty-title').textContent = first ? `Thank you, ${first}!` : 'Thank you!';
+      if (d.email) document.getElementById('ty-email-line').innerHTML =
+        `A confirmation is on its way to <b style="display:inline;color:#fff">${esc(d.email)}</b>. If you don't see it in a few minutes, check your spam folder.`;
+
+      const bits = [d.package, d.time, d.total ? `Estimated $${Number(d.total).toLocaleString()}` : ''].filter(Boolean);
+      if (bits.length) document.getElementById('ty-summary').textContent = bits.join(' · ');
+
+      if (d.held && isDate) {
+        const hours = Number(d.hours) || 72;
+        const until = new Date((d.at || Date.now()) + hours * 3600 * 1000)
+          .toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+        document.getElementById('ty-lead').textContent =
+          `Your request is in, and we've put a ${hours}-hour hold on your date so no one else can book it while we get your paperwork ready.`;
+        document.getElementById('ty-hold-box').innerHTML = `<div class="ty-hold">
+            <span class="label"><i class="fa-solid fa-calendar-check"></i> Date on hold</span>
+            <span class="date">${esc(prettyDate)}</span>
+            <span class="until">Held for you until ${esc(until)}</span>
+          </div>`;
+        document.getElementById('ty-lock-line').textContent =
+          `Sign the agreement and pay the $200 retainer before your ${hours}-hour hold ends, and the date is officially yours. The remaining balance is due 14 days before your event.`;
+      } else if (d.reason === 'date_unavailable') {
+        document.getElementById('ty-card').classList.add('warn');
+        document.getElementById('ty-icon').innerHTML = '<i class="fa-solid fa-calendar-xmark"></i>';
+        document.getElementById('ty-lead').textContent =
+          `We got your request, but ${prettyDate || 'that date'} was just taken by another booking. We'll reach out with nearby dates that are still open.`;
+      } else {
+        document.getElementById('ty-lead').textContent = prettyDate
+          ? `We got your request for ${prettyDate}. We'll check the calendar and reach out soon.`
+          : 'We got your request and will reach out soon to find the perfect date.';
+      }
+    })();
+  </script>
+</body>
+</html>
