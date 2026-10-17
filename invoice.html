@@ -741,11 +741,7 @@
               <i class="fa-solid fa-file-contract"></i> View Signed Contract
             </a>
           `;
-          if (topBtn) {
-            topBtn.innerHTML = '<i class="fa-solid fa-check-double" style="color: #10b981;"></i> Contract Executed';
-            topBtn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
-            topBtn.style.color = '#34d399';
-          }
+          if (topBtn) topBtn.style.display = 'none';
         } else {
           banner.style.background = 'rgba(255, 183, 3, 0.1)';
           banner.style.border = '1px solid rgba(255, 183, 3, 0.4)';

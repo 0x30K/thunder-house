@@ -112,7 +112,6 @@ Deno.serve(async (req: Request) => {
       const eventDate = inv.event_date ? prettyDate(inv.event_date) : "To Be Scheduled";
       const venueCity = inv.venue_city || "Oklahoma City, OK";
       const invoiceUrl = `${SITE}/invoice?num=${encodeURIComponent(invoiceNumber)}&key=${encodeURIComponent(inv.client_key)}`;
-      const squareLink = inv.square_payment_link || "";
       const notes = inv.notes || "";
       const items = Array.isArray(inv.items) && inv.items.length > 0 ? inv.items : [
         { description: "Thunder House Entertainment Services", quantity: 1, rate: totalAmount, amount: totalAmount }
@@ -167,9 +166,8 @@ LINE ITEMS:
 ${itemsText}
 
 ${notes ? `NOTES / TERMS:\n${notes}\n` : ""}
-VIEW / PAY INVOICE ONLINE:
+VIEW & PAY YOUR INVOICE:
 ${invoiceUrl}
-${squareLink ? `\nPAY DIRECTLY VIA SQUARE:\n${squareLink}\n` : ""}
 
 Thunder House ENT • Oklahoma City, OK
 Phone: (405) 283-2533
@@ -267,12 +265,8 @@ Email: ${smtpUser}`;
     <!-- Action Buttons -->
     <div style="text-align: center; margin-bottom: 26px;">
       <a href="${escapeHtml(invoiceUrl)}" target="_blank" style="display: inline-block; background: #1e6fff; color: #ffffff; font-weight: 800; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 30px; box-shadow: 0 0 25px rgba(30, 111, 255, 0.4); text-transform: uppercase; letter-spacing: 0.5px; margin: 6px;">
-        ⚡ View & Print Invoice Online
+        ⚡ View &amp; Pay Invoice
       </a>
-      ${squareLink ? `
-      <a href="${escapeHtml(squareLink)}" target="_blank" style="display: inline-block; background: #ff3d1f; color: #ffffff; font-weight: 800; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 30px; box-shadow: 0 0 25px rgba(255, 61, 31, 0.45); text-transform: uppercase; letter-spacing: 0.5px; margin: 6px;">
-        💳 Pay Balance via Square
-      </a>` : ""}
     </div>
 
     <!-- Contact & Footer -->
