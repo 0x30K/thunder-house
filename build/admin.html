@@ -320,6 +320,15 @@
       pointer-events: none;
       transition: var(--transition);
     }
+    .inv-num-wrap { position: relative; }
+    .inv-num-wrap .form-control { padding-right: 2.8rem; }
+    .inv-num-wrap .form-control[readonly] { opacity: 0.75; cursor: default; }
+    .inv-num-lock {
+      position: absolute; right: 0.4rem; top: 50%; transform: translateY(-50%);
+      width: 2rem; height: 2rem; border-radius: 6px; border: none; cursor: pointer;
+      background: rgba(255, 183, 3, 0.12); color: var(--accent-gold);
+    }
+    .inv-num-lock.unlocked { background: rgba(0, 229, 255, 0.12); color: var(--primary); cursor: default; }
     .detail-modal-overlay.active {
       opacity: 1;
       pointer-events: auto;
@@ -1864,7 +1873,12 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
           <div class="form-group">
             <label class="form-label">Invoice Number *</label>
-            <input type="text" id="inv-number-input" class="form-control" required placeholder="INV-2026-001">
+            <div class="inv-num-wrap">
+              <input type="text" id="inv-number-input" class="form-control" required placeholder="INV-2026-001" readonly>
+              <button type="button" id="inv-num-lock" class="inv-num-lock" onclick="askUnlockInvoiceNumber()" title="Invoice number is locked. Click to change it." aria-label="Unlock invoice number">
+                <i class="fa-solid fa-lock"></i>
+              </button>
+            </div>
           </div>
           <div class="form-group">
             <label class="form-label">Issue Date</label>
@@ -2038,6 +2052,21 @@
   </div>
 
   <!-- Pending DJ Intakes List Modal -->
+  <!-- Confirm before changing an invoice number -->
+  <div id="inv-num-unlock-modal" class="detail-modal-overlay" style="z-index: 3000; background: rgba(3, 5, 9, 0.82);">
+    <div class="detail-card" style="max-width: 440px; text-align: center; background: #0e121b; border: 1px solid var(--border-gold); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);">
+      <div style="width: 56px; height: 56px; margin: 0 auto 1rem; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 183, 3, 0.12); color: var(--accent-gold); font-size: 1.4rem;">
+        <i class="fa-solid fa-lock-open"></i>
+      </div>
+      <h3 style="font-size: 1.3rem; color: #fff; margin: 0 0 0.6rem;">Change the invoice number?</h3>
+      <p id="inv-num-unlock-msg" style="color: var(--text-light); font-size: 0.92rem; line-height: 1.55; margin: 0 0 1.5rem;"></p>
+      <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeUnlockInvoiceNumber()">No, keep it</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="confirmUnlockInvoiceNumber()" style="background: var(--accent-gold); border-color: var(--accent-gold); color: #000;">Yes, let me edit it</button>
+      </div>
+    </div>
+  </div>
+
   <div id="pending-intakes-modal" class="detail-modal-overlay">
     <div class="detail-card" style="max-width: 850px; width: 95%;">
       <button class="modal-close-btn" onclick="closePendingIntakesModal()">&times;</button>
@@ -3957,6 +3986,37 @@
       }).join('');
     }
 
+    /* Invoice number is locked by default; unlocking asks first */
+    function lockInvoiceNumber() {
+      const input = document.getElementById('inv-number-input');
+      const btn = document.getElementById('inv-num-lock');
+      input.readOnly = true;
+      btn.classList.remove('unlocked');
+      btn.innerHTML = '<i class="fa-solid fa-lock"></i>';
+      btn.title = 'Invoice number is locked. Click to change it.';
+    }
+    function askUnlockInvoiceNumber() {
+      if (!document.getElementById('inv-number-input').readOnly) return;
+      document.getElementById('inv-num-unlock-msg').textContent = editingInvoiceId
+        ? "This invoice already exists. The links in emails you've already sent use this number, so changing it will stop those links from working. You'd need to re-send the invoice."
+        : 'Invoice numbers are filled in automatically, in order. Only change this if you need a specific number.';
+      document.getElementById('inv-num-unlock-modal').classList.add('active');
+    }
+    function closeUnlockInvoiceNumber() {
+      document.getElementById('inv-num-unlock-modal').classList.remove('active');
+    }
+    function confirmUnlockInvoiceNumber() {
+      closeUnlockInvoiceNumber();
+      const input = document.getElementById('inv-number-input');
+      const btn = document.getElementById('inv-num-lock');
+      input.readOnly = false;
+      btn.classList.add('unlocked');
+      btn.innerHTML = '<i class="fa-solid fa-lock-open"></i>';
+      btn.title = 'Invoice number is unlocked';
+      input.focus();
+      input.select();
+    }
+
     function openCreateInvoiceModal(prefillData = null) {
       editingInvoiceId = null;
       document.getElementById('invoice-editor-form').reset();
@@ -3972,6 +4032,7 @@
       const existingSeq = allInvoices.length + 1;
       const invNum = `INV-${currentYear}-${String(existingSeq).padStart(3, '0')}`;
       document.getElementById('inv-number-input').value = invNum;
+      lockInvoiceNumber();
 
       // Dates
       const today = new Date().toISOString().slice(0, 10);
@@ -4030,6 +4091,7 @@
       populateInvoiceLeadSelector(inv.inquiry_id);
 
       document.getElementById('inv-number-input').value = inv.invoice_number || '';
+      lockInvoiceNumber();
       document.getElementById('inv-issue-date-input').value = inv.issue_date || (inv.created_at ? inv.created_at.slice(0, 10) : '');
       document.getElementById('inv-due-date-input').value = inv.due_date || '';
       document.getElementById('inv-status-input').value = inv.status || 'Sent';
