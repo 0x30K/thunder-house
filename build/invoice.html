@@ -280,6 +280,16 @@
       }
     }
   </style>
+<script>
+  /* Dates read like "November 28th, 2026" everywhere a client sees them */
+  function thDate(s) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || '');
+    if (!m) return s || '';
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const d = +m[3], sfx = (d % 100 >= 11 && d % 100 <= 13) ? 'th' : (['th','st','nd','rd'][d % 10] || 'th');
+    return `${months[+m[2] - 1]} ${d}${sfx}, ${m[1]}`;
+  }
+</script>
 </head>
 <body>
 
@@ -564,8 +574,8 @@
       statusEl.textContent = inv.status || 'Sent';
 
       // Dates
-      document.getElementById('inv-display-issue-date').textContent = inv.issue_date || new Date().toLocaleDateString();
-      document.getElementById('inv-display-due-date').textContent = inv.due_date || 'Upon Receipt';
+      document.getElementById('inv-display-issue-date').textContent = thDate(inv.issue_date || new Date().toISOString().slice(0, 10));
+      document.getElementById('inv-display-due-date').textContent = inv.due_date ? thDate(inv.due_date) : 'Upon Receipt';
 
       // Client info
       document.getElementById('inv-display-client-name').textContent = inv.client_name || 'Valued Client';
@@ -575,7 +585,7 @@
       document.getElementById('inv-display-client-contact').textContent = contactParts.join(' • ') || 'No contact provided';
 
       // Event info
-      document.getElementById('inv-display-event-date').textContent = inv.event_date ? new Date(inv.event_date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'To Be Scheduled';
+      document.getElementById('inv-display-event-date').textContent = inv.event_date ? thDate(inv.event_date) : 'To Be Scheduled';
       document.getElementById('inv-display-venue').textContent = inv.venue_city || 'Oklahoma City, OK';
 
       // Items table

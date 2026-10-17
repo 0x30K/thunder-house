@@ -10,6 +10,16 @@ const corsHeaders = {
 
 const SITE = "https://www.thunderhouseent.com";
 
+/** "2026-11-28" -> "November 28th, 2026". Anything else (e.g. "Flexible: Spring 2027") is left as is. */
+function prettyDate(s?: string | null): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || "");
+  if (!m) return s || "";
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const d = +m[3];
+  const sfx = d % 100 >= 11 && d % 100 <= 13 ? "th" : (["th", "st", "nd", "rd"][d % 10] || "th");
+  return `${months[+m[2] - 1]} ${d}${sfx}, ${m[1]}`;
+}
+
 function escapeHtml(str: string): string {
   if (!str) return "";
   return String(str)
@@ -98,8 +108,8 @@ Deno.serve(async (req: Request) => {
       const invoiceNumber = inv.invoice_number;
       const totalAmount = parseFloat(inv.total_amount || 0);
       const balanceDue = parseFloat(inv.balance_due !== undefined && inv.balance_due !== null ? inv.balance_due : totalAmount);
-      const dueDate = inv.due_date || "Upon Receipt";
-      const eventDate = inv.event_date || "To Be Scheduled";
+      const dueDate = inv.due_date ? prettyDate(inv.due_date) : "Upon Receipt";
+      const eventDate = inv.event_date ? prettyDate(inv.event_date) : "To Be Scheduled";
       const venueCity = inv.venue_city || "Oklahoma City, OK";
       const invoiceUrl = `${SITE}/invoice?num=${encodeURIComponent(invoiceNumber)}&key=${encodeURIComponent(inv.client_key)}`;
       const squareLink = inv.square_payment_link || "";
@@ -309,7 +319,7 @@ Email: ${smtpUser}`;
     } = payload;
 
     const formattedTotal = estimated_total ? `$${Number(estimated_total).toLocaleString()}` : "$0";
-    const eventDateText = event_date || "To Be Determined";
+    const eventDateText = event_date ? prettyDate(event_date) : "To Be Determined";
     const eventTimeText = event_time || "Full Event";
     const venueText = venue_city || "Oklahoma City, OK";
     const pkgText = package_name || "Thunder House DJ Package";
@@ -326,7 +336,7 @@ Email: ${smtpUser}`;
 
     const clientPlainText = `Hi ${client_name},
 
-Thank you for locking in your quote with Thunder House ENT! ${holdSentence}
+Thank you for requesting a quote with Thunder House ENT! ${holdSentence}
 
 RESERVATION SUMMARY:
 - Client Name: ${client_name}
@@ -367,7 +377,7 @@ Email: booking@thunderhouseent.com`;
         ⚡ Booking Request Received!
       </h2>
       <p style="color: #cbd5e1; font-size: 15px; line-height: 1.55; margin: 0;">
-        Hi <strong>${escapeHtml(client_name)}</strong>, thank you for locking in your quote with Thunder House ENT! ${holdSentence}
+        Hi <strong>${escapeHtml(client_name)}</strong>, thank you for requesting a quote with Thunder House ENT! ${holdSentence}
       </p>
     </div>
 
@@ -408,7 +418,7 @@ Email: booking@thunderhouseent.com`;
     <div style="text-align: center; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 12px; color: #64748b; line-height: 1.6;">
       <strong style="color: #94a3b8;">Thunder House ENT</strong> • Oklahoma City, OK<br>
       Phone: (405) 283-2533 • Email: <a href="mailto:${smtpUser}" style="color: #3d86ff; text-decoration: none;">${smtpUser}</a><br>
-      <span style="font-size: 11px; color: #475569;">You received this email because you locked in an event quote at thunderhouseent.com.</span>
+      <span style="font-size: 11px; color: #475569;">You received this email because you requested an event quote at thunderhouseent.com.</span>
     </div>
   </div>
 </body>
@@ -442,7 +452,7 @@ Notes: ${notes || "None"}
 
     const adminHtml = `
       <div style="font-family: sans-serif; padding: 20px; background: #0f172a; color: #f8fafc; border-radius: 8px;">
-        <h2 style="color: #3d86ff; margin-top: 0;">New Booking Inquiry Locked In</h2>
+        <h2 style="color: #3d86ff; margin-top: 0;">${payload.held === true ? `New Quote: Date Held ${holdHours} Hours` : "New Quote Request"}</h2>
         <p><strong>Client:</strong> ${escapeHtml(client_name)}</p>
         <p><strong>Email:</strong> <a href="mailto:${escapeHtml(client_email)}" style="color: #3d86ff;">${escapeHtml(client_email)}</a></p>
         <p><strong>Phone:</strong> <a href="tel:${escapeHtml(client_phone)}" style="color: #3d86ff;">${escapeHtml(client_phone)}</a></p>

@@ -619,6 +619,16 @@
       }
     }
   </style>
+<script>
+  /* Dates read like "November 28th, 2026" everywhere a client sees them */
+  function thDate(s) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || '');
+    if (!m) return s || '';
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const d = +m[3], sfx = (d % 100 >= 11 && d % 100 <= 13) ? 'th' : (['th','st','nd','rd'][d % 10] || 'th');
+    return `${months[+m[2] - 1]} ${d}${sfx}, ${m[1]}`;
+  }
+</script>
 </head>
 <body>
 
@@ -1187,8 +1197,8 @@
 
       if (contract.event_date) {
         const dObj = new Date(contract.event_date + 'T00:00:00');
-        document.getElementById('sum-event-date').textContent = dObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-        document.getElementById('clause-event-date').textContent = dObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        document.getElementById('sum-event-date').textContent = thDate(contract.event_date);
+        document.getElementById('clause-event-date').textContent = thDate(contract.event_date);
       }
 
       const startTime = contract.event_start_time || '5:00 PM';

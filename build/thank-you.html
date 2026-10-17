@@ -74,6 +74,16 @@
     .ty-contact a { color: var(--primary); text-decoration: none; }
     @media (max-width: 560px) { .ty-card { padding: 2rem 1.15rem; } }
   </style>
+<script>
+  /* Dates read like "November 28th, 2026" everywhere a client sees them */
+  function thDate(s) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || '');
+    if (!m) return s || '';
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const d = +m[3], sfx = (d % 100 >= 11 && d % 100 <= 13) ? 'th' : (['th','st','nd','rd'][d % 10] || 'th');
+    return `${months[+m[2] - 1]} ${d}${sfx}, ${m[1]}`;
+  }
+</script>
 </head>
 <body>
   <main class="ty-wrap">
@@ -113,9 +123,7 @@
       const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
       const first = (d.name || '').trim().split(/\s+/)[0];
       const isDate = /^\d{4}-\d{2}-\d{2}$/.test(d.date || '');
-      const prettyDate = isDate
-        ? new Date(d.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
-        : (d.date || '');
+      const prettyDate = isDate ? thDate(d.date) : (d.date || '');
 
       document.getElementById('ty-title').textContent = first ? `Thank you, ${first}!` : 'Thank you!';
       if (d.email) document.getElementById('ty-email-line').innerHTML =
