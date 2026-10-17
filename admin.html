@@ -2078,6 +2078,18 @@
 
   <script>
     let allInquiries = [];
+    // The quotes table stores full_name/email/phone/venue_location; the admin screens use client_* names.
+    function normalizeInquiry(i) {
+      return {
+        ...i,
+        client_name: i.client_name ?? i.full_name ?? i.name ?? '',
+        client_email: i.client_email ?? i.email ?? '',
+        client_phone: i.client_phone ?? i.phone ?? '',
+        venue_city: i.venue_city ?? i.venue_location ?? '',
+        // website quotes arrive as 'new'; the admin uses New / Contacted / Booked / Archived
+        status: i.status ? i.status.charAt(0).toUpperCase() + i.status.slice(1) : 'New',
+      };
+    }
     let currentFilter = 'All';
     let activeInquiryId = null;
 
@@ -3430,7 +3442,7 @@
 
         if (error) throw error;
 
-        allInquiries = data || [];
+        allInquiries = (data || []).map(normalizeInquiry);
         updateKPIs();
         renderTable();
       } catch (err) {
@@ -3678,12 +3690,12 @@
       manualForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const payload = {
-          client_name: document.getElementById('m-name').value,
-          client_phone: document.getElementById('m-phone').value,
-          client_email: document.getElementById('m-email').value,
+          full_name: document.getElementById('m-name').value,
+          phone: document.getElementById('m-phone').value,
+          email: document.getElementById('m-email').value,
           package_name: document.getElementById('m-package').value,
-          event_date: document.getElementById('m-date').value,
-          venue_city: document.getElementById('m-venue').value,
+          event_date: document.getElementById('m-date').value || null,
+          venue_location: document.getElementById('m-venue').value,
           estimated_total: parseFloat(document.getElementById('m-total').value) || 0,
           notes: document.getElementById('m-notes').value,
           status: 'New'
@@ -4587,12 +4599,12 @@
           .insert([{
             portal_token: token,
             inquiry_id: inq.id,
-            client_name: inq.name,
-            client_email: inq.email,
-            client_phone: inq.phone,
+            client_name: inq.full_name || inq.client_name || inq.name,
+            client_email: inq.email || inq.client_email,
+            client_phone: inq.phone || inq.client_phone,
             event_type: inq.event_type || 'Event',
             event_date: inq.event_date || null,
-            venue_city: inq.venue_city || 'Oklahoma City, OK',
+            venue_city: inq.venue_location || inq.venue_city || 'Oklahoma City, OK',
             timeline_items: [
               { time: '5:00 PM', title: 'Cocktail Hour & Guest Arrival', notes: 'Background music' },
               { time: '6:00 PM', title: 'Grand Entrance & Welcome', notes: 'Mic announcement' },
