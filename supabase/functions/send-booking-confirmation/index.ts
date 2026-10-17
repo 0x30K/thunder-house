@@ -190,22 +190,24 @@ Email: ${smtpUser}`;
     <div style="text-align: center; margin-bottom: 26px;">
       <h1 style="color: #3d86ff; margin: 0 0 6px 0; font-size: 28px; letter-spacing: 1.5px; font-weight: 800;">THUNDER HOUSE ENT</h1>
       <div style="display: inline-block; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #ffb703; font-weight: 700; padding: 4px 14px; border-radius: 20px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
-        OKC Event DJ & MC Services • Professional Invoicing
+        OKC Event DJ & MC Services • Invoice
       </div>
     </div>
 
     <!-- Invoice Header Callout -->
     <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 20px; margin-bottom: 22px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 12px; margin-bottom: 14px;">
-        <div>
-          <span style="font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px;">Invoice Number</span>
-          <h2 style="color: #fff; font-size: 22px; margin: 2px 0 0 0; font-weight: 800; letter-spacing: 0.5px;">${escapeHtml(invoiceNumber)}</h2>
-        </div>
-        <div style="text-align: right;">
-          <span style="font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px;">Due Date</span>
-          <div style="color: #ffb703; font-size: 15px; font-weight: 700; margin-top: 2px;">${escapeHtml(dueDate)}</div>
-        </div>
-      </div>
+      <table role="presentation" style="width: 100%; border-collapse: collapse; border-bottom: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 14px;">
+        <tr>
+          <td style="padding: 0 12px 12px 0; vertical-align: bottom;">
+            <span style="font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px;">Invoice Number</span>
+            <div style="color: #fff; font-size: 22px; margin: 2px 0 0 0; font-weight: 800; letter-spacing: 0.5px;">${escapeHtml(invoiceNumber)}</div>
+          </td>
+          <td style="padding: 0 0 12px 12px; vertical-align: bottom; text-align: right;">
+            <span style="font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px;">Due Date</span>
+            <div style="color: #ffb703; font-size: 15px; font-weight: 700; margin-top: 2px; white-space: nowrap;">${escapeHtml(dueDate)}</div>
+          </td>
+        </tr>
+      </table>
       <p style="color: #cbd5e1; font-size: 14.5px; line-height: 1.55; margin: 0;">
         Hi <strong>${escapeHtml(clientName)}</strong>, thank you for choosing Thunder House ENT! Please review your invoice details below.
       </p>
