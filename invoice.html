@@ -290,6 +290,8 @@
     return `${months[+m[2] - 1]} ${d}${sfx}, ${m[1]}`;
   }
 </script>
+  <!-- Branded popups instead of the browser alert box -->
+  <script src="js/th-alert.js"></script>
 </head>
 <body>
 
@@ -456,14 +458,10 @@
         <div id="card-payment-error" style="display: none; margin-top: 0.85rem; color: #f87171; font-size: 0.82rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 0.65rem; border-radius: 6px;"></div>
       </div>
 
-      <!-- Alternative: Direct Square Hosted Checkout Link -->
-      <div id="hosted-checkout-wrap" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
-        <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.65rem;">
-          Prefer Square's external checkout window?
-        </span>
-        <a id="btn-pay-square-link" href="#" target="_blank" class="btn btn-outline btn-sm" style="border-color: rgba(255, 183, 3, 0.4); color: var(--accent-gold);">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Hosted Square Checkout Window
-        </a>
+      <!-- Secure checkout note -->
+      <div id="secure-checkout-note" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 0.82rem; color: var(--text-muted);">
+        <i class="fa-solid fa-lock" style="color: #22c55e; margin-right: 0.35rem;"></i>
+        Secure checkout powered by Square. Your card details are encrypted and never stored by us.
       </div>
 
       <!-- Brand Logos -->
@@ -668,7 +666,7 @@
         const gated = due.stage === 'retainer' && !signed;
         document.getElementById('pay-sign-gate').style.display = gated ? 'block' : 'none';
         document.getElementById('pay-sign-gate-btn').href = `/contract?invoice=${encodeURIComponent(inv.invoice_number)}&key=${encodeURIComponent(window.invoiceKey || '')}`;
-        ['card-payment-box', 'digital-wallets-wrap', 'hosted-checkout-wrap'].forEach(id => {
+        ['card-payment-box', 'digital-wallets-wrap', 'secure-checkout-note'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.style.display = gated ? 'none' : '';
         });
