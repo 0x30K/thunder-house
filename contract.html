@@ -683,15 +683,6 @@
 
         <div class="doc-title-meta">
           <h1 class="doc-title">SERVICE AGREEMENT</h1>
-          <div class="doc-subtitle">Professional Event DJ & Entertainment</div>
-          <div>
-            <span id="doc-status-badge" class="doc-status-badge pending">
-              <i class="fa-solid fa-signature"></i> PENDING SIGNATURE
-            </span>
-          </div>
-          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.45rem; font-family: var(--font-mono);" id="doc-token-ref">
-            REF: TH-AGR-2026-001
-          </div>
         </div>
       </section>
 
@@ -1179,19 +1170,6 @@
         portalBtn.href = `portal.html?invoice=${encodeURIComponent(contract.invoice_number)}${contractKey ? '&key=' + encodeURIComponent(contractKey) : ''}`;
         portalBtn.style.display = 'inline-flex';
       }
-
-      // Status Badge
-      const statusBadge = document.getElementById('doc-status-badge');
-      if (isSigned) {
-        statusBadge.className = 'doc-status-badge signed';
-        statusBadge.innerHTML = '<i class="fa-solid fa-check-double"></i> EXECUTED & LEGALLY BINDING';
-      } else {
-        statusBadge.className = 'doc-status-badge pending';
-        statusBadge.innerHTML = '<i class="fa-solid fa-signature"></i> PENDING CLIENT SIGNATURE';
-      }
-
-      // Header Ref
-      document.getElementById('doc-token-ref').textContent = `CONTRACT REF: ${contract.contract_token.toUpperCase()}`;
 
       // Summary Strip
       document.getElementById('sum-client-name').textContent = contract.client_name;
