@@ -320,6 +320,8 @@
       pointer-events: none;
       transition: var(--transition);
     }
+    @keyframes invNudge { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+    .detail-card.inv-nudge { animation: invNudge 0.35s ease; }
     .inv-num-wrap { position: relative; }
     .inv-num-wrap .form-control { padding-right: 2.8rem; }
     .inv-num-wrap .form-control[readonly] { opacity: 0.75; cursor: default; }
@@ -1847,7 +1849,6 @@
   <!-- Custom Invoice Builder & Editor Modal -->
   <div id="invoice-editor-modal" class="detail-modal-overlay">
     <div class="detail-card" style="max-width: 920px; width: 95%;">
-      <button class="modal-close-btn" onclick="closeInvoiceModal()">&times;</button>
       <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
         <div style="display: flex; align-items: center; gap: 0.75rem;">
           <div class="kpi-icon" style="background: rgba(0, 229, 255, 0.15); color: var(--primary); width: 44px; height: 44px; font-size: 1.25rem;">
@@ -3654,11 +3655,15 @@
         if (e.target === detailModal) detailModal.classList.remove('active');
       });
 
-      // Close Invoice Editor modal on overlay click
+      // The invoice editor only closes with Cancel (or after saving). Clicking outside just nudges the form.
       const invModal = document.getElementById('invoice-editor-modal');
       if (invModal) {
         invModal.addEventListener('click', (e) => {
-          if (e.target === invModal) invModal.classList.remove('active');
+          if (e.target !== invModal) return;
+          const card = invModal.querySelector('.detail-card');
+          card.classList.remove('inv-nudge');
+          void card.offsetWidth;
+          card.classList.add('inv-nudge');
         });
       }
 
