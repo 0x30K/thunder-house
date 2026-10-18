@@ -1957,8 +1957,8 @@
             <input type="date" id="inv-issue-date-input" class="form-control" required>
           </div>
           <div class="form-group">
-            <label class="form-label">Due Date</label>
-            <input type="date" id="inv-due-date-input" class="form-control">
+            <label class="form-label" title="Policy: the $200 retainer is due now; the balance is due 14 days before the event">Due Date <span style="font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--text-muted);">(balance: 14 days before event)</span></label>
+            <input type="date" id="inv-due-date-input" class="form-control" oninput="this.dataset.auto = '0'">
           </div>
           <div class="form-group">
             <label class="form-label">Invoice Status</label>
@@ -1993,7 +1993,7 @@
             </div>
             <div class="form-group">
               <label class="form-label">Event Date</label>
-              <input type="date" id="inv-event-date" class="form-control">
+              <input type="date" id="inv-event-date" class="form-control" onchange="applyPolicyDueDate()">
             </div>
             <div class="form-group">
               <label class="form-label">City / Venue</label>
@@ -4093,6 +4093,21 @@
       input.select();
     }
 
+    /* Booking policy: the balance is due 14 days before the event (or today, if the event is sooner).
+       Fills the due date automatically until someone types their own. */
+    function applyPolicyDueDate() {
+      const dueEl = document.getElementById('inv-due-date-input');
+      if (!dueEl || dueEl.dataset.auto === '0') return;
+      const now = new Date();
+      const today = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);   // local date, not UTC
+      const ev = document.getElementById('inv-event-date').value;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(ev)) { dueEl.value = today; return; }
+      const d = new Date(ev + 'T12:00:00');
+      d.setDate(d.getDate() - 14);
+      const due = d.toISOString().slice(0, 10);
+      dueEl.value = due < today ? today : due;
+    }
+
     function openCreateInvoiceModal(prefillData = null) {
       editingInvoiceId = null;
       document.getElementById('invoice-editor-form').reset();
@@ -4113,8 +4128,8 @@
       // Dates
       const today = new Date().toISOString().slice(0, 10);
       document.getElementById('inv-issue-date-input').value = today;
-      const due = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-      document.getElementById('inv-due-date-input').value = due;
+      document.getElementById('inv-due-date-input').dataset.auto = '1';
+      applyPolicyDueDate();
       document.getElementById('inv-status-input').value = 'Sent';
 
       const container = document.getElementById('inv-items-container');
@@ -4126,6 +4141,7 @@
         if (prefillData.client_email) document.getElementById('inv-client-email').value = prefillData.client_email;
         if (prefillData.client_phone) document.getElementById('inv-client-phone').value = prefillData.client_phone;
         if (prefillData.event_date) document.getElementById('inv-event-date').value = prefillData.event_date;
+        applyPolicyDueDate();
         if (prefillData.venue_city) document.getElementById('inv-venue-city').value = prefillData.venue_city;
         if (prefillData.notes) document.getElementById('inv-notes-input').value = prefillData.notes;
 
@@ -4170,6 +4186,7 @@
       lockInvoiceNumber();
       document.getElementById('inv-issue-date-input').value = inv.issue_date || (inv.created_at ? inv.created_at.slice(0, 10) : '');
       document.getElementById('inv-due-date-input').value = inv.due_date || '';
+      document.getElementById('inv-due-date-input').dataset.auto = inv.due_date ? '0' : '1';
       document.getElementById('inv-status-input').value = inv.status || 'Sent';
 
       document.getElementById('inv-client-name').value = inv.client_name || '';
@@ -4234,6 +4251,7 @@
       if (lead.client_phone) document.getElementById('inv-client-phone').value = lead.client_phone;
       if (lead.event_date) document.getElementById('inv-event-date').value = lead.event_date;
       if (lead.venue_city) document.getElementById('inv-venue-city').value = lead.venue_city;
+      applyPolicyDueDate();
 
       const container = document.getElementById('inv-items-container');
       container.innerHTML = '';
