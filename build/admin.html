@@ -3459,13 +3459,18 @@
       if (batch.length === 0) return;
 
       try {
-        const { error } = await window.supabaseClient
+        // only ADD missing weekend dates: never overwrite a date that is already booked, held or blocked
+        const { data: added, error } = await window.supabaseClient
           .from('thunderhouse_availability')
-          .upsert(batch, { onConflict: 'date' });
+          .upsert(batch, { onConflict: 'date', ignoreDuplicates: true })
+          .select('date');
 
         if (error) throw error;
 
-        alert(`Successfully marked ${batch.length} weekend dates available for this month!`);
+        const n = (added || []).length;
+        alert(n
+          ? `Opened ${n} weekend date${n === 1 ? '' : 's'} this month. Dates that were already set (booked, held or blocked) were left as they are.`
+          : 'Every weekend date this month was already set. Nothing was changed.');
         loadAvailability();
       } catch (err) {
         alert('Failed to set weekends: ' + err.message);
