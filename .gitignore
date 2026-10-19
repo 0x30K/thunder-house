@@ -12,4 +12,5 @@ Thumbs.db
 .claude/
 agent/
 skills-lock.json
+supabase/.temp/
 

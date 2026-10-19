@@ -134,7 +134,8 @@
 
       if (d.held && isDate) {
         const hours = Number(d.hours) || 72;
-        const until = new Date((d.at || Date.now()) + hours * 3600 * 1000)
+        const expireMs = (d.at || Date.now()) + hours * 3600 * 1000;
+        const until = new Date(expireMs)
           .toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
         document.getElementById('ty-lead').textContent =
           `Your request is in, and we've put a ${hours}-hour hold on your date so no one else can book it while we get your paperwork ready.`;
@@ -142,7 +143,29 @@
             <span class="label"><i class="fa-solid fa-calendar-check"></i> Date on hold</span>
             <span class="date">${esc(prettyDate)}</span>
             <span class="until">Held for you until ${esc(until)}</span>
+            <div id="hold-live-countdown" style="margin-top: 0.4rem; font-size: 0.88rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+              <i class="fa-solid fa-stopwatch fa-beat-fade"></i> <span id="countdown-text">Calculating hold time...</span>
+            </div>
           </div>`;
+
+        function updateCountdown() {
+          const now = Date.now();
+          const diff = expireMs - now;
+          const cdText = document.getElementById('countdown-text');
+          if (!cdText) return;
+          if (diff <= 0) {
+            cdText.textContent = 'Hold expired — contact us to check availability';
+            cdText.style.color = '#ef4444';
+            return;
+          }
+          const h = Math.floor(diff / (1000 * 60 * 60));
+          const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const s = Math.floor((diff % (1000 * 60)) / 1000);
+          cdText.textContent = `Hold expires in ${h}h ${m}m ${s}s`;
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
         document.getElementById('ty-lock-line').textContent =
           `Sign the agreement and pay the $200 retainer before your ${hours}-hour hold ends, and the date is officially yours. The remaining balance is due 14 days before your event.`;
       } else if (d.reason === 'date_unavailable') {

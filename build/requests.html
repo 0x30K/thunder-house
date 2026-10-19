@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Guest Song Requests | Thunder House ENT</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    :root {
+      --cyber-cyan: #00e5ff;
+      --cyber-gold: #ffb703;
+      --cyber-pink: #ff2a85;
+      --cyber-green: #10b981;
+      --cyber-bg: #05070b;
+      --cyber-card: rgba(14, 18, 28, 0.95);
+      --cyber-border: rgba(0, 229, 255, 0.25);
+    }
+
+    body {
+      background-color: var(--cyber-bg);
+      color: #f8fafc;
+      font-family: var(--font-body);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    /* Ambient background glows */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -15%;
+      left: 10%;
+      width: 60vw;
+      height: 60vw;
+      background: radial-gradient(circle, rgba(0, 229, 255, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -15%;
+      right: 10%;
+      width: 60vw;
+      height: 60vw;
+      background: radial-gradient(circle, rgba(255, 183, 3, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .request-container {
+      max-width: 540px;
+      width: 100%;
+      padding: 1.5rem 1.25rem 4rem 1.25rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .brand-title {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .brand-title i {
+      color: var(--cyber-cyan);
+    }
+
+    .brand-pill {
+      display: inline-block;
+      background: rgba(255, 183, 3, 0.12);
+      border: 1px solid rgba(255, 183, 3, 0.4);
+      color: var(--cyber-gold);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.75rem;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .event-card {
+      background: var(--cyber-card);
+      border: 1px solid var(--cyber-border);
+      border-radius: 16px;
+      padding: 1.75rem 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 229, 255, 0.08);
+      backdrop-filter: blur(20px);
+      margin-bottom: 1.5rem;
+    }
+
+    .event-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--cyber-cyan);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+
+    .event-name {
+      font-family: var(--font-heading);
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 0.5rem 0;
+      line-height: 1.3;
+    }
+
+    .event-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    .event-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.4rem;
+    }
+
+    .form-input, .form-textarea {
+      width: 100%;
+      background: rgba(5, 7, 11, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--cyber-cyan);
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.25);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, var(--cyber-cyan), #0099ff);
+      color: #05070b;
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border: none;
+      border-radius: 10px;
+      padding: 1rem 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 20px rgba(0, 229, 255, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(0, 229, 255, 0.5);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .status-card {
+      text-align: center;
+      padding: 3rem 1.5rem;
+    }
+
+    .status-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .success-card {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 16px;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 0.78rem;
+      color: #64748b;
+      margin-top: 2rem;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="request-container">
+    <!-- Brand Header -->
+    <div class="brand-header">
+      <div class="brand-title">
+        <i class="fa-solid fa-bolt"></i> THUNDER HOUSE ENT
+      </div>
+      <div class="brand-pill">⚡ Guest Music Requests</div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="state-loading" class="status-card">
+      <i class="fa-solid fa-circle-notch fa-spin status-icon" style="color: var(--cyber-cyan);"></i>
+      <h3 style="color: #fff; margin-bottom: 0.5rem;">Connecting to DJ Booth...</h3>
+      <p style="color: #94a3b8; font-size: 0.9rem;">Looking up event request queue</p>
+    </div>
+
+    <!-- Closed / Invalid State -->
+    <div id="state-closed" class="event-card status-card" style="display: none;">
+      <i class="fa-solid fa-compact-disc status-icon" style="color: var(--cyber-gold);"></i>
+      <h3 id="closed-title" style="color: #fff; margin-bottom: 0.5rem;">Song Requests Closed</h3>
+      <p id="closed-desc" style="color: #94a3b8; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem;">
+        Guest song requests are not currently open for this event, or the link has expired.
+      </p>
+      <div style="font-size: 0.85rem; color: var(--cyber-cyan); font-weight: 600;">
+        ⚡ Enjoying the party? Come say hello to DJ Bresh at the booth!
+      </div>
+    </div>
+
+    <!-- Active Form View -->
+    <div id="state-form" style="display: none;">
+      <!-- Event Information Header -->
+      <div class="event-card">
+        <div class="event-badge">
+          <i class="fa-solid fa-headphones"></i> <span id="event-type-badge">Wedding Reception</span>
+        </div>
+        <h1 id="event-client-name" class="event-name">Celebration</h1>
+        <div class="event-meta">
+          <span id="event-date-row"><i class="fa-regular fa-calendar-check" style="color: var(--cyber-gold);"></i> <strong id="event-date-text">Tonight</strong></span>
+          <span id="event-venue-row"><i class="fa-solid fa-location-dot" style="color: var(--cyber-cyan);"></i> <span id="event-venue-text">Oklahoma City</span></span>
+        </div>
+      </div>
+
+      <!-- Request Submission Form -->
+      <form id="request-form" class="event-card" onsubmit="submitSongRequest(event)">
+        <h3 style="color: #fff; font-size: 1.15rem; margin: 0 0 1.25rem 0; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-music" style="color: var(--cyber-cyan);"></i> Request a Track
+        </h3>
+
+        <div class="form-group">
+          <label class="form-label" for="input-song-title">Song Title *</label>
+          <input type="text" id="input-song-title" class="form-input" placeholder="e.g. Uptown Funk, Yeah!, September" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="input-artist-name">Artist Name</label>
+          <input type="text" id="input-artist-name" class="form-input" placeholder="e.g. Bruno Mars, Usher, Earth Wind & Fire">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="input-guest-name">Your Name *</label>
+          <input type="text" id="input-guest-name" class="form-input" placeholder="So DJ Bresh knows who requested it" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="input-dedication">Dedication / Message for the Hosts (Optional)</label>
+          <textarea id="input-dedication" class="form-textarea" rows="2" placeholder="e.g. For Alex & Elena — let's dance!"></textarea>
+        </div>
+
+        <button type="submit" id="btn-submit" class="btn-submit">
+          <i class="fa-solid fa-paper-plane"></i> Send to DJ Queue
+        </button>
+
+        <div id="form-error" style="display: none; color: #ef4444; font-size: 0.85rem; margin-top: 0.85rem; text-align: center;"></div>
+      </form>
+    </div>
+
+    <!-- Success View -->
+    <div id="state-success" class="success-card" style="display: none;">
+      <i class="fa-solid fa-circle-check status-icon" style="color: var(--cyber-green);"></i>
+      <h2 style="color: #fff; font-size: 1.45rem; margin: 0 0 0.5rem 0;">Request Received!</h2>
+      <p id="success-song-desc" style="color: #cbd5e1; font-size: 1rem; line-height: 1.5; margin-bottom: 1.5rem;">
+        We've added your request to the queue. DJ Bresh will work it into the mix!
+      </p>
+
+      <button type="button" class="btn-submit" onclick="resetFormForAnother()" style="background: rgba(0, 229, 255, 0.15); border: 1px solid var(--cyber-cyan); color: var(--cyber-cyan); box-shadow: none;">
+        <i class="fa-solid fa-plus"></i> Submit Another Request
+      </button>
+    </div>
+
+    <!-- Footer Note -->
+    <div class="footer-note">
+      Thunder House ENT • Mobile DJ & Event Sound<br>
+      Oklahoma City, OK • (405) 283-2533
+    </div>
+  </div>
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+
+  <script>
+    let activeToken = null;
+    let activeEvent = null;
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const params = new URLSearchParams(window.location.search);
+      activeToken = params.get('code') || params.get('event') || params.get('token');
+
+      if (!activeToken) {
+        showClosed('Invalid Request Link', 'Please ask the event hosts or DJ for their direct song request link or scan their QR code.');
+        return;
+      }
+
+      await loadEventInfo(activeToken);
+    });
+
+    async function loadEventInfo(token) {
+      try {
+        const { data, error } = await window.supabaseClient.rpc('get_guest_request_info', { p_token: token });
+
+        if (error || !data || data.enabled === false) {
+          const reason = data && data.reason ? data.reason : 'Guest song requests are currently closed for this celebration.';
+          showClosed('Song Requests Closed', reason);
+          return;
+        }
+
+        activeEvent = data;
+        document.getElementById('event-client-name').textContent = data.client_name || 'Event Celebration';
+        document.getElementById('event-type-badge').textContent = data.event_type || 'Event Celebration';
+
+        if (data.event_date) {
+          const dt = new Date(data.event_date + 'T00:00:00');
+          document.getElementById('event-date-text').textContent = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        } else {
+          document.getElementById('event-date-row').style.display = 'none';
+        }
+
+        if (data.venue_name) {
+          document.getElementById('event-venue-text').textContent = data.venue_name;
+        } else {
+          document.getElementById('event-venue-row').style.display = 'none';
+        }
+
+        document.getElementById('state-loading').style.display = 'none';
+        document.getElementById('state-closed').style.display = 'none';
+        document.getElementById('state-form').style.display = 'block';
+
+      } catch (err) {
+        console.error('Error loading request info:', err);
+        showClosed('Unable to Connect', 'Could not reach the Thunder House event queue. Please try again shortly.');
+      }
+    }
+
+    function showClosed(title, desc) {
+      document.getElementById('state-loading').style.display = 'none';
+      document.getElementById('state-form').style.display = 'none';
+      document.getElementById('state-success').style.display = 'none';
+      document.getElementById('closed-title').textContent = title;
+      document.getElementById('closed-desc').textContent = desc;
+      document.getElementById('state-closed').style.display = 'block';
+    }
+
+    async function submitSongRequest(e) {
+      e.preventDefault();
+      const errBox = document.getElementById('form-error');
+      errBox.style.display = 'none';
+
+      const btn = document.getElementById('btn-submit');
+      const song = document.getElementById('input-song-title').value.trim();
+      const artist = document.getElementById('input-artist-name').value.trim();
+      const guest = document.getElementById('input-guest-name').value.trim();
+      const dedication = document.getElementById('input-dedication').value.trim();
+
+      if (!song || !guest) {
+        errBox.textContent = 'Please provide both your name and the song title.';
+        errBox.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Submitting...';
+
+      try {
+        const { data, error } = await window.supabaseClient.rpc('submit_guest_song_request', {
+          p_token: activeToken,
+          p_guest_name: guest,
+          p_song: song,
+          p_artist: artist || null,
+          p_dedication: dedication || null
+        });
+
+        if (error || (data && !data.success)) {
+          throw new Error((data && data.error) || error.message || 'Submission failed');
+        }
+
+        // Show Success
+        document.getElementById('state-form').style.display = 'none';
+        const artistPart = artist ? ` by ${escapeHtml(artist)}` : '';
+        document.getElementById('success-song-desc').innerHTML = `We've added <strong>"${escapeHtml(song)}"${artistPart}</strong> to the queue for ${escapeHtml(activeEvent.client_name || 'the hosts')}!`;
+        document.getElementById('state-success').style.display = 'block';
+
+      } catch (err) {
+        console.error('Submit error:', err);
+        errBox.textContent = err.message || 'Error submitting request. Please try again.';
+        errBox.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send to DJ Queue';
+      }
+    }
+
+    function resetFormForAnother() {
+      document.getElementById('input-song-title').value = '';
+      document.getElementById('input-artist-name').value = '';
+      document.getElementById('input-dedication').value = '';
+      const btn = document.getElementById('btn-submit');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send to DJ Queue';
+      document.getElementById('state-success').style.display = 'none';
+      document.getElementById('state-form').style.display = 'block';
+      document.getElementById('input-song-title').focus();
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

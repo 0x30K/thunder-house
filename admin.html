@@ -1740,6 +1740,35 @@
         <!-- Filled dynamically -->
       </div>
 
+      <!-- Staff-Gated Guest Song Requests Box -->
+      <div id="modal-lead-guest-box" style="margin-bottom: 1.25rem; padding: 1rem; background: rgba(0, 229, 255, 0.04); border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <strong style="color: #fff; font-size: 0.9rem; display: flex; align-items: center; gap: 0.4rem;">
+              <i class="fa-solid fa-users" style="color: var(--primary);"></i> Guest Song Requests Link
+            </strong>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">
+              Hidden from client by default. Turn on only if the client requests it.
+            </div>
+          </div>
+          <label style="position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer;">
+            <input type="checkbox" id="modal-toggle-guest-requests" onchange="toggleGuestRequestsForActiveLead(this.checked)" style="opacity: 0; width: 0; height: 0;">
+            <span id="modal-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.2); transition: .3s; border-radius: 24px;"></span>
+          </label>
+        </div>
+        <div id="modal-guest-link-row" style="display: none; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08);">
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="text" id="modal-guest-request-url" class="form-control" readonly style="font-size: 0.8rem; background: rgba(0,0,0,0.5);">
+            <button type="button" class="btn btn-outline btn-sm" onclick="copyModalGuestLink()" style="white-space: nowrap; font-size: 0.78rem;">
+              <i class="fa-solid fa-copy"></i> Copy Link
+            </button>
+            <a id="modal-guest-request-preview" href="#" target="_blank" class="btn btn-outline btn-sm" style="white-space: nowrap; font-size: 0.78rem; border-color: var(--primary); color: var(--primary);">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Open
+            </a>
+          </div>
+        </div>
+      </div>
+
       <div class="form-group" style="margin-bottom: 1.5rem;">
         <label class="form-label"><i class="fa-solid fa-note-sticky"></i> Internal Notes (Private)</label>
         <textarea id="modal-lead-notes" class="form-control" rows="3" placeholder="Add notes on phone calls, deposit status, song requests..."></textarea>
@@ -3692,7 +3721,9 @@
       }
     }
 
-    function openLeadDetails(id) {
+    let activePlanForLead = null;
+
+    async function openLeadDetails(id) {
       const item = allInquiries.find(i => i.id === id);
       if (!item) return;
 
@@ -3719,7 +3750,122 @@
       `;
 
       document.getElementById('modal-lead-body').innerHTML = bodyHtml;
+
+      // Check event plan for guest requests
+      activePlanForLead = null;
+      const toggle = document.getElementById('modal-toggle-guest-requests');
+      const slider = document.getElementById('modal-toggle-slider');
+      const linkRow = document.getElementById('modal-guest-link-row');
+      const urlInput = document.getElementById('modal-guest-request-url');
+      const previewLink = document.getElementById('modal-guest-request-preview');
+
+      try {
+        const { data: plan } = await window.supabaseClient
+          .from('thunderhouse_event_plans')
+          .select('id, guest_requests_enabled, guest_request_token')
+          .eq('inquiry_id', id)
+          .maybeSingle();
+
+        activePlanForLead = plan;
+        if (plan && plan.guest_requests_enabled) {
+          toggle.checked = true;
+          slider.style.backgroundColor = 'var(--primary)';
+          linkRow.style.display = 'block';
+          const url = `${window.location.origin}/requests?code=${encodeURIComponent(plan.guest_request_token || '')}`;
+          urlInput.value = url;
+          previewLink.href = url;
+        } else {
+          toggle.checked = false;
+          slider.style.backgroundColor = 'rgba(255,255,255,0.2)';
+          linkRow.style.display = 'none';
+        }
+      } catch (err) {
+        console.warn('Error checking plan for guest requests:', err);
+      }
+
       document.getElementById('detail-modal').classList.add('active');
+    }
+
+    async function toggleGuestRequestsForActiveLead(enabled) {
+      if (!activeInquiryId) return;
+      const slider = document.getElementById('modal-toggle-slider');
+      const linkRow = document.getElementById('modal-guest-link-row');
+      const urlInput = document.getElementById('modal-guest-request-url');
+      const previewLink = document.getElementById('modal-guest-request-preview');
+
+      try {
+        let plan = activePlanForLead;
+        if (!plan) {
+          // Look up inquiry to create initial plan
+          const { data: inq } = await window.supabaseClient
+            .from('thunderhouse_inquiries')
+            .select('*')
+            .eq('id', activeInquiryId)
+            .single();
+
+          const token = randomPortalToken();
+          const rqToken = 'rq-' + Math.random().toString(36).substring(2, 14);
+          const { data: newPlan, error } = await window.supabaseClient
+            .from('thunderhouse_event_plans')
+            .insert([{
+              portal_token: token,
+              guest_request_token: rqToken,
+              guest_requests_enabled: enabled,
+              inquiry_id: inq.id,
+              client_name: inq.full_name || inq.client_name || inq.name,
+              client_email: inq.email || inq.client_email,
+              client_phone: inq.phone || inq.client_phone,
+              event_type: inq.event_type || 'Event',
+              event_date: inq.event_date || null,
+              venue_city: inq.venue_location || inq.venue_city || 'Oklahoma City, OK'
+            }])
+            .select()
+            .single();
+
+          if (error) throw error;
+          activePlanForLead = newPlan;
+          plan = newPlan;
+        } else {
+          const rqToken = plan.guest_request_token || ('rq-' + Math.random().toString(36).substring(2, 14));
+          const { data: updated, error } = await window.supabaseClient
+            .from('thunderhouse_event_plans')
+            .update({
+              guest_requests_enabled: enabled,
+              guest_request_token: rqToken,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', plan.id)
+            .select()
+            .single();
+
+          if (error) throw error;
+          activePlanForLead = updated;
+          plan = updated;
+        }
+
+        if (enabled) {
+          slider.style.backgroundColor = 'var(--primary)';
+          linkRow.style.display = 'block';
+          const url = `${window.location.origin}/requests?code=${encodeURIComponent(plan.guest_request_token)}`;
+          urlInput.value = url;
+          previewLink.href = url;
+        } else {
+          slider.style.backgroundColor = 'rgba(255,255,255,0.2)';
+          linkRow.style.display = 'none';
+        }
+      } catch (err) {
+        alert('Error updating guest requests: ' + err.message);
+      }
+    }
+
+    function copyModalGuestLink() {
+      const url = document.getElementById('modal-guest-request-url').value;
+      if (!url) return;
+      navigator.clipboard.writeText(url).then(() => {
+        alert(`⚡ Guest Song Request Link Copied!\n\n${url}\n\nSend this link to the client so their guests can request songs.`);
+      }).catch(() => {
+        prompt('Copy Guest Request Link:', url);
+      });
     }
 
     function setupModals() {

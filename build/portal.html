@@ -748,6 +748,30 @@
           </button>
         </div>
       </div>
+
+      <!-- Guest Song Requests & Dedications (Only shown if enabled by staff) -->
+      <div id="section-guest-requests" class="song-box-section" style="display: none; border: 1px solid rgba(255, 183, 3, 0.4); background: rgba(255, 183, 3, 0.03);">
+        <div class="song-box-header">
+          <div>
+            <strong style="color: #fff; font-size: 1.05rem;">
+              <i class="fa-solid fa-users" style="color: var(--cyber-gold);"></i> Guest Song Requests & Dedications
+            </strong>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">
+              Songs submitted by your guests via your private request link. You and DJ Bresh have final approval!
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="copyClientGuestRequestLink()" style="border-color: var(--cyber-gold); color: var(--cyber-gold); font-size: 0.78rem;">
+              <i class="fa-solid fa-share-nodes"></i> Share Link with Guests
+            </button>
+            <span style="font-size: 0.8rem; color: var(--cyber-gold); font-weight: 700;" id="count-client-guest-requests">0 Requests</span>
+          </div>
+        </div>
+
+        <div id="list-client-guest-requests">
+          <!-- Populated dynamically by JS -->
+        </div>
+      </div>
     </div>
 
     <!-- TAB 2: EVENT TIMELINE & SCHEDULE -->
@@ -994,6 +1018,17 @@
       setVal('input-special-announcements', plan.special_announcements);
       setVal('input-mc-notes', plan.mc_notes);
 
+      // Guest Song Requests (Hidden by default unless enabled by staff)
+      const guestReqSection = document.getElementById('section-guest-requests');
+      if (guestReqSection) {
+        if (plan.guest_requests_enabled) {
+          guestReqSection.style.display = 'block';
+          loadClientGuestRequests();
+        } else {
+          guestReqSection.style.display = 'none';
+        }
+      }
+
       // Render Gig Summary
       renderGigSheetOutput();
     }
@@ -1192,6 +1227,107 @@
         renderSongList('do_not_play', activePlan.do_not_play_songs);
       }
       scheduleAutoSave();
+    }
+
+    // =========================================================================
+    // GUEST SONG REQUESTS (CLIENT PORTAL REVIEW)
+    // =========================================================================
+    let clientGuestRequests = [];
+
+    async function loadClientGuestRequests() {
+      const container = document.getElementById('list-client-guest-requests');
+      const countEl = document.getElementById('count-client-guest-requests');
+      if (!container || !activePlan) return;
+
+      try {
+        const { data: reqs, error } = await window.supabaseClient.rpc('client_get_guest_requests', {
+          p_token: currentToken || '',
+          p_invoice: currentInvoice || '',
+          p_key: currentKey || ''
+        });
+
+        if (error) throw error;
+        clientGuestRequests = reqs || [];
+        if (countEl) countEl.textContent = `${clientGuestRequests.length} Request${clientGuestRequests.length === 1 ? '' : 's'}`;
+
+        if (clientGuestRequests.length === 0) {
+          container.innerHTML = `
+            <div style="color: var(--text-muted); font-size: 0.88rem; font-style: italic; padding: 1rem 0; text-align: center;">
+              No guest song requests submitted yet. Share your request link with friends and family!
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = clientGuestRequests.map(r => {
+          const isApproved = r.status === 'approved';
+          const isDeclined = r.status === 'declined';
+          const isPlayed = r.status === 'played';
+
+          let statusBadge = '<span class="badge-pill badge-gold" style="font-size: 0.72rem;">Pending Review</span>';
+          if (isPlayed) statusBadge = '<span class="badge-pill badge-green" style="font-size: 0.72rem;"><i class="fa-solid fa-check"></i> Played at Event</span>';
+          else if (isApproved) statusBadge = '<span class="badge-pill badge-cyan" style="font-size: 0.72rem;"><i class="fa-solid fa-thumbs-up"></i> Approved by You</span>';
+          else if (isDeclined) statusBadge = '<span class="badge-pill" style="font-size: 0.72rem; background: rgba(239, 68, 68, 0.2); color: #f87171;"><i class="fa-solid fa-ban"></i> Declined</span>';
+
+          return `
+            <div class="song-card" style="margin-bottom: 0.6rem; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; border: 1px solid ${isApproved ? 'rgba(0, 229, 255, 0.3)' : (isDeclined ? 'rgba(239, 68, 68, 0.25)' : 'var(--border-subtle)')};">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem;">
+                  <strong style="color: #fff; font-size: 0.95rem;">${escapeHtml(r.song_title)}</strong>
+                  ${r.artist_name ? `<span style="color: var(--text-muted); font-size: 0.85rem;">by ${escapeHtml(r.artist_name)}</span>` : ''}
+                  ${statusBadge}
+                </div>
+                <div style="font-size: 0.8rem; color: #cbd5e1;">
+                  Requested by: <strong style="color: var(--cyber-gold);">${escapeHtml(r.guest_name)}</strong>
+                  ${r.dedication ? ` • <em style="color: #94a3b8;">"${escapeHtml(r.dedication)}"</em>` : ''}
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.4rem; align-items: center;">
+                ${!isPlayed ? `
+                  <button type="button" class="btn btn-outline btn-sm" onclick="setGuestRequestStatus('${r.id}', 'approved')" style="font-size: 0.75rem; padding: 0.3rem 0.55rem; border-color: var(--cyber-cyan); color: ${isApproved ? '#fff' : 'var(--cyber-cyan)'}; background: ${isApproved ? 'rgba(0, 229, 255, 0.2)' : 'transparent'};" title="Approve song for DJ">
+                    <i class="fa-solid fa-thumbs-up"></i> Approve
+                  </button>
+                  <button type="button" class="btn btn-outline btn-sm" onclick="setGuestRequestStatus('${r.id}', 'declined')" style="font-size: 0.75rem; padding: 0.3rem 0.55rem; border-color: var(--cyber-red); color: ${isDeclined ? '#fff' : 'var(--cyber-red)'}; background: ${isDeclined ? 'rgba(239, 68, 68, 0.2)' : 'transparent'};" title="Veto this song">
+                    <i class="fa-solid fa-ban"></i> Veto
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.warn('Error loading guest requests:', err);
+      }
+    }
+
+    async function setGuestRequestStatus(reqId, status) {
+      try {
+        const { error } = await window.supabaseClient.rpc('client_set_guest_request_status', {
+          p_token: currentToken || '',
+          p_invoice: currentInvoice || '',
+          p_key: currentKey || '',
+          p_request_id: reqId,
+          p_status: status
+        });
+        if (error) throw error;
+        await loadClientGuestRequests();
+      } catch (err) {
+        alert('Could not update request status: ' + err.message);
+      }
+    }
+
+    function copyClientGuestRequestLink() {
+      if (!activePlan || !activePlan.guest_request_token) {
+        alert('Guest requests are not configured.');
+        return;
+      }
+      const url = `${window.location.origin}/requests?code=${encodeURIComponent(activePlan.guest_request_token)}`;
+      navigator.clipboard.writeText(url).then(() => {
+        alert(`⚡ Guest Song Request Link Copied!\n\n${url}\n\nShare this link or text it to your wedding party and guests.`);
+      }).catch(() => {
+        prompt('Copy your guest request link:', url);
+      });
     }
 
     // =========================================================================

@@ -903,6 +903,9 @@
         THUNDER HOUSE
       </div>
       <span class="brand-badge">DJ RUN OF SHOW</span>
+      <span id="network-status-badge" class="brand-badge" style="display: none; background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.4); color: var(--cyber-gold);">
+        <i class="fa-solid fa-wifi-slash"></i> DECK CACHE ACTIVE
+      </span>
     </div>
 
     <div class="top-actions">
@@ -1012,9 +1015,14 @@
             <i class="fa-solid fa-stopwatch" style="color: var(--cyber-cyan);"></i>
             Timeline & Live Cues
           </h2>
-          <button type="button" class="btn btn-outline btn-sm" onclick="openAddCueModal()" style="font-size: 0.8rem; padding: 0.35rem 0.85rem; border-color: var(--cyber-cyan); color: var(--cyber-cyan);">
-            <i class="fa-solid fa-plus"></i> Add Cue
-          </button>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="openThunderCrateModal()" style="font-size: 0.8rem; padding: 0.35rem 0.85rem; border-color: var(--cyber-gold); color: var(--cyber-gold);" title="Load or save timeline runs">
+              <i class="fa-solid fa-bolt"></i> Thunder Crate
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="openAddCueModal()" style="font-size: 0.8rem; padding: 0.35rem 0.85rem; border-color: var(--cyber-cyan); color: var(--cyber-cyan);">
+              <i class="fa-solid fa-plus"></i> Add Cue
+            </button>
+          </div>
         </div>
 
         <div id="timeline-stream-container" class="timeline-stream">
@@ -1098,6 +1106,19 @@
             <div id="list-do-not-plays">
               <!-- Populated dynamically -->
             </div>
+          </div>
+        </div>
+
+        <!-- Live Guest Song Requests (Staff & DJ Queue) -->
+        <div id="sec-guest-requests-panel" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <h4 style="font-size: 0.85rem; text-transform: uppercase; color: var(--cyber-gold); margin: 0; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.4rem;">
+              <i class="fa-solid fa-users"></i> Live Guest Requests (<span id="count-dj-guest-requests">0</span>)
+            </h4>
+            <div id="dj-guest-requests-badge" style="font-size: 0.78rem; color: #94a3b8;"></div>
+          </div>
+          <div id="list-dj-guest-requests">
+            <!-- Populated dynamically -->
           </div>
         </div>
       </section>
@@ -1240,6 +1261,45 @@
     </div>
   </div>
 
+  <!-- Thunder Crate Saved Runs Modal -->
+  <div id="modal-thunder-crate" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="max-width: 650px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+          <h3 style="color: #fff; font-family: var(--font-heading); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-bolt" style="color: var(--cyber-gold);"></i> Thunder Crate Bank
+          </h3>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">Shared timeline templates for mobile gigs</div>
+        </div>
+        <button type="button" class="btn-top" onclick="closeThunderCrateModal()">&times;</button>
+      </div>
+
+      <!-- Save active timeline section -->
+      <div style="background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 10px; padding: 1rem; margin-bottom: 1.25rem;">
+        <div style="font-size: 0.82rem; font-weight: 700; color: #fff; text-transform: uppercase; margin-bottom: 0.4rem;">
+          <i class="fa-solid fa-cloud-arrow-up" style="color: var(--cyber-cyan);"></i> Save Active Cues as New Template
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="text" id="input-save-crate-name" class="modal-input" placeholder="e.g. Standard 5hr Wedding Reception" style="font-size: 0.85rem;">
+          <button type="button" class="btn btn-primary btn-sm" onclick="saveActiveTimelineToCrateBank()" style="white-space: nowrap; font-size: 0.82rem;">
+            <i class="fa-solid fa-floppy-disk"></i> Save to Bank
+          </button>
+        </div>
+      </div>
+
+      <!-- List of Available Runs -->
+      <div style="max-height: 380px; overflow-y: auto; padding-right: 0.35rem;" id="crate-runs-list">
+        <div style="text-align: center; padding: 2rem; color: #94a3b8;">
+          <i class="fa-solid fa-circle-notch fa-spin"></i> Loading Crate Bank...
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem;">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeThunderCrateModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Supabase CDN Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
@@ -1339,6 +1399,9 @@
         if (error) throw error;
 
         allPlans = data || [];
+        try {
+          localStorage.setItem('th_cached_all_plans', JSON.stringify(allPlans));
+        } catch (e) {}
 
         if (allPlans.length === 0) {
           loadingEl.innerHTML = `
@@ -1375,9 +1438,33 @@
 
         loadingEl.style.display = 'none';
         shellEl.style.display = 'block';
+        updateNetworkStatus();
 
       } catch (err) {
         console.error('Error loading gigs:', err);
+
+        // Offline deck fallback
+        const cachedStr = localStorage.getItem('th_cached_all_plans');
+        if (cachedStr) {
+          try {
+            allPlans = JSON.parse(cachedStr);
+            if (allPlans && allPlans.length > 0) {
+              const selector = document.getElementById('gig-selector');
+              selector.innerHTML = allPlans.map(p => {
+                const dStr = p.event_date ? new Date(p.event_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'TBD';
+                return `<option value="${p.id}">${dStr} — ${escapeHtml(p.client_name)} (${escapeHtml(p.event_type || 'Event')})</option>`;
+              }).join('');
+              const matched = allPlans[0];
+              selector.value = matched.id;
+              renderActiveGig(matched);
+              loadingEl.style.display = 'none';
+              shellEl.style.display = 'block';
+              updateNetworkStatus(true);
+              return;
+            }
+          } catch (parseErr) {}
+        }
+
         loadingEl.innerHTML = `
           <div style="font-size: 2.5rem; color: var(--cyber-red); margin-bottom: 1rem;"><i class="fa-solid fa-triangle-exclamation"></i></div>
           <h3 style="color: #fff; font-family: var(--font-heading); margin-bottom: 0.5rem;">Unable to Load Gig Vault</h3>
@@ -1455,6 +1542,12 @@
       renderSpecialMoments(plan.special_moments || {});
       renderMusicLists(plan.must_play_songs || [], plan.do_not_play_songs || []);
       renderSpotifyEmbed(plan.spotify_playlist_url);
+      renderDjGuestRequests(plan);
+
+      // Cache active plan locally for offline deck operation
+      try {
+        localStorage.setItem('th_cached_plan_' + plan.id, JSON.stringify(plan));
+      } catch (e) {}
 
       // 5. Contacts & Venue
       document.getElementById('contact-client-name').textContent = plan.client_name;
@@ -1858,6 +1951,299 @@
         if (wakeLock) {
           wakeLock.release().then(() => { wakeLock = null; });
         }
+      }
+    }
+
+    // =========================================================================
+    // NETWORK STATUS & DECK CACHE
+    // =========================================================================
+    function updateNetworkStatus(forceOffline = false) {
+      const badge = document.getElementById('network-status-badge');
+      if (!badge) return;
+      if (forceOffline || !navigator.onLine) {
+        badge.style.display = 'inline-flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+    window.addEventListener('online', () => { updateNetworkStatus(); loadAllGigs(); });
+    window.addEventListener('offline', () => updateNetworkStatus());
+
+    // =========================================================================
+    // THUNDER CRATE BANK (SHARED RUN-OF-SHOW TEMPLATES)
+    // =========================================================================
+    const CORE_CRATE_TEMPLATES = [
+      {
+        id: "preset-wedding-5hr",
+        name: "Standard Wedding Reception (5 Hours)",
+        created_by_name: "Thunder House HQ",
+        is_preset: true,
+        moments: [
+          { time: "5:00 PM", title: "Cocktail Hour & Guest Arrival", song_cue: "Upbeat Motown & Neo-Soul Playlist", notes: "Lounge ambiance. Keep volume at 40%." },
+          { time: "6:00 PM", title: "Grand Entrance & Welcome", song_cue: "High-Energy Walk-in Track", notes: "Announce wedding party with energetic diction." },
+          { time: "6:15 PM", title: "Dinner Service", song_cue: "Acoustic Pop & Classic Soul", notes: "Mellow background music while tables are served." },
+          { time: "7:00 PM", title: "Toasts & Speeches", song_cue: null, notes: "Best Man & Maid of Honor handheld wireless mic." },
+          { time: "7:20 PM", title: "Cake Cutting & Champagne Toast", song_cue: "Sweet Acoustic / Upbeat Love Ballad", notes: "Coordinate with photographer before cueing track." },
+          { time: "7:30 PM", title: "First Dance", song_cue: "Couple Special Moment Track", notes: "Warm uplighting, fade at 2:30 or let run per couple plan." },
+          { time: "7:35 PM", title: "Parent Dances", song_cue: "Father/Daughter & Mother/Son", notes: "Invite Father of Bride then Mother of Groom." },
+          { time: "7:45 PM", title: "Dance Floor Ignition & Group Photo", song_cue: "Universal Crowd Pleasers / Earth Wind & Fire", notes: "Pack the dance floor immediately after group picture." },
+          { time: "9:45 PM", title: "Bouquet / Garter Toss", song_cue: "Single Ladies / Mission Impossible", notes: "Optional energetic break." },
+          { time: "10:55 PM", title: "Grand Finale Song & Send-Off", song_cue: "Final Anthem", notes: "Direct guests to sparkler exit / send-off tunnel." }
+        ]
+      },
+      {
+        id: "preset-corp-gala",
+        name: "Corporate Gala & Awards (4 Hours)",
+        created_by_name: "Thunder House HQ",
+        is_preset: true,
+        moments: [
+          { time: "6:00 PM", title: "VIP Networking Cocktail", song_cue: "Sophisticated Deep House & Modern Jazz", notes: "Establish upscale professional atmosphere." },
+          { time: "7:00 PM", title: "Welcome Address & Dinner", song_cue: "Low Ambient Instrumentals", notes: "Executive intro on wireless mic." },
+          { time: "8:00 PM", title: "Keynote & Awards Presentation", song_cue: "Walk-Up Stingers & Fanfare", notes: "Tight audio stingers as winners walk up." },
+          { time: "9:00 PM", title: "Celebration Dance Party", song_cue: "Universal Funk, Pop & 80s/90s Anthems", notes: "High energy, all-ages dance floor." },
+          { time: "10:00 PM", title: "Closing Remarks & Wrap", song_cue: "Warm Outro Track", notes: "Thank sponsors and guests." }
+        ]
+      },
+      {
+        id: "preset-prom-dance",
+        name: "School Dance / Prom (3 Hours)",
+        created_by_name: "Thunder House HQ",
+        is_preset: true,
+        moments: [
+          { time: "7:00 PM", title: "Doors Open & Warmup Mix", song_cue: "Current Clean Hits & Viral Pop", notes: "High clarity sound check." },
+          { time: "7:45 PM", title: "Peak Floor Opener", song_cue: "Clean EDM & Hip-Hop Bangers", notes: "Turn on cold sparks / strobe effect." },
+          { time: "8:45 PM", title: "Royalty Coronation & Slow Dance", song_cue: "Romantic Top 40 Ballad", notes: "Crown King & Queen." },
+          { time: "9:00 PM", title: "Mainstage Peak Rave", song_cue: "Bass-heavy Clean Mashups", notes: "Max energy floor." },
+          { time: "10:00 PM", title: "Grand Finale & Lights Up", song_cue: "Sing-along Anthem", notes: "Chaperone announcement." }
+        ]
+      }
+    ];
+
+    async function openThunderCrateModal() {
+      document.getElementById('modal-thunder-crate').style.display = 'flex';
+      await loadCrateBank();
+    }
+
+    function closeThunderCrateModal() {
+      document.getElementById('modal-thunder-crate').style.display = 'none';
+    }
+
+    async function loadCrateBank() {
+      const listEl = document.getElementById('crate-runs-list');
+      let saved = [];
+      try {
+        if (window.supabaseClient) {
+          const { data, error } = await window.supabaseClient
+            .from('thunderhouse_saved_runs')
+            .select('*')
+            .order('created_at', { ascending: false });
+          if (!error && data) saved = data;
+        }
+      } catch (err) {
+        console.warn('Could not fetch saved runs:', err);
+      }
+
+      const allRuns = [...saved, ...CORE_CRATE_TEMPLATES];
+      if (allRuns.length === 0) {
+        listEl.innerHTML = '<div style="color: #94a3b8; text-align: center; padding: 2rem;">No crate templates available.</div>';
+        return;
+      }
+
+      listEl.innerHTML = allRuns.map(run => {
+        const isPreset = run.is_preset;
+        const creator = run.created_by_name || 'Staff';
+        const count = Array.isArray(run.moments) ? run.moments.length : 0;
+        const canDelete = currentUser && run.created_by === currentUser.id && !isPreset;
+
+        return `
+          <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--cyber-border); border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                  <strong style="color: #fff; font-size: 0.95rem;">${escapeHtml(run.name)}</strong>
+                  ${isPreset ? '<span class="badge-pill badge-gold" style="font-size: 0.65rem;">HQ Core</span>' : '<span class="badge-pill badge-cyan" style="font-size: 0.65rem;">Staff Saved</span>'}
+                </div>
+                <div style="font-size: 0.78rem; color: #94a3b8;">
+                  ${count} Cues • Created by <span style="color: #cbd5e1;">${escapeHtml(creator)}</span>
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.4rem; align-items: center;">
+                <button type="button" class="btn btn-outline btn-sm" onclick='previewCrateRun(${JSON.stringify(run.moments).replace(/'/g, "&apos;")})' style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
+                  <i class="fa-solid fa-eye"></i> Preview
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" onclick='applyCrateRun(${JSON.stringify(run.moments).replace(/'/g, "&apos;")}, "replace")' style="font-size: 0.75rem; padding: 0.25rem 0.65rem;">
+                  Load
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" onclick='applyCrateRun(${JSON.stringify(run.moments).replace(/'/g, "&apos;")}, "append")' style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" title="Append to existing cues">
+                  + Append
+                </button>
+                ${canDelete ? `
+                  <button type="button" class="btn btn-outline btn-sm" onclick="deleteCrateRun('${run.id}')" style="font-size: 0.75rem; padding: 0.25rem 0.45rem; border-color: #ef4444; color: #ef4444;" title="Delete this template">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function previewCrateRun(moments) {
+      if (!moments || moments.length === 0) return alert('This template has no cues.');
+      const previewText = moments.map((m, i) => `${i+1}. [${m.time || 'TBD'}] ${m.title}${m.song_cue ? ' — Song: ' + m.song_cue : ''}${m.notes ? ' (' + m.notes + ')' : ''}`).join('\n');
+      alert('⚡ Crate Preview:\n\n' + previewText);
+    }
+
+    async function applyCrateRun(moments, mode) {
+      if (!currentPlan) return alert('No active gig selected.');
+      if (!moments || moments.length === 0) return;
+
+      if (mode === 'replace') {
+        if (currentPlan.timeline_items && currentPlan.timeline_items.length > 0) {
+          if (!confirm('Replace all existing timeline cues with this template?')) return;
+        }
+        currentPlan.timeline_items = JSON.parse(JSON.stringify(moments));
+      } else {
+        currentPlan.timeline_items = currentPlan.timeline_items || [];
+        currentPlan.timeline_items.push(...JSON.parse(JSON.stringify(moments)));
+      }
+
+      renderTimeline(currentPlan.timeline_items);
+      await saveTimelineToDatabase();
+      closeThunderCrateModal();
+      alert('⚡ Crate loaded successfully into active run of show!');
+    }
+
+    async function saveActiveTimelineToCrateBank() {
+      if (!currentPlan) return alert('Select an active gig first.');
+      const cues = currentPlan.timeline_items || [];
+      if (cues.length === 0) return alert('The current gig has no cues to save.');
+
+      const nameInput = document.getElementById('input-save-crate-name');
+      const name = nameInput.value.trim();
+      if (!name) return alert('Please enter a template name.');
+
+      try {
+        const { error } = await window.supabaseClient
+          .from('thunderhouse_saved_runs')
+          .insert([{
+            name: name,
+            moments: cues
+          }]);
+
+        if (error) throw error;
+        nameInput.value = '';
+        await loadCrateBank();
+        alert(`⚡ Saved "${name}" to Thunder Crate Bank! Available to all staff.`);
+      } catch (err) {
+        alert('Error saving to Crate Bank: ' + err.message);
+      }
+    }
+
+    async function deleteCrateRun(id) {
+      if (!confirm('Delete this saved run template?')) return;
+      try {
+        const { error } = await window.supabaseClient
+          .from('thunderhouse_saved_runs')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+        await loadCrateBank();
+      } catch (err) {
+        alert('Error deleting run: ' + err.message);
+      }
+    }
+
+    // =========================================================================
+    // LIVE GUEST SONG REQUESTS (DJ BOOTH)
+    // =========================================================================
+    async function renderDjGuestRequests(plan) {
+      const container = document.getElementById('list-dj-guest-requests');
+      const countEl = document.getElementById('count-dj-guest-requests');
+      const badgeEl = document.getElementById('dj-guest-requests-badge');
+
+      if (!container) return;
+
+      if (!plan || !plan.id) {
+        container.innerHTML = '<div style="color: #94a3b8; font-size: 0.85rem; font-style: italic;">No gig selected.</div>';
+        return;
+      }
+
+      try {
+        const { data: reqs, error } = await window.supabaseClient
+          .from('thunderhouse_guest_requests')
+          .select('*')
+          .eq('event_plan_id', plan.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        const items = reqs || [];
+        countEl.textContent = items.length;
+
+        if (!plan.guest_requests_enabled) {
+          badgeEl.innerHTML = '<span style="color: #94a3b8;"><i class="fa-solid fa-lock"></i> Requests Closed by Staff</span>';
+        } else {
+          badgeEl.innerHTML = '<span style="color: var(--cyber-green);"><i class="fa-solid fa-satellite-dish fa-fade"></i> Live Guest Link Active</span>';
+        }
+
+        if (items.length === 0) {
+          container.innerHTML = '<div style="color: #94a3b8; font-size: 0.85rem; font-style: italic; padding: 0.5rem 0;">No guest requests received yet.</div>';
+          return;
+        }
+
+        container.innerHTML = items.map(r => {
+          const isPlayed = r.status === 'played';
+          const isApproved = r.status === 'approved';
+          const isDeclined = r.status === 'declined';
+
+          let statusBadge = '<span class="badge-pill badge-gold" style="font-size: 0.65rem;">Pending</span>';
+          if (isPlayed) statusBadge = '<span class="badge-pill badge-green" style="font-size: 0.65rem;"><i class="fa-solid fa-check"></i> Played</span>';
+          else if (isApproved) statusBadge = '<span class="badge-pill badge-cyan" style="font-size: 0.65rem;">Host Approved</span>';
+          else if (isDeclined) statusBadge = '<span class="badge-pill" style="font-size: 0.65rem; background: rgba(239, 68, 68, 0.2); color: #f87171;">Host Declined</span>';
+
+          return `
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid ${isPlayed ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 183, 3, 0.2)'}; border-radius: 8px; padding: 0.75rem; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.2rem;">
+                  <strong style="color: #fff; font-size: 0.9rem;">${escapeHtml(r.song_title)}</strong>
+                  ${r.artist_name ? `<span style="color: #94a3b8; font-size: 0.82rem;">by ${escapeHtml(r.artist_name)}</span>` : ''}
+                  ${statusBadge}
+                </div>
+                <div style="font-size: 0.78rem; color: #cbd5e1;">
+                  Requested by: <strong style="color: var(--cyber-gold);">${escapeHtml(r.guest_name)}</strong>
+                  ${r.dedication ? ` • <em style="color: #94a3b8;">"${escapeHtml(r.dedication)}"</em>` : ''}
+                </div>
+              </div>
+              <div>
+                ${!isPlayed ? `
+                  <button type="button" class="btn btn-outline btn-sm" onclick="markDjRequestPlayed('${r.id}')" style="font-size: 0.75rem; padding: 0.3rem 0.65rem; border-color: var(--cyber-green); color: var(--cyber-green);" title="Mark track as played">
+                    <i class="fa-solid fa-play"></i> Played
+                  </button>
+                ` : `
+                  <span style="font-size: 0.8rem; color: var(--cyber-green);"><i class="fa-solid fa-check-double"></i></span>
+                `}
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.warn('Error fetching guest requests for DJ:', err);
+        container.innerHTML = '<div style="color: #94a3b8; font-size: 0.82rem;">Guest requests unavailable offline.</div>';
+      }
+    }
+
+    async function markDjRequestPlayed(reqId) {
+      try {
+        const { error } = await window.supabaseClient
+          .from('thunderhouse_guest_requests')
+          .update({ status: 'played', updated_at: new Date().toISOString() })
+          .eq('id', reqId);
+        if (error) throw error;
+        if (currentPlan) renderDjGuestRequests(currentPlan);
+      } catch (err) {
+        alert('Error updating request status: ' + err.message);
       }
     }
 
