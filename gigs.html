@@ -1142,9 +1142,287 @@
       overflow-y: auto;
       color: #94a3b8;
     }
+
+    /* Thunder Keys Synthesizer & Macro Deck Styling */
+    .thunder-keys-rack {
+      border: 1px solid rgba(255, 183, 3, 0.25);
+      background: radial-gradient(circle at 10% 20%, rgba(255, 183, 3, 0.05) 0%, rgba(10, 14, 23, 0.96) 90%);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 183, 3, 0.05);
+      position: relative;
+    }
+    .keys-mode-switcher {
+      display: inline-flex;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      padding: 0.25rem;
+      gap: 0.35rem;
+    }
+    .mode-switch-btn {
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all 0.2s ease;
+    }
+    .mode-switch-btn.active {
+      background: var(--cyber-gold);
+      color: #000;
+      box-shadow: 0 0 12px rgba(255, 183, 3, 0.4);
+    }
+    .mode-switch-btn.active.synth-mode {
+      background: var(--cyber-cyan);
+      color: #000;
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.4);
+    }
+    .keys-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 0.85rem 1.15rem;
+      margin-bottom: 1.25rem;
+    }
+    .keys-tool-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .keys-tool-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+    .keys-select {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(255, 183, 3, 0.35);
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      outline: none;
+      cursor: pointer;
+    }
+    .octave-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .btn-oct {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: all 0.15s ease;
+    }
+    .btn-oct:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+    .octave-val {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--cyber-gold);
+      font-weight: 700;
+      min-width: 65px;
+      text-align: center;
+    }
+    .wheel-meters {
+      display: flex;
+      gap: 0.45rem;
+      align-items: center;
+    }
+    .wheel-track {
+      width: 45px;
+      height: 10px;
+      background: #000;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+    .wheel-fill {
+      height: 100%;
+      background: var(--cyber-cyan);
+      transition: width 0.05s ease, left 0.05s ease;
+    }
+    .wheel-fill.pitch-center {
+      width: 2px;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--cyber-gold);
+    }
+    .wheel-fill.mod-zero {
+      width: 0%;
+      background: var(--cyber-pink);
+    }
+    .keys-range {
+      accent-color: var(--cyber-gold);
+      width: 90px;
+      cursor: pointer;
+    }
+
+    /* Virtual Piano Keyboard */
+    .piano-wrapper {
+      background: #030508;
+      border: 2px solid rgba(0, 0, 0, 0.8);
+      border-radius: 12px;
+      padding: 0.75rem 0.85rem 1rem 0.85rem;
+      box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.9), 0 10px 30px rgba(0, 0, 0, 0.6);
+      overflow-x: auto;
+      scrollbar-width: thin;
+      user-select: none;
+    }
+    .piano-keyboard {
+      display: flex;
+      position: relative;
+      height: 175px;
+      min-width: 780px;
+      justify-content: flex-start;
+      margin: 0 auto;
+    }
+    .key-white {
+      flex: 1;
+      height: 100%;
+      background: linear-gradient(180deg, #f1f5f9 0%, #cbd5e1 88%, #94a3b8 100%);
+      border: 1px solid #0f172a;
+      border-radius: 0 0 6px 6px;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+      transition: all 0.08s ease;
+      z-index: 1;
+    }
+    .key-white:hover {
+      background: linear-gradient(180deg, #fff 0%, #e2e8f0 88%, #cbd5e1 100%);
+    }
+    .key-white.active, .key-white:active {
+      background: linear-gradient(180deg, #a5f3fc 0%, var(--cyber-cyan) 85%, #0891b2 100%) !important;
+      box-shadow: 0 0 18px rgba(0, 229, 255, 0.6), inset 0 -4px 6px rgba(0, 0, 0, 0.3);
+      transform: translateY(2px);
+    }
+    .key-white.active.macro-hit {
+      background: linear-gradient(180deg, #fde68a 0%, var(--cyber-gold) 85%, #d97706 100%) !important;
+      box-shadow: 0 0 18px rgba(255, 183, 3, 0.6);
+    }
+    .key-black {
+      position: absolute;
+      width: 4.2%;
+      height: 62%;
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 75%, #020617 100%);
+      border: 1px solid #000;
+      border-radius: 0 0 5px 5px;
+      cursor: pointer;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 0.45rem;
+      box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.8);
+      transition: all 0.08s ease;
+    }
+    .key-black:hover {
+      background: linear-gradient(180deg, #334155 0%, #1e293b 75%, #090d16 100%);
+    }
+    .key-black.active, .key-black:active {
+      background: linear-gradient(180deg, #00e5ff 0%, #0284c7 85%, #0369a1 100%) !important;
+      box-shadow: 0 0 16px rgba(0, 229, 255, 0.7);
+      transform: translateY(2px);
+    }
+    .key-black.active.macro-hit {
+      background: linear-gradient(180deg, #ffb703 0%, #d97706 85%, #b45309 100%) !important;
+      box-shadow: 0 0 16px rgba(255, 183, 3, 0.7);
+    }
+    .key-note-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #334155;
+      pointer-events: none;
+    }
+    .key-black .key-note-label {
+      color: #94a3b8;
+      font-size: 0.6rem;
+    }
+    .key-macro-badge {
+      font-size: 0.58rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 0.15rem 0.25rem;
+      border-radius: 3px;
+      background: rgba(0, 0, 0, 0.8);
+      color: var(--cyber-gold);
+      text-align: center;
+      line-height: 1.1;
+      max-width: 90%;
+      word-break: break-word;
+      pointer-events: none;
+      margin-bottom: 0.25rem;
+    }
+    .key-black .key-macro-badge {
+      background: rgba(0, 0, 0, 0.9);
+      color: var(--cyber-cyan);
+      font-size: 0.52rem;
+    }
+    .keys-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.85rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    /* Ambient Stage Strobe Overlay */
+    #stage-strobe-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #fff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 99999;
+      transition: opacity 0.05s ease-out;
+    }
+    #stage-strobe-overlay.flash {
+      opacity: 0.85;
+      transition: none;
+    }
   </style>
 </head>
 <body>
+
+  <!-- Ambient Stage Strobe Overlay (Triggerable via Macro Deck) -->
+  <div id="stage-strobe-overlay"></div>
 
   <!-- Top Sticky Navigation Bar -->
   <header class="gig-top-bar">
@@ -1160,6 +1438,11 @@
     </div>
 
     <div class="top-actions">
+      <!-- Thunder Keys Quick Toggle -->
+      <a href="#sec-thunder-keys" class="btn-top" style="border-color: rgba(255, 183, 3, 0.4); color: var(--cyber-gold);" title="Jump to Thunder Keys Live Synthesizer & Macro Deck">
+        <i class="fa-solid fa-keyboard"></i> Thunder Keys
+      </a>
+
       <!-- Hardware MIDI Learn & Controller Status -->
       <button type="button" id="btn-midi-status" class="btn-midi-pill" onclick="openMidiLearnModal()" title="Hardware Controller Mapping & Status (Pioneer DDJ-FLX2)">
         <span class="midi-dot" id="midi-status-dot"></span>
@@ -1260,6 +1543,7 @@
       <nav class="quick-nav-bar">
         <a href="#sec-timeline" class="nav-chip active"><i class="fa-solid fa-clock"></i> Timeline & Cues</a>
         <a href="#sec-soundboard" class="nav-chip"><i class="fa-solid fa-waveform-lines"></i> Soundboard</a>
+        <a href="#sec-thunder-keys" class="nav-chip" style="border-color: rgba(255, 183, 3, 0.35); color: var(--cyber-gold);"><i class="fa-solid fa-keyboard"></i> Thunder Keys</a>
         <a href="#sec-vip" class="nav-chip"><i class="fa-solid fa-microphone"></i> VIP & Pronunciations</a>
         <a href="#sec-music" class="nav-chip"><i class="fa-solid fa-music"></i> Music & Playlists</a>
         <a href="#sec-venue" class="nav-chip"><i class="fa-solid fa-building"></i> Venue & Power</a>
@@ -1385,6 +1669,101 @@
             <div class="sound-pad-title">Stage Chime</div>
             <div class="sound-pad-sub">Attention Bell Harmonic</div>
           </button>
+        </div>
+      </section>
+
+      <!-- 2.6 THUNDER KEYS: DUAL-MODE LIVE SYNTH & MASTER MACRO DECK -->
+      <section id="sec-thunder-keys" class="section-card thunder-keys-rack">
+        <div class="section-header">
+          <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <h2 class="section-title">
+              <i class="fa-solid fa-keyboard" style="color: var(--cyber-gold);"></i>
+              Thunder Keys
+            </h2>
+            <span class="brand-badge" style="background: rgba(255, 183, 3, 0.15); border-color: var(--cyber-gold); color: var(--cyber-gold);">
+              LIVE SYNTH &amp; MACRO DECK
+            </span>
+          </div>
+
+          <!-- Dual Mode Toggle Switcher -->
+          <div class="keys-mode-switcher">
+            <button type="button" id="btn-mode-synth" class="mode-switch-btn active synth-mode" onclick="setThunderKeysMode('SYNTH')">
+              <i class="fa-solid fa-music"></i> Live Synth Mode
+            </button>
+            <button type="button" id="btn-mode-macro" class="mode-switch-btn" onclick="setThunderKeysMode('MACRO')">
+              <i class="fa-solid fa-bolt"></i> Macro Deck Mode
+            </button>
+          </div>
+        </div>
+
+        <!-- Controls Toolbar (Synth Presets, Octave, Wheels, Volume) -->
+        <div class="keys-toolbar">
+          <!-- Preset Selector (Synth Mode) -->
+          <div class="keys-tool-group" id="group-synth-presets">
+            <label class="keys-tool-label">Synth Sound Preset</label>
+            <select id="synth-preset-select" class="keys-select" onchange="onSynthPresetChange(this.value)">
+              <option value="brass">🎺 Thunder Brass (Trap Horn Stabs)</option>
+              <option value="sub808">🔊 808 Sub Bass (Deep Glide)</option>
+              <option value="pluck">⚡ Cyber Pluck (Punchy Lead)</option>
+              <option value="rhodes">🎹 Electric Rhodes (Warm Chimes)</option>
+              <option value="riser">🚨 Siren &amp; Riser (Hype FX)</option>
+            </select>
+          </div>
+
+          <!-- Macro Mode Info (Macro Mode) -->
+          <div class="keys-tool-group" id="group-macro-info" style="display: none;">
+            <label class="keys-tool-label">Macro Status</label>
+            <div style="font-size: 0.85rem; color: var(--cyber-gold); font-weight: 700; padding-top: 0.25rem;">
+              <i class="fa-solid fa-bolt"></i> All 25 Keys Armed as Instant Stage Triggers
+            </div>
+          </div>
+
+          <!-- Octave Transpose -->
+          <div class="keys-tool-group">
+            <label class="keys-tool-label">Octave Shift</label>
+            <div class="octave-controls">
+              <button type="button" class="btn-oct" onclick="shiftOctave(-1)" title="Down 1 Octave"><i class="fa-solid fa-minus"></i></button>
+              <span id="octave-display" class="octave-val">C3 – C5</span>
+              <button type="button" class="btn-oct" onclick="shiftOctave(1)" title="Up 1 Octave"><i class="fa-solid fa-plus"></i></button>
+            </div>
+          </div>
+
+          <!-- Pitch Bend & Mod Wheel Visualizers -->
+          <div class="keys-tool-group" style="min-width: 120px;">
+            <label class="keys-tool-label">Pitch / Mod Hardware</label>
+            <div class="wheel-meters">
+              <div class="wheel-track" title="Pitch Bend Position">
+                <div id="wheel-pitch-fill" class="wheel-fill pitch-center"></div>
+              </div>
+              <div class="wheel-track" title="Modulation Wheel Position">
+                <div id="wheel-mod-fill" class="wheel-fill mod-zero"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Volume Slider -->
+          <div class="keys-tool-group" style="min-width: 110px;">
+            <label class="keys-tool-label">Master Level</label>
+            <input type="range" id="synth-volume-slider" min="0" max="100" value="75" class="keys-range" oninput="onSynthVolumeChange(this.value)">
+          </div>
+        </div>
+
+        <!-- 25-Key Interactive Visual Piano Surface -->
+        <div class="piano-wrapper">
+          <div id="virtual-piano-keyboard" class="piano-keyboard">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+
+        <!-- Keyboard Status Footer -->
+        <div class="keys-footer">
+          <div style="font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-circle-info" style="color: var(--cyber-cyan);"></i>
+            <span>Plug in any USB / Bluetooth MIDI keyboard. Keys light up in real time with velocity.</span>
+          </div>
+          <div id="active-playing-note-badge" style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--cyber-cyan); font-weight: 700;">
+            Idle
+          </div>
         </div>
       </section>
 
@@ -1766,6 +2145,11 @@
 
       // 3. Initialize Web MIDI & Controller Engine
       await initWebMidi();
+
+      // 4. Initialize Thunder Keys (Live Synth & Macro Deck)
+      if (typeof initThunderKeys === 'function') {
+        initThunderKeys();
+      }
     });
 
     // =========================================================================
@@ -3028,10 +3412,35 @@
       const isNoteOn = (messageType === 9 && velocity > 0);
       const isNoteOff = (messageType === 8 || (messageType === 9 && velocity === 0));
       const isCC = (messageType === 11);
+      const isPitchBend = (messageType === 14);
+
+      // Pitch Bend (14)
+      if (isPitchBend) {
+        const bendVal = (data[2] << 7) | data[1];
+        if (typeof handleHardwarePitchBend === 'function') {
+          handleHardwarePitchBend(bendVal);
+        }
+        return;
+      }
+
+      // Modulation Wheel (CC 1)
+      if (isCC && number === 1) {
+        if (typeof handleHardwareModWheel === 'function') {
+          handleHardwareModWheel(velocity);
+        }
+      }
 
       // Format log line
       const typeStr = isNoteOn ? 'NoteOn' : (isNoteOff ? 'NoteOff' : (isCC ? 'CC' : `0x${status.toString(16)}`));
       logMidiMonitor(`[Ch ${channel + 1}] ${typeStr} #${number} • Val: ${velocity}`);
+
+      // Handle NoteOff for Synthesizer
+      if (isNoteOff) {
+        if (typeof synthNoteOff === 'function') {
+          synthNoteOff(number);
+        }
+        return;
+      }
 
       // If in MIDI LEARN mode, capture this input!
       if (midiLearnActionKey) {
@@ -3053,7 +3462,8 @@
         return;
       }
 
-      // Normal mode: Trigger bound action
+      // Normal mode: Check against explicit mapped actions (DJ Controller pads/knobs)
+      let actionMatched = false;
       if (isNoteOn || (isCC && velocity > 0)) {
         for (const [actionKey, binding] of Object.entries(midiMappings)) {
           if (!binding) continue;
@@ -3063,7 +3473,21 @@
 
           if (matchType && matchChannel && matchNumber) {
             triggerMidiAction(actionKey, velocity);
+            actionMatched = true;
             break;
+          }
+        }
+      }
+
+      // If NoteOn wasn't claimed by a mapped action, route to Thunder Keys!
+      if (!actionMatched && isNoteOn) {
+        if (thunderKeysMode === 'SYNTH') {
+          if (typeof synthNoteOn === 'function') {
+            synthNoteOn(number, velocity);
+          }
+        } else if (thunderKeysMode === 'MACRO') {
+          if (typeof handleKeyboardMacro === 'function') {
+            handleKeyboardMacro(number, velocity);
           }
         }
       }
@@ -3229,6 +3653,11 @@
       if (badgeChime) badgeChime.textContent = midiMappings['SOUND_CHIME'] ? midiMappings['SOUND_CHIME'].label : 'FLX2 PAD 8';
     }
 
+    function clearMidiLog() {
+      const box = document.getElementById('midi-live-monitor');
+      if (box) box.textContent = 'Monitor log cleared. Waiting for events...';
+    }
+
     function logMidiMonitor(msg) {
       const box = document.getElementById('midi-live-monitor');
       if (!box) return;
@@ -3237,9 +3666,435 @@
       box.textContent = line + '\n' + box.textContent.split('\n').slice(0, 7).join('\n');
     }
 
-    function clearMidiLog() {
-      const box = document.getElementById('midi-live-monitor');
-      if (box) box.textContent = 'Monitor log cleared. Waiting for events...';
+    // =========================================================================
+    // 10. THUNDER KEYS POLYPHONIC SYNTHESIZER & MACRO ENGINE
+    // =========================================================================
+    let thunderKeysMode = 'SYNTH'; // 'SYNTH' or 'MACRO'
+    let currentSynthPreset = 'brass';
+    let currentOctaveShift = 0; // -2 to +2
+    let synthMasterVolume = 0.75;
+    let activeSynthVoices = {}; // midiNote -> { oscs, masterGain, filter, lfo, releaseTime }
+    let currentPitchBendCents = 0; // -200 to +200 cents
+    let currentModWheelValue = 0; // 0 to 127
+
+    const MACRO_DECK_KEYS = {
+      48: { name: 'Next Cue', action: () => nextCue() }, // C3
+      49: { name: 'Timer Run', action: () => toggleCueTimer() }, // C#3
+      50: { name: 'Prev Cue', action: () => prevCue() }, // D3
+      51: { name: 'Timer Reset', action: () => resetCueTimer() }, // D#3
+      52: { name: 'Showtime', action: () => toggleShowtimeMode() }, // E3
+      53: { name: 'Thunder Crate', action: () => openThunderCrateModal() }, // F3
+      54: { name: 'GPS Maps', action: () => { const a = document.getElementById('btn-maps-nav'); if (a) a.click(); } }, // F#3
+      55: { name: 'Spotify App', action: () => { const a = document.querySelector('#spotify-app-link-wrap a'); if (a) a.click(); } }, // G3
+      56: { name: 'Call Host', action: () => { const a = document.getElementById('btn-call-client'); if (a) a.click(); } }, // G#3
+      57: { name: 'Call Venue', action: () => { const a = document.getElementById('btn-call-coord'); if (a) a.click(); } }, // A3
+      58: { name: 'Pre-Flight', action: () => { const el = document.getElementById('sec-gear'); if (el) el.scrollIntoView({ behavior: 'smooth' }); } }, // A#3
+      59: { name: 'Complete Gig', action: () => markGigComplete() }, // B3
+      60: { name: 'Airhorn', action: () => triggerSoundAction('SOUND_AIRHORN') }, // C4
+      61: { name: '808 Sub', action: () => triggerSoundAction('SOUND_SUB_DROP') }, // C#4
+      62: { name: 'Laser', action: () => triggerSoundAction('SOUND_LASER') }, // D4
+      63: { name: 'Chime', action: () => triggerSoundAction('SOUND_CHIME') }, // D#4
+      64: { name: 'Top Request', action: () => playNextTopRequest() }, // E4
+      65: { name: 'Strobe FX', action: () => triggerStageStrobe() }, // F4
+      66: { name: 'Airhorn x2', action: () => { triggerSoundAction('SOUND_AIRHORN'); setTimeout(() => triggerSoundAction('SOUND_AIRHORN'), 180); } }, // F#4
+      67: { name: 'Hype Brass', action: () => { const ctx = getAudioContext(); if (ctx) playSynthAirhorn(ctx); } }, // G4
+      68: { name: 'Sub Drop Low', action: () => triggerSoundAction('SOUND_SUB_DROP') }, // G#4
+      69: { name: 'Laser High', action: () => triggerSoundAction('SOUND_LASER') }, // A4
+      70: { name: 'Chime Bell', action: () => triggerSoundAction('SOUND_CHIME') }, // A#4
+      71: { name: 'Wake Lock', action: () => toggleShowtimeMode() }, // B4
+      72: { name: 'Mode Switch', action: () => toggleThunderKeysMode() } // C5
+    };
+
+    function initThunderKeys() {
+      buildVirtualPiano();
+      setThunderKeysMode('SYNTH');
+    }
+
+    function setThunderKeysMode(mode) {
+      thunderKeysMode = mode;
+      const btnSynth = document.getElementById('btn-mode-synth');
+      const btnMacro = document.getElementById('btn-mode-macro');
+      const groupPresets = document.getElementById('group-synth-presets');
+      const groupMacro = document.getElementById('group-macro-info');
+
+      if (mode === 'SYNTH') {
+        if (btnSynth) { btnSynth.className = 'mode-switch-btn active synth-mode'; }
+        if (btnMacro) { btnMacro.className = 'mode-switch-btn'; }
+        if (groupPresets) groupPresets.style.display = 'flex';
+        if (groupMacro) groupMacro.style.display = 'none';
+        logMidiMonitor('🎹 Thunder Keys switched to: LIVE SYNTH MODE');
+      } else {
+        if (btnSynth) { btnSynth.className = 'mode-switch-btn'; }
+        if (btnMacro) { btnMacro.className = 'mode-switch-btn active'; }
+        if (groupPresets) groupPresets.style.display = 'none';
+        if (groupMacro) groupMacro.style.display = 'flex';
+        logMidiMonitor('⚡ Thunder Keys switched to: MACRO DECK MODE');
+      }
+
+      updatePianoKeyLabels();
+    }
+
+    function toggleThunderKeysMode() {
+      setThunderKeysMode(thunderKeysMode === 'SYNTH' ? 'MACRO' : 'SYNTH');
+    }
+
+    function onSynthPresetChange(preset) {
+      currentSynthPreset = preset;
+      logMidiMonitor(`🎹 Synth Preset changed: ${preset}`);
+    }
+
+    function shiftOctave(delta) {
+      currentOctaveShift = Math.max(-2, Math.min(2, currentOctaveShift + delta));
+      const el = document.getElementById('octave-display');
+      if (el) {
+        const rootOct = 3 + currentOctaveShift;
+        el.textContent = `C${rootOct} – C${rootOct + 2}`;
+      }
+      logMidiMonitor(`Octave shift: ${currentOctaveShift >= 0 ? '+' : ''}${currentOctaveShift}`);
+    }
+
+    function onSynthVolumeChange(val) {
+      synthMasterVolume = val / 100;
+    }
+
+    function handleHardwarePitchBend(val) {
+      const normalized = (val - 8192) / 8192; // -1 to +1
+      currentPitchBendCents = normalized * 200; // +/- 200 cents
+
+      const meter = document.getElementById('wheel-pitch-fill');
+      if (meter) {
+        const pct = 50 + (normalized * 50);
+        meter.style.left = `${Math.max(5, Math.min(95, pct))}%`;
+      }
+
+      for (const [note, voice] of Object.entries(activeSynthVoices)) {
+        if (voice && voice.oscs) {
+          voice.oscs.forEach(osc => {
+            if (osc.baseDetune !== undefined) {
+              osc.detune.setValueAtTime(osc.baseDetune + currentPitchBendCents, getAudioContext().currentTime);
+            }
+          });
+        }
+      }
+    }
+
+    function handleHardwareModWheel(val) {
+      currentModWheelValue = val;
+      const norm = val / 127;
+
+      const meter = document.getElementById('wheel-mod-fill');
+      if (meter) {
+        meter.style.width = `${Math.round(norm * 100)}%`;
+      }
+
+      for (const [note, voice] of Object.entries(activeSynthVoices)) {
+        if (voice && voice.filter && voice.baseCutoff) {
+          const modFreq = voice.baseCutoff + (norm * 3000);
+          voice.filter.frequency.setValueAtTime(modFreq, getAudioContext().currentTime);
+        }
+      }
+    }
+
+    function createSynthVoice(ctx, freq, velGain, now, preset) {
+      const masterGain = ctx.createGain();
+      masterGain.connect(ctx.destination);
+
+      let oscs = [];
+      let filter = null;
+      let lfo = null;
+      let releaseTime = 0.2;
+
+      if (preset === 'brass') {
+        filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.baseCutoff = 800;
+        filter.frequency.setValueAtTime(3600, now);
+        filter.frequency.exponentialRampToValueAtTime(750, now + 0.3);
+        filter.connect(masterGain);
+
+        masterGain.gain.setValueAtTime(0.001, now);
+        masterGain.gain.linearRampToValueAtTime(velGain * 0.45, now + 0.015);
+        masterGain.gain.exponentialRampToValueAtTime(velGain * 0.32, now + 0.3);
+        releaseTime = 0.22;
+
+        [-8, 8].forEach(detuneCents => {
+          const osc = ctx.createOscillator();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, now);
+          osc.baseDetune = detuneCents;
+          osc.detune.setValueAtTime(detuneCents + currentPitchBendCents, now);
+          osc.connect(filter);
+          osc.start(now);
+          oscs.push(osc);
+        });
+      } else if (preset === 'sub808') {
+        masterGain.gain.setValueAtTime(0.001, now);
+        masterGain.gain.linearRampToValueAtTime(velGain * 0.7, now + 0.01);
+        releaseTime = 0.35;
+
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq * 1.5, now);
+        osc.frequency.exponentialRampToValueAtTime(freq, now + 0.04);
+        osc.baseDetune = 0;
+        osc.detune.setValueAtTime(currentPitchBendCents, now);
+        osc.connect(masterGain);
+        osc.start(now);
+        oscs.push(osc);
+      } else if (preset === 'pluck') {
+        filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.Q.value = 2.5;
+        filter.baseCutoff = 2200;
+        filter.frequency.setValueAtTime(2800, now);
+        filter.connect(masterGain);
+
+        masterGain.gain.setValueAtTime(0.001, now);
+        masterGain.gain.linearRampToValueAtTime(velGain * 0.5, now + 0.005);
+        masterGain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+        releaseTime = 0.15;
+
+        ['sawtooth', 'triangle'].forEach((type, idx) => {
+          const osc = ctx.createOscillator();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, now);
+          osc.baseDetune = (idx === 0 ? -4 : 4);
+          osc.detune.setValueAtTime(osc.baseDetune + currentPitchBendCents, now);
+          osc.connect(filter);
+          osc.start(now);
+          oscs.push(osc);
+        });
+      } else if (preset === 'rhodes') {
+        filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 2500;
+        filter.connect(masterGain);
+
+        masterGain.gain.setValueAtTime(0.001, now);
+        masterGain.gain.linearRampToValueAtTime(velGain * 0.38, now + 0.01);
+        masterGain.gain.exponentialRampToValueAtTime(velGain * 0.18, now + 0.9);
+        releaseTime = 0.5;
+
+        const osc1 = ctx.createOscillator();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(freq, now);
+        osc1.baseDetune = 0;
+        osc1.detune.setValueAtTime(currentPitchBendCents, now);
+        osc1.connect(filter);
+        osc1.start(now);
+        oscs.push(osc1);
+
+        const osc2 = ctx.createOscillator();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(freq * 3.5, now);
+        osc2.baseDetune = 3;
+        osc2.detune.setValueAtTime(3 + currentPitchBendCents, now);
+        const tineGain = ctx.createGain();
+        tineGain.gain.setValueAtTime(0.18, now);
+        tineGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc2.connect(tineGain);
+        tineGain.connect(filter);
+        osc2.start(now);
+        oscs.push(osc2);
+      } else if (preset === 'riser') {
+        masterGain.gain.setValueAtTime(0.001, now);
+        masterGain.gain.linearRampToValueAtTime(velGain * 0.45, now + 0.08);
+        releaseTime = 0.35;
+
+        const osc = ctx.createOscillator();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(freq * 2.8, now + 1.2);
+        osc.baseDetune = 0;
+        osc.detune.setValueAtTime(currentPitchBendCents, now);
+        osc.connect(masterGain);
+        osc.start(now);
+        oscs.push(osc);
+      }
+
+      return { oscs, masterGain, filter, lfo, releaseTime };
+    }
+
+    function synthNoteOn(midiNote, velocity = 100) {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+
+      synthNoteOff(midiNote);
+
+      const shiftedNote = midiNote + (currentOctaveShift * 12);
+      const freq = 440 * Math.pow(2, (shiftedNote - 69) / 12);
+      const velGain = (velocity / 127) * synthMasterVolume;
+      const now = ctx.currentTime;
+
+      highlightVirtualKey(midiNote, true, 'synth');
+
+      const voice = createSynthVoice(ctx, freq, velGain, now, currentSynthPreset);
+      if (voice) {
+        activeSynthVoices[midiNote] = voice;
+      }
+
+      const badge = document.getElementById('active-playing-note-badge');
+      if (badge) {
+        badge.textContent = `Playing: ${midiNoteToName(shiftedNote)} (${Math.round(freq)} Hz)`;
+      }
+    }
+
+    function synthNoteOff(midiNote) {
+      const voice = activeSynthVoices[midiNote];
+      if (voice) {
+        const ctx = getAudioContext();
+        const now = ctx ? ctx.currentTime : 0;
+        const releaseTime = voice.releaseTime || 0.2;
+
+        if (voice.masterGain) {
+          voice.masterGain.gain.cancelScheduledValues(now);
+          voice.masterGain.gain.setValueAtTime(voice.masterGain.gain.value, now);
+          voice.masterGain.gain.exponentialRampToValueAtTime(0.0001, now + releaseTime);
+        }
+
+        setTimeout(() => {
+          if (voice.oscs) {
+            voice.oscs.forEach(osc => {
+              try { osc.stop(); osc.disconnect(); } catch (e) {}
+            });
+          }
+        }, (releaseTime + 0.1) * 1000);
+
+        delete activeSynthVoices[midiNote];
+      }
+
+      highlightVirtualKey(midiNote, false);
+
+      if (Object.keys(activeSynthVoices).length === 0) {
+        const badge = document.getElementById('active-playing-note-badge');
+        if (badge) badge.textContent = 'Idle';
+      }
+    }
+
+    function handleKeyboardMacro(midiNote, velocity = 100) {
+      highlightVirtualKey(midiNote, true, 'macro');
+      setTimeout(() => highlightVirtualKey(midiNote, false), 220);
+
+      const mapping = MACRO_DECK_KEYS[midiNote];
+      if (mapping && typeof mapping.action === 'function') {
+        logMidiMonitor(`⚡ Macro [${midiNoteToName(midiNote)}]: ${mapping.name}`);
+        mapping.action();
+      } else {
+        logMidiMonitor(`⚡ Macro [${midiNoteToName(midiNote)}]: Unassigned`);
+      }
+    }
+
+    function triggerStageStrobe() {
+      const el = document.getElementById('stage-strobe-overlay');
+      if (!el) return;
+      el.classList.add('flash');
+      setTimeout(() => el.classList.remove('flash'), 70);
+      setTimeout(() => el.classList.add('flash'), 140);
+      setTimeout(() => el.classList.remove('flash'), 210);
+    }
+
+    function buildVirtualPiano() {
+      const container = document.getElementById('virtual-piano-keyboard');
+      if (!container) return;
+
+      const whiteNotes = [48, 50, 52, 53, 55, 57, 59, 60, 62, 64, 65, 67, 69, 71, 72];
+      const blackNotesConfig = [
+        { note: 49, left: 4.8 },
+        { note: 51, left: 11.4 },
+        { note: 54, left: 24.8 },
+        { note: 56, left: 31.4 },
+        { note: 58, left: 38.1 },
+        { note: 61, left: 51.4 },
+        { note: 63, left: 58.1 },
+        { note: 66, left: 71.4 },
+        { note: 68, left: 78.1 },
+        { note: 70, left: 84.8 }
+      ];
+
+      let html = '';
+
+      whiteNotes.forEach(note => {
+        html += `
+          <div class="key-white" id="vk-${note}" data-note="${note}">
+            <div class="key-macro-badge" id="macro-badge-${note}" style="display: none;"></div>
+            <span class="key-note-label">${midiNoteToName(note)}</span>
+          </div>
+        `;
+      });
+
+      blackNotesConfig.forEach(b => {
+        html += `
+          <div class="key-black" id="vk-${b.note}" data-note="${b.note}" style="left: ${b.left}%;">
+            <div class="key-macro-badge" id="macro-badge-${b.note}" style="display: none;"></div>
+            <span class="key-note-label">${midiNoteToName(b.note)}</span>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+
+      const allKeyEls = container.querySelectorAll('.key-white, .key-black');
+      allKeyEls.forEach(el => {
+        const note = parseInt(el.getAttribute('data-note'), 10);
+
+        const onDown = (e) => {
+          e.preventDefault();
+          if (thunderKeysMode === 'SYNTH') {
+            synthNoteOn(note, 110);
+          } else {
+            handleKeyboardMacro(note, 110);
+          }
+        };
+
+        const onUp = (e) => {
+          e.preventDefault();
+          if (thunderKeysMode === 'SYNTH') {
+            synthNoteOff(note);
+          }
+        };
+
+        el.addEventListener('mousedown', onDown);
+        el.addEventListener('mouseup', onUp);
+        el.addEventListener('mouseleave', onUp);
+        el.addEventListener('touchstart', onDown, { passive: false });
+        el.addEventListener('touchend', onUp, { passive: false });
+      });
+
+      updatePianoKeyLabels();
+    }
+
+    function updatePianoKeyLabels() {
+      for (let note = 48; note <= 72; note++) {
+        const badge = document.getElementById(`macro-badge-${note}`);
+        if (!badge) continue;
+
+        if (thunderKeysMode === 'MACRO') {
+          const mapping = MACRO_DECK_KEYS[note];
+          badge.textContent = mapping ? mapping.name : '';
+          badge.style.display = mapping ? 'block' : 'none';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    }
+
+    function highlightVirtualKey(midiNote, isActive, mode = 'synth') {
+      const el = document.getElementById(`vk-${midiNote}`);
+      if (!el) return;
+
+      if (isActive) {
+        el.classList.add('active');
+        if (mode === 'macro') el.classList.add('macro-hit');
+      } else {
+        el.classList.remove('active', 'macro-hit');
+      }
+    }
+
+    function midiNoteToName(note) {
+      const names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+      const octave = Math.floor(note / 12) - 1;
+      const name = names[note % 12];
+      return `${name}${octave}`;
     }
 
     function escapeHtml(text) {
