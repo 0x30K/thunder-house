@@ -891,6 +891,257 @@
     .modal-input:focus {
       border-color: var(--cyber-cyan);
     }
+
+    /* MIDI & Controller Styling */
+    .btn-midi-pill {
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.4rem 0.75rem;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      background: rgba(0, 229, 255, 0.08);
+      color: #e2e8f0;
+    }
+    .btn-midi-pill.connected {
+      border-color: var(--cyber-green);
+      background: rgba(16, 185, 129, 0.15);
+      color: #fff;
+    }
+    .btn-midi-pill.connected .midi-dot {
+      background: var(--cyber-green);
+      box-shadow: 0 0 8px var(--cyber-green);
+    }
+    .btn-midi-pill .midi-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #94a3b8;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+
+    /* Live Cue Stopwatch Bar */
+    .cue-timer-dock {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(0, 0, 0, 0.6));
+      border: 1px solid var(--cyber-border);
+      border-radius: 12px;
+      padding: 0.85rem 1.25rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .cue-timer-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+    .cue-timer-label {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      color: var(--cyber-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+    }
+    .active-cue-name {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .cue-timer-clock-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .cue-timer-clock {
+      font-family: var(--font-mono);
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #fff;
+      background: #000;
+      border: 1px solid rgba(0, 229, 255, 0.35);
+      border-radius: 8px;
+      padding: 0.25rem 0.85rem;
+      min-width: 105px;
+      text-align: center;
+      letter-spacing: 0.05em;
+      box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.15);
+    }
+    .cue-timer-clock.running {
+      border-color: var(--cyber-green);
+      color: #34d399;
+      box-shadow: inset 0 0 12px rgba(16, 185, 129, 0.25), 0 0 10px rgba(16, 185, 129, 0.2);
+    }
+    .btn-cue-timer {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.15s ease;
+    }
+    .btn-cue-timer:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: #fff;
+    }
+    .btn-cue-timer.active-run {
+      background: rgba(16, 185, 129, 0.25);
+      border-color: var(--cyber-green);
+      color: #34d399;
+    }
+    .cue-timer-nav-group {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .btn-cue-nav {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #e2e8f0;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.5rem 0.85rem;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-cue-nav:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+    .btn-cue-nav-primary {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.25), rgba(0, 153, 255, 0.2));
+      border-color: var(--cyber-cyan);
+      color: #fff;
+    }
+    .btn-cue-nav-primary:hover {
+      background: var(--cyber-cyan);
+      color: #000;
+    }
+
+    /* DJ Soundboard Grid */
+    .soundboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 0.85rem;
+    }
+    .sound-pad-btn {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 1.1rem 1rem;
+      text-align: left;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+    .sound-pad-btn:hover {
+      border-color: var(--cyber-cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 229, 255, 0.15);
+    }
+    .sound-pad-btn:active, .sound-pad-btn.triggered {
+      transform: scale(0.97);
+      background: rgba(0, 229, 255, 0.25);
+      border-color: var(--cyber-cyan);
+      box-shadow: 0 0 25px rgba(0, 229, 255, 0.5);
+    }
+    .sound-pad-badge {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--cyber-cyan);
+      background: rgba(0, 229, 255, 0.12);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 0.5rem;
+    }
+    .sound-pad-icon {
+      font-size: 1.5rem;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+    .sound-pad-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.15rem;
+    }
+    .sound-pad-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* MIDI Learn Modal Table & Monitor */
+    .midi-actions-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.25rem;
+    }
+    .midi-actions-table th {
+      text-align: left;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      padding: 0.5rem 0.6rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .midi-actions-table td {
+      padding: 0.6rem 0.6rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.85rem;
+      color: #cbd5e1;
+    }
+    .midi-binding-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      display: inline-block;
+    }
+    .midi-binding-badge.learning {
+      background: rgba(0, 229, 255, 0.2);
+      border-color: var(--cyber-cyan);
+      color: var(--cyber-cyan);
+      animation: pulseGlow 1.2s infinite ease-in-out;
+    }
+    .midi-log-box {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      background: #000;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      max-height: 85px;
+      overflow-y: auto;
+      color: #94a3b8;
+    }
   </style>
 </head>
 <body>
@@ -909,6 +1160,13 @@
     </div>
 
     <div class="top-actions">
+      <!-- Hardware MIDI Learn & Controller Status -->
+      <button type="button" id="btn-midi-status" class="btn-midi-pill" onclick="openMidiLearnModal()" title="Hardware Controller Mapping & Status (Pioneer DDJ-FLX2)">
+        <span class="midi-dot" id="midi-status-dot"></span>
+        <i class="fa-solid fa-sliders" style="color: var(--cyber-cyan);"></i>
+        <span id="midi-status-text">MIDI Offline</span>
+      </button>
+
       <!-- Gig Selector Dropdown -->
       <select id="gig-selector" class="select-gig-input" onchange="onSelectGigChange(this.value)" title="Switch Active Gig">
         <option value="">Loading upcoming gigs...</option>
@@ -1001,6 +1259,7 @@
       <!-- Quick Section Anchor Chips -->
       <nav class="quick-nav-bar">
         <a href="#sec-timeline" class="nav-chip active"><i class="fa-solid fa-clock"></i> Timeline & Cues</a>
+        <a href="#sec-soundboard" class="nav-chip"><i class="fa-solid fa-waveform-lines"></i> Soundboard</a>
         <a href="#sec-vip" class="nav-chip"><i class="fa-solid fa-microphone"></i> VIP & Pronunciations</a>
         <a href="#sec-music" class="nav-chip"><i class="fa-solid fa-music"></i> Music & Playlists</a>
         <a href="#sec-venue" class="nav-chip"><i class="fa-solid fa-building"></i> Venue & Power</a>
@@ -1021,6 +1280,33 @@
             </button>
             <button type="button" class="btn btn-outline btn-sm" onclick="openAddCueModal()" style="font-size: 0.8rem; padding: 0.35rem 0.85rem; border-color: var(--cyber-cyan); color: var(--cyber-cyan);">
               <i class="fa-solid fa-plus"></i> Add Cue
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Active Cue Stopwatch & Hardware Control Dock -->
+        <div id="cue-timer-dock" class="cue-timer-dock">
+          <div class="cue-timer-info">
+            <span class="cue-timer-label"><i class="fa-solid fa-stopwatch"></i> Active Cue Timer</span>
+            <div id="active-cue-display-name" class="active-cue-name">Cue 1: Loading...</div>
+          </div>
+          <div class="cue-timer-clock-wrap">
+            <div id="cue-timer-clock" class="cue-timer-clock">00:00</div>
+            <div class="cue-timer-btn-group" style="display: flex; gap: 0.35rem;">
+              <button type="button" id="btn-cue-timer-toggle" class="btn-cue-timer" onclick="toggleCueTimer()" title="Start / Pause Timer (FLX2 Pad 4)">
+                <i class="fa-solid fa-play" id="icon-cue-timer-play"></i>
+              </button>
+              <button type="button" class="btn-cue-timer" onclick="resetCueTimer()" title="Reset Timer">
+                <i class="fa-solid fa-rotate-left"></i>
+              </button>
+            </div>
+          </div>
+          <div class="cue-timer-nav-group">
+            <button type="button" class="btn-cue-nav" onclick="prevCue()" title="Previous Cue (FLX2 Pad 2)">
+              <i class="fa-solid fa-backward-step"></i> Prev
+            </button>
+            <button type="button" class="btn-cue-nav btn-cue-nav-primary" onclick="nextCue()" title="Next Cue (FLX2 Pad 1)">
+              Next <i class="fa-solid fa-forward-step"></i>
             </button>
           </div>
         </div>
@@ -1056,6 +1342,49 @@
               ⚡ Thunder House MC Standard: Warm, concise, clear diction. Keep the focus entirely on the couple / client.
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- 2.5 CYBER SOUNDBOARD & LIVE STABS (FLX2 PADS 5-8) -->
+      <section id="sec-soundboard" class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="fa-solid fa-waveform-lines" style="color: var(--cyber-cyan);"></i>
+            Cyber Soundboard & Live Stabs
+          </h2>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="badge-pill badge-cyan" style="font-size: 0.65rem;">Zero-Latency Web Audio</span>
+            <button type="button" class="btn btn-outline btn-sm" onclick="openMidiLearnModal()" style="font-size: 0.75rem; padding: 0.25rem 0.65rem; border-color: var(--cyber-cyan); color: var(--cyber-cyan);" title="Customize MIDI trigger assignments">
+              <i class="fa-solid fa-sliders"></i> Map Controller
+            </button>
+          </div>
+        </div>
+
+        <div class="soundboard-grid">
+          <button type="button" class="sound-pad-btn" id="soundpad-airhorn" onclick="triggerSoundAction('SOUND_AIRHORN')">
+            <div class="sound-pad-badge" id="badge-map-airhorn">FLX2 PAD 5</div>
+            <div class="sound-pad-icon"><i class="fa-solid fa-bullhorn" style="color: var(--cyber-gold);"></i></div>
+            <div class="sound-pad-title">Airhorn Blast</div>
+            <div class="sound-pad-sub">Triple Saw Hype Stinger</div>
+          </button>
+          <button type="button" class="sound-pad-btn" id="soundpad-sub" onclick="triggerSoundAction('SOUND_SUB_DROP')">
+            <div class="sound-pad-badge" id="badge-map-sub">FLX2 PAD 6</div>
+            <div class="sound-pad-icon"><i class="fa-solid fa-bolt" style="color: var(--cyber-pink);"></i></div>
+            <div class="sound-pad-title">808 Sub Drop</div>
+            <div class="sound-pad-sub">Deep 130Hz→32Hz Dive</div>
+          </button>
+          <button type="button" class="sound-pad-btn" id="soundpad-laser" onclick="triggerSoundAction('SOUND_LASER')">
+            <div class="sound-pad-badge" id="badge-map-laser">FLX2 PAD 7</div>
+            <div class="sound-pad-icon"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--cyber-cyan);"></i></div>
+            <div class="sound-pad-title">Laser Sweep</div>
+            <div class="sound-pad-sub">Resonant High Synth Chirp</div>
+          </button>
+          <button type="button" class="sound-pad-btn" id="soundpad-chime" onclick="triggerSoundAction('SOUND_CHIME')">
+            <div class="sound-pad-badge" id="badge-map-chime">FLX2 PAD 8</div>
+            <div class="sound-pad-icon"><i class="fa-solid fa-bell" style="color: var(--cyber-green);"></i></div>
+            <div class="sound-pad-title">Stage Chime</div>
+            <div class="sound-pad-sub">Attention Bell Harmonic</div>
+          </button>
         </div>
       </section>
 
@@ -1300,6 +1629,73 @@
     </div>
   </div>
 
+  <!-- Hardware MIDI Controller & Learn Modal -->
+  <div id="modal-midi-learn" class="modal-overlay" style="display: none;">
+    <div class="modal-box" style="max-width: 680px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+          <h3 style="color: #fff; font-family: var(--font-heading); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-sliders" style="color: var(--cyber-cyan);"></i> Hardware MIDI Learn & Mapping
+          </h3>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">
+            Map any Pioneer DDJ-FLX2, MIDI controller, or keyboard directly to DJ Run-of-Show actions.
+          </div>
+        </div>
+        <button type="button" class="btn-top" onclick="closeMidiLearnModal()">&times;</button>
+      </div>
+
+      <!-- Device Connection Status Box -->
+      <div style="background: rgba(0, 229, 255, 0.05); border: 1px solid var(--cyber-border); border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 0.2rem;">Connected Controller</div>
+          <div id="midi-modal-device-name" style="font-size: 0.95rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.45rem;">
+            <span class="midi-dot" id="midi-modal-dot"></span> <span id="midi-modal-device-text">Scanning for USB / Bluetooth MIDI...</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn btn-outline btn-sm" onclick="requestMidiAccess()" style="font-size: 0.75rem; padding: 0.3rem 0.65rem;">
+            <i class="fa-solid fa-rotate"></i> Re-Scan
+          </button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="resetMidiToDefaults()" style="font-size: 0.75rem; padding: 0.3rem 0.65rem; border-color: var(--cyber-gold); color: var(--cyber-gold);" title="Restore Pioneer DDJ-FLX2 factory pad mapping">
+            <i class="fa-solid fa-bolt"></i> FLX2 Defaults
+          </button>
+        </div>
+      </div>
+
+      <!-- Action Mapping Table -->
+      <div style="max-height: 290px; overflow-y: auto; padding-right: 0.35rem; margin-bottom: 1.25rem;">
+        <table class="midi-actions-table">
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Assigned Trigger</th>
+              <th style="text-align: right;">Map Controls</th>
+            </tr>
+          </thead>
+          <tbody id="midi-mappings-tbody">
+            <!-- Populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Live MIDI Signal Monitor -->
+      <div style="margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+          <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted);">
+            <i class="fa-solid fa-satellite-dish"></i> Live Incoming MIDI Monitor
+          </span>
+          <button type="button" onclick="clearMidiLog()" style="background: none; border: none; color: #94a3b8; font-size: 0.7rem; cursor: pointer;">Clear Log</button>
+        </div>
+        <div id="midi-live-monitor" class="midi-log-box">Listening for MIDI input packets... Touch any pad, button, or knob on your controller to test.</div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.75rem; color: #94a3b8;"><i class="fa-solid fa-circle-info"></i> Mappings auto-saved in local browser cache.</span>
+        <button type="button" class="btn btn-primary btn-sm" onclick="closeMidiLearnModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Supabase CDN Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
@@ -1367,6 +1763,9 @@
 
       // 2. Load all available event plans
       await loadAllGigs();
+
+      // 3. Initialize Web MIDI & Controller Engine
+      await initWebMidi();
     });
 
     // =========================================================================
@@ -1532,6 +1931,17 @@
 
       // 2. Timeline Run of Show
       renderTimeline(plan.timeline_items || []);
+      const items = plan.timeline_items || [];
+      const nameEl = document.getElementById('active-cue-display-name');
+      if (nameEl) {
+        if (items.length > 0) {
+          if (activeCueIndex >= items.length) activeCueIndex = 0;
+          const activeItem = items[activeCueIndex];
+          nameEl.textContent = `Cue ${activeCueIndex + 1}: ${activeItem.title} (${activeItem.time || 'TBD'})`;
+        } else {
+          nameEl.textContent = 'No cues scheduled';
+        }
+      }
 
       // 3. VIP Names & Pronunciations
       renderVipNames(plan.vip_names_pronunciations || []);
@@ -1635,9 +2045,43 @@
     }
 
     function setActiveCue(idx) {
+      if (!currentPlan || !currentPlan.timeline_items || currentPlan.timeline_items.length === 0) return;
+      const items = currentPlan.timeline_items;
+      if (idx < 0) idx = 0;
+      if (idx >= items.length) idx = items.length - 1;
       activeCueIndex = idx;
-      if (currentPlan) {
-        renderTimeline(currentPlan.timeline_items || []);
+      renderTimeline(items);
+
+      // Update Active Cue Dock Display
+      const activeItem = items[idx];
+      const nameEl = document.getElementById('active-cue-display-name');
+      if (nameEl && activeItem) {
+        nameEl.textContent = `Cue ${idx + 1}: ${activeItem.title} (${activeItem.time || 'TBD'})`;
+      }
+
+      // Scroll active cue into view
+      const el = document.getElementById(`cue-row-${idx}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      // Update hardware feedback
+      if (typeof updateMidiLedFeedback === 'function') {
+        updateMidiLedFeedback();
+      }
+    }
+
+    function nextCue() {
+      if (!currentPlan || !currentPlan.timeline_items) return;
+      if (activeCueIndex < currentPlan.timeline_items.length - 1) {
+        setActiveCue(activeCueIndex + 1);
+      }
+    }
+
+    function prevCue() {
+      if (!currentPlan || !currentPlan.timeline_items) return;
+      if (activeCueIndex > 0) {
+        setActiveCue(activeCueIndex - 1);
       }
     }
 
@@ -2245,6 +2689,557 @@
       } catch (err) {
         alert('Error updating request status: ' + err.message);
       }
+    }
+
+    // =========================================================================
+    // 7. CUE STOPWATCH TIMER (FLX2 PAD 4)
+    // =========================================================================
+    let cueTimerSeconds = 0;
+    let cueTimerInterval = null;
+
+    function toggleCueTimer() {
+      if (cueTimerInterval) {
+        pauseCueTimer();
+      } else {
+        startCueTimer();
+      }
+    }
+
+    function startCueTimer() {
+      if (cueTimerInterval) return;
+      cueTimerInterval = setInterval(() => {
+        cueTimerSeconds++;
+        updateCueTimerDisplay();
+      }, 1000);
+      updateCueTimerStateUi(true);
+      if (typeof updateMidiLedFeedback === 'function') updateMidiLedFeedback();
+    }
+
+    function pauseCueTimer() {
+      if (cueTimerInterval) {
+        clearInterval(cueTimerInterval);
+        cueTimerInterval = null;
+      }
+      updateCueTimerStateUi(false);
+      if (typeof updateMidiLedFeedback === 'function') updateMidiLedFeedback();
+    }
+
+    function resetCueTimer() {
+      pauseCueTimer();
+      cueTimerSeconds = 0;
+      updateCueTimerDisplay();
+    }
+
+    function updateCueTimerDisplay() {
+      const clockEl = document.getElementById('cue-timer-clock');
+      if (!clockEl) return;
+      const m = Math.floor(cueTimerSeconds / 60);
+      const s = cueTimerSeconds % 60;
+      clockEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updateCueTimerStateUi(isRunning) {
+      const clockEl = document.getElementById('cue-timer-clock');
+      const toggleBtn = document.getElementById('btn-cue-timer-toggle');
+      const icon = document.getElementById('icon-cue-timer-play');
+      if (!clockEl || !toggleBtn || !icon) return;
+
+      if (isRunning) {
+        clockEl.classList.add('running');
+        toggleBtn.classList.add('active-run');
+        icon.className = 'fa-solid fa-pause';
+      } else {
+        clockEl.classList.remove('running');
+        toggleBtn.classList.remove('active-run');
+        icon.className = 'fa-solid fa-play';
+      }
+    }
+
+    // =========================================================================
+    // 8. WEB AUDIO ZERO-LATENCY SYNTHESIS (AIRHORN, 808 SUB, LASER, CHIME)
+    // =========================================================================
+    let audioCtx = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function triggerSoundAction(soundKey) {
+      const padMap = {
+        'SOUND_AIRHORN': 'soundpad-airhorn',
+        'SOUND_SUB_DROP': 'soundpad-sub',
+        'SOUND_LASER': 'soundpad-laser',
+        'SOUND_CHIME': 'soundpad-chime'
+      };
+
+      const btnId = padMap[soundKey];
+      if (btnId) {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+          btn.classList.add('triggered');
+          setTimeout(() => btn.classList.remove('triggered'), 200);
+        }
+      }
+
+      const ctx = getAudioContext();
+      if (!ctx) return;
+
+      if (soundKey === 'SOUND_AIRHORN') playSynthAirhorn(ctx);
+      else if (soundKey === 'SOUND_SUB_DROP') playSynthSubDrop(ctx);
+      else if (soundKey === 'SOUND_LASER') playSynthLaser(ctx);
+      else if (soundKey === 'SOUND_CHIME') playSynthChime(ctx);
+    }
+
+    // 1. Triple Saw Hype Airhorn
+    function playSynthAirhorn(ctx) {
+      const now = ctx.currentTime;
+      const freqs = [466.16, 587.33, 698.46]; // Bb Major Triad Stabs
+      const masterGain = ctx.createGain();
+      masterGain.gain.setValueAtTime(0.38, now);
+      masterGain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+      masterGain.connect(ctx.destination);
+
+      freqs.forEach(freq => {
+        const osc = ctx.createOscillator();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq * 0.92, now);
+        osc.frequency.exponentialRampToValueAtTime(freq, now + 0.05);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.98, now + 0.65);
+        osc.connect(masterGain);
+        osc.start(now);
+        osc.stop(now + 0.65);
+      });
+    }
+
+    // 2. Deep 808 Sub Bass Drop
+    function playSynthSubDrop(ctx) {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+
+      // Pitch sweep from 135Hz down to 32Hz
+      osc.frequency.setValueAtTime(135, now);
+      osc.frequency.exponentialRampToValueAtTime(32, now + 0.9);
+
+      // Amplitude envelope
+      gain.gain.setValueAtTime(0.75, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 1.1);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 1.1);
+    }
+
+    // 3. Resonant High Laser Synth
+    function playSynthLaser(ctx) {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+
+      // Fast chirp from 1800Hz down to 160Hz
+      osc.frequency.setValueAtTime(1800, now);
+      osc.frequency.exponentialRampToValueAtTime(160, now + 0.28);
+
+      gain.gain.setValueAtTime(0.35, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.28);
+    }
+
+    // 4. Stage Attention Chime
+    function playSynthChime(ctx) {
+      const now = ctx.currentTime;
+      const freqs = [880, 1320, 1760]; // Pure bell harmonics
+      freqs.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+
+        const decay = 0.85 + (idx * 0.2);
+        gain.gain.setValueAtTime(0.25 / (idx + 1), now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + decay);
+      });
+    }
+
+    // =========================================================================
+    // 9. WEB MIDI API & CONTROLLER INTEGRATION (PIONEER DDJ-FLX2)
+    // =========================================================================
+    let midiAccess = null;
+    let connectedMidiInputs = [];
+    let connectedMidiOutputs = [];
+    let midiLearnActionKey = null;
+
+    // Available Actions Definition
+    const MIDI_ACTION_DEFINITIONS = [
+      { key: 'NEXT_CUE', name: 'Next Timeline Cue', desc: 'Advances to next cue & scrolls into view', defaultNote: 36, defaultChan: 0 },
+      { key: 'PREV_CUE', name: 'Previous Timeline Cue', desc: 'Steps back to previous milestone', defaultNote: 37, defaultChan: 0 },
+      { key: 'TOGGLE_SHOWTIME', name: 'Toggle Showtime Mode', desc: 'Screen wake lock & high contrast', defaultNote: 38, defaultChan: 0 },
+      { key: 'TIMER_TOGGLE', name: 'Cue Timer Start/Pause', desc: 'Runs live stopwatch for speeches/dances', defaultNote: 39, defaultChan: 0 },
+      { key: 'SOUND_AIRHORN', name: 'Airhorn Stinger Drop', desc: 'Plays triple saw hype blast', defaultNote: 40, defaultChan: 0 },
+      { key: 'SOUND_SUB_DROP', name: '808 Sub Drop Stinger', desc: 'Plays deep 130Hz→32Hz bass dive', defaultNote: 41, defaultChan: 0 },
+      { key: 'SOUND_LASER', name: 'Laser Sweep Drop', desc: 'Plays resonant high synth chirp', defaultNote: 42, defaultChan: 0 },
+      { key: 'PLAY_TOP_REQUEST', name: 'Mark Top Request Played', desc: 'Marks next guest song request as played', defaultNote: 43, defaultChan: 0 },
+      { key: 'TOGGLE_CRATE', name: 'Toggle Thunder Crate', desc: 'Opens/closes saved runs modal', defaultNote: 44, defaultChan: 0 },
+      { key: 'TIMER_RESET', name: 'Reset Cue Timer', desc: 'Resets cue timer to 00:00', defaultNote: 45, defaultChan: 0 }
+    ];
+
+    let midiMappings = {};
+
+    function loadMidiMappings() {
+      try {
+        const stored = localStorage.getItem('th_midi_mappings');
+        if (stored) {
+          midiMappings = JSON.parse(stored);
+          return;
+        }
+      } catch (e) {}
+
+      resetMidiToDefaults(false);
+    }
+
+    function saveMidiMappings() {
+      try {
+        localStorage.setItem('th_midi_mappings', JSON.stringify(midiMappings));
+      } catch (e) {}
+      updateSoundboardBadges();
+      renderMidiMappingsTable();
+    }
+
+    function resetMidiToDefaults(doAlert = true) {
+      midiMappings = {};
+      MIDI_ACTION_DEFINITIONS.forEach(def => {
+        if (def.defaultNote !== null) {
+          midiMappings[def.key] = {
+            type: 'noteon',
+            channel: def.defaultChan,
+            number: def.defaultNote,
+            label: `Ch ${def.defaultChan + 1} • Note ${def.defaultNote}`
+          };
+        }
+      });
+      saveMidiMappings();
+      if (doAlert) {
+        logMidiMonitor('⚡ Reset mappings to Pioneer DDJ-FLX2 factory defaults.');
+        alert('⚡ Restored Pioneer DDJ-FLX2 default mappings (Pads 1–8).');
+      }
+    }
+
+    async function initWebMidi() {
+      loadMidiMappings();
+      updateSoundboardBadges();
+
+      if (!('requestMIDIAccess' in navigator)) {
+        updateMidiStatusUi(false, 'Web MIDI Offline (Use Chrome/Edge)');
+        return;
+      }
+
+      try {
+        midiAccess = await navigator.requestMIDIAccess({ sysex: false });
+        midiAccess.onstatechange = onMidiStateChange;
+        refreshMidiDevices();
+      } catch (err) {
+        console.warn('Web MIDI permission denied or unavailable:', err);
+        updateMidiStatusUi(false, 'MIDI Disconnected (Click to Map)');
+      }
+    }
+
+    async function requestMidiAccess() {
+      logMidiMonitor('Scanning for USB & Bluetooth MIDI hardware...');
+      await initWebMidi();
+    }
+
+    function onMidiStateChange(e) {
+      logMidiMonitor(`Hardware Port State: ${e.port.name || 'MIDI Port'} (${e.port.type} ${e.port.state})`);
+      refreshMidiDevices();
+    }
+
+    function refreshMidiDevices() {
+      if (!midiAccess) return;
+      connectedMidiInputs = [];
+      connectedMidiOutputs = [];
+
+      for (const input of midiAccess.inputs.values()) {
+        connectedMidiInputs.push(input);
+        input.onmidimessage = handleMidiMessage;
+      }
+
+      for (const output of midiAccess.outputs.values()) {
+        connectedMidiOutputs.push(output);
+      }
+
+      if (connectedMidiInputs.length > 0) {
+        const devName = connectedMidiInputs[0].name || 'MIDI Controller';
+        updateMidiStatusUi(true, `${devName}`);
+        logMidiMonitor(`Connected: ${devName}`);
+      } else {
+        updateMidiStatusUi(false, 'MIDI Offline (Click to Map)');
+      }
+    }
+
+    function updateMidiStatusUi(isConnected, text) {
+      const btn = document.getElementById('btn-midi-status');
+      const textEl = document.getElementById('midi-status-text');
+      const modalDot = document.getElementById('midi-modal-dot');
+      const modalText = document.getElementById('midi-modal-device-text');
+
+      if (textEl) textEl.textContent = text;
+      if (modalText) modalText.textContent = text;
+
+      if (isConnected) {
+        if (btn) btn.classList.add('connected');
+        if (modalDot) modalDot.classList.add('connected');
+      } else {
+        if (btn) btn.classList.remove('connected');
+        if (modalDot) modalDot.classList.remove('connected');
+      }
+    }
+
+    function handleMidiMessage(event) {
+      const data = event.data;
+      if (!data || data.length < 2) return;
+
+      const status = data[0];
+      const messageType = status >> 4;
+      const channel = status & 0xf;
+      const number = data[1];
+      const velocity = data.length > 2 ? data[2] : 0;
+
+      const isNoteOn = (messageType === 9 && velocity > 0);
+      const isNoteOff = (messageType === 8 || (messageType === 9 && velocity === 0));
+      const isCC = (messageType === 11);
+
+      // Format log line
+      const typeStr = isNoteOn ? 'NoteOn' : (isNoteOff ? 'NoteOff' : (isCC ? 'CC' : `0x${status.toString(16)}`));
+      logMidiMonitor(`[Ch ${channel + 1}] ${typeStr} #${number} • Val: ${velocity}`);
+
+      // If in MIDI LEARN mode, capture this input!
+      if (midiLearnActionKey) {
+        if (isNoteOn || (isCC && velocity > 0)) {
+          const type = isNoteOn ? 'noteon' : 'controlchange';
+          const label = `Ch ${channel + 1} • ${isNoteOn ? 'Note' : 'CC'} ${number}`;
+          midiMappings[midiLearnActionKey] = {
+            type: type,
+            channel: channel,
+            number: number,
+            label: label
+          };
+          const learnedKey = midiLearnActionKey;
+          midiLearnActionKey = null;
+          saveMidiMappings();
+          logMidiMonitor(`✔ Bound "${learnedKey}" to ${label}!`);
+          triggerMidiAction(learnedKey, velocity);
+        }
+        return;
+      }
+
+      // Normal mode: Trigger bound action
+      if (isNoteOn || (isCC && velocity > 0)) {
+        for (const [actionKey, binding] of Object.entries(midiMappings)) {
+          if (!binding) continue;
+          const matchType = (binding.type === 'noteon' && isNoteOn) || (binding.type === 'controlchange' && isCC);
+          const matchChannel = (binding.channel === undefined || binding.channel === channel);
+          const matchNumber = (binding.number === number);
+
+          if (matchType && matchChannel && matchNumber) {
+            triggerMidiAction(actionKey, velocity);
+            break;
+          }
+        }
+      }
+    }
+
+    function triggerMidiAction(actionKey, velocity = 127) {
+      switch (actionKey) {
+        case 'NEXT_CUE':
+          nextCue();
+          break;
+        case 'PREV_CUE':
+          prevCue();
+          break;
+        case 'TOGGLE_SHOWTIME':
+          toggleShowtimeMode();
+          break;
+        case 'TIMER_TOGGLE':
+          toggleCueTimer();
+          break;
+        case 'TIMER_RESET':
+          resetCueTimer();
+          break;
+        case 'SOUND_AIRHORN':
+        case 'SOUND_SUB_DROP':
+        case 'SOUND_LASER':
+        case 'SOUND_CHIME':
+          triggerSoundAction(actionKey);
+          break;
+        case 'PLAY_TOP_REQUEST':
+          playNextTopRequest();
+          break;
+        case 'TOGGLE_CRATE':
+          const crateModal = document.getElementById('modal-thunder-crate');
+          if (crateModal.style.display === 'flex') closeThunderCrateModal();
+          else openThunderCrateModal();
+          break;
+      }
+
+      // Visual pulse in mapping modal if open
+      const row = document.getElementById(`midi-action-row-${actionKey}`);
+      if (row) {
+        row.style.background = 'rgba(0, 229, 255, 0.2)';
+        setTimeout(() => row.style.background = '', 250);
+      }
+    }
+
+    async function playNextTopRequest() {
+      if (!currentPlan || !currentPlan.id) return;
+      try {
+        const { data: reqs } = await window.supabaseClient
+          .from('thunderhouse_guest_requests')
+          .select('id, song_title, guest_name')
+          .eq('event_plan_id', currentPlan.id)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: true })
+          .limit(1);
+
+        if (reqs && reqs.length > 0) {
+          await markDjRequestPlayed(reqs[0].id);
+          logMidiMonitor(`✔ Marked request "${reqs[0].song_title}" as Played!`);
+        } else {
+          logMidiMonitor('No pending guest requests to mark as played.');
+        }
+      } catch (e) {
+        console.warn('Error marking request played via MIDI:', e);
+      }
+    }
+
+    function updateMidiLedFeedback() {
+      if (!connectedMidiOutputs || connectedMidiOutputs.length === 0) return;
+
+      const isRunning = (cueTimerInterval !== null);
+      const timerBinding = midiMappings['TIMER_TOGGLE'];
+      if (timerBinding && timerBinding.type === 'noteon') {
+        const vel = isRunning ? 127 : 0;
+        sendMidiRaw([0x90 | (timerBinding.channel & 0xf), timerBinding.number, vel]);
+      }
+
+      const showtimeBinding = midiMappings['TOGGLE_SHOWTIME'];
+      const isShowtime = document.body.classList.contains('showtime-mode');
+      if (showtimeBinding && showtimeBinding.type === 'noteon') {
+        const vel = isShowtime ? 127 : 0;
+        sendMidiRaw([0x90 | (showtimeBinding.channel & 0xf), showtimeBinding.number, vel]);
+      }
+    }
+
+    function sendMidiRaw(bytes) {
+      connectedMidiOutputs.forEach(output => {
+        try {
+          output.send(bytes);
+        } catch (e) {}
+      });
+    }
+
+    function openMidiLearnModal() {
+      document.getElementById('modal-midi-learn').style.display = 'flex';
+      refreshMidiDevices();
+      renderMidiMappingsTable();
+    }
+
+    function closeMidiLearnModal() {
+      midiLearnActionKey = null;
+      document.getElementById('modal-midi-learn').style.display = 'none';
+    }
+
+    function renderMidiMappingsTable() {
+      const tbody = document.getElementById('midi-mappings-tbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = MIDI_ACTION_DEFINITIONS.map(def => {
+        const binding = midiMappings[def.key];
+        const isLearning = (midiLearnActionKey === def.key);
+        const labelText = isLearning ? 'HIT ANY PAD / KEY NOW...' : (binding ? binding.label : 'Unassigned');
+        const badgeClass = isLearning ? 'midi-binding-badge learning' : 'midi-binding-badge';
+
+        return `
+          <tr id="midi-action-row-${def.key}">
+            <td>
+              <strong style="color: #fff; font-size: 0.9rem;">${escapeHtml(def.name)}</strong>
+              <div style="font-size: 0.75rem; color: #94a3b8;">${escapeHtml(def.desc)}</div>
+            </td>
+            <td>
+              <span class="${badgeClass}">${escapeHtml(labelText)}</span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="startMidiLearn('${def.key}')" style="font-size: 0.75rem; padding: 0.25rem 0.55rem; ${isLearning ? 'border-color: var(--cyber-cyan); color: var(--cyber-cyan); font-weight: 800;' : ''}">
+                ${isLearning ? '<i class="fa-solid fa-spinner fa-spin"></i> Learning...' : '<i class="fa-solid fa-graduation-cap"></i> Learn'}
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="triggerMidiAction('${def.key}')" style="font-size: 0.75rem; padding: 0.25rem 0.45rem;" title="Test trigger action">
+                <i class="fa-solid fa-play"></i>
+              </button>
+              ${binding ? `
+                <button type="button" class="btn btn-outline btn-sm" onclick="clearMidiMapping('${def.key}')" style="font-size: 0.75rem; padding: 0.25rem 0.45rem; border-color: #ef4444; color: #ef4444;" title="Clear assignment">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              ` : ''}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function startMidiLearn(actionKey) {
+      midiLearnActionKey = actionKey;
+      logMidiMonitor(`⚡ [LEARN ACTIVE] Touch a pad, knob, or key on your controller for "${actionKey}"...`);
+      renderMidiMappingsTable();
+    }
+
+    function clearMidiMapping(actionKey) {
+      delete midiMappings[actionKey];
+      saveMidiMappings();
+    }
+
+    function updateSoundboardBadges() {
+      const badgeAirhorn = document.getElementById('badge-map-airhorn');
+      const badgeSub = document.getElementById('badge-map-sub');
+      const badgeLaser = document.getElementById('badge-map-laser');
+      const badgeChime = document.getElementById('badge-map-chime');
+
+      if (badgeAirhorn) badgeAirhorn.textContent = midiMappings['SOUND_AIRHORN'] ? midiMappings['SOUND_AIRHORN'].label : 'FLX2 PAD 5';
+      if (badgeSub) badgeSub.textContent = midiMappings['SOUND_SUB_DROP'] ? midiMappings['SOUND_SUB_DROP'].label : 'FLX2 PAD 6';
+      if (badgeLaser) badgeLaser.textContent = midiMappings['SOUND_LASER'] ? midiMappings['SOUND_LASER'].label : 'FLX2 PAD 7';
+      if (badgeChime) badgeChime.textContent = midiMappings['SOUND_CHIME'] ? midiMappings['SOUND_CHIME'].label : 'FLX2 PAD 8';
+    }
+
+    function logMidiMonitor(msg) {
+      const box = document.getElementById('midi-live-monitor');
+      if (!box) return;
+      const t = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const line = `[${t}] ${msg}`;
+      box.textContent = line + '\n' + box.textContent.split('\n').slice(0, 7).join('\n');
+    }
+
+    function clearMidiLog() {
+      const box = document.getElementById('midi-live-monitor');
+      if (box) box.textContent = 'Monitor log cleared. Waiting for events...';
     }
 
     function escapeHtml(text) {
