@@ -10,6 +10,7 @@
     { "source": "/runofshow", "destination": "/gigs.html" },
     { "source": "/contract", "destination": "/contract.html" },
     { "source": "/requests", "destination": "/requests.html" },
+    { "source": "/keys", "destination": "/keys.html" },
     { "source": "/thank-you", "destination": "/thank-you.html" }
   ]
 }

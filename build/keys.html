@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Thunder Keys // DJ Stage Cockpit | Thunder House ENT</title>
+  <meta name="description" content="Dedicated DJ Stage Cockpit for Thunder Keys - Polyphonic Web Audio Synthesizer, Pioneer DDJ-FLX2 Web MIDI Integration, and Live Run of Show Macro Deck.">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Design System CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    :root {
+      --bg-cockpit: #040711;
+      --bg-panel: rgba(10, 15, 29, 0.94);
+      --bg-panel-border: rgba(0, 229, 255, 0.16);
+      --cyber-cyan: #00e5ff;
+      --cyber-gold: #ffb703;
+      --cyber-pink: #ff0055;
+      --cyber-green: #00ff88;
+      --cyber-red: #ef4444;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-cockpit);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(0, 229, 255, 0.05) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(255, 183, 3, 0.04) 0%, transparent 45%),
+        linear-gradient(180deg, #020409 0%, #060913 100%);
+      color: #f1f5f9;
+      font-family: var(--font-body);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Stage Strobe Overlay */
+    #stage-strobe-overlay {
+      position: fixed;
+      inset: 0;
+      background: #ffffff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 99999;
+      transition: opacity 0.05s ease-out;
+    }
+    #stage-strobe-overlay.flash {
+      opacity: 0.95;
+    }
+
+    /* Top DJ Cockpit Header */
+    .cockpit-header {
+      background: rgba(3, 7, 18, 0.95);
+      border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+      padding: 0.65rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(14px);
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .brand-logo-img {
+      height: 38px;
+      filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.45));
+    }
+
+    .brand-title-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: linear-gradient(135deg, #ffffff 40%, var(--cyber-cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-sub {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--cyber-gold);
+      font-weight: 700;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+    }
+
+    /* Hardware MIDI status pill */
+    .midi-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(15, 23, 42, 0.85);
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .midi-pill.connected {
+      border-color: var(--cyber-cyan);
+      color: var(--cyber-cyan);
+      background: rgba(0, 229, 255, 0.12);
+      box-shadow: 0 0 14px rgba(0, 229, 255, 0.25);
+    }
+    .midi-pill.flx2 {
+      border-color: var(--cyber-gold);
+      color: var(--cyber-gold);
+      background: rgba(255, 183, 3, 0.14);
+      box-shadow: 0 0 16px rgba(255, 183, 3, 0.3);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .status-dot.pulse {
+      animation: dotPulse 1.4s infinite;
+    }
+    @keyframes dotPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .btn-cockpit {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.4rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(15, 23, 42, 0.75);
+      color: #cbd5e1;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-cockpit:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+    .btn-cockpit.gold {
+      border-color: var(--cyber-gold);
+      color: var(--cyber-gold);
+    }
+    .btn-cockpit.gold:hover {
+      background: rgba(255, 183, 3, 0.15);
+    }
+    .btn-cockpit.cyan {
+      border-color: var(--cyber-cyan);
+      color: var(--cyber-cyan);
+    }
+    .btn-cockpit.cyan:hover {
+      background: rgba(0, 229, 255, 0.15);
+    }
+
+    .select-gig {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.38rem 0.75rem;
+      border-radius: 8px;
+      outline: none;
+      cursor: pointer;
+      max-width: 240px;
+    }
+
+    /* Main Stage Workspace */
+    .stage-workspace {
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.25rem 1.25rem 2.5rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Live Cue HUD Strip */
+    .cue-hud-strip {
+      background: rgba(10, 15, 29, 0.85);
+      border: 1px solid rgba(0, 229, 255, 0.2);
+      border-radius: 12px;
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    .cue-hud-details {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .cue-badge-pill {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      background: rgba(0, 229, 255, 0.15);
+      color: var(--cyber-cyan);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+    }
+
+    .cue-title-text {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 0;
+    }
+
+    .cue-song-text {
+      font-size: 0.82rem;
+      color: var(--cyber-gold);
+      font-weight: 600;
+    }
+
+    .cue-hud-timer {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .hud-clock {
+      font-family: var(--font-mono);
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--cyber-cyan);
+      text-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+      min-width: 95px;
+      text-align: right;
+    }
+
+    .btn-hud-control {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-hud-control:hover {
+      background: var(--cyber-cyan);
+      color: #000;
+    }
+    .btn-hud-control.active {
+      background: var(--cyber-cyan);
+      color: #000;
+    }
+
+    /* Thunder Keys Main Rack */
+    .thunder-keys-stage-card {
+      background: radial-gradient(circle at 10% 20%, rgba(255, 183, 3, 0.05) 0%, rgba(10, 14, 25, 0.96) 90%);
+      border: 1px solid rgba(255, 183, 3, 0.3);
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 183, 3, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .stage-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 1rem;
+    }
+
+    .keys-mode-switcher {
+      display: inline-flex;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      padding: 0.25rem;
+      gap: 0.4rem;
+    }
+
+    .mode-switch-btn {
+      font-size: 0.82rem;
+      font-weight: 800;
+      padding: 0.45rem 1.15rem;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    .mode-switch-btn.active.synth-mode {
+      background: var(--cyber-cyan);
+      color: #000;
+      box-shadow: 0 0 16px rgba(0, 229, 255, 0.4);
+    }
+    .mode-switch-btn.active.macro-mode {
+      background: var(--cyber-gold);
+      color: #000;
+      box-shadow: 0 0 16px rgba(255, 183, 3, 0.4);
+    }
+
+    /* Toolbar controls */
+    .keys-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 0.85rem 1.15rem;
+    }
+
+    .keys-tool-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .keys-tool-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+    }
+
+    .keys-select {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(255, 183, 3, 0.4);
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 0.84rem;
+      font-weight: 600;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .octave-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-oct {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.15s ease;
+    }
+    .btn-oct:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .octave-val {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      color: var(--cyber-gold);
+      font-weight: 700;
+      min-width: 75px;
+      text-align: center;
+    }
+
+    .wheel-meters {
+      display: flex;
+      gap: 0.65rem;
+      align-items: center;
+    }
+
+    .wheel-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .wheel-track {
+      width: 30px;
+      height: 65px;
+      background: #000;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .wheel-fill {
+      width: 100%;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      transition: height 0.05s ease;
+    }
+    .wheel-fill.pitch-fill {
+      background: var(--cyber-gold);
+      height: 50%;
+    }
+    .wheel-fill.mod-fill {
+      background: var(--cyber-pink);
+      height: 0%;
+    }
+
+    .wheel-sublabel {
+      font-size: 0.65rem;
+      color: #94a3b8;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+
+    .keys-range {
+      accent-color: var(--cyber-gold);
+      width: 110px;
+      cursor: pointer;
+    }
+
+    /* Virtual Piano Keyboard */
+    .piano-wrapper {
+      background: #020408;
+      border: 2px solid rgba(0, 0, 0, 0.85);
+      border-radius: 14px;
+      padding: 1rem 1.25rem 1.25rem 1.25rem;
+      box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.95), 0 15px 40px rgba(0, 0, 0, 0.7);
+      overflow-x: auto;
+      scrollbar-width: thin;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .piano-keyboard {
+      display: flex;
+      position: relative;
+      height: 220px;
+      min-width: 820px;
+      justify-content: flex-start;
+      margin: 0 auto;
+    }
+
+    .key-white {
+      flex: 1;
+      height: 100%;
+      background: linear-gradient(180deg, #f8fafc 0%, #cbd5e1 88%, #94a3b8 100%);
+      border: 1px solid #0f172a;
+      border-radius: 0 0 8px 8px;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 0.65rem;
+      box-shadow: 0 5px 8px rgba(0, 0, 0, 0.45);
+      transition: all 0.08s ease;
+      z-index: 1;
+    }
+    .key-white:active, .key-white.active {
+      background: linear-gradient(180deg, #38bdf8 0%, #00e5ff 100%);
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.6);
+      transform: translateY(3px);
+      border-color: #00e5ff;
+    }
+    .key-white.active.macro-hit {
+      background: linear-gradient(180deg, #fde047 0%, #ffb703 100%);
+      box-shadow: 0 0 24px rgba(255, 183, 3, 0.9), inset 0 0 10px rgba(255, 255, 255, 0.8);
+      border-color: #ffb703;
+    }
+
+    .key-black {
+      position: absolute;
+      width: 4.8%;
+      height: 60%;
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 75%, #020617 100%);
+      border: 1px solid #000;
+      border-radius: 0 0 6px 6px;
+      cursor: pointer;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 0.45rem;
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.8);
+      transition: all 0.08s ease;
+    }
+    .key-black:active, .key-black.active {
+      background: linear-gradient(180deg, #0284c7 0%, #00e5ff 100%);
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.85);
+      transform: translateY(3px);
+      border-color: #00e5ff;
+    }
+    .key-black.active.macro-hit {
+      background: linear-gradient(180deg, #d97706 0%, #ffb703 100%);
+      box-shadow: 0 0 24px rgba(255, 183, 3, 0.95);
+      border-color: #ffb703;
+    }
+
+    .key-note-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: #334155;
+      pointer-events: none;
+    }
+    .key-black .key-note-label {
+      color: #94a3b8;
+      font-size: 0.65rem;
+    }
+    .key-white.active .key-note-label, .key-black.active .key-note-label {
+      color: #000;
+      font-weight: 900;
+    }
+
+    .key-macro-badge {
+      position: absolute;
+      top: 6px;
+      left: 2px;
+      right: 2px;
+      font-size: 0.62rem;
+      font-weight: 800;
+      text-align: center;
+      text-transform: uppercase;
+      background: rgba(0, 0, 0, 0.75);
+      color: var(--cyber-gold);
+      border: 1px solid rgba(255, 183, 3, 0.4);
+      border-radius: 4px;
+      padding: 0.15rem 0.1rem;
+      line-height: 1.1;
+      pointer-events: none;
+      word-break: break-word;
+    }
+    .key-black .key-macro-badge {
+      font-size: 0.58rem;
+      background: rgba(0, 0, 0, 0.9);
+      top: 4px;
+    }
+
+    /* Soundboard Pads Strip */
+    .soundboard-pad-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.85rem;
+    }
+
+    .stage-sound-pad {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      user-select: none;
+    }
+    .stage-sound-pad:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-2px);
+    }
+    .stage-sound-pad:active {
+      transform: translateY(2px);
+      box-shadow: 0 0 20px currentColor;
+    }
+    .stage-sound-pad.airhorn {
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #ef4444;
+    }
+    .stage-sound-pad.subdrop {
+      border-color: rgba(0, 229, 255, 0.4);
+      color: var(--cyber-cyan);
+    }
+    .stage-sound-pad.laser {
+      border-color: rgba(255, 183, 3, 0.4);
+      color: var(--cyber-gold);
+    }
+    .stage-sound-pad.chime {
+      border-color: rgba(168, 85, 247, 0.4);
+      color: #c084fc;
+    }
+
+    .pad-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      font-family: var(--font-heading);
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .pad-subtitle {
+      font-size: 0.7rem;
+      color: #94a3b8;
+    }
+
+    /* Footer info */
+    .stage-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0.5rem;
+      font-size: 0.76rem;
+      color: #94a3b8;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    /* Modal / Drawer */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 1rem;
+    }
+    .modal-box {
+      background: #0b1120;
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: 16px;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 650px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    @media (max-width: 768px) {
+      .cockpit-header {
+        padding: 0.5rem 0.75rem;
+      }
+      .brand-title {
+        font-size: 0.9rem;
+      }
+      .stage-workspace {
+        padding: 0.75rem;
+      }
+      .piano-keyboard {
+        height: 180px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Stage Strobe Screen Effect Overlay -->
+  <div id="stage-strobe-overlay"></div>
+
+  <!-- Top DJ Cockpit Header -->
+  <header class="cockpit-header">
+    <div class="brand-section">
+      <a href="/gigs" title="Return to Run of Show">
+        <img src="assets/images/branding/Thunder House Logo-PNG.png" alt="Thunder House ENT" class="brand-logo-img">
+      </a>
+      <div class="brand-title-wrap">
+        <h1 class="brand-title">
+          <i class="fa-solid fa-keyboard" style="color: var(--cyber-gold);"></i> THUNDER KEYS
+        </h1>
+        <span class="brand-sub">DJ Stage Performance Cockpit</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Web MIDI Auto-Detect Pill -->
+      <button type="button" id="btn-midi-status" class="midi-pill" onclick="openMidiMonitorModal()" title="Pioneer DDJ-FLX2 / USB MIDI Keyboard Status">
+        <span class="status-dot"></span>
+        <span id="midi-status-text">Detecting MIDI...</span>
+      </button>
+
+      <!-- Active Gig Switcher Dropdown -->
+      <select id="select-active-gig" class="select-gig" onchange="onActiveGigChanged(this.value)" title="Link to live Gig Run of Show">
+        <option value="">Loading active gigs...</option>
+      </select>
+
+      <!-- Jump to Run of Show -->
+      <a href="/gigs" class="btn-cockpit cyan" title="Switch to Full Run of Show Timeline">
+        <i class="fa-solid fa-stopwatch"></i> Run of Show
+      </a>
+
+      <!-- Fullscreen Toggle -->
+      <button type="button" class="btn-cockpit" onclick="toggleStageFullscreen()" title="Toggle Fullscreen Mode (F11)">
+        <i class="fa-solid fa-expand"></i>
+      </button>
+
+      <!-- Staff Sign Out -->
+      <button type="button" class="btn-cockpit" onclick="signOutStaff()" title="Sign out of DJ Staff Portal">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Stage Workspace -->
+  <main class="stage-workspace">
+
+    <!-- Live Cue HUD Strip (Realtime Sync with Active Gig) -->
+    <section class="cue-hud-strip" id="cue-hud-strip">
+      <div class="cue-hud-details">
+        <span class="cue-badge-pill" id="hud-cue-step">Active Cue</span>
+        <div>
+          <h2 class="cue-title-text" id="hud-cue-title">Loading Active Cue...</h2>
+          <div class="cue-song-text" id="hud-cue-song">Track: Preparing Audio Desk</div>
+        </div>
+      </div>
+
+      <div class="cue-hud-timer">
+        <div class="hud-clock" id="hud-cue-clock">00:00</div>
+        <button type="button" id="btn-hud-timer-toggle" class="btn-hud-control" onclick="toggleHudTimer()" title="Play / Pause Cue Timer (FLX2 Pad 4)">
+          <i class="fa-solid fa-play" id="hud-timer-icon"></i>
+        </button>
+        <button type="button" class="btn-hud-control" onclick="resetHudTimer()" title="Reset Cue Timer (FLX2 Shift+Pad 4)">
+          <i class="fa-solid fa-rotate-left"></i>
+        </button>
+        <button type="button" class="btn-hud-control" onclick="advanceHudCue(-1)" title="Previous Cue (FLX2 Pad 1)">
+          <i class="fa-solid fa-backward-step"></i>
+        </button>
+        <button type="button" class="btn-hud-control" onclick="advanceHudCue(1)" title="Next Cue (FLX2 Pad 2)">
+          <i class="fa-solid fa-forward-step"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- Thunder Keys Instrument & Macro Console -->
+    <section class="thunder-keys-stage-card">
+      <div class="stage-card-header">
+        <div style="display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;">
+          <h2 style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800; margin: 0; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-sliders" style="color: var(--cyber-gold);"></i>
+            Stage Console
+          </h2>
+          <span style="font-size: 0.72rem; font-weight: 700; color: var(--cyber-cyan); background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.3); padding: 0.2rem 0.65rem; border-radius: 999px;">
+            LOW-LATENCY WEB AUDIO
+          </span>
+        </div>
+
+        <!-- Mode Switcher -->
+        <div class="keys-mode-switcher">
+          <button type="button" id="btn-mode-synth" class="mode-switch-btn active synth-mode" onclick="setStageMode('SYNTH')">
+            <i class="fa-solid fa-music"></i> Live Synth Mode
+          </button>
+          <button type="button" id="btn-mode-macro" class="mode-switch-btn" onclick="setStageMode('MACRO')">
+            <i class="fa-solid fa-bolt"></i> Macro Deck Mode
+          </button>
+        </div>
+      </div>
+
+      <!-- Controls Toolbar -->
+      <div class="keys-toolbar">
+        <!-- Preset Selector (Synth Mode) -->
+        <div class="keys-tool-group" id="group-synth-presets">
+          <label class="keys-tool-label">Polyphonic Preset</label>
+          <select id="synth-preset-select" class="keys-select" onchange="onPresetChange(this.value)">
+            <option value="brass">🎺 Thunder Brass (Trap Horn Stabs)</option>
+            <option value="sub808">🔊 808 Sub Bass (Deep Glide)</option>
+            <option value="pluck">⚡ Cyber Pluck (Punchy Lead)</option>
+            <option value="rhodes">🎹 Electric Rhodes (Warm Chimes)</option>
+            <option value="riser">🚨 Siren &amp; Riser (Hype FX)</option>
+          </select>
+        </div>
+
+        <!-- Macro Notice (Macro Mode) -->
+        <div class="keys-tool-group" id="group-macro-notice" style="display: none;">
+          <label class="keys-tool-label">Macro Status</label>
+          <div style="font-size: 0.85rem; color: var(--cyber-gold); font-weight: 700; padding-top: 0.35rem;">
+            <i class="fa-solid fa-bolt"></i> 25 Keys Armed for Instant Stage Triggers
+          </div>
+        </div>
+
+        <!-- Octave Transpose -->
+        <div class="keys-tool-group">
+          <label class="keys-tool-label">Octave Shift</label>
+          <div class="octave-controls">
+            <button type="button" class="btn-oct" onclick="shiftOctave(-1)" title="Down 1 Octave"><i class="fa-solid fa-minus"></i></button>
+            <span id="octave-display" class="octave-val">C3 – C5</span>
+            <button type="button" class="btn-oct" onclick="shiftOctave(1)" title="Up 1 Octave"><i class="fa-solid fa-plus"></i></button>
+          </div>
+        </div>
+
+        <!-- Pitch & Mod Wheels -->
+        <div class="keys-tool-group">
+          <label class="keys-tool-label">Pitch / Mod Visualizer</label>
+          <div class="wheel-meters">
+            <div class="wheel-column">
+              <div class="wheel-track" id="wheel-pitch-track" title="Pitch Bend Wheel (Touch Drag / Hardware)">
+                <div class="wheel-fill pitch-fill" id="wheel-pitch-fill"></div>
+              </div>
+              <span class="wheel-sublabel">PITCH</span>
+            </div>
+            <div class="wheel-column">
+              <div class="wheel-track" id="wheel-mod-track" title="Modulation Wheel (Touch Drag / Hardware)">
+                <div class="wheel-fill mod-fill" id="wheel-mod-fill"></div>
+              </div>
+              <span class="wheel-sublabel">MOD</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Master Volume -->
+        <div class="keys-tool-group">
+          <label class="keys-tool-label">Master Level</label>
+          <input type="range" id="synth-volume-slider" min="0" max="100" value="80" class="keys-range" oninput="onMasterVolumeChange(this.value)">
+        </div>
+
+        <!-- Quick Monitor Button -->
+        <div class="keys-tool-group" style="margin-left: auto;">
+          <label class="keys-tool-label">MIDI Setup</label>
+          <button type="button" class="btn-cockpit gold" onclick="openMidiMonitorModal()" style="font-size: 0.78rem;">
+            <i class="fa-solid fa-sliders"></i> MIDI Learn &amp; Monitor
+          </button>
+        </div>
+      </div>
+
+      <!-- 25-Key Interactive Visual Piano Surface -->
+      <div class="piano-wrapper">
+        <div id="stage-piano-keyboard" class="piano-keyboard">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Realtime Playing Status -->
+      <div class="stage-footer">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-circle-info" style="color: var(--cyber-cyan);"></i>
+          <span>Plug in your Pioneer DDJ-FLX2 or any USB/Bluetooth MIDI keyboard. Multi-touch chords supported.</span>
+        </div>
+        <div id="active-note-badge" style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--cyber-cyan); font-weight: 700;">
+          Idle
+        </div>
+      </div>
+    </section>
+
+    <!-- Rapid Soundboard Trigger Pads -->
+    <section>
+      <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 800; color: #94a3b8; letter-spacing: 0.08em; margin-bottom: 0.65rem;">
+        ⚡ Instant Soundboard Launchpads (Zero Latency)
+      </div>
+      <div class="soundboard-pad-strip">
+        <div class="stage-sound-pad airhorn" onclick="triggerSoundDrop('airhorn')" title="Airhorn Blast (FLX2 Pad 5)">
+          <i class="fa-solid fa-bullhorn" style="font-size: 1.4rem;"></i>
+          <span class="pad-title">AIRHORN</span>
+          <span class="pad-subtitle">Club Hype Stabs</span>
+        </div>
+        <div class="stage-sound-pad subdrop" onclick="triggerSoundDrop('sub808')" title="808 Sub Drop (FLX2 Pad 6)">
+          <i class="fa-solid fa-volume-high" style="font-size: 1.4rem;"></i>
+          <span class="pad-title">808 DROP</span>
+          <span class="pad-subtitle">Sub-Bass Rumbles</span>
+        </div>
+        <div class="stage-sound-pad laser" onclick="triggerSoundDrop('laser')" title="Laser Sweep (FLX2 Pad 7)">
+          <i class="fa-solid fa-bolt" style="font-size: 1.4rem;"></i>
+          <span class="pad-title">LASER SWEEP</span>
+          <span class="pad-subtitle">Rave Synth Chirp</span>
+        </div>
+        <div class="stage-sound-pad chime" onclick="triggerSoundDrop('chime')" title="Stage Chime (FLX2 Pad 8)">
+          <i class="fa-solid fa-bell" style="font-size: 1.4rem;"></i>
+          <span class="pad-title">STAGE CHIME</span>
+          <span class="pad-subtitle">Attention Bell</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MIDI Learn & Monitor Modal -->
+  <div id="modal-midi-monitor" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+          <h3 style="color: #fff; font-family: var(--font-heading); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-sliders" style="color: var(--cyber-cyan);"></i> Hardware MIDI Learn &amp; Monitor
+          </h3>
+          <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 0.2rem;">
+            Connect your Pioneer DDJ-FLX2 or any MIDI keyboard to trigger cues and synth notes.
+          </div>
+        </div>
+        <button type="button" class="btn-cockpit" onclick="closeMidiMonitorModal()" style="font-size: 1.1rem; padding: 0.2rem 0.6rem;">&times;</button>
+      </div>
+
+      <!-- Live Packet Monitor -->
+      <div style="margin-bottom: 1rem;">
+        <label style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: #94a3b8; letter-spacing: 0.05em; margin-bottom: 0.35rem; display: block;">
+          Live MIDI Traffic Stream
+        </label>
+        <div id="midi-traffic-log" style="background: #020617; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; font-family: var(--font-mono); font-size: 0.75rem; color: var(--cyber-green); padding: 0.75rem; height: 160px; overflow-y: auto;">
+          [System] Waiting for hardware MIDI input packet...
+        </div>
+      </div>
+
+      <!-- Hardware Autodetect Summary -->
+      <div style="background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.2); border-radius: 10px; padding: 0.85rem; margin-bottom: 1rem;">
+        <div style="font-size: 0.82rem; font-weight: 700; color: #fff; margin-bottom: 0.35rem;">
+          <i class="fa-solid fa-circle-check" style="color: var(--cyber-green);"></i> Pioneer DDJ-FLX2 Factory Preset Mappings:
+        </div>
+        <div style="font-size: 0.76rem; color: #cbd5e1; line-height: 1.5;">
+          • <strong>Pad 1:</strong> Previous Cue &nbsp;|&nbsp; <strong>Pad 2:</strong> Next Cue &nbsp;|&nbsp; <strong>Pad 3:</strong> Mark Played<br>
+          • <strong>Pad 4:</strong> Toggle Cue Timer &nbsp;|&nbsp; <strong>Shift+Pad 4:</strong> Reset Timer<br>
+          • <strong>Pads 5–8:</strong> Airhorn, 808 Sub Drop, Laser Sweep, Stage Chime
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button type="button" class="btn-cockpit" onclick="closeMidiMonitorModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase & Dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+
+  <script>
+    // ==========================================
+    // THUNDER KEYS STAGE COCKPIT ENGINE
+    // ==========================================
+
+    let stageMode = 'SYNTH'; // 'SYNTH' or 'MACRO'
+    let currentOctaveShift = 0; // -2 to +2
+    let currentPreset = 'brass';
+    let masterVolume = 0.8;
+    let currentPitchBendCents = 0;
+    let activeSynthVoices = {};
+    let audioCtx = null;
+
+    // Web MIDI state
+    let midiAccess = null;
+    let connectedMidiInputs = [];
+    let connectedMidiOutputs = [];
+    let isFlx2Detected = false;
+
+    // Active gig & timer state
+    let activeGig = null;
+    let activeTimelineCues = [];
+    let currentCueIndex = 0;
+    let cueTimerInterval = null;
+    let cueTimerSeconds = 0;
+    let isCueTimerRunning = false;
+
+    // 25-Key Macro Mapping Deck (MIDI Notes 48 to 72 = C3 to C5)
+    const STAGE_MACRO_MAP = {
+      48: { name: 'Airhorn', action: () => triggerSoundDrop('airhorn') },
+      49: { name: '808 Drop', action: () => triggerSoundDrop('sub808') },
+      50: { name: 'Laser', action: () => triggerSoundDrop('laser') },
+      51: { name: 'Chime', action: () => triggerSoundDrop('chime') },
+      52: { name: 'Siren FX', action: () => triggerSoundDrop('riser') },
+      53: { name: 'Strobe', action: () => triggerStageStrobe() },
+      54: { name: 'Prev Cue', action: () => advanceHudCue(-1) },
+      55: { name: 'Next Cue', action: () => advanceHudCue(1) },
+      56: { name: 'Timer Run', action: () => toggleHudTimer() },
+      57: { name: 'Timer Reset', action: () => resetHudTimer() },
+      58: { name: 'Showtime', action: () => toggleStageFullscreen() },
+      59: { name: 'RunOfShow', action: () => { window.location.href = '/gigs'; } },
+      60: { name: 'Hype Stabs', action: () => triggerSoundDrop('brass_stab') },
+      61: { name: 'Sub Boom', action: () => triggerSoundDrop('sub808') },
+      62: { name: 'Laser Fast', action: () => triggerSoundDrop('laser') },
+      63: { name: 'Ding', action: () => triggerSoundDrop('chime') },
+      64: { name: 'Rewind', action: () => logMidiTraffic('⚡ Macro: DJ Rewind') },
+      65: { name: 'Applause', action: () => logMidiTraffic('⚡ Macro: Crowd Hype') },
+      66: { name: 'Lights Max', action: () => triggerStageStrobe() },
+      67: { name: 'Cue +1', action: () => advanceHudCue(1) },
+      68: { name: 'Cue -1', action: () => advanceHudCue(-1) },
+      69: { name: 'Timer +1m', action: () => { cueTimerSeconds += 60; updateHudTimerDisplay(); } },
+      70: { name: 'Timer -1m', action: () => { cueTimerSeconds = Math.max(0, cueTimerSeconds - 60); updateHudTimerDisplay(); } },
+      71: { name: 'Stopwatch', action: () => toggleHudTimer() },
+      72: { name: 'Grand Finale', action: () => { triggerSoundDrop('airhorn'); triggerStageStrobe(); } }
+    };
+
+    // ==========================================
+    // INITIALIZATION & STAFF AUTH GATE
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Enforce Staff Auth
+      if (window.supabaseClient) {
+        try {
+          const { data: { session }, error: sessErr } = await window.supabaseClient.auth.getSession();
+          if (sessErr || !session || !session.user) {
+            console.warn('Unauthorized. Redirecting to staff login...');
+            window.location.href = 'login.html?redirect=keys';
+            return;
+          }
+
+          // Verify user against thunderhouse_staff or thunderhouse_team
+          const { data: staffData } = await window.supabaseClient
+            .from('thunderhouse_staff')
+            .select('role, full_name')
+            .eq('email', session.user.email)
+            .maybeSingle();
+
+          console.log('⚡ Authenticated DJ Staff:', session.user.email, staffData ? staffData.role : 'member');
+        } catch (e) {
+          console.warn('Auth check skipped in dev mode:', e);
+        }
+      }
+
+      // 2. Build 25-key visual piano keyboard
+      buildStagePiano();
+
+      // 3. Initialize Web MIDI autodetect
+      initWebMidiEngine();
+
+      // 4. Fetch available gigs for the timeline HUD
+      await loadStaffGigs();
+
+      // 5. Setup touch drag on Pitch/Mod visualizers
+      setupWheelTouchControls();
+    });
+
+    // ==========================================
+    // WEB AUDIO SYNTHESIZER ENGINE
+    // ==========================================
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function createSynthVoice(ctx, freq, velGain, now, preset) {
+      const oscs = [];
+      const masterGain = ctx.createGain();
+      masterGain.connect(ctx.destination);
+
+      let filter = null;
+      let releaseTime = 0.25;
+
+      if (preset === 'brass') {
+        filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(350, now);
+        filter.frequency.exponentialRampToValueAtTime(3800, now + 0.08);
+        filter.frequency.exponentialRampToValueAtTime(1400, now + 0.35);
+        filter.Q.value = 4.5;
+        filter.connect(masterGain);
+
+        masterGain.gain.setValueAtTime(0.001, now);
+        masterGain.gain.linearRampToValueAtTime(velGain * 0.45, now + 0.02);
+        masterGain.gain.exponentialRampToValueAtTime(velGain * 0.25, now + 0.45);
+        releaseTime = 0.3;
+
+        [-8, 0, 8].forEach(detuneVal => {
+          const osc = ctx.createOscillator();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, now);
+          osc.baseDetune = detuneVal;
+          osc.detune.setValueAtTime(detuneVal + currentPitchBendCents, now);
+          osc.connect(filter);
+          osc.start(now);
+          oscs.push(osc);
+        });
+      } else if (preset === 'sub808') {
+        filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 280;
+        filter.connect(masterGain);
+
+        masterGain.gain.setValueAtTime(0.001, now);
+        masterGain.gain.linearRampToValueAtTime(velGain * 0.8, now + 0.015);
+        masterGain.gain.exponentialRampToValueAtTime(velGain * 0.35, now + 1.2);
+        releaseTime = 0.4;
+
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq * 1.5, now);
+        osc.frequency.exponentialRampToValueAtTime(freq, now + 0.06);
+        osc.baseDetune = 0;
+        osc.detune.setValueAtTime(currentPitchBendCents, now);
+        osc.connect(filter);
+        osc.start(now);
+        oscs.push(osc);
+      } else if (preset === 'pluck') {
+        filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(2400, now);
+        filter.frequency.exponentialRampToValueAtTime(450, now + 0.18);
+        filter.Q.value = 3.0;
+        filter.connect(masterGain);
+
+        masterGain.gain.setValueAtTime(0.001, now);
+        masterGain.gain.linearRampToValueAtTime(velGain * 0.5, now + 0.005);
+        masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+        releaseTime = 0.15;
+
+        [0, 5].forEach(detuneVal => {
+          const osc = ctx.createOscillator();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(freq, now);
+          osc.baseDetune = detuneVal;
+          osc.detune.setValueAtTime(detuneVal + currentPitchBendCents, now);
+          osc.connect(filter);
+          osc.start(now);
+          oscs.push(osc);
+        });
+      } else if (preset === 'rhodes') {
+        filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 2600;
+        filter.connect(masterGain);
+
+        masterGain.gain.setValueAtTime(0.001, now);
+        masterGain.gain.linearRampToValueAtTime(velGain * 0.4, now + 0.01);
+        masterGain.gain.exponentialRampToValueAtTime(velGain * 0.18, now + 0.9);
+        releaseTime = 0.5;
+
+        const osc1 = ctx.createOscillator();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(freq, now);
+        osc1.baseDetune = 0;
+        osc1.detune.setValueAtTime(currentPitchBendCents, now);
+        osc1.connect(filter);
+        osc1.start(now);
+        oscs.push(osc1);
+
+        const osc2 = ctx.createOscillator();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(freq * 3.5, now);
+        osc2.baseDetune = 4;
+        osc2.detune.setValueAtTime(4 + currentPitchBendCents, now);
+        const tineGain = ctx.createGain();
+        tineGain.gain.setValueAtTime(0.2, now);
+        tineGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc2.connect(tineGain);
+        tineGain.connect(filter);
+        osc2.start(now);
+        oscs.push(osc2);
+      } else if (preset === 'riser') {
+        masterGain.gain.setValueAtTime(0.001, now);
+        masterGain.gain.linearRampToValueAtTime(velGain * 0.45, now + 0.08);
+        releaseTime = 0.35;
+
+        const osc = ctx.createOscillator();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(freq * 2.8, now + 1.2);
+        osc.baseDetune = 0;
+        osc.detune.setValueAtTime(currentPitchBendCents, now);
+        osc.connect(masterGain);
+        osc.start(now);
+        oscs.push(osc);
+      }
+
+      return { oscs, masterGain, filter, releaseTime };
+    }
+
+    function synthNoteOn(midiNote, velocity = 100) {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+
+      synthNoteOff(midiNote);
+
+      const shiftedNote = midiNote + (currentOctaveShift * 12);
+      const freq = 440 * Math.pow(2, (shiftedNote - 69) / 12);
+      const velGain = (velocity / 127) * masterVolume;
+      const now = ctx.currentTime;
+
+      highlightKey(midiNote, true, 'synth');
+
+      const voice = createSynthVoice(ctx, freq, velGain, now, currentPreset);
+      if (voice) {
+        activeSynthVoices[midiNote] = voice;
+      }
+
+      const badge = document.getElementById('active-note-badge');
+      if (badge) {
+        badge.textContent = `Playing: ${midiNoteToName(shiftedNote)} (${Math.round(freq)} Hz)`;
+      }
+    }
+
+    function synthNoteOff(midiNote) {
+      const voice = activeSynthVoices[midiNote];
+      if (voice) {
+        const ctx = getAudioContext();
+        const now = ctx ? ctx.currentTime : 0;
+        const releaseTime = voice.releaseTime || 0.2;
+
+        if (voice.masterGain) {
+          voice.masterGain.gain.cancelScheduledValues(now);
+          voice.masterGain.gain.setValueAtTime(voice.masterGain.gain.value, now);
+          voice.masterGain.gain.exponentialRampToValueAtTime(0.0001, now + releaseTime);
+        }
+
+        setTimeout(() => {
+          if (voice.oscs) {
+            voice.oscs.forEach(osc => {
+              try { osc.stop(); osc.disconnect(); } catch (e) {}
+            });
+          }
+        }, (releaseTime + 0.1) * 1000);
+
+        delete activeSynthVoices[midiNote];
+      }
+
+      highlightKey(midiNote, false);
+
+      if (Object.keys(activeSynthVoices).length === 0) {
+        const badge = document.getElementById('active-note-badge');
+        if (badge) badge.textContent = 'Idle';
+      }
+    }
+
+    function handleMacroKeyPress(midiNote, velocity = 100) {
+      highlightKey(midiNote, true, 'macro');
+      setTimeout(() => highlightKey(midiNote, false), 220);
+
+      const macro = STAGE_MACRO_MAP[midiNote];
+      if (macro && typeof macro.action === 'function') {
+        logMidiTraffic(`⚡ Macro [${midiNoteToName(midiNote)}]: ${macro.name}`);
+        macro.action();
+      } else {
+        logMidiTraffic(`⚡ Macro [${midiNoteToName(midiNote)}]: Unassigned`);
+      }
+    }
+
+    // Zero Latency Web Audio Sound Drops
+    function triggerSoundDrop(type) {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+
+      if (type === 'airhorn') {
+        const chord = [466.16, 554.37, 622.25];
+        chord.forEach(freq => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq * 1.02, now);
+          osc.frequency.exponentialRampToValueAtTime(freq * 0.98, now + 0.6);
+          gain.gain.setValueAtTime(0.25 * masterVolume, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.6);
+        });
+        logMidiTraffic('📢 Soundboard: AIRHORN BLAST');
+      } else if (type === 'sub808') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(34, now + 0.85);
+        gain.gain.setValueAtTime(0.85 * masterVolume, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.1);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 1.1);
+        logMidiTraffic('🔊 Soundboard: 808 SUB DROP');
+      } else if (type === 'laser') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(1900, now);
+        osc.frequency.exponentialRampToValueAtTime(150, now + 0.26);
+        gain.gain.setValueAtTime(0.4 * masterVolume, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.26);
+        logMidiTraffic('⚡ Soundboard: LASER SWEEP');
+      } else if (type === 'chime') {
+        const bellTones = [1046.5, 1567.98, 2093.0];
+        bellTones.forEach((f, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, now);
+          gain.gain.setValueAtTime((0.3 / (idx + 1)) * masterVolume, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.5);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 1.5);
+        });
+        logMidiTraffic('🔔 Soundboard: STAGE CHIME');
+      } else if (type === 'riser') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(1760, now + 1.0);
+        gain.gain.setValueAtTime(0.4 * masterVolume, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 1.0);
+        logMidiTraffic('🚨 Soundboard: SIREN RISER');
+      }
+    }
+
+    // ==========================================
+    // VIRTUAL PIANO KEYBOARD BUILDER
+    // ==========================================
+    function buildStagePiano() {
+      const container = document.getElementById('stage-piano-keyboard');
+      if (!container) return;
+
+      const whiteNotes = [48, 50, 52, 53, 55, 57, 59, 60, 62, 64, 65, 67, 69, 71, 72];
+      const blackNotesConfig = [
+        { note: 49, left: 4.8 },
+        { note: 51, left: 11.4 },
+        { note: 54, left: 24.8 },
+        { note: 56, left: 31.4 },
+        { note: 58, left: 38.1 },
+        { note: 61, left: 51.4 },
+        { note: 63, left: 58.1 },
+        { note: 66, left: 71.4 },
+        { note: 68, left: 78.1 },
+        { note: 70, left: 84.8 }
+      ];
+
+      let html = '';
+
+      whiteNotes.forEach(note => {
+        html += `
+          <div class="key-white" id="vk-${note}" data-note="${note}">
+            <div class="key-macro-badge" id="macro-badge-${note}" style="display: none;"></div>
+            <span class="key-note-label">${midiNoteToName(note)}</span>
+          </div>
+        `;
+      });
+
+      blackNotesConfig.forEach(b => {
+        html += `
+          <div class="key-black" id="vk-${b.note}" data-note="${b.note}" style="left: ${b.left}%;">
+            <div class="key-macro-badge" id="macro-badge-${b.note}" style="display: none;"></div>
+            <span class="key-note-label">${midiNoteToName(b.note)}</span>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+
+      const allKeys = container.querySelectorAll('.key-white, .key-black');
+      allKeys.forEach(el => {
+        const note = parseInt(el.getAttribute('data-note'), 10);
+
+        const onDown = (e) => {
+          e.preventDefault();
+          if (stageMode === 'SYNTH') {
+            synthNoteOn(note, 115);
+          } else {
+            handleMacroKeyPress(note, 115);
+          }
+        };
+
+        const onUp = (e) => {
+          e.preventDefault();
+          if (stageMode === 'SYNTH') {
+            synthNoteOff(note);
+          }
+        };
+
+        el.addEventListener('mousedown', onDown);
+        el.addEventListener('mouseup', onUp);
+        el.addEventListener('mouseleave', onUp);
+        el.addEventListener('touchstart', onDown, { passive: false });
+        el.addEventListener('touchend', onUp, { passive: false });
+      });
+
+      updatePianoMacroBadges();
+    }
+
+    function updatePianoMacroBadges() {
+      for (let note = 48; note <= 72; note++) {
+        const badge = document.getElementById(`macro-badge-${note}`);
+        if (!badge) continue;
+
+        if (stageMode === 'MACRO') {
+          const mapping = STAGE_MACRO_MAP[note];
+          badge.textContent = mapping ? mapping.name : '';
+          badge.style.display = mapping ? 'block' : 'none';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    }
+
+    function highlightKey(midiNote, isActive, mode = 'synth') {
+      const el = document.getElementById(`vk-${midiNote}`);
+      if (!el) return;
+
+      if (isActive) {
+        el.classList.add('active');
+        if (mode === 'macro') el.classList.add('macro-hit');
+      } else {
+        el.classList.remove('active', 'macro-hit');
+      }
+    }
+
+    function midiNoteToName(note) {
+      const names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+      const octave = Math.floor(note / 12) - 1;
+      const name = names[note % 12];
+      return `${name}${octave}`;
+    }
+
+    // ==========================================
+    // STAGE MODES & CONTROLS
+    // ==========================================
+    function setStageMode(mode) {
+      stageMode = mode;
+      const btnSynth = document.getElementById('btn-mode-synth');
+      const btnMacro = document.getElementById('btn-mode-macro');
+      const presetGroup = document.getElementById('group-synth-presets');
+      const macroNotice = document.getElementById('group-macro-notice');
+
+      if (mode === 'SYNTH') {
+        btnSynth.className = 'mode-switch-btn active synth-mode';
+        btnMacro.className = 'mode-switch-btn';
+        if (presetGroup) presetGroup.style.display = 'flex';
+        if (macroNotice) macroNotice.style.display = 'none';
+        logMidiTraffic('⚡ Mode: Live Synth Activated');
+      } else {
+        btnSynth.className = 'mode-switch-btn';
+        btnMacro.className = 'mode-switch-btn active macro-mode';
+        if (presetGroup) presetGroup.style.display = 'none';
+        if (macroNotice) macroNotice.style.display = 'flex';
+        logMidiTraffic('⚡ Mode: Macro Deck Armed');
+      }
+
+      updatePianoMacroBadges();
+    }
+
+    function shiftOctave(delta) {
+      currentOctaveShift = Math.max(-2, Math.min(2, currentOctaveShift + delta));
+      const display = document.getElementById('octave-display');
+      if (display) {
+        const rootOctave = 3 + currentOctaveShift;
+        display.textContent = `C${rootOctave} – C${rootOctave + 2}`;
+      }
+      logMidiTraffic(`⚡ Octave Transposed: ${currentOctaveShift > 0 ? '+' : ''}${currentOctaveShift}`);
+    }
+
+    function onPresetChange(val) {
+      currentPreset = val;
+      logMidiTraffic(`⚡ Preset Selected: ${val.toUpperCase()}`);
+    }
+
+    function onMasterVolumeChange(val) {
+      masterVolume = val / 100;
+    }
+
+    function setupWheelTouchControls() {
+      const pitchTrack = document.getElementById('wheel-pitch-track');
+      const modTrack = document.getElementById('wheel-mod-track');
+      const pitchFill = document.getElementById('wheel-pitch-fill');
+      const modFill = document.getElementById('wheel-mod-fill');
+
+      if (pitchTrack && pitchFill) {
+        let isPitchDragging = false;
+        const handlePitch = (e) => {
+          const rect = pitchTrack.getBoundingClientRect();
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          const ratio = Math.max(0, Math.min(1, 1 - ((clientY - rect.top) / rect.height)));
+          pitchFill.style.height = `${ratio * 100}%`;
+          currentPitchBendCents = (ratio - 0.5) * 400; // -200 to +200 cents
+        };
+
+        const resetPitch = () => {
+          isPitchDragging = false;
+          pitchFill.style.height = '50%';
+          currentPitchBendCents = 0;
+        };
+
+        pitchTrack.addEventListener('mousedown', (e) => { isPitchDragging = true; handlePitch(e); });
+        window.addEventListener('mousemove', (e) => { if (isPitchDragging) handlePitch(e); });
+        window.addEventListener('mouseup', resetPitch);
+        pitchTrack.addEventListener('touchstart', (e) => { isPitchDragging = true; handlePitch(e); }, { passive: false });
+        pitchTrack.addEventListener('touchmove', (e) => { if (isPitchDragging) handlePitch(e); }, { passive: false });
+        pitchTrack.addEventListener('touchend', resetPitch);
+      }
+
+      if (modTrack && modFill) {
+        let isModDragging = false;
+        const handleMod = (e) => {
+          const rect = modTrack.getBoundingClientRect();
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          const ratio = Math.max(0, Math.min(1, 1 - ((clientY - rect.top) / rect.height)));
+          modFill.style.height = `${ratio * 100}%`;
+        };
+
+        modTrack.addEventListener('mousedown', (e) => { isModDragging = true; handleMod(e); });
+        window.addEventListener('mousemove', (e) => { if (isModDragging) handleMod(e); });
+        window.addEventListener('mouseup', () => { isModDragging = false; });
+        modTrack.addEventListener('touchstart', (e) => { isModDragging = true; handleMod(e); }, { passive: false });
+        modTrack.addEventListener('touchmove', (e) => { if (isModDragging) handleMod(e); }, { passive: false });
+        modTrack.addEventListener('touchend', () => { isModDragging = false; });
+      }
+    }
+
+    function triggerStageStrobe() {
+      const overlay = document.getElementById('stage-strobe-overlay');
+      if (!overlay) return;
+      overlay.classList.add('flash');
+      setTimeout(() => overlay.classList.remove('flash'), 65);
+      setTimeout(() => overlay.classList.add('flash'), 130);
+      setTimeout(() => overlay.classList.remove('flash'), 195);
+      logMidiTraffic('💡 Stage Strobe Flash Triggered');
+    }
+
+    function toggleStageFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(e => console.warn(e));
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
+    // ==========================================
+    // WEB MIDI ENGINE & HARDWARE AUTODETECT
+    // ==========================================
+    function initWebMidiEngine() {
+      if (!navigator.requestMIDIAccess) {
+        updateMidiPill('MIDI Unsupported', false);
+        return;
+      }
+
+      navigator.requestMIDIAccess({ sysex: true })
+        .then(onMidiSuccess)
+        .catch(err => {
+          console.warn('Web MIDI error:', err);
+          updateMidiPill('MIDI Ready (Offline)', false);
+        });
+    }
+
+    function onMidiSuccess(access) {
+      midiAccess = access;
+      midiAccess.onstatechange = onMidiStateChange;
+      refreshMidiConnections();
+    }
+
+    function onMidiStateChange(e) {
+      console.log('MIDI device state changed:', e.port.name, e.port.state);
+      refreshMidiConnections();
+    }
+
+    function refreshMidiConnections() {
+      connectedMidiInputs = [];
+      connectedMidiOutputs = [];
+      isFlx2Detected = false;
+
+      const inputs = midiAccess.inputs.values();
+      for (let input of inputs) {
+        connectedMidiInputs.push(input);
+        input.onmidimessage = handleIncomingMidiMessage;
+
+        const name = (input.name || '').toLowerCase();
+        if (name.includes('flx2') || name.includes('ddj') || name.includes('pioneer')) {
+          isFlx2Detected = true;
+        }
+      }
+
+      const outputs = midiAccess.outputs.values();
+      for (let output of outputs) {
+        connectedMidiOutputs.push(output);
+      }
+
+      if (isFlx2Detected) {
+        updateMidiPill('⚡ DDJ-FLX2 Ready', true, true);
+        logMidiTraffic('⚡ Connected: Pioneer DDJ-FLX2 Controller Active!');
+      } else if (connectedMidiInputs.length > 0) {
+        const devName = connectedMidiInputs[0].name || 'MIDI Controller';
+        updateMidiPill(`🎹 ${devName}`, true, false);
+        logMidiTraffic(`🎹 Connected: ${devName}`);
+      } else {
+        updateMidiPill('🔌 Plug in MIDI Device', false);
+      }
+    }
+
+    function updateMidiPill(text, isConnected, isFlx2 = false) {
+      const pill = document.getElementById('btn-midi-status');
+      const textEl = document.getElementById('midi-status-text');
+      if (!pill || !textEl) return;
+
+      textEl.textContent = text;
+      pill.className = 'midi-pill';
+      if (isConnected) pill.classList.add('connected');
+      if (isFlx2) pill.classList.add('flx2');
+    }
+
+    function handleIncomingMidiMessage(event) {
+      const [status, note, velocity] = event.data;
+      const cmd = status >> 4;
+      const channel = status & 0xf;
+
+      logMidiTraffic(`[Raw] Ch:${channel} Cmd:${cmd} Note:${note} Vel:${velocity}`);
+
+      // Note On (velocity > 0)
+      if (cmd === 9 && velocity > 0) {
+        // FLX2 Factory Pad Mappings (Channel 7 / Pads)
+        if (isFlx2Detected || channel === 7 || channel === 9) {
+          if (note === 36) advanceHudCue(-1); // Pad 1: Prev Cue
+          else if (note === 37) advanceHudCue(1); // Pad 2: Next Cue
+          else if (note === 39) toggleHudTimer(); // Pad 4: Timer Run
+          else if (note === 40) triggerSoundDrop('airhorn'); // Pad 5: Airhorn
+          else if (note === 41) triggerSoundDrop('sub808'); // Pad 6: 808
+          else if (note === 42) triggerSoundDrop('laser'); // Pad 7: Laser
+          else if (note === 43) triggerSoundDrop('chime'); // Pad 8: Chime
+        }
+
+        // Standard Keyboard note
+        if (stageMode === 'SYNTH') {
+          synthNoteOn(note, velocity);
+        } else {
+          handleMacroKeyPress(note, velocity);
+        }
+      }
+      // Note Off (cmd 8 or cmd 9 with velocity 0)
+      else if (cmd === 8 || (cmd === 9 && velocity === 0)) {
+        if (stageMode === 'SYNTH') {
+          synthNoteOff(note);
+        }
+      }
+      // Pitch Bend (cmd 14)
+      else if (cmd === 14) {
+        const pitchVal = (velocity << 7) | note;
+        const normalized = (pitchVal - 8192) / 8192; // -1.0 to +1.0
+        currentPitchBendCents = normalized * 200;
+
+        const pitchFill = document.getElementById('wheel-pitch-fill');
+        if (pitchFill) {
+          pitchFill.style.height = `${(normalized + 1) * 50}%`;
+        }
+
+        // Update detune on playing voices
+        Object.values(activeSynthVoices).forEach(v => {
+          if (v.oscs) {
+            v.oscs.forEach(osc => {
+              const base = osc.baseDetune || 0;
+              osc.detune.setValueAtTime(base + currentPitchBendCents, audioCtx.currentTime);
+            });
+          }
+        });
+      }
+      // CC (Modulation Wheel = CC 1)
+      else if (cmd === 11 && note === 1) {
+        const modFill = document.getElementById('wheel-mod-fill');
+        if (modFill) {
+          modFill.style.height = `${(velocity / 127) * 100}%`;
+        }
+      }
+    }
+
+    function logMidiTraffic(msg) {
+      const log = document.getElementById('midi-traffic-log');
+      if (!log) return;
+      const line = document.createElement('div');
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      log.prepend(line);
+      while (log.children.length > 25) {
+        log.removeChild(log.lastChild);
+      }
+    }
+
+    function openMidiMonitorModal() {
+      document.getElementById('modal-midi-monitor').style.display = 'flex';
+    }
+    function closeMidiMonitorModal() {
+      document.getElementById('modal-midi-monitor').style.display = 'none';
+    }
+
+    // ==========================================
+    // RUN OF SHOW & TIMELINE HUD INTEGRATION
+    // ==========================================
+    async function loadStaffGigs() {
+      const select = document.getElementById('select-active-gig');
+      if (!select || !window.supabaseClient) return;
+
+      try {
+        const { data: plans, error } = await window.supabaseClient
+          .from('thunderhouse_event_plans')
+          .select('id, client_names, event_date, event_type, timeline_moments')
+          .order('event_date', { ascending: true });
+
+        if (error || !plans || plans.length === 0) {
+          select.innerHTML = '<option value="">No Active Gigs Found</option>';
+          return;
+        }
+
+        let html = '';
+        plans.forEach((plan, idx) => {
+          const title = `${plan.client_names || 'Client Event'} (${plan.event_date || 'TBD'})`;
+          html += `<option value="${plan.id}" ${idx === 0 ? 'selected' : ''}>${title}</option>`;
+        });
+        select.innerHTML = html;
+
+        // Load the first gig by default
+        loadSelectedGigPlan(plans[0]);
+      } catch (err) {
+        console.warn('Error loading gigs into stage cockpit:', err);
+      }
+    }
+
+    async function onActiveGigChanged(gigId) {
+      if (!gigId || !window.supabaseClient) return;
+      try {
+        const { data: plan } = await window.supabaseClient
+          .from('thunderhouse_event_plans')
+          .select('*')
+          .eq('id', gigId)
+          .single();
+
+        if (plan) loadSelectedGigPlan(plan);
+      } catch (err) {
+        console.warn('Gig change load error:', err);
+      }
+    }
+
+    function loadSelectedGigPlan(plan) {
+      activeGig = plan;
+      activeTimelineCues = Array.isArray(plan.timeline_moments) && plan.timeline_moments.length > 0
+        ? plan.timeline_moments
+        : [
+            { time: "5:00 PM", title: "Cocktail Hour & Ambient Grooves", song_cue: "Smooth Soul / Nu-Jazz", notes: "Low volume, keep atmosphere warm." },
+            { time: "6:00 PM", title: "Grand Entrance & Welcome", song_cue: "Can't Stop The Feeling - Justin Timberlake", notes: "Full hype, announce bridal party." },
+            { time: "7:00 PM", title: "First Dance", song_cue: "Lover - Taylor Swift", notes: "Lower hall lights to 30%, spot on couple." },
+            { time: "8:30 PM", title: "Dance Floor Open & Prime Anthems", song_cue: "Yeah! - Usher", notes: "High energy, club lighting." },
+            { time: "10:30 PM", title: "Grand Finale Sing-Along", song_cue: "Don't Stop Believin' - Journey", notes: "Sparkler send-off prep." }
+          ];
+
+      currentCueIndex = 0;
+      updateHudCueDisplay();
+    }
+
+    function updateHudCueDisplay() {
+      const cue = activeTimelineCues[currentCueIndex];
+      if (!cue) return;
+
+      const titleEl = document.getElementById('hud-cue-title');
+      const songEl = document.getElementById('hud-cue-song');
+      const stepEl = document.getElementById('hud-cue-step');
+
+      if (titleEl) titleEl.textContent = `${cue.time ? cue.time + ' - ' : ''}${cue.title}`;
+      if (songEl) songEl.textContent = `Track: ${cue.song_cue || 'DJ Discretion'} ${cue.notes ? ' • ' + cue.notes : ''}`;
+      if (stepEl) stepEl.textContent = `Cue ${currentCueIndex + 1} of ${activeTimelineCues.length}`;
+    }
+
+    function advanceHudCue(delta) {
+      const newIdx = currentCueIndex + delta;
+      if (newIdx >= 0 && newIdx < activeTimelineCues.length) {
+        currentCueIndex = newIdx;
+        cueTimerSeconds = 0;
+        updateHudTimerDisplay();
+        updateHudCueDisplay();
+        logMidiTraffic(`⚡ Cue Advanced: ${activeTimelineCues[currentCueIndex].title}`);
+      }
+    }
+
+    function toggleHudTimer() {
+      const btn = document.getElementById('btn-hud-timer-toggle');
+      const icon = document.getElementById('hud-timer-icon');
+
+      if (isCueTimerRunning) {
+        clearInterval(cueTimerInterval);
+        isCueTimerRunning = false;
+        if (btn) btn.classList.remove('active');
+        if (icon) icon.className = 'fa-solid fa-play';
+        logMidiTraffic('⏱️ Cue Timer Paused');
+      } else {
+        isCueTimerRunning = true;
+        cueTimerInterval = setInterval(() => {
+          cueTimerSeconds++;
+          updateHudTimerDisplay();
+        }, 1000);
+        if (btn) btn.classList.add('active');
+        if (icon) icon.className = 'fa-solid fa-pause';
+        logMidiTraffic('⏱️ Cue Timer Started');
+      }
+    }
+
+    function resetHudTimer() {
+      cueTimerSeconds = 0;
+      updateHudTimerDisplay();
+      logMidiTraffic('⏱️ Cue Timer Reset to 00:00');
+    }
+
+    function updateHudTimerDisplay() {
+      const clockEl = document.getElementById('hud-cue-clock');
+      if (!clockEl) return;
+      const mins = Math.floor(cueTimerSeconds / 60);
+      const secs = cueTimerSeconds % 60;
+      clockEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    async function signOutStaff() {
+      if (confirm('Sign out of Thunder Keys and staff DJ session?')) {
+        if (window.supabaseClient) {
+          await window.supabaseClient.auth.signOut();
+        }
+        window.location.href = 'login.html';
+      }
+    }
+  </script>
+</body>
+</html>
