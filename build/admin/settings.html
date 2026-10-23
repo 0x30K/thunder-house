@@ -42,6 +42,7 @@
         <a href="#team"><i class="fa-solid fa-users-gear"></i> Team Permissions</a>
         <a href="#website"><i class="fa-solid fa-paintbrush"></i> Public Site Editor</a>
         <a href="#sending"><i class="fa-solid fa-server"></i> SMTP & Sending</a>
+        <a href="#logs"><i class="fa-solid fa-triangle-exclamation"></i> Error Logs</a>
       </nav>
 
       <!-- Settings Sections -->
@@ -205,6 +206,39 @@
             <button class="btn btn-sm" onclick="testEmailRelay()">Send Test</button>
           </div>
         </section>
+
+        <!-- System Error Logs & Health Monitor -->
+        <section id="logs" class="card" style="margin-top:1.5rem">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.75rem">
+            <div>
+              <div class="label" style="display:flex; align-items:center; gap:0.5rem; color:var(--text-main)">
+                <i class="fa-solid fa-triangle-exclamation" style="color:var(--secondary)"></i> System Error Logs & Health Monitor
+              </div>
+              <div class="small muted" style="margin-top:0.25rem">
+                Rate-limited, deduplicated in-memory, and auto-pruned to the last 200 distinct issues.
+              </div>
+            </div>
+            <div style="display:flex; gap:0.5rem">
+              <button class="btn btn-sm btn-outline" onclick="testSystemLogger()" title="Trigger a test log">
+                <i class="fa-solid fa-vial"></i> Test Log
+              </button>
+              <button class="btn btn-sm btn-outline" onclick="loadSystemErrorLogs()" title="Refresh logs">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh
+              </button>
+              <button class="btn btn-sm btn-ghost" onclick="clearSystemErrorLogs()" style="color:var(--secondary)" title="Purge logs">
+                <i class="fa-solid fa-trash-can"></i> Purge
+              </button>
+            </div>
+          </div>
+
+          <div style="max-height: 480px; overflow-y: auto;">
+            <div id="error-logs-container">
+              <div style="padding:1.5rem 0; text-align:center" class="muted small">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Checking system health…
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   </main>
@@ -237,6 +271,7 @@
     };
 
     await loadSettings();
+    await loadSystemErrorLogs();
   });
 
   async function loadSettings() {
@@ -290,6 +325,97 @@
   window.testEmailRelay = function () {
     window.showToast('Test verification email queued to olifedigital@gmail.com!', 'gold');
   };
+
+  // =========================================================================
+  // SYSTEM ERROR LOGS & HEALTH MONITOR
+  // =========================================================================
+  window.loadSystemErrorLogs = async function () {
+    const container = document.getElementById('error-logs-container');
+    if (!container) return;
+
+    let logs = [];
+    if (window.supabaseClient) {
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('thunderhouse_system_errors')
+          .select('*')
+          .order('last_occurred_at', { ascending: false })
+          .limit(50);
+        if (!error && data) logs = data;
+      } catch (e) {}
+    }
+
+    // Fallback to local storage if DB empty or offline
+    if (logs.length === 0 && window.ThunderLogger) {
+      logs = window.ThunderLogger.getLocalLogs();
+    }
+
+    if (!logs || logs.length === 0) {
+      container.innerHTML = `
+        <div style="padding:2rem 0; text-align:center" class="muted small">
+          <i class="fa-solid fa-circle-check" style="color:var(--success); font-size:1.5rem; display:block; margin-bottom:0.5rem"></i>
+          All Systems Operational · Zero active runtime errors recorded.
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = logs.map(log => {
+      const sevClass = log.severity === 'critical' ? 'pill-pink' : log.severity === 'warn' ? 'pill-gold' : 'pill-cyan';
+      const timeStr = log.last_occurred_at ? new Date(log.last_occurred_at).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' }) : 'Recent';
+      const dateStr = log.last_occurred_at ? new Date(log.last_occurred_at).toLocaleDateString() : '';
+      const count = log.count || 1;
+
+      return `
+        <div class="set-row" style="padding:0.75rem 0; align-items:flex-start; flex-direction:column; gap:0.4rem">
+          <div style="display:flex; justify-content:space-between; align-items:center; width:100%">
+            <div style="display:flex; align-items:center; gap:0.5rem">
+              <span class="pill ${sevClass}" style="text-transform:uppercase; font-size:0.7rem">${log.severity || 'error'}</span>
+              <span class="pill" style="font-size:0.7rem; background:rgba(255,255,255,0.06); color:var(--text-light)"><i class="fa-solid fa-cube"></i> ${escapeHtml(log.source || 'app')}</span>
+              ${count > 1 ? `<span class="pill pill-gold" style="font-size:0.7rem"><i class="fa-solid fa-arrows-rotate"></i> ${count}x</span>` : ''}
+            </div>
+            <span class="small muted">${dateStr} ${timeStr}</span>
+          </div>
+          <div style="font-size:0.88rem; font-weight:600; color:#fff; word-break:break-word">
+            ${escapeHtml(log.error_message || 'Unknown Error')}
+          </div>
+          ${log.error_stack ? `
+            <details style="width:100%; margin-top:0.3rem">
+              <summary class="small muted" style="cursor:pointer; user-select:none"><i class="fa-solid fa-code"></i> View Call Stack & Context</summary>
+              <pre style="background:rgba(0,0,0,0.5); padding:0.6rem 0.8rem; border-radius:6px; font-size:0.72rem; color:var(--text-light); overflow-x:auto; margin-top:0.3rem; border:1px solid rgba(255,255,255,0.05)">${escapeHtml(log.error_stack)}</pre>
+            </details>
+          ` : ''}
+        </div>
+      `;
+    }).join('');
+  };
+
+  window.clearSystemErrorLogs = async function () {
+    if (window.ThunderLogger) window.ThunderLogger.clearLocalLogs();
+    if (window.supabaseClient) {
+      try {
+        await window.supabaseClient.from('thunderhouse_system_errors').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      } catch (e) {}
+    }
+    window.showToast('System error logs cleared', 'info');
+    await loadSystemErrorLogs();
+  };
+
+  window.testSystemLogger = function () {
+    if (window.ThunderLogger) {
+      window.ThunderLogger.warn('settings_panel', 'Diagnostics verification test: simulated network timeout', {
+        stack: 'Error: Simulated test exception\n    at testSystemLogger (settings.html:310:12)'
+      });
+      window.showToast('Generated test error log!', 'gold');
+      setTimeout(loadSystemErrorLogs, 600);
+    }
+  };
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[s]));
+  }
 </script>
 </body>
 </html>

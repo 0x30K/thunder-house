@@ -5,6 +5,13 @@
  */
 
 (function () {
+  // Ensure System Error Logger is active across all admin views
+  if (!window.ThunderLogger && typeof document !== 'undefined') {
+    const s = document.createElement('script');
+    s.src = '../js/system-logger.js';
+    document.head.appendChild(s);
+  }
+
   const NAV = [
     { id: 'today', href: 'today.html', icon: 'fa-house', label: 'Today' },
     { group: 'Broadcast' },
