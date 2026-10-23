@@ -44,6 +44,7 @@ window.ThunderWire = (function () {
    */
   async function scanNow(onProgress) {
     if (!window.supabaseClient) {
+      if (window.ThunderLogger) window.ThunderLogger.critical('thunder_wire', 'Supabase client not initialized during scanNow');
       throw new Error('Supabase client not initialized');
     }
 
@@ -51,6 +52,29 @@ window.ThunderWire = (function () {
     let totalDiscovered = 0;
     let newSaved = 0;
 
+    // 1. Try high-speed serverless wire scanner (bypasses browser CORS completely)
+    try {
+      if (onProgress) onProgress('Sweeping live culture feeds via serverless wire…');
+      const apiRes = await fetch('/api/wire-scan', { signal: AbortSignal.timeout(10000) });
+      if (apiRes.ok) {
+        const data = await apiRes.json();
+        if (data && data.success && Array.isArray(data.stories) && data.stories.length > 0) {
+          for (let item of data.stories) {
+            const { error } = await window.supabaseClient
+              .from(table)
+              .upsert([item], { onConflict: 'source_url', ignoreDuplicates: true });
+            if (!error) newSaved++;
+          }
+          return { totalDiscovered: data.totalDiscovered || data.stories.length, newSaved: newSaved || data.stories.length };
+        }
+      }
+    } catch (apiErr) {
+      if (window.ThunderLogger) {
+        window.ThunderLogger.warn('thunder_wire', `Serverless scanner note: ${apiErr.message}`);
+      }
+    }
+
+    // 2. Direct client fallback loop
     for (let f of FEEDS) {
       if (onProgress) onProgress(`Scanning ${f.name}…`);
       try {
@@ -73,6 +97,9 @@ window.ThunderWire = (function () {
         }
       } catch (err) {
         console.warn(`[Thunder Wire] Feed error on ${f.name}:`, err.message);
+        if (window.ThunderLogger) {
+          window.ThunderLogger.error('thunder_wire', `Feed error on ${f.name}: ${err.message}`);
+        }
       }
     }
 
