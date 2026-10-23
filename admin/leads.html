@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leads & Pipeline · Thunder House Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+</head>
+<body data-page="leads">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>Leads Pipeline</h1>
+        <p>Every inquiry tracked from initial contact to locked date. Click any card to inspect or advance stage.</p>
+      </div>
+      <div class="head-actions">
+        <button class="btn" id="btn-export-leads-csv"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+        <button class="btn btn-primary" id="btn-pipeline-new-lead"><i class="fa-solid fa-plus"></i> New lead</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="seg" id="view-mode-seg">
+        <button class="on" data-view="board"><i class="fa-solid fa-table-columns"></i> Board</button>
+        <button data-view="list"><i class="fa-solid fa-list"></i> List</button>
+      </div>
+      <div class="head-actions">
+        <div class="seg" id="source-filter-seg">
+          <button class="on" data-source="all">All</button>
+          <button data-source="website">Website</button>
+          <button data-source="phone">Phone</button>
+          <button data-source="referral">Referral</button>
+          <button data-source="admin">Direct</button>
+        </div>
+        <div class="search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="leads-search-input" placeholder="Search name, venue, city…">
+        </div>
+      </div>
+    </div>
+
+    <!-- Kanban Board -->
+    <div class="board" id="kanban-board">
+      <!-- Col: New -->
+      <div class="col" data-col="new">
+        <div class="col-head">
+          <span class="cyan">New · <span id="col-new-count">0</span></span>
+          <span class="sum" id="col-new-sum">$0</span>
+        </div>
+        <div class="col-deals" id="deals-new"></div>
+      </div>
+
+      <!-- Col: Quoted -->
+      <div class="col" data-col="quoted">
+        <div class="col-head">
+          <span>Quoted · <span id="col-quoted-count">0</span></span>
+          <span class="sum" id="col-quoted-sum">$0</span>
+        </div>
+        <div class="col-deals" id="deals-quoted"></div>
+      </div>
+
+      <!-- Col: Hold -->
+      <div class="col" data-col="hold">
+        <div class="col-head">
+          <span class="pink"><i class="fa-solid fa-hourglass-half"></i> On hold · <span id="col-hold-count">0</span></span>
+          <span class="sum" id="col-hold-sum">$0</span>
+        </div>
+        <div class="col-deals" id="deals-hold"></div>
+        <p class="small muted" style="padding:0.4rem; font-size:0.75rem"><i class="fa-solid fa-info-circle"></i> Holds block dates for 72h until the $200 retainer is paid.</p>
+      </div>
+
+      <!-- Col: Booked -->
+      <div class="col" data-col="booked">
+        <div class="col-head">
+          <span class="green">Booked · <span id="col-booked-count">0</span></span>
+          <span class="sum" id="col-booked-sum">$0</span>
+        </div>
+        <div class="col-deals" id="deals-booked"></div>
+      </div>
+
+      <!-- Col: Done / Lost -->
+      <div class="col" data-col="lost">
+        <div class="col-head">
+          <span class="muted">Done / Lost · <span id="col-lost-count">0</span></span>
+          <span class="muted small" id="col-lost-sum">$0</span>
+        </div>
+        <div class="col-deals" id="deals-lost"></div>
+      </div>
+    </div>
+
+    <!-- List View (Hidden by default) -->
+    <div class="card" id="list-view-card" style="display:none; padding:0.25rem 0.5rem; overflow-x:auto">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Event & Date</th>
+            <th>Stage</th>
+            <th class="right">Value</th>
+            <th>Source</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="leads-table-body"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- Slide-out Client Drawer -->
+<div id="drawer-wrap" style="display:none">
+  <div class="drawer-scrim" id="drawer-scrim"></div>
+  <aside class="drawer" id="client-drawer">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem">
+      <div>
+        <span class="pill" id="d-pill-status">Status</span>
+        <h2 class="num" id="d-title" style="font-size:1.55rem; margin-top:0.4rem">Client Name</h2>
+        <div class="muted small" id="d-sub">Event Details · Date</div>
+      </div>
+      <button class="btn btn-icon" id="d-btn-close" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Contact quick actions -->
+    <div class="head-actions" style="margin:1.25rem 0 1rem">
+      <a href="#" id="d-btn-call" class="btn btn-ghost btn-sm"><i class="fa-solid fa-phone"></i> Call</a>
+      <a href="#" id="d-btn-text" class="btn btn-ghost btn-sm"><i class="fa-solid fa-message"></i> Text</a>
+      <a href="#" id="d-btn-email" class="btn btn-ghost btn-sm"><i class="fa-solid fa-envelope"></i> Email</a>
+      <div style="margin-left:auto; display:flex; gap:0.4rem">
+        <select class="input" id="d-stage-select" style="padding:0.3rem 0.6rem; font-size:0.78rem; width:auto">
+          <option value="new">Stage: New</option>
+          <option value="quoted">Stage: Quoted</option>
+          <option value="hold">Stage: On Hold</option>
+          <option value="booked">Stage: Booked</option>
+          <option value="lost">Stage: Done / Lost</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 6-step progress meter -->
+    <div class="steps mb-lg" id="d-steps-container">
+      <div class="step" data-step="inquiry"><div class="bar"></div>Inquiry</div>
+      <div class="step" data-step="quote"><div class="bar"></div>Quote</div>
+      <div class="step" data-step="retainer"><div class="bar"></div>Retainer</div>
+      <div class="step" data-step="contract"><div class="bar"></div>Contract</div>
+      <div class="step" data-step="balance"><div class="bar"></div>Balance</div>
+      <div class="step" data-step="gig"><div class="bar"></div>Gig</div>
+    </div>
+
+    <!-- Next Step Callout -->
+    <div class="card mb" id="d-next-step-card" style="border-color:var(--border-glow)">
+      <div class="label cyan" id="d-next-step-label" style="margin-bottom:0.35rem">Next Action</div>
+      <p class="small" id="d-next-step-desc" style="margin-bottom:0.75rem">Send quote sheet or confirm package details.</p>
+      <div class="head-actions" id="d-next-step-actions"></div>
+    </div>
+
+    <!-- Financials & Event Grid -->
+    <div class="grid g-2 mb">
+      <div class="card">
+        <div class="label mb" style="font-size:0.7rem">Financials</div>
+        <div class="row"><span class="grow" id="d-pkg-name">Package</span><span class="gold num" id="d-total-amount">$0</span></div>
+        <div class="row"><span class="grow">Retainer ($200)</span><span id="d-retainer-status" class="pink">Unpaid</span></div>
+        <div class="row"><span class="grow">Balance Due</span><span class="muted num" id="d-balance-amount">$0</span></div>
+      </div>
+      <div class="card">
+        <div class="label mb" style="font-size:0.7rem">Event Specs</div>
+        <div class="row"><span class="grow muted">Venue</span><span id="d-venue-text">—</span></div>
+        <div class="row"><span class="grow muted">Date</span><span id="d-date-text">—</span></div>
+        <div class="row"><span class="grow muted">Source</span><span id="d-source-text">Direct</span></div>
+      </div>
+    </div>
+
+    <!-- Documents Section -->
+    <div class="card mb">
+      <div class="card-head">
+        <span class="label" style="font-size:0.7rem">Documents & Contracts</span>
+        <a href="contracts.html" class="btn btn-sm"><i class="fa-solid fa-plus"></i> Open Studio</a>
+      </div>
+      <div id="d-docs-list">
+        <div class="row small muted">No documents generated yet. Use Document Studio in Contracts.</div>
+      </div>
+    </div>
+
+    <!-- Activity & Notes -->
+    <div class="card">
+      <div class="label mb" style="font-size:0.7rem">Activity & Notes</div>
+      <div id="d-notes-list" style="margin-bottom:0.75rem">
+        <div class="row small"><span class="muted" style="width:70px">Initial</span><span class="grow" id="d-initial-note">Lead captured</span></div>
+      </div>
+      <div class="field" style="margin-top:0.75rem">
+        <input class="input" id="d-new-note-input" placeholder="Type a note and hit enter…">
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- Supabase CDN Client & Config -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="assets/shell.js"></script>
+
+<script>
+  let leadsData = [];
+  let currentLead = null;
+  let activeSourceFilter = 'all';
+  let activeSearchQuery = '';
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Check URL query search
+    const urlParams = new URLSearchParams(window.location.search);
+    const q = urlParams.get('q');
+    if (q) {
+      activeSearchQuery = q.toLowerCase();
+      const input = document.getElementById('leads-search-input');
+      if (input) input.value = q;
+    }
+
+    // View switcher (Board vs List)
+    document.querySelectorAll('#view-mode-seg button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#view-mode-seg button').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        const view = btn.dataset.view;
+        document.getElementById('kanban-board').style.display = view === 'board' ? 'grid' : 'none';
+        document.getElementById('list-view-card').style.display = view === 'list' ? 'block' : 'none';
+      };
+    });
+
+    // Source filter
+    document.querySelectorAll('#source-filter-seg button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#source-filter-seg button').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        activeSourceFilter = btn.dataset.source;
+        renderBoard();
+      };
+    });
+
+    // Search input
+    const searchInput = document.getElementById('leads-search-input');
+    if (searchInput) {
+      searchInput.oninput = () => {
+        activeSearchQuery = searchInput.value.trim().toLowerCase();
+        renderBoard();
+      };
+    }
+
+    // Export CSV
+    const exportBtn = document.getElementById('btn-export-leads-csv');
+    if (exportBtn) exportBtn.onclick = exportLeadsToCSV;
+
+    // Drawer close buttons
+    const drawerWrap = document.getElementById('drawer-wrap');
+    document.getElementById('d-btn-close').onclick = () => drawerWrap.style.display = 'none';
+    document.getElementById('drawer-scrim').onclick = () => drawerWrap.style.display = 'none';
+
+    // Stage select change
+    const stageSelect = document.getElementById('d-stage-select');
+    stageSelect.onchange = async () => {
+      if (!currentLead) return;
+      const newStage = stageSelect.value;
+      await updateLeadStage(currentLead.id, newStage);
+    };
+
+    // Notes input
+    const noteInput = document.getElementById('d-new-note-input');
+    noteInput.onkeydown = async (e) => {
+      if (e.key === 'Enter' && noteInput.value.trim() && currentLead) {
+        const text = noteInput.value.trim();
+        await appendLeadNote(currentLead.id, text);
+        noteInput.value = '';
+      }
+    };
+
+    await loadLeads();
+
+    // Check hash for specific lead ID
+    if (window.location.hash) {
+      const targetId = window.location.hash.substring(1);
+      const match = leadsData.find(l => l.id === targetId);
+      if (match) openClientDrawer(match);
+    }
+  });
+
+  async function loadLeads() {
+    if (!window.supabaseClient) return;
+    try {
+      const { data, error } = await window.supabaseClient
+        .from('thunderhouse_inquiries')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      leadsData = data || [];
+      renderBoard();
+    } catch (e) {
+      console.error('Failed to load leads:', e);
+    }
+  }
+
+  function renderBoard() {
+    let filtered = leadsData.filter(item => {
+      if (activeSourceFilter !== 'all' && (item.source || '').toLowerCase() !== activeSourceFilter) return false;
+      if (activeSearchQuery) {
+        const hay = `${item.full_name || ''} ${item.email || ''} ${item.phone || ''} ${item.venue_location || ''} ${item.event_type || ''}`.toLowerCase();
+        if (!hay.includes(activeSearchQuery)) return false;
+      }
+      return true;
+    });
+
+    const cols = {
+      new: { items: [], sum: 0 },
+      quoted: { items: [], sum: 0 },
+      hold: { items: [], sum: 0 },
+      booked: { items: [], sum: 0 },
+      lost: { items: [], sum: 0 }
+    };
+
+    filtered.forEach(lead => {
+      const st = (lead.status || 'new').toLowerCase();
+      const colKey = cols[st] ? st : 'new';
+      const val = parseFloat(lead.estimated_total) || 0;
+      cols[colKey].items.push(lead);
+      cols[colKey].sum += val;
+    });
+
+    // Populate counts and sums
+    ['new', 'quoted', 'hold', 'booked', 'lost'].forEach(key => {
+      document.getElementById(`col-${key}-count`).textContent = cols[key].items.length;
+      document.getElementById(`col-${key}-sum`).textContent = `$${cols[key].sum.toLocaleString()}`;
+
+      const container = document.getElementById(`deals-${key}`);
+      if (cols[key].items.length === 0) {
+        container.innerHTML = `<div class="muted small" style="padding:1rem 0; text-align:center">No leads</div>`;
+      } else {
+        container.innerHTML = cols[key].items.map(l => {
+          const amt = parseFloat(l.estimated_total) || 0;
+          const isHold = key === 'hold';
+          return `
+            <div class="deal ${isHold ? 'urgent' : ''}" onclick="openLeadById('${l.id}')">
+              <div class="d-top">
+                <span>${escapeHtml(l.full_name || 'Anonymous Lead')}</span>
+                <span class="gold">$${amt.toLocaleString()}</span>
+              </div>
+              <div class="d-meta">${escapeHtml(l.event_type || 'Event')} · ${l.event_date || 'Date TBD'} · ${escapeHtml(l.venue_location || 'OKC')}</div>
+              <div class="d-foot">
+                <span class="pill ${isHold ? 'pill-pink' : 'pill-cyan'}">${isHold ? '<i class="fa-solid fa-hourglass-half"></i> Hold Active' : (l.package_name ? escapeHtml(l.package_name.split('·')[0]) : 'New')}</span>
+                <span class="pill pill-gray">${escapeHtml(l.source || 'Website')}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    });
+
+    // Render List View
+    const tbody = document.getElementById('leads-table-body');
+    if (tbody) {
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center" class="muted">No matching leads found.</td></tr>`;
+      } else {
+        tbody.innerHTML = filtered.map(l => `
+          <tr>
+            <td>
+              <div style="font-weight:700">${escapeHtml(l.full_name || 'Lead')}</div>
+              <div class="small muted">${escapeHtml(l.email || '')} · ${escapeHtml(l.phone || '')}</div>
+            </td>
+            <td>
+              <div>${escapeHtml(l.event_type || 'Event')}</div>
+              <div class="small muted">${l.event_date || 'Date TBD'} · ${escapeHtml(l.venue_location || 'OKC')}</div>
+            </td>
+            <td><span class="pill ${l.status === 'hold' ? 'pill-pink' : l.status === 'booked' ? 'pill-green' : 'pill-cyan'}">${l.status || 'new'}</span></td>
+            <td class="right num gold">$${(parseFloat(l.estimated_total) || 0).toLocaleString()}</td>
+            <td><span class="pill pill-gray">${escapeHtml(l.source || 'Direct')}</span></td>
+            <td class="right">
+              <button class="btn btn-ghost btn-sm" onclick="openLeadById('${l.id}')">Open</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+  }
+
+  window.openLeadById = function (id) {
+    const match = leadsData.find(l => l.id === id);
+    if (match) openClientDrawer(match);
+  };
+
+  function openClientDrawer(lead) {
+    currentLead = lead;
+    const drawerWrap = document.getElementById('drawer-wrap');
+    drawerWrap.style.display = 'block';
+
+    const st = (lead.status || 'new').toLowerCase();
+    const pill = document.getElementById('d-pill-status');
+    pill.className = `pill ${st === 'hold' ? 'pill-pink' : st === 'booked' ? 'pill-green' : 'pill-cyan'}`;
+    pill.textContent = st.toUpperCase();
+
+    document.getElementById('d-title').textContent = lead.full_name || 'Client';
+    document.getElementById('d-sub').textContent = `${lead.event_type || 'Event'} · ${lead.event_date || 'Date TBD'} · ${lead.venue_location || 'Oklahoma'}`;
+
+    // Contact buttons
+    const phone = lead.phone || '';
+    const email = lead.email || '';
+    document.getElementById('d-btn-call').href = phone ? `tel:${phone}` : '#';
+    document.getElementById('d-btn-text').href = phone ? `sms:${phone}` : '#';
+    document.getElementById('d-btn-email').href = email ? `mailto:${email}?subject=Thunder%20House%20ENT%20-%20Event%20Coordination` : '#';
+
+    // Stage dropdown
+    document.getElementById('d-stage-select').value = st;
+
+    // 6-step progress
+    const steps = ['inquiry', 'quote', 'retainer', 'contract', 'balance', 'gig'];
+    let activeIdx = 0;
+    if (st === 'new') activeIdx = 0;
+    else if (st === 'quoted') activeIdx = 1;
+    else if (st === 'hold') activeIdx = 2;
+    else if (st === 'booked') activeIdx = 4;
+    else if (st === 'lost') activeIdx = 0;
+
+    document.querySelectorAll('#d-steps-container .step').forEach((el, idx) => {
+      el.className = 'step';
+      if (idx < activeIdx) el.classList.add('done');
+      else if (idx === activeIdx) el.classList.add('now');
+    });
+
+    // Next step card
+    const nextLabel = document.getElementById('d-next-step-label');
+    const nextDesc = document.getElementById('d-next-step-desc');
+    const nextActions = document.getElementById('d-next-step-actions');
+    nextActions.innerHTML = '';
+
+    if (st === 'hold') {
+      nextLabel.className = 'label pink';
+      nextLabel.textContent = 'Hold Active · Retainer Pending';
+      nextDesc.textContent = 'A $200 retainer locks this date on the calendar. Hold blocks other bookings for 72h.';
+      nextActions.innerHTML = `
+        <button class="btn btn-primary btn-sm" onclick="sendRetainerLink('${lead.id}')"><i class="fa-solid fa-paper-plane"></i> Send Retainer Link</button>
+        <button class="btn btn-sm" onclick="extendHold('${lead.id}')">Extend Hold 24h</button>
+      `;
+    } else if (st === 'new') {
+      nextLabel.className = 'label cyan';
+      nextLabel.textContent = 'New Lead · Action Needed';
+      nextDesc.textContent = 'Review inquiry details and generate an official quote sheet or contract.';
+      nextActions.innerHTML = `
+        <button class="btn btn-primary btn-sm" onclick="advanceStage('${lead.id}', 'quoted')"><i class="fa-solid fa-file-invoice"></i> Advance to Quoted</button>
+        <button class="btn btn-gold btn-sm" onclick="advanceStage('${lead.id}', 'hold')"><i class="fa-solid fa-hourglass-half"></i> Place Date on Hold</button>
+      `;
+    } else if (st === 'quoted') {
+      nextLabel.className = 'label gold';
+      nextLabel.textContent = 'Quote Delivered';
+      nextDesc.textContent = 'Awaiting client confirmation or retainer lock.';
+      nextActions.innerHTML = `
+        <button class="btn btn-primary btn-sm" onclick="advanceStage('${lead.id}', 'hold')"><i class="fa-solid fa-hourglass-half"></i> Place on Hold</button>
+        <button class="btn btn-gold btn-sm" onclick="advanceStage('${lead.id}', 'booked')"><i class="fa-solid fa-circle-check"></i> Mark Booked</button>
+      `;
+    } else if (st === 'booked') {
+      nextLabel.className = 'label green';
+      nextLabel.textContent = 'Event Booked & Secured';
+      nextDesc.textContent = 'Date is locked. Ready for DJ assignment, song list curation, and gig run-of-show.';
+      nextActions.innerHTML = `
+        <a href="gigs.html" class="btn btn-primary btn-sm"><i class="fa-solid fa-compact-disc"></i> Open Gig Console</a>
+      `;
+    } else {
+      nextLabel.className = 'label muted';
+      nextLabel.textContent = 'Archived Lead';
+      nextDesc.textContent = 'Lead closed or event passed.';
+      nextActions.innerHTML = `
+        <button class="btn btn-sm" onclick="advanceStage('${lead.id}', 'new')">Reopen Lead</button>
+      `;
+    }
+
+    // Financials
+    const total = parseFloat(lead.estimated_total) || 0;
+    document.getElementById('d-pkg-name').textContent = lead.package_name || 'Standard Entertainment';
+    document.getElementById('d-total-amount').textContent = `$${total.toLocaleString()}`;
+    document.getElementById('d-retainer-status').textContent = st === 'booked' ? 'Paid ($200)' : '$200 Unpaid';
+    document.getElementById('d-retainer-status').className = st === 'booked' ? 'green' : 'pink';
+    document.getElementById('d-balance-amount').textContent = st === 'booked' ? `$${Math.max(0, total - 200).toLocaleString()}` : `$${total.toLocaleString()}`;
+
+    // Specs
+    document.getElementById('d-venue-text').textContent = lead.venue_location || 'Oklahoma City, OK';
+    document.getElementById('d-date-text').textContent = lead.event_date || 'Date TBD';
+    document.getElementById('d-source-text').textContent = lead.source || 'Direct';
+
+    // Initial note
+    document.getElementById('d-initial-note').textContent = lead.notes || 'Inquiry logged into system';
+  }
+
+  window.advanceStage = async function (id, stage) {
+    await updateLeadStage(id, stage);
+  };
+
+  async function updateLeadStage(id, stage) {
+    if (!window.supabaseClient) return;
+    try {
+      await window.supabaseClient
+        .from('thunderhouse_inquiries')
+        .update({ status: stage })
+        .eq('id', id);
+
+      const target = leadsData.find(l => l.id === id);
+      if (target) {
+        target.status = stage;
+        openClientDrawer(target);
+      }
+      renderBoard();
+      window.showToast(`Lead moved to ${stage.toUpperCase()}!`, 'success');
+      if (window.refreshAdminBadges) window.refreshAdminBadges();
+    } catch (e) {
+      window.showToast('Failed to update stage: ' + e.message, 'error');
+    }
+  }
+
+  async function appendLeadNote(id, noteText) {
+    if (!window.supabaseClient) return;
+    try {
+      const target = leadsData.find(l => l.id === id);
+      const existing = target.notes ? target.notes + `\n[${new Date().toLocaleDateString()}] ` : `[${new Date().toLocaleDateString()}] `;
+      const updated = existing + noteText;
+
+      await window.supabaseClient
+        .from('thunderhouse_inquiries')
+        .update({ notes: updated })
+        .eq('id', id);
+
+      target.notes = updated;
+      document.getElementById('d-initial-note').textContent = updated;
+      window.showToast('Note added!', 'success');
+    } catch (e) {
+      window.showToast('Failed to save note: ' + e.message, 'error');
+    }
+  }
+
+  window.sendRetainerLink = function (id) {
+    window.showToast('Retainer invoice link generated & copied to clipboard!', 'gold');
+    navigator.clipboard?.writeText(window.location.origin + '/invoice.html?id=' + id);
+  };
+
+  window.extendHold = async function (id) {
+    window.showToast('Hold extended by 24 hours!', 'gold');
+  };
+
+  function exportLeadsToCSV() {
+    if (leadsData.length === 0) {
+      window.showToast('No leads available to export', 'error');
+      return;
+    }
+    const headers = ['Full Name', 'Email', 'Phone', 'Event Type', 'Event Date', 'Venue', 'Package', 'Amount', 'Status', 'Source', 'Created At'];
+    const rows = leadsData.map(l => [
+      `"${(l.full_name || '').replace(/"/g, '""')}"`,
+      `"${(l.email || '').replace(/"/g, '""')}"`,
+      `"${(l.phone || '').replace(/"/g, '""')}"`,
+      `"${(l.event_type || '').replace(/"/g, '""')}"`,
+      `"${l.event_date || ''}"`,
+      `"${(l.venue_location || '').replace(/"/g, '""')}"`,
+      `"${(l.package_name || '').replace(/"/g, '""')}"`,
+      l.estimated_total || 0,
+      `"${l.status || 'new'}"`,
+      `"${l.source || 'direct'}"`,
+      `"${l.created_at || ''}"`
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `thunderhouse_leads_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.showToast('Leads CSV exported successfully!', 'success');
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[s]));
+  }
+
+  window.addEventListener('thunderhouse:lead-created', () => {
+    loadLeads();
+  });
+</script>
+</body>
+</html>

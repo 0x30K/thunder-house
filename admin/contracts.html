@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contracts & Document Studio · Thunder House Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+  <link rel="stylesheet" href="../css/document-studio.css">
+</head>
+<body data-page="contracts">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>Contracts & Document Vault</h1>
+        <p>Agreements, releases, and split sheets. Track signatures, fill client details, or author source master templates.</p>
+      </div>
+      <div class="head-actions">
+        <button class="btn btn-primary" id="btn-open-doc-studio"><i class="fa-solid fa-file-signature"></i> Open Document Studio</button>
+      </div>
+    </div>
+
+    <div class="grid g-main-side">
+      <div>
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <div class="seg" id="contracts-filter-seg">
+            <button class="on" data-tab="all">All Documents</button>
+            <button data-tab="waiting">Waiting to Sign</button>
+            <button data-tab="signed">Signed</button>
+            <button data-tab="vault">Vault Saved</button>
+          </div>
+          <div class="search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="contracts-search" placeholder="Search client or document…">
+          </div>
+        </div>
+
+        <!-- Waiting to Sign Section -->
+        <div class="label mb" id="waiting-label" style="font-size:0.75rem; color:var(--accent-gold)">
+          <i class="fa-solid fa-hourglass-half"></i> Pending Signatures
+        </div>
+        <section class="card mb" id="waiting-contracts-card">
+          <div id="waiting-contracts-list">
+            <div style="padding:1rem 0; text-align:center" class="muted small">Checking pending agreements…</div>
+          </div>
+        </section>
+
+        <!-- Recently Signed Section -->
+        <div class="label mb" id="signed-label" style="font-size:0.75rem; color:var(--success)">
+          <i class="fa-solid fa-circle-check"></i> Executed & Signed Agreements
+        </div>
+        <section class="card mb" id="signed-contracts-card">
+          <div id="signed-contracts-list">
+            <div style="padding:1rem 0; text-align:center" class="muted small">Checking signed agreements…</div>
+          </div>
+        </section>
+
+        <!-- Document Studio In-Place Workspace -->
+        <div id="studio-embed-container" style="display:none; margin-top:1.5rem">
+          <div class="card-head">
+            <span class="label" style="color:var(--primary); font-size:0.9rem"><i class="fa-solid fa-pen-nib"></i> Interactive Document Studio</span>
+            <button class="btn btn-sm btn-ghost" id="btn-collapse-studio"><i class="fa-solid fa-chevron-up"></i> Close Studio</button>
+          </div>
+          <div id="document-studio-mount"></div>
+        </div>
+      </div>
+
+      <!-- Sidebar Tools & Templates -->
+      <aside>
+        <section class="card mb">
+          <div class="label mb" style="font-size:0.72rem">Standard Master Templates</div>
+          <div class="row">
+            <i class="fa-solid fa-compact-disc cyan"></i>
+            <span class="grow">Performance Agreement & Rider</span>
+            <button class="btn btn-sm" onclick="launchTemplate('performance')">Use</button>
+          </div>
+          <div class="row">
+            <i class="fa-solid fa-music gold"></i>
+            <span class="grow">Music Production Split Sheet</span>
+            <button class="btn btn-sm" onclick="launchTemplate('split_sheet')">Use</button>
+          </div>
+          <div class="row">
+            <i class="fa-solid fa-file-invoice-dollar green"></i>
+            <span class="grow">Executive Client Quote Sheet</span>
+            <button class="btn btn-sm" onclick="launchTemplate('quote_sheet')">Use</button>
+          </div>
+          <div class="row">
+            <i class="fa-solid fa-camera pink"></i>
+            <span class="grow">Photo & Video Media Release</span>
+            <button class="btn btn-sm" onclick="launchTemplate('photo_release')">Use</button>
+          </div>
+          <div class="row">
+            <i class="fa-solid fa-user-tie cyan"></i>
+            <span class="grow">Work-for-Hire Master Agreement</span>
+            <button class="btn btn-sm" onclick="launchTemplate('work_for_hire')">Use</button>
+          </div>
+          <div class="row">
+            <i class="fa-solid fa-boxes-packing gold"></i>
+            <span class="grow">Gear Loan & Rental Custody</span>
+            <button class="btn btn-sm" onclick="launchTemplate('gear_rental')">Use</button>
+          </div>
+          <div class="row">
+            <i class="fa-solid fa-file-lines muted"></i>
+            <span class="grow">Executive Letterhead Memo</span>
+            <button class="btn btn-sm" onclick="launchTemplate('letterhead_memo')">Use</button>
+          </div>
+        </section>
+
+        <section class="card glow">
+          <div class="eyebrow">Studio Workflow</div>
+          <div class="check ok" style="margin-top:0.6rem"><i class="fa-solid fa-1"></i> Pick a template or agreement</div>
+          <div class="check ok"><i class="fa-solid fa-2"></i> Type or customize terms in live preview</div>
+          <div class="check ok"><i class="fa-solid fa-3"></i> Print with official letterhead or save to vault</div>
+          <p class="small muted" style="margin-top:0.75rem">
+            <i class="fa-solid fa-shield-halved gold"></i> Superuser authoring mode allows editing company-wide master source defaults.
+          </p>
+        </section>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<!-- Supabase CDN Client & Config -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="assets/shell.js"></script>
+<script src="../js/document-studio.js"></script>
+
+<script>
+  let contractsData = [];
+  let documentsVaultData = [];
+  let currentTab = 'all';
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Studio toggle button
+    const openStudioBtn = document.getElementById('btn-open-doc-studio');
+    const collapseStudioBtn = document.getElementById('btn-collapse-studio');
+    const studioEmbed = document.getElementById('studio-embed-container');
+
+    if (openStudioBtn) {
+      openStudioBtn.onclick = () => {
+        studioEmbed.style.display = 'block';
+        initStudioEmbed();
+        studioEmbed.scrollIntoView({ behavior: 'smooth' });
+      };
+    }
+    if (collapseStudioBtn) {
+      collapseStudioBtn.onclick = () => {
+        studioEmbed.style.display = 'none';
+      };
+    }
+
+    // Tab buttons
+    document.querySelectorAll('#contracts-filter-seg button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#contracts-filter-seg button').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        currentTab = btn.dataset.tab;
+        renderContracts();
+      };
+    });
+
+    // Search filter
+    const searchInput = document.getElementById('contracts-search');
+    if (searchInput) {
+      searchInput.oninput = () => renderContracts();
+    }
+
+    await loadContractsAndVault();
+  });
+
+  async function loadContractsAndVault() {
+    if (!window.supabaseClient) return;
+
+    try {
+      // 1. Fetch contracts
+      const { data: contracts } = await window.supabaseClient
+        .from('thunderhouse_contracts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      contractsData = contracts || [];
+
+      // 2. Fetch documents vault
+      const { data: vaultDocs } = await window.supabaseClient
+        .from('thunderhouse_documents')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      documentsVaultData = vaultDocs || [];
+
+      renderContracts();
+    } catch (e) {
+      console.error('Error loading contracts:', e);
+    }
+  }
+
+  function renderContracts() {
+    const q = (document.getElementById('contracts-search')?.value || '').trim().toLowerCase();
+
+    // Filter contracts
+    let filteredContracts = contractsData.filter(c => {
+      if (q) {
+        const text = `${c.client_name || ''} ${c.event_type || ''} ${c.package_name || ''}`.toLowerCase();
+        if (!text.includes(q)) return false;
+      }
+      return true;
+    });
+
+    const waitingList = filteredContracts.filter(c => !c.signed_at && c.status !== 'signed');
+    const signedList = filteredContracts.filter(c => c.signed_at || c.status === 'signed');
+
+    const waitingContainer = document.getElementById('waiting-contracts-list');
+    const signedContainer = document.getElementById('signed-contracts-list');
+
+    // Render Waiting
+    if (waitingList.length === 0) {
+      waitingContainer.innerHTML = `
+        <div style="padding:1rem 0; text-align:center" class="muted small">
+          No contracts currently pending client signature.
+        </div>
+      `;
+    } else {
+      waitingContainer.innerHTML = waitingList.map(c => `
+        <div class="row">
+          <i class="fa-solid fa-file-signature cyan"></i>
+          <div class="grow">
+            <strong>${escapeHtml(c.client_name || 'Client')}</strong> · ${escapeHtml(c.event_type || 'Event Contract')}
+            <span class="sub">Event Date: ${c.event_date || 'TBD'} · $${(parseFloat(c.total_amount) || 0).toLocaleString()}</span>
+          </div>
+          <span class="pill pill-gold">Waiting Signature</span>
+          <button class="btn btn-ghost btn-sm" onclick="copySignLink('${c.contract_token || c.id}')"><i class="fa-solid fa-link"></i> Link</button>
+        </div>
+      `).join('');
+    }
+
+    // Render Signed
+    if (signedList.length === 0) {
+      signedContainer.innerHTML = `
+        <div style="padding:1rem 0; text-align:center" class="muted small">
+          No signed contracts on file yet.
+        </div>
+      `;
+    } else {
+      signedContainer.innerHTML = signedList.map(c => `
+        <div class="row">
+          <i class="fa-solid fa-circle-check green"></i>
+          <div class="grow">
+            <strong>${escapeHtml(c.client_name || 'Client')}</strong> · ${escapeHtml(c.event_type || 'Contract')}
+            <span class="sub">Signed by: ${escapeHtml(c.signer_name || c.client_name || 'Client')} · ${c.signed_at ? new Date(c.signed_at).toLocaleDateString() : 'Signed'}</span>
+          </div>
+          <span class="pill pill-green">Executed</span>
+          <button class="btn btn-sm" onclick="viewSignedContract('${c.id}')"><i class="fa-solid fa-file-pdf"></i> View / Print</button>
+        </div>
+      `).join('');
+    }
+  }
+
+  window.copySignLink = function (token) {
+    const url = `${window.location.origin}/contract.html?token=${encodeURIComponent(token)}`;
+    navigator.clipboard?.writeText(url);
+    window.showToast('Contract signing link copied to clipboard!', 'gold');
+  };
+
+  window.viewSignedContract = function (id) {
+    window.open(`${window.location.origin}/contract.html?id=${encodeURIComponent(id)}`, '_blank');
+  };
+
+  let studioInitialized = false;
+  function initStudioEmbed() {
+    if (studioInitialized) return;
+    const mount = document.getElementById('document-studio-mount');
+    if (mount && window.ThunderHouseDocumentStudio) {
+      window.ThunderHouseDocumentStudio.init(mount);
+      studioInitialized = true;
+    }
+  }
+
+  window.launchTemplate = function (templateId) {
+    const studioEmbed = document.getElementById('studio-embed-container');
+    studioEmbed.style.display = 'block';
+    initStudioEmbed();
+    if (window.ThunderHouseDocumentStudio?.selectTemplate) {
+      window.ThunderHouseDocumentStudio.selectTemplate(templateId);
+    }
+    studioEmbed.scrollIntoView({ behavior: 'smooth' });
+    window.showToast(`Loaded ${templateId.replace('_', ' ').toUpperCase()} into Document Studio!`, 'cyan');
+  };
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[s]));
+  }
+</script>
+</body>
+</html>

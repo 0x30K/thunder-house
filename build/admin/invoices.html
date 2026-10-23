@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quotes & Invoices · Thunder House Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+</head>
+<body data-page="invoices">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>Quotes & Invoices</h1>
+        <p>Retainers, balances, and client quotes in one unified ledger. Overdue invoices float to top.</p>
+      </div>
+      <div class="head-actions">
+        <button class="btn" id="btn-create-quote"><i class="fa-solid fa-file-lines"></i> New quote</button>
+        <button class="btn btn-primary" id="btn-create-invoice"><i class="fa-solid fa-plus"></i> New invoice</button>
+      </div>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="grid g-4 mb-lg">
+      <div class="kpi">
+        <div class="k-label">Overdue</div>
+        <div class="k-value pink" id="kpi-inv-overdue">$0</div>
+        <div class="k-sub" id="kpi-inv-overdue-count">0 invoices</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">Due Soon (14d)</div>
+        <div class="k-value gold" id="kpi-inv-soon">$0</div>
+        <div class="k-sub" id="kpi-inv-soon-count">0 balances</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">Quotes Out</div>
+        <div class="k-value cyan" id="kpi-inv-quotes">$0</div>
+        <div class="k-sub" id="kpi-inv-quotes-count">0 awaiting approval</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">Collected (Month)</div>
+        <div class="k-value green" id="kpi-inv-collected">$0</div>
+        <div class="k-sub">via Square & Retainers</div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="seg" id="inv-type-seg">
+        <button class="on" data-filter="all">All</button>
+        <button data-filter="quotes">Quotes</button>
+        <button data-filter="retainers">Retainers</button>
+        <button data-filter="balances">Balances</button>
+        <button data-filter="paid">Paid</button>
+      </div>
+      <div class="search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="inv-search-input" placeholder="Search invoice #, client…">
+      </div>
+    </div>
+
+    <!-- Invoices Table -->
+    <div class="card" style="padding:0.25rem 0.5rem; overflow-x:auto">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Client & Event</th>
+            <th>Type</th>
+            <th>Due Date</th>
+            <th class="right">Amount</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="invoices-table-body">
+          <tr><td colspan="6" style="text-align:center" class="muted">Loading billing records…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- Modal: New Invoice / Quote -->
+<div id="new-invoice-modal" class="modal-scrim" style="display:none">
+  <div class="modal-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem">
+      <div class="label" style="font-size:0.95rem" id="modal-inv-title"><i class="fa-solid fa-file-invoice-dollar gold"></i> Create New Invoice</div>
+      <button class="btn btn-icon" id="btn-close-inv-modal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="new-invoice-form">
+      <div class="grid g-2">
+        <div class="field">
+          <label>Client Name *</label>
+          <input class="input" id="inv-client-name" required placeholder="e.g. Jordan Vance">
+        </div>
+        <div class="field">
+          <label>Client Email *</label>
+          <input class="input" type="email" id="inv-client-email" required placeholder="jordan@example.com">
+        </div>
+      </div>
+      <div class="grid g-2">
+        <div class="field">
+          <label>Type</label>
+          <select class="input" id="inv-type-select">
+            <option value="Invoice">Full Event Invoice</option>
+            <option value="Retainer">Date Lock Retainer ($200)</option>
+            <option value="Balance">Remaining Balance</option>
+            <option value="Quote">Formal Quote Sheet</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Due Date</label>
+          <input class="input" type="date" id="inv-due-date">
+        </div>
+      </div>
+      <div class="grid g-2">
+        <div class="field">
+          <label>Total Amount ($) *</label>
+          <input class="input gold num" type="number" id="inv-amount" required value="700">
+        </div>
+        <div class="field">
+          <label>Retainer Requested ($)</label>
+          <input class="input num" type="number" id="inv-deposit" value="200">
+        </div>
+      </div>
+      <div class="field">
+        <label>Line Items / Service Notes</label>
+        <textarea class="input" id="inv-notes" placeholder="Thunder Party Package (4 hrs DJ/MC, sound system, dance floor lighting)"></textarea>
+      </div>
+      <div class="head-actions" style="justify-content:flex-end; margin-top:1.25rem">
+        <button type="button" class="btn" id="btn-cancel-inv-modal">Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Issue Invoice & Link</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Supabase CDN Client & Config -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="assets/shell.js"></script>
+
+<script>
+  let invoicesData = [];
+  let activeInvFilter = 'all';
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Filter segments
+    document.querySelectorAll('#inv-type-seg button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#inv-type-seg button').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        activeInvFilter = btn.dataset.filter;
+        renderInvoices();
+      };
+    });
+
+    // Search filter
+    const searchInput = document.getElementById('inv-search-input');
+    if (searchInput) {
+      searchInput.oninput = () => renderInvoices();
+    }
+
+    // Modal toggles
+    const modal = document.getElementById('new-invoice-modal');
+    const closeBtn = document.getElementById('btn-close-inv-modal');
+    const cancelBtn = document.getElementById('btn-cancel-inv-modal');
+    const newInvBtn = document.getElementById('btn-create-invoice');
+    const newQuoteBtn = document.getElementById('btn-create-quote');
+
+    if (newInvBtn) {
+      newInvBtn.onclick = () => {
+        document.getElementById('modal-inv-title').innerHTML = '<i class="fa-solid fa-file-invoice-dollar gold"></i> Create New Invoice';
+        document.getElementById('inv-type-select').value = 'Invoice';
+        modal.style.display = 'flex';
+      };
+    }
+    if (newQuoteBtn) {
+      newQuoteBtn.onclick = () => {
+        document.getElementById('modal-inv-title').innerHTML = '<i class="fa-solid fa-file-lines cyan"></i> Generate Formal Quote';
+        document.getElementById('inv-type-select').value = 'Quote';
+        modal.style.display = 'flex';
+      };
+    }
+    if (closeBtn) closeBtn.onclick = () => modal.style.display = 'none';
+    if (cancelBtn) cancelBtn.onclick = () => modal.style.display = 'none';
+
+    // Form submit
+    const invForm = document.getElementById('new-invoice-form');
+    if (invForm) {
+      invForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const clientName = document.getElementById('inv-client-name').value.trim();
+        const clientEmail = document.getElementById('inv-client-email').value.trim();
+        const invType = document.getElementById('inv-type-select').value;
+        const dueDate = document.getElementById('inv-due-date').value || null;
+        const total = parseFloat(document.getElementById('inv-amount').value) || 0;
+        const deposit = parseFloat(document.getElementById('inv-deposit').value) || 0;
+        const notes = document.getElementById('inv-notes').value.trim();
+        const invNum = 'TH-' + (1000 + Math.floor(Math.random() * 9000));
+
+        try {
+          if (window.supabaseClient) {
+            await window.supabaseClient.from('thunderhouse_invoices').insert([{
+              invoice_number: invNum,
+              client_name: clientName,
+              client_email: clientEmail,
+              total_amount: total,
+              deposit_requested: deposit,
+              balance_due: total,
+              amount_paid: 0,
+              due_date: dueDate,
+              issue_date: new Date().toISOString().split('T')[0],
+              status: invType === 'Quote' ? 'draft' : 'sent',
+              notes: notes,
+              items: [{ description: `${invType}: ${notes || 'DJ Entertainment'}`, amount: total }]
+            }]);
+
+            // Sync client into CRM
+            await window.supabaseClient.from('thunderhouse_clients').upsert([{
+              full_name: clientName,
+              email: clientEmail.toLowerCase(),
+              source: 'invoice'
+            }], { onConflict: 'email' });
+          }
+
+          window.showToast(`Invoice #${invNum} created for ${clientName}!`, 'success');
+          modal.style.display = 'none';
+          invForm.reset();
+          await loadInvoices();
+        } catch (err) {
+          window.showToast('Error issuing invoice: ' + err.message, 'error');
+        }
+      };
+    }
+
+    await loadInvoices();
+  });
+
+  async function loadInvoices() {
+    if (!window.supabaseClient) return;
+
+    try {
+      const { data, error } = await window.supabaseClient
+        .from('thunderhouse_invoices')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      invoicesData = data || [];
+      renderInvoices();
+    } catch (e) {
+      console.error('Error loading invoices:', e);
+    }
+  }
+
+  function renderInvoices() {
+    const q = (document.getElementById('inv-search-input')?.value || '').trim().toLowerCase();
+
+    let overdueTotal = 0, overdueCount = 0;
+    let soonTotal = 0, soonCount = 0;
+    let quotesTotal = 0, quotesCount = 0;
+    let collectedTotal = 0;
+
+    const now = new Date();
+    const twoWeeks = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+
+    invoicesData.forEach(inv => {
+      const tot = parseFloat(inv.total_amount) || 0;
+      const paid = parseFloat(inv.amount_paid) || 0;
+      const due = parseFloat(inv.balance_due) || (tot - paid);
+      collectedTotal += paid;
+
+      if (inv.status === 'draft') {
+        quotesTotal += tot;
+        quotesCount++;
+      } else if (due > 0 && inv.status !== 'paid') {
+        if (inv.due_date && new Date(inv.due_date) < now) {
+          overdueTotal += due;
+          overdueCount++;
+        } else if (inv.due_date && new Date(inv.due_date) <= twoWeeks) {
+          soonTotal += due;
+          soonCount++;
+        }
+      }
+    });
+
+    document.getElementById('kpi-inv-overdue').textContent = `$${overdueTotal.toLocaleString()}`;
+    document.getElementById('kpi-inv-overdue-count').textContent = `${overdueCount} overdue`;
+    document.getElementById('kpi-inv-soon').textContent = `$${soonTotal.toLocaleString()}`;
+    document.getElementById('kpi-inv-soon-count').textContent = `${soonCount} balances`;
+    document.getElementById('kpi-inv-quotes').textContent = `$${quotesTotal.toLocaleString()}`;
+    document.getElementById('kpi-inv-quotes-count').textContent = `${quotesCount} quotes`;
+    document.getElementById('kpi-inv-collected').textContent = `$${collectedTotal.toLocaleString()}`;
+
+    // Filter table
+    let filtered = invoicesData.filter(inv => {
+      if (q) {
+        const text = `${inv.client_name || ''} ${inv.client_email || ''} ${inv.invoice_number || ''}`.toLowerCase();
+        if (!text.includes(q)) return false;
+      }
+
+      const st = (inv.status || '').toLowerCase();
+      const due = parseFloat(inv.balance_due) || 0;
+
+      if (activeInvFilter === 'quotes') return st === 'draft';
+      if (activeInvFilter === 'paid') return st === 'paid' || due === 0;
+      if (activeInvFilter === 'retainers') return inv.deposit_requested > 0;
+      if (activeInvFilter === 'balances') return due > 0 && st !== 'draft';
+
+      return true;
+    });
+
+    // Sort: Overdue first, then pending, then paid
+    filtered.sort((a, b) => {
+      const aOver = a.due_date && new Date(a.due_date) < now && (parseFloat(a.balance_due) || 0) > 0;
+      const bOver = b.due_date && new Date(b.due_date) < now && (parseFloat(b.balance_due) || 0) > 0;
+      if (aOver && !bOver) return -1;
+      if (!aOver && bOver) return 1;
+      return 0;
+    });
+
+    const tbody = document.getElementById('invoices-table-body');
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center" class="muted">No invoices matching current filter.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(inv => {
+      const tot = parseFloat(inv.total_amount) || 0;
+      const paid = parseFloat(inv.amount_paid) || 0;
+      const due = parseFloat(inv.balance_due) || (tot - paid);
+      const isOverdue = inv.due_date && new Date(inv.due_date) < now && due > 0 && inv.status !== 'paid';
+      const isPaid = inv.status === 'paid' || (due === 0 && paid > 0);
+
+      let statusPill = `<span class="pill pill-cyan">Sent</span>`;
+      if (isOverdue) statusPill = `<span class="pill pill-pink">Overdue</span>`;
+      else if (isPaid) statusPill = `<span class="pill pill-green">Paid</span>`;
+      else if (inv.status === 'draft') statusPill = `<span class="pill pill-gold">Quote</span>`;
+
+      return `
+        <tr>
+          <td>
+            <strong>${escapeHtml(inv.client_name || 'Client')}</strong>
+            <div class="small muted">#${escapeHtml(inv.invoice_number || 'INV')} · ${escapeHtml(inv.client_email || '')}</div>
+          </td>
+          <td>${inv.status === 'draft' ? 'Quote' : (due > 0 && due < tot ? 'Balance' : 'Full Invoice')}</td>
+          <td class="${isOverdue ? 'pink font-bold' : ''}">${inv.due_date || 'Due upon receipt'}</td>
+          <td class="right num gold">$${tot.toLocaleString()}${due > 0 && due < tot ? `<div class="small pink">$${due.toLocaleString()} due</div>` : ''}</td>
+          <td>${statusPill}</td>
+          <td class="right">
+            <button class="btn btn-ghost btn-sm" onclick="copyInvoicePayLink('${inv.id}')" title="Copy Client Link"><i class="fa-solid fa-link"></i> Link</button>
+            <button class="btn btn-sm" onclick="viewInvoiceReceipt('${inv.id}')" title="Open Invoice / Receipt"><i class="fa-solid fa-receipt"></i> View</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  window.copyInvoicePayLink = function (id) {
+    const url = `${window.location.origin}/invoice.html?id=${encodeURIComponent(id)}`;
+    navigator.clipboard?.writeText(url);
+    window.showToast('Payment link copied to clipboard!', 'gold');
+  };
+
+  window.viewInvoiceReceipt = function (id) {
+    window.open(`${window.location.origin}/invoice.html?id=${encodeURIComponent(id)}`, '_blank');
+  };
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[s]));
+  }
+</script>
+</body>
+</html>

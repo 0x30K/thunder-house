@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile View · Thunder House Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+  <style>
+    .phones { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; padding: 2rem 1rem 4rem; }
+    .phone-wrap { text-align: center; }
+    .phone-wrap > .label { display: block; margin-bottom: 0.75rem; color: var(--text-muted); }
+    .phone { width: 340px; height: 700px; border-radius: 40px; border: 2px solid rgba(255, 255, 255, 0.12); background: var(--bg-main); overflow: hidden; display: flex; flex-direction: column; text-align: left; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); }
+    .phone-status { display: flex; justify-content: space-between; padding: 0.75rem 1.5rem 0.25rem; font-size: 0.75rem; font-weight: 600; }
+    .phone-body { flex: 1; overflow-y: auto; padding: 0.75rem 1rem; }
+    .tabbar-mock { display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid var(--border-subtle); background: var(--bg-surface); padding: 0.55rem 0 1.1rem; }
+    .tabbar-mock a { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; font-size: 0.65rem; color: var(--text-muted); }
+    .tabbar-mock a i { font-size: 1.05rem; }
+    .tabbar-mock a.on { color: var(--primary); }
+    .phone .card { padding: 0.85rem; margin-bottom: 0.7rem; }
+    .phone .row { font-size: 0.82rem; padding: 0.55rem 0; }
+  </style>
+</head>
+<body data-page="mobile">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <div style="text-align:center; padding:1rem 1rem 0">
+      <div class="eyebrow">Mobile Responsive Experience</div>
+      <h1 class="num" style="font-size:1.85rem; margin-top:0.35rem">On Your Phone at the Venue</h1>
+      <p class="muted">On smartphones, the desktop sidebar transforms into an intuitive bottom navigation tab bar.</p>
+    </div>
+
+    <div class="phones">
+      <!-- Screen: Today -->
+      <div class="phone-wrap">
+        <span class="label">Today on Phone</span>
+        <div class="phone">
+          <div class="phone-status"><span>9:41</span><span><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-battery-three-quarters"></i></span></div>
+          <div class="phone-body">
+            <div class="eyebrow">Thursday</div>
+            <h2 class="num" style="font-size:1.35rem">Good evening</h2>
+            <p class="small pink" style="margin-bottom:0.75rem">Operational & Ready</p>
+            <div class="card">
+              <div class="row"><span class="pill pill-pink">Hold</span><span class="grow">Johnson · 6h left</span><i class="fa-solid fa-chevron-right muted"></i></div>
+              <div class="row"><span class="pill pill-cyan">New</span><span class="grow">Maria G. · Nov 14</span><i class="fa-solid fa-chevron-right muted"></i></div>
+            </div>
+            <div class="card glow">
+              <div class="eyebrow">Next Gig · Sat</div>
+              <div class="num" style="font-size:1.05rem; margin:0.2rem 0">Vance 40th Birthday</div>
+              <div class="small muted">6:00–11:00 PM · Edmond, OK</div>
+              <a href="gigs.html" class="btn btn-primary btn-block btn-sm" style="margin-top:0.7rem"><i class="fa-solid fa-stopwatch"></i> Run of Show</a>
+            </div>
+          </div>
+          <div class="tabbar-mock">
+            <a href="today.html" class="on"><i class="fa-solid fa-house"></i><span>Today</span></a>
+            <a href="leads.html"><i class="fa-solid fa-inbox"></i><span>Leads</span></a>
+            <a href="gigs.html"><i class="fa-solid fa-compact-disc"></i><span>Gigs</span></a>
+            <a href="invoices.html"><i class="fa-solid fa-file-invoice-dollar"></i><span>Invoices</span></a>
+            <a href="settings.html"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Supabase CDN Client & Config -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="assets/shell.js"></script>
+</body>
+</html>

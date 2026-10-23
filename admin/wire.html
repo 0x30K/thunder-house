@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thunder Wire Newsroom · #WAKEITUP Morning Show</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+  <style>
+    .story-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.15rem; }
+    .story-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.22s ease;
+      position: relative;
+    }
+    .story-card:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    .story-card.selected {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 20px rgba(255, 183, 3, 0.25);
+    }
+    .story-card.selected::before {
+      content: 'LOCKED FOR SHOW';
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 5;
+      background: var(--accent-gold);
+      color: #041016;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--radius-full);
+      box-shadow: 0 0 10px rgba(255, 183, 3, 0.6);
+    }
+    .story-thumb {
+      width: 100%;
+      height: 160px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    .story-thumb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(7,9,14,0.85) 100%);
+    }
+    .story-meta-float {
+      position: absolute;
+      bottom: 10px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2;
+    }
+    .story-body {
+      padding: 1rem 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      flex: 1;
+    }
+    .story-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.35;
+      color: #fff;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin: 0;
+    }
+    .story-snip {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin: 0;
+      flex: 1;
+    }
+    .story-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    /* Fullscreen Broadcast Teleprompter Modal */
+    .tp-modal-window {
+      position: fixed;
+      inset: 20px;
+      background: #04060a;
+      border: 1px solid var(--border-glow);
+      border-radius: var(--radius-lg);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.95), 0 0 40px rgba(0, 229, 255, 0.2);
+      overflow: hidden;
+      animation: modalZoom 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalZoom {
+      from { transform: scale(0.96); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .tp-header {
+      padding: 1rem 1.5rem;
+      background: rgba(14, 18, 28, 0.98);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .tp-body-workspace {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .tp-rundown-sidebar {
+      background: rgba(8, 11, 18, 0.95);
+      border-right: 1px solid var(--border-subtle);
+      overflow-y: auto;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .tp-prompter-screen {
+      background: #000;
+      overflow-y: auto;
+      padding: 2.5rem 3.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+      position: relative;
+      scroll-behavior: smooth;
+    }
+    .tp-cue-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      background: rgba(0, 229, 255, 0.15);
+      color: #00e5ff;
+      border: 1px solid rgba(0, 229, 255, 0.35);
+    }
+    .tp-cue-pill.pill-pink {
+      background: rgba(255, 0, 85, 0.15);
+      color: #ff0055;
+      border-color: rgba(255, 0, 85, 0.35);
+    }
+    .tp-cue-pill.pill-gold {
+      background: rgba(255, 183, 3, 0.15);
+      color: #ffb703;
+      border-color: rgba(255, 183, 3, 0.35);
+    }
+    .tp-cue-pill.pill-green {
+      background: rgba(0, 255, 136, 0.15);
+      color: #00ff88;
+      border-color: rgba(0, 255, 136, 0.35);
+    }
+    .tp-script-lead {
+      font-size: 1.7rem;
+      font-weight: 800;
+      line-height: 1.35;
+      color: #ffffff;
+      margin-top: 0.5rem;
+    }
+    .tp-script-talking-point {
+      font-size: 1.3rem;
+      font-weight: 500;
+      line-height: 1.6;
+      color: #e2e8f0;
+      margin-left: 1.5rem;
+      margin-top: 0.75rem;
+    }
+    .tp-script-question {
+      font-size: 1.45rem;
+      font-weight: 800;
+      line-height: 1.45;
+      color: #ffb703;
+      background: rgba(255, 183, 3, 0.08);
+      border-left: 6px solid #ffb703;
+      padding: 1rem 1.4rem;
+      border-radius: 0 12px 12px 0;
+      margin-top: 1rem;
+    }
+    .rundown-item-card {
+      background: rgba(18, 24, 38, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .rundown-item-card:hover {
+      border-color: var(--border-glow);
+      background: rgba(24, 32, 50, 0.85);
+    }
+    .rundown-item-card.active-on-air {
+      border-color: #00ff88;
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+    }
+    .rundown-item-card.active-on-air::before {
+      content: 'ON OBS AIR';
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      background: #00ff88;
+      color: #000;
+      padding: 0.15rem 0.45rem;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body data-page="wire">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow"><i class="fa-solid fa-bolt cyan"></i> Thunder Wire Newsroom</div>
+        <h1>#WAKEITUP Producer Desk</h1>
+        <p>Continuous intelligence for your morning broadcast. Select 5 stories to generate tomorrow's scripts & OBS assets.</p>
+      </div>
+      <div class="head-actions" style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap">
+        <a href="../wire-overlay.html" target="_blank" class="btn btn-outline" title="Open OBS Browser Source Preview">
+          <i class="fa-solid fa-satellite-dish cyan"></i> OBS Overlay
+        </a>
+        <button class="btn btn-outline" onclick="clearOBS()" title="Clear Live OBS Lower-Third">
+          <i class="fa-solid fa-eye-slash"></i> Clear OBS
+        </button>
+        <button class="btn btn-gold" id="btn-wire-scan">
+          <i class="fa-solid fa-arrows-rotate"></i> Wire Scan Now
+        </button>
+        <button class="btn btn-primary" id="btn-build-show">
+          <i class="fa-solid fa-microphone-lines"></i> Build #WAKEITUP Show (<span id="show-selected-count">0</span>/5)
+        </button>
+      </div>
+    </div>
+
+    <!-- Live Metrics Strip -->
+    <div class="grid g-4 mb-lg">
+      <div class="kpi">
+        <div class="k-label">Stories Ingested</div>
+        <div class="k-value cyan" id="wire-total-count">0</div>
+        <div class="k-sub">Active in queue</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">The Opening Bell (Lead)</div>
+        <div class="k-value gold" id="wire-lead-count">0</div>
+        <div class="k-sub">Top headline contenders</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">The Shade Storm</div>
+        <div class="k-value pink" id="wire-shade-count">0</div>
+        <div class="k-sub">Beef, drama & courts</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">Are You Out Your Mind?!</div>
+        <div class="k-value green" id="wire-wild-count">0</div>
+        <div class="k-sub">Viral & comedy stories</div>
+      </div>
+    </div>
+
+    <!-- Category Toolbar -->
+    <div class="toolbar">
+      <div class="seg" id="wire-category-seg">
+        <button class="on" data-cat="all">All Stories</button>
+        <button data-cat="lead"><i class="fa-solid fa-bell cyan"></i> The Opening Bell</button>
+        <button data-cat="shade"><i class="fa-solid fa-fire pink"></i> The Shade Storm</button>
+        <button data-cat="drops"><i class="fa-solid fa-compact-disc gold"></i> The Drop Zone</button>
+        <button data-cat="wild"><i class="fa-solid fa-face-grin-squint"></i> Are You Out Your Mind?!</button>
+        <button data-cat="realtalk"><i class="fa-solid fa-comments green"></i> Real Talk</button>
+        <button data-cat="selected" style="border-left:1px solid var(--border-subtle)"><i class="fa-solid fa-star gold"></i> Selected (<span id="btn-badge-selected">0</span>)</button>
+      </div>
+      <div class="search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="wire-search" placeholder="Search artist, scandal, topic…">
+      </div>
+    </div>
+
+    <!-- Stories Grid -->
+    <div class="story-grid" id="wire-stories-container">
+      <div style="padding:2rem 0; text-align:center; grid-column:1/-1" class="muted small">
+        <i class="fa-solid fa-circle-notch fa-spin"></i> Polling Thunder Wire…
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Slide-Out Story Inspector Drawer -->
+<div id="story-drawer-wrap" style="display:none">
+  <div class="drawer-scrim" id="story-drawer-scrim"></div>
+  <aside class="drawer" id="story-drawer">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem">
+      <div>
+        <div style="display:flex; gap:0.4rem; align-items:center; margin-bottom:0.4rem">
+          <span class="pill" id="sd-pill-cat">Category</span>
+          <span class="pill pill-gold" id="sd-pill-heat"><i class="fa-solid fa-fire"></i> Heat 95</span>
+          <span class="pill pill-gray" id="sd-pill-verify">Confirmed</span>
+        </div>
+        <h2 class="num" id="sd-title" style="font-size:1.45rem; line-height:1.3">Headline</h2>
+        <div class="muted small" id="sd-source-meta" style="margin-top:0.3rem">Rolling Stone · 2 hours ago</div>
+      </div>
+      <button class="btn btn-icon" id="sd-btn-close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Toggle Action & OBS Controls -->
+    <div style="margin:1.25rem 0 1.5rem; display:flex; flex-direction:column; gap:0.6rem">
+      <button class="btn btn-primary btn-block" id="sd-btn-toggle-show">
+        <i class="fa-solid fa-check"></i> Lock into Tomorrow's #WAKEITUP Rundown
+      </button>
+      <div style="display:flex; gap:0.5rem">
+        <button class="btn btn-gold btn-block" id="sd-btn-send-obs" style="font-size:0.85rem">
+          <i class="fa-solid fa-satellite-dish"></i> Push to OBS Lower-Third
+        </button>
+        <button class="btn btn-outline" id="sd-btn-clear-obs" title="Clear OBS Lower-Third">
+          <i class="fa-solid fa-eye-slash"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Host Talking Points (The Broadcast Meat) -->
+    <div class="card mb glow" style="border-color:var(--border-glow)">
+      <div class="label cyan" style="margin-bottom:0.6rem"><i class="fa-solid fa-microphone"></i> On-Air Host Talking Points</div>
+      <ul id="sd-talking-points" style="padding-left:1.25rem; font-size:0.88rem; line-height:1.6; color:var(--text-light)">
+        <li>Point 1</li>
+      </ul>
+    </div>
+
+    <!-- Why It Matters -->
+    <div class="card mb">
+      <div class="label gold" style="margin-bottom:0.45rem"><i class="fa-solid fa-chart-line"></i> Why It Matters (The Angle)</div>
+      <p class="small" id="sd-why-matters" style="line-height:1.55; color:var(--text-light)">Industry context...</p>
+    </div>
+
+    <!-- Charlamagne Host Question -->
+    <div class="card mb" style="background:rgba(255, 0, 85, 0.08); border-color:rgba(255, 0, 85, 0.35)">
+      <div class="label pink" style="margin-bottom:0.45rem"><i class="fa-solid fa-comment-dots"></i> Host Mic Prompt / Audience Debate</div>
+      <p class="small" id="sd-host-question" style="font-weight:600; color:#fff">Question for listeners...</p>
+    </div>
+
+    <!-- Full Story Body -->
+    <div class="card">
+      <div class="card-head">
+        <span class="label">Full News Report</span>
+        <a href="#" target="_blank" id="sd-source-link" class="small cyan">Original Article <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+      </div>
+      <p class="small" id="sd-full-content" style="line-height:1.6; color:var(--text-muted)">Story text...</p>
+    </div>
+  </aside>
+</div>
+
+<!-- Fullscreen #WAKEITUP Show Rundown & Teleprompter Modal -->
+<div id="teleprompter-modal-wrap" style="display:none">
+  <div class="drawer-scrim" id="tp-modal-scrim" style="background:rgba(2, 4, 8, 0.9);"></div>
+  <div class="tp-modal-window">
+    <div class="tp-header">
+      <div style="display:flex; align-items:center; gap:0.75rem">
+        <div style="width:12px; height:12px; background:#00e5ff; border-radius:50%; box-shadow:0 0 10px #00e5ff;"></div>
+        <div>
+          <h2 style="font-family:var(--font-heading); font-size:1.15rem; color:#fff; margin:0">
+            #WAKEITUP Broadcast Rundown & On-Air Teleprompter
+          </h2>
+          <div class="muted small" id="tp-episode-date">Tomorrow's Morning Show</div>
+        </div>
+      </div>
+
+      <!-- Teleprompter Controls -->
+      <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" id="tp-btn-toggle-scroll">
+          <i class="fa-solid fa-play"></i> Auto-Scroll
+        </button>
+        <div style="display:flex; align-items:center; gap:0.3rem; background:rgba(255,255,255,0.06); padding:0.2rem 0.5rem; border-radius:var(--radius-sm)">
+          <span style="font-size:0.75rem; color:var(--text-muted)">Speed:</span>
+          <button class="btn btn-ghost btn-sm tp-speed-btn" data-speed="1">1x</button>
+          <button class="btn btn-ghost btn-sm tp-speed-btn on" data-speed="1.75">2x</button>
+          <button class="btn btn-ghost btn-sm tp-speed-btn" data-speed="3">3x</button>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="clearOBS()">
+          <i class="fa-solid fa-eye-slash"></i> Clear OBS
+        </button>
+        <button class="btn btn-gold btn-sm" onclick="window.print()">
+          <i class="fa-solid fa-print"></i> Print Rundown
+        </button>
+        <button class="btn btn-icon btn-sm" id="tp-btn-close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Split Workspace: Left Rundown Timeline, Right Teleprompter Script -->
+    <div class="tp-body-workspace">
+      <!-- Left: Segment Timeline & OBS Pushers -->
+      <div class="tp-rundown-sidebar">
+        <div class="label" style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em">
+          Run of Show (Click Story to Jump & Push to OBS)
+        </div>
+        <div id="tp-rundown-cards-container">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Right: Continuous High-Contrast Prompter Screen -->
+      <div class="tp-prompter-screen" id="tp-prompter-screen">
+        <!-- Rendered teleprompter text blocks -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Supabase CDN Client & Config -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="assets/shell.js"></script>
+<script src="../js/thunderwire-engine.js"></script>
+
+<script>
+  let feedStories = [];
+  let activeCatFilter = 'all';
+  let activeSearch = '';
+  let activeStory = null;
+  let activeFeedTable = 'thunderwire_feed';
+  let activeOnAirStoryId = null;
+
+  // Teleprompter Engine
+  let tpScrolling = false;
+  let tpScrollSpeed = 1.75;
+  let tpScrollInterval = null;
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    if (window.ThunderWire && window.ThunderWire.getFeedTable) {
+      activeFeedTable = await window.ThunderWire.getFeedTable();
+    }
+
+    // Category tabs
+    document.querySelectorAll('#wire-category-seg button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#wire-category-seg button').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        activeCatFilter = btn.dataset.cat;
+        renderStories();
+      };
+    });
+
+    // Search filter
+    const searchInput = document.getElementById('wire-search');
+    if (searchInput) {
+      searchInput.oninput = () => {
+        activeSearch = searchInput.value.trim().toLowerCase();
+        renderStories();
+      };
+    }
+
+    // Manual Scan Now Button
+    const scanBtn = document.getElementById('btn-wire-scan');
+    scanBtn.onclick = async () => {
+      scanBtn.disabled = true;
+      const originalText = scanBtn.innerHTML;
+      scanBtn.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Scanning Wire…';
+      window.showToast('Initiating Thunder Wire multi-feed sweep…', 'gold');
+
+      try {
+        const engine = window.ThunderWire || window.ThunderPulse;
+        const result = await engine.scanNow(msg => {
+          scanBtn.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin"></i> ${msg}`;
+        });
+        window.showToast(`Wire sweep complete! Discovered ${result.totalDiscovered} stories, ${result.newSaved} fresh additions.`, 'success');
+        await loadFeed();
+        if (window.refreshAdminBadges) window.refreshAdminBadges();
+      } catch (err) {
+        window.showToast('Scan note: ' + err.message, 'error');
+      } finally {
+        scanBtn.disabled = false;
+        scanBtn.innerHTML = originalText;
+      }
+    };
+
+    // Build Show Button
+    document.getElementById('btn-build-show').onclick = () => {
+      openShowBuilderModal();
+    };
+
+    // Story Drawer toggles
+    const drawerWrap = document.getElementById('story-drawer-wrap');
+    document.getElementById('sd-btn-close').onclick = () => drawerWrap.style.display = 'none';
+    document.getElementById('story-drawer-scrim').onclick = () => drawerWrap.style.display = 'none';
+
+    // Toggle Show Lock button in drawer
+    document.getElementById('sd-btn-toggle-show').onclick = async () => {
+      if (!activeStory) return;
+      await toggleStorySelection(activeStory.id);
+    };
+
+    // Send to OBS from drawer
+    document.getElementById('sd-btn-send-obs').onclick = () => {
+      if (!activeStory) return;
+      sendToOBS(activeStory, true);
+    };
+
+    // Clear OBS from drawer
+    document.getElementById('sd-btn-clear-obs').onclick = () => {
+      clearOBS();
+    };
+
+    // Teleprompter Modal close
+    const tpWrap = document.getElementById('teleprompter-modal-wrap');
+    document.getElementById('tp-btn-close').onclick = () => closeTeleprompter();
+    document.getElementById('tp-modal-scrim').onclick = () => closeTeleprompter();
+
+    // Teleprompter auto-scroll toggle
+    const tpScrollBtn = document.getElementById('tp-btn-toggle-scroll');
+    tpScrollBtn.onclick = () => {
+      toggleTeleprompterScroll();
+    };
+
+    // Speed buttons
+    document.querySelectorAll('.tp-speed-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.tp-speed-btn').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        tpScrollSpeed = parseFloat(btn.dataset.speed);
+      };
+    });
+
+    // Spacebar to pause/resume teleprompter when open
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && tpWrap.style.display === 'block' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        toggleTeleprompterScroll();
+      }
+    });
+
+    await loadFeed();
+  });
+
+  async function loadFeed() {
+    if (!window.supabaseClient) return;
+
+    try {
+      if (window.ThunderWire && window.ThunderWire.getFeedTable) {
+        activeFeedTable = await window.ThunderWire.getFeedTable();
+      }
+
+      let { data, error } = await window.supabaseClient
+        .from(activeFeedTable)
+        .select('*')
+        .order('virality_score', { ascending: false });
+
+      if (error && activeFeedTable !== 'thunderpulse_feed') {
+        const fallback = await window.supabaseClient
+          .from('thunderpulse_feed')
+          .select('*')
+          .order('virality_score', { ascending: false });
+        if (!fallback.error) {
+          activeFeedTable = 'thunderpulse_feed';
+          data = fallback.data;
+          error = null;
+        }
+      }
+
+      if (error) throw error;
+      feedStories = data || [];
+      renderStories();
+    } catch (e) {
+      console.error('Error loading Thunder Wire feed:', e);
+    }
+  }
+
+  function renderStories() {
+    const total = feedStories.length;
+    const leads = feedStories.filter(s => s.category === 'lead').length;
+    const shade = feedStories.filter(s => s.category === 'shade').length;
+    const wild = feedStories.filter(s => s.category === 'wild').length;
+    const selected = feedStories.filter(s => s.selected_for_show).length;
+
+    document.getElementById('wire-total-count').textContent = total;
+    document.getElementById('wire-lead-count').textContent = leads;
+    document.getElementById('wire-shade-count').textContent = shade;
+    document.getElementById('wire-wild-count').textContent = wild;
+    document.getElementById('show-selected-count').textContent = selected;
+    document.getElementById('btn-badge-selected').textContent = selected;
+
+    let filtered = feedStories.filter(s => {
+      if (activeCatFilter === 'selected' && !s.selected_for_show) return false;
+      if (activeCatFilter !== 'all' && activeCatFilter !== 'selected' && s.category !== activeCatFilter) return false;
+      if (activeSearch) {
+        const text = `${s.title || ''} ${s.summary || ''} ${s.source_name || ''} ${(s.tags || []).join(' ')}`.toLowerCase();
+        if (!text.includes(activeSearch)) return false;
+      }
+      return true;
+    });
+
+    const container = document.getElementById('wire-stories-container');
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div style="padding:2rem 0; text-align:center; grid-column:1/-1" class="muted small">
+          No stories found in this section. Hit "Wire Scan Now" to refresh the live feeds!
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = filtered.map(story => {
+      const isSelected = story.selected_for_show;
+      const catPill = getCategoryPill(story.category);
+      const heat = story.virality_score || 85;
+
+      return `
+        <div class="story-card ${isSelected ? 'selected' : ''}" onclick="openStoryDrawer('${story.id}')">
+          <div class="story-thumb" style="background-image: url('${escapeHtml(story.image_url || '')}')">
+            <div class="story-meta-float">
+              ${catPill}
+              <span class="pill pill-gold"><i class="fa-solid fa-fire"></i> Heat ${heat}</span>
+            </div>
+          </div>
+          <div class="story-body">
+            <h3 class="story-title">${escapeHtml(story.title)}</h3>
+            <p class="story-snip">${escapeHtml(story.summary || '')}</p>
+            <div class="story-foot">
+              <span class="small muted"><i class="fa-regular fa-newspaper"></i> ${escapeHtml(story.source_name)}</span>
+              <div style="display:flex; gap:0.4rem">
+                <button class="btn btn-sm ${isSelected ? 'btn-gold' : 'btn-ghost'}" onclick="event.stopPropagation(); toggleStorySelection('${story.id}')">
+                  <i class="fa-solid ${isSelected ? 'fa-check' : 'fa-plus'}"></i> ${isSelected ? 'In Show' : 'Add to Show'}
+                </button>
+                <button class="btn btn-sm btn-outline" title="Push immediately to OBS Lower-Third" onclick="event.stopPropagation(); sendToOBS(feedStories.find(s=>s.id==='${story.id}'), true)">
+                  <i class="fa-solid fa-satellite-dish cyan"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.openStoryDrawer = function (id) {
+    const story = feedStories.find(s => s.id === id);
+    if (!story) return;
+    activeStory = story;
+
+    const drawerWrap = document.getElementById('story-drawer-wrap');
+    drawerWrap.style.display = 'block';
+
+    document.getElementById('sd-title').textContent = story.title;
+    document.getElementById('sd-source-meta').textContent = `${story.source_name} · ${story.published_at ? new Date(story.published_at).toLocaleDateString() : 'Today'}`;
+    document.getElementById('sd-source-link').href = story.source_url || '#';
+    document.getElementById('sd-pill-heat').innerHTML = `<i class="fa-solid fa-fire"></i> Heat ${story.virality_score || 85}`;
+
+    const verifyPill = document.getElementById('sd-pill-verify');
+    verifyPill.textContent = (story.verification_status || 'confirmed').toUpperCase();
+    verifyPill.className = `pill ${story.verification_status === 'rumor' ? 'pill-pink' : 'pill-green'}`;
+
+    const catPill = document.getElementById('sd-pill-cat');
+    catPill.textContent = getCategoryName(story.category).toUpperCase();
+    catPill.className = `pill ${story.category === 'lead' ? 'pill-cyan' : story.category === 'shade' ? 'pill-pink' : story.category === 'wild' ? 'pill-green' : 'pill-gold'}`;
+
+    const pointsList = document.getElementById('sd-talking-points');
+    const points = Array.isArray(story.talking_points) ? story.talking_points : [story.summary];
+    pointsList.innerHTML = points.map(p => `<li>${escapeHtml(p)}</li>`).join('');
+
+    document.getElementById('sd-why-matters').textContent = story.why_it_matters || 'Major cultural conversation trending across digital platforms.';
+    document.getElementById('sd-host-question').textContent = story.host_question || 'What is your honest take on this: smart move or terrible idea?';
+    document.getElementById('sd-full-content').textContent = story.content || story.summary || '';
+
+    updateDrawerButtonState(story.selected_for_show);
+  };
+
+  function updateDrawerButtonState(isSelected) {
+    const btn = document.getElementById('sd-btn-toggle-show');
+    if (isSelected) {
+      btn.className = 'btn btn-gold btn-block';
+      btn.innerHTML = '<i class="fa-solid fa-check"></i> Locked in Tomorrow\'s Show (Click to Remove)';
+    } else {
+      btn.className = 'btn btn-primary btn-block';
+      btn.innerHTML = '<i class="fa-solid fa-plus"></i> Lock into Tomorrow\'s #WAKEITUP Rundown';
+    }
+  }
+
+  async function toggleStorySelection(id) {
+    if (!window.supabaseClient) return;
+    const story = feedStories.find(s => s.id === id);
+    if (!story) return;
+
+    const newStatus = !story.selected_for_show;
+    try {
+      await window.supabaseClient
+        .from(activeFeedTable)
+        .update({ selected_for_show: newStatus })
+        .eq('id', id);
+
+      story.selected_for_show = newStatus;
+      renderStories();
+
+      if (activeStory && activeStory.id === id) {
+        updateDrawerButtonState(newStatus);
+      }
+
+      if (window.refreshAdminBadges) window.refreshAdminBadges();
+      window.showToast(newStatus ? `Added to #WAKEITUP Show!` : 'Removed from Show', newStatus ? 'success' : 'gold');
+    } catch (e) {
+      window.showToast('Error updating story: ' + e.message, 'error');
+    }
+  }
+
+  // =========================================================================
+  // OBS BROADCAST CONTROL & CROSS-MACHINE CLOUD SYNC
+  // =========================================================================
+  window.sendToOBS = function(story, showImmediately = true) {
+    if (!story) return;
+    activeOnAirStoryId = showImmediately ? story.id : null;
+
+    const payload = {
+      show_overlay: showImmediately,
+      headline: story.title,
+      category: story.category,
+      category_title: getCategoryName(story.category),
+      source: story.source_name,
+      host_question: story.host_question || '',
+      virality_score: story.virality_score || 92,
+      ticker_items: feedStories.filter(s => s.selected_for_show).map(s => s.title),
+      timestamp: Date.now()
+    };
+
+    // 1. BroadcastChannel (instant for local OBS browser source)
+    try {
+      const ch = new BroadcastChannel('thunder_wire_obs');
+      ch.postMessage(payload);
+    } catch(e) {}
+
+    // 2. localStorage
+    try {
+      localStorage.setItem('thunder_wire_live_state', JSON.stringify(payload));
+    } catch(e) {}
+
+    // 3. Supabase Cloud Sync (for remote Production PC)
+    if (window.supabaseClient) {
+      window.supabaseClient
+        .from('thunderwire_broadcast_state')
+        .upsert({
+          id: 'live',
+          is_live: true,
+          show_overlay: showImmediately,
+          banner_title: story.title,
+          banner_subtitle: story.source_name,
+          category: story.category,
+          ticker_text: story.host_question,
+          active_story: story,
+          updated_at: new Date().toISOString()
+        })
+        .then(() => {})
+        .catch(() => {});
+    }
+
+    // Update active on-air UI chips in rundown
+    document.querySelectorAll('.rundown-item-card').forEach(card => {
+      if (card.dataset.id === story.id && showImmediately) {
+        card.classList.add('active-on-air');
+      } else {
+        card.classList.remove('active-on-air');
+      }
+    });
+
+    window.showToast(showImmediately ? `Live on OBS: "${story.title.substring(0, 32)}…"` : 'Cleared OBS Lower-Third', 'gold');
+  };
+
+  window.clearOBS = function() {
+    activeOnAirStoryId = null;
+    const payload = { show_overlay: false, timestamp: Date.now() };
+
+    try { new BroadcastChannel('thunder_wire_obs').postMessage(payload); } catch(e) {}
+    try { localStorage.setItem('thunder_wire_live_state', JSON.stringify(payload)); } catch(e) {}
+
+    if (window.supabaseClient) {
+      window.supabaseClient
+        .from('thunderwire_broadcast_state')
+        .update({ show_overlay: false, updated_at: new Date().toISOString() })
+        .eq('id', 'live')
+        .then(() => {});
+    }
+
+    document.querySelectorAll('.rundown-item-card').forEach(card => card.classList.remove('active-on-air'));
+    window.showToast('Cleared OBS Lower-Third', 'info');
+  };
+
+  // =========================================================================
+  // SHOW BUILDER & ON-AIR TELEPROMPTER COCKPIT
+  // =========================================================================
+  function openShowBuilderModal() {
+    const selected = feedStories.filter(s => s.selected_for_show);
+    if (selected.length === 0) {
+      window.showToast('Select 1 to 5 stories using "Add to Show" first!', 'error');
+      return;
+    }
+
+    const modal = document.getElementById('teleprompter-modal-wrap');
+    modal.style.display = 'block';
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dateStr = tomorrow.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+    document.getElementById('tp-episode-date').textContent = `${dateStr} · ${selected.length} Segments Locked`;
+
+    // 1. Build Left Timeline Cards
+    const timelineContainer = document.getElementById('tp-rundown-cards-container');
+    const timeSlots = ['00:00 - Cold Open', '02:30 - Opening Bell', '08:00 - The Shade Storm', '14:00 - The Drop Zone', '20:00 - Out Your Mind?!', '26:00 - Real Talk', '31:00 - Outro / Sign-off'];
+
+    timelineContainer.innerHTML = `
+      <div class="rundown-item-card" onclick="jumpToPrompter('tp-sec-open')">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <span class="tp-cue-pill"><i class="fa-solid fa-clock"></i> 00:00</span>
+          <span class="small muted">Intro</span>
+        </div>
+        <strong style="color:#fff; font-size:0.95rem">Station ID & Cold Open</strong>
+        <div class="small muted">Host greetings, time check, and tease of top stories.</div>
+      </div>
+      ${selected.map((s, idx) => `
+        <div class="rundown-item-card ${s.id === activeOnAirStoryId ? 'active-on-air' : ''}" data-id="${s.id}" onclick="jumpToPrompter('tp-sec-story-${s.id}')">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <span class="tp-cue-pill ${getCategoryPillClass(s.category)}"><i class="fa-solid fa-clock"></i> ${timeSlots[idx + 1] || '08:00'}</span>
+            <span class="small muted">${s.category.toUpperCase()}</span>
+          </div>
+          <strong style="color:#fff; font-size:0.92rem; line-height:1.3">${escapeHtml(s.title)}</strong>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.4rem">
+            <span class="small muted"><i class="fa-solid fa-fire gold"></i> Heat ${s.virality_score || 90}</span>
+            <button class="btn btn-sm btn-gold" onclick="event.stopPropagation(); sendToOBS(feedStories.find(st=>st.id==='${s.id}'), true)">
+              <i class="fa-solid fa-satellite-dish"></i> Push OBS
+            </button>
+          </div>
+        </div>
+      `).join('')}
+      <div class="rundown-item-card" onclick="jumpToPrompter('tp-sec-outro')">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <span class="tp-cue-pill"><i class="fa-solid fa-clock"></i> 32:00</span>
+          <span class="small muted">Wrap</span>
+        </div>
+        <strong style="color:#fff; font-size:0.95rem">Show Sign-off & Music Transition</strong>
+        <div class="small muted">Social shoutouts, podcast tease, and DJ mix handover.</div>
+      </div>
+    `;
+
+    // 2. Build Continuous Prompter Screen
+    const prompterScreen = document.getElementById('tp-prompter-screen');
+    prompterScreen.scrollTop = 0;
+
+    prompterScreen.innerHTML = `
+      <!-- Segment 0: Cold Open -->
+      <div id="tp-sec-open" style="border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:3rem">
+        <span class="tp-cue-pill"><i class="fa-solid fa-microphone"></i> 00:00 · COLD OPEN & MORNING MONOLOGUE</span>
+        <div class="tp-script-lead">
+          "GOOD MORNING WORLD! You are tuned in live to THUNDER HOUSE ENT'S #WAKEITUP MORNING SHOW. I'm your host, and today the culture is on FIRE."
+        </div>
+        <div class="tp-script-talking-point">
+          • Hit station drops & soundboard fanfare.
+        </div>
+        <div class="tp-script-talking-point">
+          • TEASE TODAY'S TOPIC: ${escapeHtml(selected[0]?.title || 'Huge news breaking across the industry')}.
+        </div>
+        <div class="tp-script-talking-point">
+          • "Phone lines and Twitch chat are wide open. Let's get straight into THE WIRE!"
+        </div>
+      </div>
+
+      <!-- Selected Story Segments -->
+      ${selected.map((s, idx) => `
+        <div id="tp-sec-story-${s.id}" style="border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:3rem">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem">
+            <span class="tp-cue-pill ${getCategoryPillClass(s.category)}">
+              <i class="fa-solid fa-bolt"></i> SEGMENT ${idx + 1}: ${getCategoryName(s.category).toUpperCase()}
+            </span>
+            <button class="btn btn-sm btn-gold" onclick="sendToOBS(feedStories.find(st=>st.id==='${s.id}'), true)">
+              <i class="fa-solid fa-satellite-dish"></i> DISPLAY ON OBS LOWER-THIRD
+            </button>
+          </div>
+
+          <div class="tp-script-lead" style="margin-top:1rem">
+            "${escapeHtml(s.title)}"
+          </div>
+
+          <div style="margin-top:1rem">
+            <div style="color:var(--primary); font-size:0.95rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em">
+              <i class="fa-solid fa-list-check"></i> Host Talking Points:
+            </div>
+            ${(Array.isArray(s.talking_points) ? s.talking_points : [s.summary]).map(pt => `
+              <div class="tp-script-talking-point">• ${escapeHtml(pt)}</div>
+            `).join('')}
+          </div>
+
+          <div style="margin-top:1.5rem">
+            <div style="color:var(--accent-gold); font-size:0.95rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em">
+              <i class="fa-solid fa-chart-line"></i> The Angle (Why It Matters):
+            </div>
+            <div class="tp-script-talking-point" style="color:var(--text-light)">
+              ${escapeHtml(s.why_it_matters || 'Major industry and culture story capturing nationwide audience engagement.')}
+            </div>
+          </div>
+
+          <!-- Charlamagne Prompt / Callers -->
+          <div class="tp-script-question">
+            <div style="font-size:0.82rem; text-transform:uppercase; letter-spacing:0.1em; color:#ffb703; margin-bottom:0.4rem">
+              <i class="fa-solid fa-headset"></i> TALK TO US / CALL-IN PROMPT:
+            </div>
+            "${escapeHtml(s.host_question || 'What is your honest take on this: smart move or completely out of their mind?')}"
+          </div>
+        </div>
+      `).join('')}
+
+      <!-- Segment Wrap: Outro -->
+      <div id="tp-sec-outro" style="padding-bottom:5rem">
+        <span class="tp-cue-pill"><i class="fa-solid fa-flag-checkered"></i> 32:00 · SIGN-OFF & SPONSORS</span>
+        <div class="tp-script-lead">
+          "That wraps up today's #WAKEITUP Culture Wire on Thunder House ENT!"
+        </div>
+        <div class="tp-script-talking-point">
+          • Plug tomorrow's show, website (thunderhouseent.com), and upcoming DJ booking dates.
+        </div>
+        <div class="tp-script-talking-point">
+          • "Stay locked, stay focused, and keep the energy electric. Dropping into the heavy mix in 3... 2... 1!"
+        </div>
+      </div>
+    `;
+
+    // Save show draft to Supabase
+    saveShowToCloud(selected);
+  }
+
+  function jumpToPrompter(elemId) {
+    const el = document.getElementById(elemId);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function toggleTeleprompterScroll() {
+    const screen = document.getElementById('tp-prompter-screen');
+    const btn = document.getElementById('tp-btn-toggle-scroll');
+
+    tpScrolling = !tpScrolling;
+    if (tpScrolling) {
+      btn.className = 'btn btn-gold btn-sm';
+      btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause Prompter';
+      tpScrollInterval = setInterval(() => {
+        screen.scrollTop += tpScrollSpeed;
+      }, 30);
+    } else {
+      btn.className = 'btn btn-outline btn-sm';
+      btn.innerHTML = '<i class="fa-solid fa-play"></i> Auto-Scroll';
+      if (tpScrollInterval) clearInterval(tpScrollInterval);
+    }
+  }
+
+  function closeTeleprompter() {
+    if (tpScrollInterval) clearInterval(tpScrollInterval);
+    tpScrolling = false;
+    document.getElementById('tp-btn-toggle-scroll').innerHTML = '<i class="fa-solid fa-play"></i> Auto-Scroll';
+    document.getElementById('tp-btn-toggle-scroll').className = 'btn btn-outline btn-sm';
+    document.getElementById('teleprompter-modal-wrap').style.display = 'none';
+  }
+
+  async function saveShowToCloud(selectedStories) {
+    if (!window.supabaseClient) return;
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dateISO = tomorrow.toISOString().split('T')[0];
+
+    try {
+      await window.supabaseClient
+        .from('thunderwire_shows')
+        .upsert({
+          show_date: dateISO,
+          episode_title: `#WAKEITUP Morning Broadcast - ${dateISO}`,
+          status: 'ready',
+          selected_stories: selectedStories,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'show_date' });
+    } catch(e) {
+      // Fallback to legacy table if not yet renamed
+      try {
+        await window.supabaseClient
+          .from('thunderpulse_shows')
+          .upsert({
+            show_date: dateISO,
+            episode_title: `#WAKEITUP Morning Broadcast - ${dateISO}`,
+            status: 'ready',
+            selected_stories: selectedStories,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'show_date' });
+      } catch(err) {}
+    }
+  }
+
+  function getCategoryPill(cat) {
+    if (cat === 'lead') return `<span class="pill pill-cyan">The Opening Bell</span>`;
+    if (cat === 'shade') return `<span class="pill pill-pink">The Shade Storm</span>`;
+    if (cat === 'drops') return `<span class="pill pill-gold">The Drop Zone</span>`;
+    if (cat === 'wild') return `<span class="pill pill-green">Are You Out Your Mind?!</span>`;
+    return `<span class="pill pill-gray">Real Talk</span>`;
+  }
+
+  function getCategoryPillClass(cat) {
+    if (cat === 'shade') return 'pill-pink';
+    if (cat === 'drops') return 'pill-gold';
+    if (cat === 'wild') return 'pill-green';
+    return '';
+  }
+
+  function getCategoryName(cat) {
+    const map = {
+      lead: 'The Opening Bell (Lead)',
+      shade: 'The Shade Storm (Beef/Gossip)',
+      drops: 'The Drop Zone (Music)',
+      wild: 'Are You Out Your Mind?! (Comedy)',
+      realtalk: 'Real Talk (Culture/Industry)'
+    };
+    return map[cat] || 'General';
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[s]));
+  }
+</script>
+</body>
+</html>

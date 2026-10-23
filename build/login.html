@@ -134,7 +134,7 @@
       if (window.supabaseClient) {
         const { data: { session } } = await window.supabaseClient.auth.getSession();
         if (session) {
-          let targetUrl = 'admin.html';
+          let targetUrl = 'admin/today.html';
           try {
             const { data: member } = await window.supabaseClient
               .from('thunderhouse_team')
@@ -177,7 +177,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const redirectParam = urlParams.get('redirect');
 
-            let targetUrl = 'admin.html';
+            let targetUrl = 'admin/today.html';
             if (redirectParam) {
               const cleaned = redirectParam.replace(/^\/+/, '');
               if (cleaned === 'keys' || cleaned === 'keys.html') {

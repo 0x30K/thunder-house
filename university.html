@@ -1,0 +1,3504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thunder University | Conservatory of Modern Music & Sonic Architecture</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Google Fonts: Syne, Outfit, Cinzel -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/university-data.js?v=7"></script>
+  <script src="js/university-videos-data.js?v=1"></script>
+
+  <style>
+    :root {
+      --bg-main: #07090e;
+      --bg-surface: #0e121c;
+      --bg-card: rgba(17, 24, 39, 0.75);
+      --primary: #00e5ff;
+      --primary-glow: rgba(0, 229, 255, 0.35);
+      --accent-gold: #ffb703;
+      --gold-glow: rgba(255, 183, 3, 0.35);
+      --text-main: #f8fafc;
+      --text-light: #94a3b8;
+      --text-muted: #64748b;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-gold: rgba(255, 183, 3, 0.3);
+      --border-cyan: rgba(0, 229, 255, 0.3);
+      --font-display: 'Cinzel', serif;
+      --font-heading: 'Syne', sans-serif;
+      --font-body: 'Outfit', sans-serif;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    .campus-bg {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 15% 15%, rgba(0, 229, 255, 0.05) 0%, transparent 45%),
+                  radial-gradient(circle at 85% 30%, rgba(255, 183, 3, 0.05) 0%, transparent 50%),
+                  radial-gradient(circle at 50% 80%, rgba(14, 18, 28, 0.95) 0%, var(--bg-main) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .ivy-banner {
+      background: linear-gradient(90deg, #0b1120 0%, #1e1b4b 50%, #0b1120 100%);
+      border-bottom: 1px solid var(--border-gold);
+      padding: 0.4rem 1.5rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-gold);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 50;
+      font-weight: 700;
+    }
+
+    .univ-navbar {
+      background: rgba(10, 14, 24, 0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0.85rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .univ-brand {
+      display: flex;
+      align-items: center;
+      gap: 1.1rem;
+      text-decoration: none;
+    }
+
+    .univ-brand-crest {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      box-shadow: 0 0 15px var(--gold-glow);
+      border: 1.5px solid var(--accent-gold);
+      object-fit: cover;
+    }
+
+    .univ-brand-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.05em;
+      line-height: 1.2;
+    }
+
+    .univ-brand-sub {
+      font-size: 0.72rem;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+    }
+
+    .univ-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .univ-nav-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-light);
+      padding: 0.45rem 0.85rem;
+      border-radius: var(--radius-full);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .univ-nav-btn:hover, .univ-nav-btn.active {
+      background: rgba(0, 229, 255, 0.1);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
+
+    .univ-nav-btn.gold:hover, .univ-nav-btn.gold.active {
+      background: rgba(255, 183, 3, 0.12);
+      border-color: var(--accent-gold);
+      color: var(--accent-gold);
+      box-shadow: 0 0 12px var(--gold-glow);
+    }
+
+    .user-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 0.35rem 0.8rem;
+      font-size: 0.78rem;
+      color: var(--text-light);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .univ-main {
+      position: relative;
+      z-index: 10;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 2rem 2rem 8rem 2rem;
+    }
+
+    /* Department View Container (Tabs) */
+    .dept-view {
+      display: none;
+      animation: fadeInDept 0.35s ease;
+    }
+    .dept-view.active {
+      display: block;
+    }
+
+    @keyframes fadeInDept {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Department Header Bar */
+    .dept-header {
+      background: linear-gradient(135deg, rgba(14, 18, 28, 0.95), rgba(20, 27, 45, 0.95));
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2rem 2.5rem;
+      margin-bottom: 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .dept-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent-gold), var(--primary));
+    }
+
+    .dept-tag {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      color: var(--accent-gold);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .dept-title {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      color: #fff;
+      line-height: 1.15;
+    }
+
+    .dept-subtitle {
+      color: var(--text-light);
+      font-size: 0.95rem;
+      margin-top: 0.4rem;
+      max-width: 750px;
+    }
+
+    /* Hero Campus Quad Banner */
+    .campus-hero {
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 2.5rem;
+      border: 1px solid var(--border-gold);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+      background: #0b101d;
+    }
+
+    .campus-hero-img {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.65) contrast(1.15);
+    }
+
+    .campus-hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(7, 9, 14, 0.2) 0%, rgba(7, 9, 14, 0.85) 65%, var(--bg-main) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 3rem;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: 2.6rem;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.15;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+      margin-bottom: 0.6rem;
+      max-width: 900px;
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: #cbd5e1;
+      max-width: 780px;
+      margin-bottom: 1.5rem;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 2rem;
+      margin-bottom: 3.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .overview-grid { grid-template-columns: 1fr; }
+    }
+
+    .dean-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2.2rem;
+      position: relative;
+    }
+
+    .dean-letter-body {
+      color: #94a3b8;
+      font-size: 0.98rem;
+      line-height: 1.75;
+      margin-bottom: 1.5rem;
+    }
+    .dean-letter-body p { margin-bottom: 1rem; }
+
+    /* Student ID Card */
+    .student-badge-card {
+      background: linear-gradient(135deg, rgba(14, 18, 28, 0.95), rgba(20, 27, 45, 0.95));
+      border: 1.5px solid var(--border-cyan);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 229, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .id-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .id-chip {
+      width: 44px;
+      height: 32px;
+      background: linear-gradient(135deg, #ffd700, #b8860b);
+      border-radius: 6px;
+      border: 1px solid rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+    .id-chip::after {
+      content: '';
+      position: absolute;
+      inset: 6px;
+      border: 1px solid rgba(0,0,0,0.4);
+      border-radius: 3px;
+    }
+
+    .id-profile {
+      display: flex;
+      gap: 1.25rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .id-photo-box {
+      width: 90px;
+      height: 110px;
+      background: rgba(0, 229, 255, 0.08);
+      border: 1.5px dashed var(--primary);
+      border-radius: var(--radius-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: 0.72rem;
+      text-align: center;
+      padding: 0.5rem;
+      cursor: pointer;
+    }
+
+    .id-field-label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .id-field-val {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .id-footer-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.85rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      text-align: center;
+    }
+
+    .id-stat-num {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--primary);
+      font-family: var(--font-heading);
+    }
+    .id-stat-lbl {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    /* Library Search & Filter Bar */
+    .library-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.5rem;
+    }
+
+    .search-input-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 280px;
+    }
+    .search-input-wrap i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--primary);
+      font-size: 0.95rem;
+    }
+    .search-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 0.65rem 1rem 0.65rem 2.6rem;
+      color: #fff;
+      font-size: 0.92rem;
+      outline: none;
+      transition: var(--transition);
+    }
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    .genre-filter-bar {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-light);
+      padding: 0.45rem 1rem;
+      border-radius: var(--radius-full);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .filter-pill:hover, .filter-pill.active {
+      background: rgba(0, 229, 255, 0.15);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    /* Artist Cards Grid */
+    .artists-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+
+    .artist-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      transition: var(--transition);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .artist-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 10px 30px rgba(0, 229, 255, 0.12);
+      transform: translateY(-3px);
+    }
+
+    .artist-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.25rem;
+    }
+
+    .course-code {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      background: rgba(255, 183, 3, 0.1);
+      border: 1px solid var(--border-gold);
+      color: var(--accent-gold);
+    }
+
+    .artist-badge-avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #111827;
+      border: 2px solid var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: #fff;
+      box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    .artist-name {
+      font-family: var(--font-heading);
+      font-size: 1.55rem;
+      color: #fff;
+      margin-bottom: 0.2rem;
+    }
+
+    .artist-real-name {
+      font-size: 0.85rem;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .artist-meta-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.65rem;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.85rem 1rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1.25rem;
+      font-size: 0.82rem;
+    }
+    .meta-item strong { color: #fff; display: block; font-size: 0.85rem; }
+    .meta-item span { color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; }
+
+    .artist-bio-snippet {
+      color: var(--text-light);
+      font-size: 0.88rem;
+      margin-bottom: 1.25rem;
+      line-height: 1.55;
+    }
+
+    .tracks-preview-box {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 1.1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tracks-box-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-gold);
+      margin-bottom: 0.65rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .track-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.4rem 0.6rem;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+      cursor: pointer;
+      margin-bottom: 0.25rem;
+    }
+    .track-row:hover {
+      background: rgba(0, 229, 255, 0.1);
+    }
+    .track-title { font-size: 0.82rem; font-weight: 600; color: #fff; }
+
+    /* Office of the Bursar */
+    .bursar-card {
+      background: linear-gradient(135deg, rgba(14, 18, 28, 0.98), rgba(20, 27, 45, 0.95));
+      border: 1.5px solid var(--border-gold);
+      border-radius: var(--radius-lg);
+      padding: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .bursar-watermark {
+      position: absolute;
+      right: -40px;
+      bottom: -40px;
+      width: 320px;
+      height: 320px;
+      opacity: 0.08;
+      pointer-events: none;
+    }
+
+    .tuition-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+    .tuition-table th {
+      text-align: left;
+      padding: 0.85rem 1rem;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .tuition-table td {
+      padding: 1rem;
+      font-size: 0.95rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #cbd5e1;
+    }
+    .zero-cost {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      color: #10b981;
+      text-align: right;
+    }
+    .bursar-total-box {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: var(--radius-md);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.6rem 1.3rem;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      border: 1px solid transparent;
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, #ffb703 0%, #fb8500 100%);
+      color: #0b1120;
+      box-shadow: 0 4px 20px var(--gold-glow);
+    }
+    .btn-cyan {
+      background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);
+      color: #0b1120;
+      box-shadow: 0 4px 20px var(--primary-glow);
+    }
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--border-subtle);
+      color: #fff;
+    }
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #fff;
+    }
+
+    /* Alumni Grid */
+    .alumni-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .alumni-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.4rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      transition: var(--transition);
+    }
+    .alumni-card:hover {
+      border-color: var(--accent-gold);
+      transform: translateY(-2px);
+    }
+    .alumni-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #111827;
+      border: 1.5px solid var(--accent-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    /* Cinema Grid */
+    .cinema-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 2rem;
+    }
+    .cinema-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    .cinema-card:hover {
+      border-color: #ef4444;
+      box-shadow: 0 10px 30px rgba(239, 68, 68, 0.15);
+      transform: translateY(-3px);
+    }
+    .cinema-thumb-wrap {
+      width: 100%;
+      height: 200px;
+      background: #000;
+    }
+    .cinema-thumb-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .cinema-body { padding: 1.5rem; }
+
+    /* Exam Box */
+    .exam-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-cyan);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+    }
+    .quiz-question-box {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .quiz-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .quiz-opt-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: #cbd5e1;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      text-align: left;
+      cursor: pointer;
+      font-size: 0.88rem;
+    }
+    .quiz-opt-btn.correct { background: rgba(16, 185, 129, 0.2) !important; border-color: #10b981 !important; color: #34d399 !important; font-weight: 700; }
+    .quiz-opt-btn.wrong { background: rgba(239, 68, 68, 0.2) !important; border-color: #ef4444 !important; color: #f87171 !important; }
+
+    .diploma-box {
+      display: none;
+      background: #0f172a;
+      border: 8px double var(--accent-gold);
+      padding: 3rem;
+      text-align: center;
+      border-radius: var(--radius-md);
+      margin-top: 2rem;
+    }
+
+    /* Listening Dock */
+    .listening-dock {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(10, 14, 24, 0.95);
+      backdrop-filter: blur(25px);
+      border-top: 1px solid var(--border-cyan);
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.7);
+      padding: 1rem 2rem;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      transform: translateY(120%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .listening-dock.active { transform: translateY(0); }
+    .dock-vinyl {
+      width: 48px; height: 48px; border-radius: 50%; background: #000;
+      border: 2px solid var(--accent-gold); display: flex; align-items: center;
+      justify-content: center; color: var(--accent-gold);
+      animation: spinVinyl 5s linear infinite paused;
+    }
+    .listening-dock.playing .dock-vinyl { animation-play-state: running; }
+    @keyframes spinVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    .dock-progress-track {
+      flex: 1; height: 5px; background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px; overflow: hidden; cursor: pointer; position: relative;
+    }
+    .dock-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--accent-gold)); }
+
+    /* Dossier Modal */
+    .dossier-modal {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(15px); z-index: 2000; display: none;
+      align-items: center; justify-content: center; padding: 2rem;
+    }
+    .dossier-modal.active { display: flex; }
+    .dossier-modal-content {
+      background: var(--bg-surface); border: 1.5px solid var(--border-gold);
+      border-radius: var(--radius-lg); max-width: 980px; width: 100%;
+      max-height: 88vh; overflow-y: auto; padding: 0; position: relative;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 242, 254, 0.15);
+    }
+    .dossier-close-btn {
+      position: absolute; top: 1.25rem; right: 1.25rem;
+      background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff; width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; z-index: 10;
+      transition: all 0.2s ease;
+    }
+    .dossier-close-btn:hover {
+      background: var(--primary); color: #000; transform: scale(1.1);
+    }
+    .dossier-close-btn {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-subtle);
+      color: #fff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .dossier-close-btn:hover { background: #ef4444; border-color: #ef4444; }
+
+    @media print {
+      body * { visibility: hidden; }
+      #printable-receipt, #printable-receipt * { visibility: visible; }
+      #printable-receipt { position: absolute; left: 0; top: 0; width: 100%; color: #000 !important; background: #fff !important; }
+    }
+  
+    /* ==========================================================================
+       DEGREE PROGRESS & STUDY CHECKLIST STYLING
+       ========================================================================== */
+    .genre-pillar-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .genre-pillar-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--primary);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+    }
+    .genre-pillar-card.completed {
+      border-color: var(--accent-gold);
+      background: rgba(245, 158, 11, 0.05);
+    }
+
+    /* Study Checklist inside Artist Dossier */
+    .study-checklist-box {
+      background: linear-gradient(135deg, rgba(0, 242, 254, 0.05) 0%, rgba(245, 158, 11, 0.05) 100%);
+      border: 1px solid var(--border-cyan);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .study-task-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 0.65rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+      transition: all 0.25s ease;
+    }
+    .study-task-item.completed {
+      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.08);
+    }
+    .task-status-btn {
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+    }
+    .task-status-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: scale(1.04);
+    }
+    .task-status-btn.done {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #10b981;
+      color: #34d399;
+    }
+
+    /* Print styling for official diploma */
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+      #printable-diploma-frame, #printable-diploma-frame * {
+        visibility: visible !important;
+      }
+      #printable-diploma-frame {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        border: 12px double #d4af37 !important;
+        padding: 3rem !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="campus-bg"></div>
+
+  <!-- Ivy League Style Upper Banner -->
+  <div class="ivy-banner">
+    <div><i class="fa-solid fa-graduation-cap"></i> <span>Thunder University • College of Modern Music & Sonic Architecture</span></div>
+    <div><span>Ex Musica Lux • Est. 2026 • Private Conservatory</span></div>
+  </div>
+
+  <!-- University Navigation Bar -->
+  <header class="univ-navbar">
+    <a href="#" class="univ-brand" onclick="showDepartment('quad'); return false;">
+      <img src="assets/images/branding/thunder-university-crest.jpg" alt="Thunder University Crest" class="univ-brand-crest">
+      <div>
+        <div class="univ-brand-title">THUNDER UNIVERSITY</div>
+        <div class="univ-brand-sub">Private Academic Conservatory</div>
+      </div>
+    </a>
+
+    <nav class="univ-nav-links">
+      <button class="univ-nav-btn active" id="nav-quad" onclick="showDepartment('quad')"><i class="fa-solid fa-landmark"></i> Campus Quad</button>
+      <button class="univ-nav-btn" id="nav-courses" onclick="showDepartment('courses')"><i class="fa-solid fa-book-open"></i> Courses (101-301)</button>
+      <button class="univ-nav-btn" id="nav-library" onclick="showDepartment('library')"><i class="fa-solid fa-book-bookmark"></i> University Library (Wiki)</button>
+      <button class="univ-nav-btn" id="nav-cinema" onclick="showDepartment('cinema')"><i class="fa-solid fa-film"></i> Video Vault</button>
+      <button class="univ-nav-btn gold" id="nav-bursar" onclick="showDepartment('bursar')"><i class="fa-solid fa-receipt"></i> Office of the Bursar</button>
+      <button class="univ-nav-btn" id="nav-alumni" onclick="showDepartment('alumni')"><i class="fa-solid fa-medal"></i> Alumni Hall</button>
+      
+    </nav>
+
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <div class="user-pill" id="univ-user-container" style="display: flex; align-items: center; gap: 0.5rem;">
+        <span id="univ-role-badge" style="background: rgba(0, 229, 255, 0.15); border: 1px solid var(--primary); color: var(--primary); padding: 3px 9px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase;">
+          <i class="fa-solid fa-graduation-cap"></i> Student
+        </span>
+        <span id="univ-user-email" style="font-size: 0.82rem; color: #fff;">Fellow Access</span>
+      </div>
+      <a href="admin/today.html" id="staff-admin-nav-btn" class="btn btn-outline btn-sm" style="display: none; border-color: var(--accent-gold); color: var(--accent-gold);" title="Staff Admin Portal">
+        <i class="fa-solid fa-crown"></i> Staff Admin
+      </a>
+      <button class="btn btn-outline btn-sm" onclick="handleUniversitySignOut()" title="Sign Out">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Campus Container -->
+  <main class="univ-main">
+
+    <!-- =====================================================================
+         DEPARTMENT 1: THE CAMPUS QUAD
+         ===================================================================== -->
+    <section id="view-quad" class="dept-view active">
+      <div class="campus-hero">
+        <img src="assets/images/branding/thunder-university-campus.jpg" alt="Campus Quad" class="campus-hero-img">
+        <div class="campus-hero-overlay">
+          <h1 class="hero-title">Rhythm, Lineage, and the Architecture of Modern Sound</h1>
+          <p class="hero-desc">
+            Beyond the 15-second viral soundbites lies the true history of modern music. Explore the breakout hustle, formal training, the essential study tracks, and watershed moments that shaped culture.
+          </p>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button class="btn btn-gold" onclick="showDepartment('courses')"><i class="fa-solid fa-play"></i> Enter Course Syllabi</button>
+            <button class="btn btn-cyan" onclick="showDepartment('library')"><i class="fa-solid fa-book-bookmark"></i> Browse Artist Library (Wiki)</button>
+            <button class="btn btn-outline" onclick="showDepartment('bursar')"><i class="fa-solid fa-receipt"></i> Office of the Bursar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="overview-grid">
+        <div class="dean-card">
+          <div class="dept-tag"><i class="fa-solid fa-scroll"></i> Dean's Convocation Address</div>
+          <h2 style="font-family: var(--font-heading); font-size: 1.7rem; color: #fff; margin-bottom: 1rem;">Why Thunder University Exists</h2>
+          <div class="dean-letter-body">
+            <p>
+              Welcome to Thunder University. Today’s music is consumed at lightning speed—an endless feed of algorithmic soundbites, viral TikTok hooks, and fleeting memes. You can know every trending snippet without ever knowing the name of the genius who spent 90 days in a room agonizing over the bassline.
+            </p>
+            <p>
+              <strong>Real power in music comes from lineage.</strong> Knowing that Michael Jackson’s dance mechanics trace directly back to James Brown; that Bruno Mars spent 15 years as an Elvis impersonator and uncredited songwriter before hitting #1; that Pharrell Williams learned syncopated jazz rhythm on a high school marching band snare drum; that Kanye West chopped vintage Chaka Khan soul records on a beat machine with his jaw wired shut; and that Juice WRLD took classical childhood piano training and invented a new genre of non-stop freestyle emo-trap.
+            </p>
+            <p>
+              This academy is your compass. Dive deep, listen with intention, and graduate into a true connoisseur of sound.
+            </p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 1rem; border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
+            <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-gold), var(--primary)); display: flex; align-items: center; justify-content: center; color: #000; font-weight: 800;">⚡</div>
+            <div>
+              <strong style="color: #fff; font-size: 0.92rem;">Dean of Sonic Architecture</strong>
+              <div style="color: var(--text-muted); font-size: 0.75rem;">Thunder House Entertainment • Father & Son Faculty</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="student-badge-card">
+          <div>
+            <div class="id-header">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <img src="assets/images/branding/thunder-university-crest.jpg" style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--accent-gold);" alt="Crest">
+                <div>
+                  <strong style="color: #fff; font-size: 0.85rem; font-family: var(--font-display);">THUNDER UNIVERSITY</strong>
+                  <div style="font-size: 0.65rem; color: var(--accent-gold); letter-spacing: 0.08em; text-transform: uppercase;">Official Student Fellow ID</div>
+                </div>
+              </div>
+              <div class="id-chip"></div>
+            </div>
+
+            <div class="id-profile">
+              <div class="id-photo-box" onclick="editStudentName()" title="Click to personalize name">
+                <i class="fa-solid fa-user-graduate" style="font-size: 2rem; margin-bottom: 0.35rem;"></i>
+                <span>HONORS FELLOW</span>
+              </div>
+              <div style="flex: 1;">
+                <div class="id-field-label">Student Name</div>
+                <div class="id-field-val" id="student-display-name" onclick="editStudentName()" style="cursor: pointer;">
+                  Thunder House Fellow <i class="fa-solid fa-pen" style="font-size: 0.75rem; color: var(--primary);"></i>
+                </div>
+                <div class="id-field-label">Department / Major</div>
+                <div class="id-field-val" style="color: var(--accent-gold); font-size: 0.88rem;">Modern Music History & Sonic Architecture</div>
+                <div class="id-field-label">Student ID #</div>
+                <div style="font-family: monospace; font-size: 0.82rem; color: var(--primary);">THU-2026-00819</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="id-footer-stats">
+            <div>
+              <div class="id-stat-num">4.0</div>
+              <div class="id-stat-lbl">GPA (Honors)</div>
+            </div>
+            <div>
+              <div class="id-stat-num" id="total-artists-stat">307</div>
+              <div class="id-stat-lbl">Artists Cataloged</div>
+            </div>
+            <div>
+              <div class="id-stat-num" style="color: #10b981; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.35rem;"><i class="fa-solid fa-circle-check"></i> CLEARED</div>
+              <div class="id-stat-lbl">Bursar Status</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+      <!-- =====================================================================
+           ACADEMIC DEGREE PROGRESS AUDIT & DIPLOMA CONFERRAL PORTAL
+           ===================================================================== -->
+      <div class="degree-portal-card" id="degree-portal-hub" style="margin-top: 2.5rem; background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(10, 15, 30, 0.98) 100%); border: 2px solid var(--border-gold); border-radius: var(--radius-lg); padding: 2.25rem; box-shadow: 0 20px 50px rgba(0,0,0,0.85); position: relative; overflow: hidden;">
+        
+        <!-- Ambient watermarks -->
+        <div style="position: absolute; right: -30px; bottom: -30px; opacity: 0.05; pointer-events: none;">
+          <img src="assets/images/branding/thunder-university-crest.jpg" style="width: 280px; height: 280px; filter: grayscale(100%);" alt="Watermark">
+        </div>
+
+        <!-- Portal Header -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 2rem; position: relative; z-index: 1;">
+          <div>
+            <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: var(--accent-gold); padding: 4px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem;">
+              <i class="fa-solid fa-graduation-cap"></i> Office of Academic Records & Degree Candidacy
+            </div>
+            <h2 style="font-family: var(--font-heading); font-size: 2rem; color: #fff; margin: 0; line-height: 1.2;">
+              Official Degree Progress Audit & Graduation Vault
+            </h2>
+            <p style="color: #94a3b8; font-size: 0.95rem; margin-top: 0.4rem; max-width: 750px; line-height: 1.6;">
+              Degree Track: <strong style="color: var(--accent-gold);">Doctor of Modern Musicology & Sonic Architecture</strong>. Complete <strong style="color: #fff;">10 Mastered Artists across each of the 5 core music departments (50 total)</strong> and pass the <strong style="color: #fff;">Collegiate Comprehensive Final Exam</strong> at the end of Courses to confer your official presidential parchment diploma.
+            </p>
+          </div>
+
+          <!-- Overall Progress Badge -->
+          <div style="background: rgba(0, 0, 0, 0.45); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem 1.75rem; text-align: center; min-width: 220px;">
+            <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 700;">Degree Progress</div>
+            <div id="degree-overall-percent" style="font-family: var(--font-display); font-size: 2.5rem; color: var(--accent-gold); font-weight: 700; line-height: 1.1; margin: 0.25rem 0;">0%</div>
+            <div id="degree-status-pill" style="display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,0.06); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1);">
+              Candidate in Progress
+            </div>
+          </div>
+        </div>
+
+        <!-- Master Progress Bar -->
+        <div style="margin-bottom: 2.25rem; position: relative; z-index: 1;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #cbd5e1; font-weight: 600; margin-bottom: 0.5rem;">
+            <span><i class="fa-solid fa-list-check" style="color: var(--primary);"></i> Degree Requirements Completed</span>
+            <span id="degree-req-summary" style="color: var(--accent-gold);">0 of 50 Artists Mastered • Capstone Exam Incomplete</span>
+          </div>
+          <div style="height: 14px; background: rgba(0,0,0,0.6); border-radius: 999px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); padding: 2px;">
+            <div id="degree-progress-bar-fill" style="height: 100%; width: 0%; background: linear-gradient(90deg, #00f2fe 0%, #f59e0b 100%); border-radius: 999px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);"></div>
+          </div>
+        </div>
+
+        <!-- 5 Genre Department Pillars Grid -->
+        <div style="position: relative; z-index: 1; margin-bottom: 2.5rem;">
+          <div style="font-family: var(--font-display); font-size: 1.15rem; color: #fff; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.65rem;">
+            <i class="fa-solid fa-shapes" style="color: var(--primary);"></i> 5 Core Department Distribution (10 Mastered Artists Each)
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem;" id="genre-pillars-container">
+            <!-- Injected via JavaScript -->
+          </div>
+        </div>
+
+        <!-- Capstone Final Exam Requirement Box -->
+        <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.25rem; margin-bottom: 2.5rem; position: relative; z-index: 1;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div id="exam-status-icon" style="width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #94a3b8;">
+              <i class="fa-solid fa-clipboard-question"></i>
+            </div>
+            <div>
+              <div style="font-weight: 700; color: #fff; font-size: 1.05rem;">Collegiate Comprehensive Final Examination</div>
+              <div id="exam-status-desc" style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.2rem;">
+                Located at the end of the Courses department. Score 100% on the 5 capstone questions to complete this requirement.
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-outline" onclick="showDepartment('courses'); setTimeout(() => { document.getElementById('course-final-exam-section')?.scrollIntoView({ behavior: 'smooth' }); }, 200);">
+            <i class="fa-solid fa-arrow-right"></i> Go to Final Exam in Courses
+          </button>
+        </div>
+
+        <!-- THE DIPLOMA DISPLAY VAULT (LOCKED / UNLOCKED) -->
+        <div id="diploma-vault-container" style="position: relative; z-index: 1;">
+          <!-- Dynamically populated via renderDiplomaVault() -->
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- =====================================================================
+         DEPARTMENT 2: ACADEMIC COURSES (CORE CURRICULUM)
+         ===================================================================== -->
+    <section id="view-courses" class="dept-view">
+      <div class="dept-header">
+        <div>
+          <div class="dept-tag"><i class="fa-solid fa-graduation-cap"></i> Academic Department</div>
+          <h2 class="dept-title">Collegiate Course Syllabi (101 – 301)</h2>
+          <p class="dept-subtitle">Structured academic courses covering vocal mastery, beat architecture, and classical freestyle improvisation.</p>
+        </div>
+        <div class="course-filter-bar">
+          <button class="filter-pill active" onclick="filterCourseSyllabi('all')">All Courses</button>
+          <button class="filter-pill" onclick="filterCourseSyllabi('Course 101')">Course 101: Pop Titans</button>
+          <button class="filter-pill" onclick="filterCourseSyllabi('Course 201')">Course 201: Beat Alchemists</button>
+          <button class="filter-pill" onclick="filterCourseSyllabi('Course 301')">Course 301: Freestyle Savants</button>
+        </div>
+      </div>
+
+      <div class="artists-grid" id="courses-container">
+        <!-- Injected via JavaScript from initial core masterclasses -->
+      </div>
+    
+      <!-- =====================================================================
+           DEPARTMENT FINAL ASSESSMENT: COLLEGIATE COMPREHENSIVE EXAMINATION
+           ===================================================================== -->
+      <div class="exam-section" id="course-final-exam-section" style="margin-top: 3.5rem; background: var(--bg-surface); border: 2px solid var(--border-gold); border-radius: var(--radius-lg); padding: 2.25rem; box-shadow: 0 16px 40px rgba(0,0,0,0.85);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;">
+          <div>
+            <div class="dept-tag" style="color: var(--accent-gold);"><i class="fa-solid fa-clipboard-question"></i> Department Capstone Assessment</div>
+            <h2 class="dept-title" style="margin-bottom: 0.35rem;">Collegiate Comprehensive Final Examination</h2>
+            <p class="dept-subtitle" style="margin: 0; max-width: 750px;">
+              Score 100% on the 5 questions below to satisfy your Capstone Examination requirement and earn your final degree honors.
+            </p>
+          </div>
+          <div id="quiz-score-pill" style="font-size: 0.95rem; font-weight: 700; color: var(--accent-gold); background: rgba(255,183,3,0.1); border: 1px solid var(--border-gold); padding: 0.4rem 1.25rem; border-radius: var(--radius-full);">
+            Score: 0 / 5
+          </div>
+        </div>
+
+        <div id="quiz-container">
+          <!-- Injected via JavaScript -->
+        </div>
+
+        <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-top: 1px solid var(--border-subtle); padding-top: 1.5rem;">
+          <div id="exam-feedback-msg" style="font-size: 0.95rem; font-weight: 600; color: var(--text-light);">
+            Select your answers and submit for official faculty grading.
+          </div>
+          <button class="btn btn-gold" id="btn-submit-exam" onclick="checkExamResults()">
+            <i class="fa-solid fa-certificate"></i> Grade My Exam & Record Degree Credit
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- =====================================================================
+         DEPARTMENT 3: THE UNIVERSITY LIBRARY (MUSIC WIKI ARCHIVE)
+         ===================================================================== -->
+    <section id="view-library" class="dept-view">
+      <div class="dept-header">
+        <div>
+          <div class="dept-tag"><i class="fa-solid fa-book-bookmark"></i> Campus Library & Archive</div>
+          <h2 class="dept-title">The Musicology Wiki Encyclopedia</h2>
+          <p class="dept-subtitle">Search and study every major recording artist across Pop, R&B, Hip-Hop, Rock, and Country. Complete biographical dossiers, verified training, and 5 study tracks per legend.</p>
+        </div>
+        <div style="font-size: 0.88rem; color: var(--accent-gold); background: rgba(255,183,3,0.1); border: 1px solid var(--border-gold); padding: 0.5rem 1rem; border-radius: var(--radius-full);">
+          <i class="fa-solid fa-database"></i> <span id="library-count-badge">307 Verified Artist Records</span>
+        </div>
+      </div>
+
+      <!-- Search & Genre Filters Toolbar -->
+      <div class="library-toolbar">
+        <div class="search-input-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="library-search-input" class="search-input" placeholder="Search by artist name, legal name, birthplace, or era (e.g. Gary, Indiana, Prince, 808s)..." oninput="handleLibrarySearch()">
+        </div>
+        <div class="genre-filter-bar">
+          <button class="filter-pill active" onclick="filterLibraryGenre('all', this)">All Genres</button>
+          <button class="filter-pill" onclick="filterLibraryGenre('hiphop', this)">Hip-Hop / Rap</button>
+          <button class="filter-pill" onclick="filterLibraryGenre('pop', this)">Pop</button>
+          <button class="filter-pill" onclick="filterLibraryGenre('rnb', this)">R&B / Soul / Funk</button>
+          <button class="filter-pill" onclick="filterLibraryGenre('rock', this)">Rock & Alt</button>
+          <button class="filter-pill" onclick="filterLibraryGenre('country', this)">Country & Roots</button>
+        </div>
+      </div>
+
+      <!-- Library Grid -->
+      <div class="artists-grid" id="library-container">
+        <!-- Injected dynamically from window.THUNDER_UNIV_ARTISTS -->
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         DEPARTMENT 4: VIDEO VAULT (WATERSHED MOMENTS)
+         ===================================================================== -->
+    <section id="view-cinema" class="dept-view">
+      <div class="dept-header">
+        <div>
+          <div class="dept-tag" style="color: #ef4444;"><i class="fa-solid fa-film"></i> Course 401 Media Vault</div>
+          <h2 class="dept-title">Watershed Moments That Shook Culture</h2>
+          <p class="dept-subtitle">Historical broadcasts, televised clashes, and the unscripted incidents that permanently redirected the music business.</p>
+        </div>
+      </div>
+
+      <div class="cinema-grid" id="cinema-container">
+        <!-- Injected via JavaScript -->
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         DEPARTMENT 5: OFFICE OF THE BURSAR
+         ===================================================================== -->
+    <section id="view-bursar" class="dept-view">
+      <div class="bursar-card">
+        <img src="assets/images/branding/thunder-university-crest.jpg" class="bursar-watermark" alt="Watermark">
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1.5rem;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <img src="assets/images/branding/thunder-university-crest.jpg" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--accent-gold);" alt="Crest">
+            <div>
+              <div style="font-family: var(--font-display); font-size: 1.5rem; color: #fff; font-weight: 800;">OFFICE OF THE BURSAR</div>
+              <div style="font-size: 0.8rem; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 0.1em;">Official Statement of Student Account • Academic Year 2026-2027</div>
+            </div>
+          </div>
+          <button class="btn btn-outline" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Bursar Statement</button>
+        </div>
+
+        <div id="printable-receipt">
+          <table class="tuition-table">
+            <thead>
+              <tr>
+                <th>Curricular Fee Category</th>
+                <th>Department Reference</th>
+                <th>Standard Rate</th>
+                <th>Endowment Credit</th>
+                <th style="text-align: right;">Student Due</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Undergraduate Tuition & Artist Masterclass Access</strong></td>
+                <td>Dept of Modern Music Heritage</td>
+                <td style="text-decoration: line-through; color: var(--text-muted);">$18,500.00</td>
+                <td style="color: #34d399;">-$18,500.00 (Scholarship)</td>
+                <td class="zero-cost">$0.00</td>
+              </tr>
+              <tr>
+                <td><strong>Audio Engineering & Listening Lab Studio Access</strong></td>
+                <td>The Conservatory Studio Suite</td>
+                <td style="text-decoration: line-through; color: var(--text-muted);">$3,200.00</td>
+                <td style="color: #34d399;">-$3,200.00 (Father & Son Grant)</td>
+                <td class="zero-cost">$0.00</td>
+              </tr>
+              <tr>
+                <td><strong>Vinyl & Vintage Sample Clearance Archive Access</strong></td>
+                <td>Sonic Architecture Archives</td>
+                <td style="text-decoration: line-through; color: var(--text-muted);">$1,450.00</td>
+                <td style="color: #34d399;">-$1,450.00 (Full Waiver)</td>
+                <td class="zero-cost">$0.00</td>
+              </tr>
+              <tr>
+                <td><strong>Watershed Moments Video Vault Projection Fee</strong></td>
+                <td>Course 401 Video Vault</td>
+                <td style="text-decoration: line-through; color: var(--text-muted);">$750.00</td>
+                <td style="color: #34d399;">-$750.00 (Full Waiver)</td>
+                <td class="zero-cost">$0.00</td>
+              </tr>
+              <tr>
+                <td><strong>Alumni Hall of Fame & Industry Induction Fee</strong></td>
+                <td>Thunder House Alumni Association</td>
+                <td style="text-decoration: line-through; color: var(--text-muted);">$600.00</td>
+                <td style="color: #34d399;">-$600.00 (Presidential Pass)</td>
+                <td class="zero-cost">$0.00</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="bursar-total-box">
+            <div>
+              <div style="font-size: 0.95rem; color: #34d399; font-weight: 700;">
+                <i class="fa-solid fa-circle-check"></i> 100% PRESIDENTIAL ENDOWMENT SCHOLARSHIP APPLIED
+              </div>
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">
+                Enrolled through Thunder House Entertainment Family Legacy Trust. All enrollment & lab fees waived in perpetuity.
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em;">Total Out-of-Pocket Balance</div>
+              <div style="font-family: var(--font-heading); font-size: 2.6rem; font-weight: 900; color: #10b981; line-height: 1;">$0.00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         DEPARTMENT 6: ALUMNI ASSOCIATION (HALL OF FAME)
+         ===================================================================== -->
+    <section id="view-alumni" class="dept-view">
+      <div class="dept-header">
+        <div>
+          <div class="dept-tag"><i class="fa-solid fa-medal"></i> Distinguished Alumni</div>
+          <h2 class="dept-title">Alumni Hall of Fame & Doctorates</h2>
+          <p class="dept-subtitle">Our permanent faculty and honored graduates who set the platinum benchmark for musicianship and stagecraft.</p>
+        </div>
+      </div>
+
+      <div class="alumni-grid" id="alumni-container">
+        <!-- Injected via JavaScript -->
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         DEPARTMENT 7: EXAMINATIONS & CONFERRED DEGREE
+         ===================================================================== -->
+    
+
+  </main>
+
+  <!-- Sticky In-Browser Conservatory Listening Lab Dock -->
+  <aside id="listening-dock" class="listening-dock">
+    <!-- Floating Video / Studio Visualizer Screen -->
+    <div id="dock-youtube-container" style="display: none; position: absolute; bottom: 88px; right: 2rem; width: 340px; height: 195px; border-radius: 12px; overflow: hidden; border: 2px solid var(--border-gold); box-shadow: 0 16px 45px rgba(0,0,0,0.95); background: #000; z-index: 1001; transition: all 0.3s ease;">
+      <div style="position: absolute; top: 6px; right: 6px; z-index: 2; display: flex; gap: 4px;">
+        <button onclick="toggleVideoDock()" style="background: rgba(0,0,0,0.75); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; width: 26px; height: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;" title="Minimize Video">
+          <i class="fa-solid fa-compress"></i>
+        </button>
+      </div>
+      <iframe id="dock-youtube-iframe" width="100%" height="100%" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+
+    <!-- Track & Artist Info -->
+    <div style="display: flex; align-items: center; gap: 1rem; min-width: 270px; max-width: 320px;">
+      <div class="dock-vinyl" id="dock-vinyl-icon" onclick="toggleAudioMode()" style="cursor: pointer;" title="Click to switch Audio Source (YouTube Master Stream vs. Local File)">
+        <i class="fa-solid fa-compact-disc"></i>
+      </div>
+      <div style="overflow: hidden;">
+        <div style="font-size: 0.95rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="dock-track-title">Select a Track to Study</div>
+        <div style="font-size: 0.78rem; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="dock-artist-name">Thunder University Listening Lab</div>
+        <div style="margin-top: 3px;">
+          <span id="dock-source-badge" style="display: inline-flex; align-items: center; gap: 4px; background: rgba(255, 0, 0, 0.15); border: 1px solid rgba(255, 0, 0, 0.4); color: #ff6b6b; padding: 1px 7px; border-radius: 999px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase;">
+            <i class="fa-brands fa-youtube"></i> YouTube Master Audio
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Playback Controls & Progress Bar -->
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.4rem; flex: 1; max-width: 580px;">
+      <div style="display: flex; align-items: center; gap: 1.15rem;">
+        <!-- Ear Training Speed Button -->
+        <button id="dock-speed-btn" onclick="cyclePlaybackSpeed()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: var(--accent-gold); font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; cursor: pointer;" title="Ear Training Tempo (0.75x, 1.0x, 1.25x)">
+          1.0x
+        </button>
+
+        <!-- Previous -->
+        <button style="background: none; border: none; color: var(--text-light); font-size: 1.1rem; cursor: pointer;" onclick="skipTrack(-1)" title="Previous Track"><i class="fa-solid fa-backward-step"></i></button>
+        
+        <!-- Play / Pause -->
+        <button style="width: 42px; height: 42px; border-radius: 50%; background: var(--primary); color: #0b1120; border: none; font-size: 1.05rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);" id="dock-play-pause-btn" onclick="togglePlayPause()">
+          <i class="fa-solid fa-play"></i>
+        </button>
+        
+        <!-- Next -->
+        <button style="background: none; border: none; color: var(--text-light); font-size: 1.1rem; cursor: pointer;" onclick="skipTrack(1)" title="Next Track"><i class="fa-solid fa-forward-step"></i></button>
+
+        <!-- Loop / Repeat -->
+        <button id="dock-loop-btn" onclick="toggleAudioLoop()" style="background: none; border: none; color: var(--text-muted); font-size: 0.95rem; cursor: pointer;" title="Toggle Track Loop">
+          <i class="fa-solid fa-repeat"></i>
+        </button>
+      </div>
+
+      <div style="width: 100%; display: flex; align-items: center; gap: 0.75rem; font-size: 0.72rem; color: var(--text-muted);">
+        <span id="dock-cur-time">0:00</span>
+        <div class="dock-progress-track" id="dock-progress-bar" onclick="seekAudio(event)">
+          <div class="dock-progress-fill" id="dock-progress-fill"></div>
+        </div>
+        <span id="dock-total-time">0:00</span>
+      </div>
+    </div>
+
+    <!-- Teacher Coach & Direct Action Buttons -->
+    <div style="display: flex; align-items: center; gap: 0.85rem; max-width: 380px;">
+      <div style="background: rgba(0, 229, 255, 0.06); border: 1px solid var(--border-cyan); border-radius: var(--radius-sm); padding: 0.5rem 0.85rem; font-size: 0.76rem; color: #cbd5e1; line-height: 1.35; flex: 1; max-height: 64px; overflow-y: auto;" id="dock-coach-note">
+        <strong style="color: var(--primary);"><i class="fa-solid fa-headphones"></i> Listening Coach:</strong> Click any track above to isolate the rhythm, sample pocket, and vocal delivery.
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+        <button class="btn btn-sm btn-outline" id="dock-video-toggle-btn" onclick="toggleVideoDock()" style="padding: 4px 8px; font-size: 0.72rem; border-color: rgba(255,255,255,0.2);" title="Toggle Floating Video / Music Visualizer">
+          <i class="fa-solid fa-tv"></i> Video
+        </button>
+        <button class="btn btn-sm btn-outline" id="dock-source-toggle-btn" onclick="toggleAudioMode()" style="padding: 4px 8px; font-size: 0.72rem; border-color: var(--accent-gold); color: var(--accent-gold);" title="Switch Source (YouTube Stream vs. Local Vault)">
+          <i class="fa-solid fa-sliders"></i> Mode
+        </button>
+      </div>
+    </div>
+
+    <audio id="univ-audio-element" preload="auto"></audio>
+  </aside>
+
+  <!-- Full Masterclass Dossier Modal -->
+  <div id="dossier-modal" class="dossier-modal" onclick="closeDossierModal(event)">
+    <div class="dossier-modal-content" onclick="event.stopPropagation()">
+      <button class="dossier-close-btn" onclick="document.getElementById('dossier-modal').classList.remove('active')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div id="dossier-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Interactive Conservatory Lightbox Modal -->
+  <div id="conservatory-lightbox" class="lightbox-modal" onclick="closeLightbox(event)" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(20px); z-index: 3000; align-items: center; justify-content: center; padding: 2rem;">
+    <div style="position: relative; max-width: 900px; width: 100%; text-align: center;" onclick="event.stopPropagation()">
+      <button onclick="document.getElementById('conservatory-lightbox').style.display='none'" style="position: absolute; top: -45px; right: 0; background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer; padding: 5px;">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <img id="lightbox-img" src="" alt="Gallery Image" style="max-height: 75vh; max-width: 100%; border-radius: var(--radius-md); border: 2px solid var(--border-gold); box-shadow: 0 20px 60px rgba(0,0,0,0.9); object-fit: contain;" />
+      <div style="margin-top: 1rem;">
+        <h3 id="lightbox-title" style="color: #fff; font-size: 1.35rem; margin: 0 0 0.35rem 0;"></h3>
+        <p id="lightbox-desc" style="color: #94a3b8; font-size: 0.95rem; margin: 0;"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Masterclass Cinema Modal -->
+  <div id="video-masterclass-modal" class="dossier-modal" onclick="closeVideoMasterclassModal(event)">
+    <div class="dossier-modal-content" style="max-width: 880px; padding: 1.75rem; background: #0b0f19; border: 1.5px solid var(--border-cyan); box-shadow: 0 25px 80px rgba(0,0,0,0.95), 0 0 40px rgba(0,229,255,0.2);" onclick="event.stopPropagation()">
+      <button class="dossier-close-btn" onclick="closeVideoMasterclassModal()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div style="aspect-ratio: 16/9; width: 100%; border-radius: 12px; overflow: hidden; background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); margin-bottom: 1.25rem;">
+        <iframe id="masterclass-youtube-iframe" style="width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div>
+        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary); letter-spacing: 0.08em; font-weight: 700;" id="masterclass-artist-name">Artist</span>
+        <h3 style="font-size: 1.35rem; color: #fff; margin: 0.2rem 0 0.5rem 0;" id="masterclass-video-title">Video Title</h3>
+      </div>
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); padding: 1rem; border-radius: 8px; margin-top: 0.75rem;">
+        <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--accent-gold); font-weight: 700; margin-bottom: 0.35rem;"><i class="fa-solid fa-graduation-cap"></i> Faculty Listening & Analysis Notes</div>
+        <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.55; margin: 0;" id="masterclass-curator-note"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Staff In-Place Artist Profile Editor Modal -->
+  <div id="artist-edit-modal" class="dossier-modal" onclick="closeArtistEditorModal(event)">
+    <div class="dossier-modal-content" style="max-width: 900px; padding: 2rem; background: #0c101b; border: 1.5px solid var(--border-gold); box-shadow: 0 25px 80px rgba(0,0,0,0.95), 0 0 45px rgba(255,183,3,0.2);" onclick="event.stopPropagation()">
+      <button class="dossier-close-btn" onclick="closeArtistEditorModal()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,183,3,0.3); padding-bottom: 1rem;">
+        <i class="fa-solid fa-pen-to-square" style="font-size: 1.5rem; color: var(--accent-gold);"></i>
+        <div>
+          <h2 style="font-family: var(--font-heading); font-size: 1.5rem; color: #fff; margin: 0;">Staff Artist Profile Editor</h2>
+          <span style="font-size: 0.8rem; color: var(--accent-gold);"><i class="fa-solid fa-lock"></i> Superuser Live Revision • Changes DO NOT autosave</span>
+        </div>
+      </div>
+
+      <form id="artist-edit-form" onsubmit="event.preventDefault(); promptConfirmSaveArtist();">
+        <input type="hidden" id="edit-artist-id" />
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+          <div>
+            <label style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-light); font-weight: 700; display: block; margin-bottom: 0.35rem;">Artist Name</label>
+            <input type="text" id="edit-artist-name" class="form-control" style="width: 100%; background: #07090e; border: 1px solid var(--border-subtle); color: #fff; padding: 0.65rem 0.85rem; border-radius: 8px;" required />
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-light); font-weight: 700; display: block; margin-bottom: 0.35rem;">Legal / Real Name</label>
+            <input type="text" id="edit-artist-real-name" class="form-control" style="width: 100%; background: #07090e; border: 1px solid var(--border-subtle); color: #fff; padding: 0.65rem 0.85rem; border-radius: 8px;" />
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-light); font-weight: 700; display: block; margin-bottom: 0.35rem;">Subgenre / Epoch</label>
+            <input type="text" id="edit-artist-subgenre" class="form-control" style="width: 100%; background: #07090e; border: 1px solid var(--border-subtle); color: #fff; padding: 0.65rem 0.85rem; border-radius: 8px;" />
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-light); font-weight: 700; display: block; margin-bottom: 0.35rem;">Active Years</label>
+            <input type="text" id="edit-artist-years" class="form-control" style="width: 100%; background: #07090e; border: 1px solid var(--border-subtle); color: #fff; padding: 0.65rem 0.85rem; border-radius: 8px;" />
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-light); font-weight: 700; display: block; margin-bottom: 0.35rem;">Hometown / Roots</label>
+            <input type="text" id="edit-artist-birthplace" class="form-control" style="width: 100%; background: #07090e; border: 1px solid var(--border-subtle); color: #fff; padding: 0.65rem 0.85rem; border-radius: 8px;" />
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-light); font-weight: 700; display: block; margin-bottom: 0.35rem;">Photo URL</label>
+            <input type="text" id="edit-artist-photo" class="form-control" style="width: 100%; background: #07090e; border: 1px solid var(--border-subtle); color: #fff; padding: 0.65rem 0.85rem; border-radius: 8px;" />
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-light); font-weight: 700; display: block; margin-bottom: 0.35rem;">Biography & Historical Significance</label>
+          <textarea id="edit-artist-bio" rows="3" style="width: 100%; background: #07090e; border: 1px solid var(--border-subtle); color: #fff; padding: 0.65rem 0.85rem; border-radius: 8px; font-family: inherit; line-height: 1.5;"></textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <label style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-light); font-weight: 700; display: block; margin-bottom: 0.35rem;">Formal & Street Music Education</label>
+            <textarea id="edit-artist-education" rows="3" style="width: 100%; background: #07090e; border: 1px solid var(--border-subtle); color: #fff; padding: 0.65rem 0.85rem; border-radius: 8px; font-family: inherit; line-height: 1.5;"></textarea>
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-light); font-weight: 700; display: block; margin-bottom: 0.35rem;">Breakthrough Hustle</label>
+            <textarea id="edit-artist-breakout" rows="3" style="width: 100%; background: #07090e; border: 1px solid var(--border-subtle); color: #fff; padding: 0.65rem 0.85rem; border-radius: 8px; font-family: inherit; line-height: 1.5;"></textarea>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-subtle); padding-top: 1.25rem; margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <h4 style="font-size: 1.05rem; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.45rem;">
+                <i class="fa-brands fa-youtube" style="color: #ff0000;"></i> Curated YouTube Music Videos (Up to 5)
+              </h4>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Paste full YouTube URL or 11-character video ID</p>
+            </div>
+            <button type="button" class="btn btn-outline btn-sm" id="btn-add-edit-video" onclick="addVideoInputRow()">
+              <i class="fa-solid fa-plus"></i> Add Video (<span id="edit-video-count-badge">0/5</span>)
+            </button>
+          </div>
+          
+          <div id="edit-videos-container" style="display: flex; flex-direction: column; gap: 0.85rem;"></div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 1rem; border-top: 1px solid var(--border-subtle); padding-top: 1.25rem;">
+          <button type="button" class="btn btn-outline" onclick="closeArtistEditorModal()">Cancel</button>
+          <button type="submit" class="btn btn-gold" style="font-weight: 700;"><i class="fa-solid fa-floppy-disk"></i> Save Profile Updates</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Custom Warning Confirmation Modal -->
+  <div id="artist-warning-modal" class="dossier-modal" style="z-index: 4000;">
+    <div class="dossier-modal-content" style="max-width: 520px; padding: 2.25rem; background: #0e121c; border: 2px solid var(--accent-gold); box-shadow: 0 25px 80px rgba(0,0,0,0.95), 0 0 45px rgba(255, 183, 3, 0.25); text-align: center;" onclick="event.stopPropagation()">
+      <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(255, 183, 3, 0.15); border: 2px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto;">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.85rem; color: var(--accent-gold);"></i>
+      </div>
+      <h3 style="font-family: var(--font-heading); font-size: 1.4rem; color: #fff; margin-bottom: 0.5rem;">Confirm Live Profile Revision</h3>
+      <p style="color: #cbd5e1; font-size: 0.92rem; line-height: 1.6; margin-bottom: 1.5rem;">
+        You are about to modify the canonical academic profile for <strong id="warning-artist-name" style="color: var(--accent-gold);">Artist</strong>.<br/><br/>
+        <span style="font-size: 0.82rem; color: #94a3b8; display: block; background: rgba(0,0,0,0.4); border: 1px solid var(--border-subtle); padding: 0.75rem 1rem; border-radius: 6px; text-align: left; line-height: 1.5;">
+          <i class="fa-solid fa-circle-exclamation" style="color: var(--accent-gold);"></i> <strong>Warning:</strong> Changes will be published to the live University database immediately and will affect all student curricula and faculty records.
+        </span>
+      </p>
+      <div style="display: flex; gap: 0.85rem; justify-content: center;">
+        <button type="button" class="btn btn-outline" onclick="closeWarningModal()">
+          <i class="fa-solid fa-arrow-left"></i> Return to Editor
+        </button>
+        <button type="button" class="btn btn-gold" id="btn-confirm-save-artist" onclick="executeSaveArtistOverride()" style="font-weight: 700;">
+          <i class="fa-solid fa-check"></i> Yes, Publish Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. DEPARTMENT VIEW SWITCHER (SPA TAB ROUTER)
+    // =========================================================================
+    function showDepartment(deptId) {
+      document.querySelectorAll('.dept-view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.univ-nav-btn').forEach(b => b.classList.remove('active'));
+
+      const targetView = document.getElementById(`view-${deptId}`);
+      const targetNav = document.getElementById(`nav-${deptId}`);
+
+      if (targetView) targetView.classList.add('active');
+      if (targetNav) targetNav.classList.add('active');
+
+      window.location.hash = deptId;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // =========================================================================
+    // 2. DATA INGESTION & RENDERING
+    // =========================================================================
+    let ALL_ARTISTS = window.THUNDER_UNIV_ARTISTS || [];
+    let isSuperuser = false;
+    let currentSession = null;
+    let currentStudentProfile = null;
+
+    const WATERSHED_CINEMA = [
+      {
+        title: "The 1984 Pepsi Commercial Fire Incident",
+        badge: "Industry Watershed • 1984",
+        youtube_id: "277e90qU2sU",
+        desc: "During the 6th take of a concert commercial at the Shrine Auditorium in LA, magnesium fireworks exploded prematurely, catching Michael Jackson's hair and scalp on fire. The second- and third-degree burns permanently altered his physical health, leading to surgeries, scalp reconstruction, and his subsequent dependence on prescription painkillers."
+      },
+      {
+        title: "The 2009 VMAs Interruption ('Imma Let You Finish')",
+        badge: "Pop Culture Canon • 2009",
+        youtube_id: "1z8gCZ7zpsQ",
+        desc: "Kanye walked on stage during 19-year-old Taylor Swift's acceptance speech for Best Female Video, grabbed the microphone, and declared that Beyoncé had 'one of the best videos of all time.' The global backlash pushed Kanye into self-imposed exile in Hawaii, where he channeled the villain narrative into his magnum opus album, 'My Beautiful Dark Twisted Fantasy'."
+      },
+      {
+        title: "The 1995 Source Awards (East vs. West Ignition)",
+        badge: "Hip Hop Civil War • 1995",
+        youtube_id: "S8g6X4_J-jM",
+        desc: "Standing in the heart of New York City at Madison Square Garden, Death Row Records CEO Suge Knight took the stage: 'Any artist out there that wanna be an artist and wanna stay a star... come to Death Row!' This public challenge ignited the East Coast vs. West Coast rivalry that would tragically engulf 2Pac and The Notorious B.I.G."
+      },
+      {
+        title: "The Tim Westwood 1-Hour Non-Stop Freestyle",
+        badge: "Freestyle Mastery • 2018",
+        youtube_id: "3V1pS3e1_1Q",
+        desc: "Juice WRLD walked into Tim Westwood's London studio and rapped off the top of his dome over classic Eminem beats for over 60 minutes straight without taking a breath, looking at a phone, or stumbling on a single rhyme scheme. Widely considered one of the greatest displays of pure improvisation in music history."
+      },
+      {
+        title: "Super Bowl XLVIII Solo Drum Mastery",
+        badge: "Live Musicianship • 2014",
+        youtube_id: "F2i0Bc3f7jk",
+        desc: "When critics questioned whether Bruno had enough hits to headline the Super Bowl Halftime Show, he opened the show completely alone on an illuminated drum kit, performing an explosive, polyrhythmic drum solo in front of 115 million viewers before singing a single note."
+      }
+    ];
+
+    const ALUMNI_DATA = [
+      { name: "Michael Joseph Jackson", degree: "Doctor of Pop Choreography & Vocal Dynamics", classYear: "Class of '82", icon: "👑" },
+      { name: "Peter Gene Hernandez (Bruno Mars)", degree: "B.A. in Funk Revivalism & Cabaret Showmanship", classYear: "Class of '10", icon: "🎩" },
+      { name: "Pharrell Lanscilo Williams", degree: "M.S. in 4-Count Beat Architecture", classYear: "Class of '98", icon: "🛸" },
+      { name: "Kanye Omari West (Ye)", degree: "Fellowship in Soul Chopping & Era Reinvention", classYear: "Class of '04", icon: "🐻" },
+      { name: "Jarad Anthony Higgins (Juice WRLD)", degree: "Valedictorian in Stream-of-Consciousness Improvisation", classYear: "Class of '18", icon: "🧃" },
+      { name: "Prince Rogers Nelson", degree: "Honorary Chancellor Emeritus of Multi-Instrumentalism", classYear: "Class of '84", icon: "🎸" },
+      { name: "Whitney Elizabeth Houston", degree: "Chair of Melodic Belting & Dynamic Control", classYear: "Class of '85", icon: "🎤" },
+      { name: "James Joseph Brown", degree: "Founding Father of 'The One' & Modern Groove", classYear: "Class of '65", icon: "🥁" },
+      { name: "Stevland Hardaway Morris (Stevie Wonder)", degree: "Distinguished Chair of Electronic Synthesis & Harmonica", classYear: "Class of '72", icon: "🎹" },
+      { name: "Tupac Amaru Shakur", degree: "Doctorate in Sociopolitical Lyricism & West Coast Heritage", classYear: "Class of '95", icon: "🕊️" },
+      { name: "Christopher Wallace (The Notorious B.I.G.)", degree: "Master of Flow Architecture & East Coast Narrative", classYear: "Class of '94", icon: "👑" },
+      { name: "Marshall Mathers (Eminem)", degree: "Fellowship in Multi-Syllabic Speed & Technical Phrasing", classYear: "Class of '99", icon: "⚡" }
+    ];
+
+    const QUIZ_QUESTIONS = [
+      {
+        q: "1. Which producer famously mixed Michael Jackson's 'Billie Jean' 91 times before choosing Mix #2?",
+        options: ["Berry Gordy", "Quincy Jones", "Teddy Riley", "Rick Rubin"],
+        correct: 1
+      },
+      {
+        q: "2. What signature musical trademark does Pharrell Williams put at the beginning of almost every song he produces?",
+        options: ["A whisper of his name", "A reversed cymbal crash", "A 4-count beat intro", "A telephone dial tone"],
+        correct: 2
+      },
+      {
+        q: "3. What was the title of Kanye West's breakthrough debut track, recorded with his jaw wired shut following a near-fatal 2002 car accident?",
+        options: ["Jesus Walks", "Through the Wire", "Gold Digger", "Stronger"],
+        correct: 1
+      },
+      {
+        q: "4. What instrument did Bruno Mars's mother and father train him on starting in Waikiki hotel cabaret shows at age 4?",
+        options: ["Violin & Cello", "Turntables & Sampler", "Elvis impersonation & Percussion/Drums", "French Horn"],
+        correct: 2
+      },
+      {
+        q: "5. What made Juice WRLD's songwriting process historically unique compared to almost all other recording artists?",
+        options: ["He typed his lyrics on an antique typewriter", "He never wrote lyrics down; every song was a 100% off-the-top freestyle", "He only recorded in total pitch darkness", "He used auto-tune on every single vowel"],
+        correct: 1
+      }
+    ];
+
+    
+    // =========================================================================
+    // THUNDER UNIVERSITY DEGREE AUDIT & CURRICULUM MASTERY SYSTEM
+    // =========================================================================
+    const DEGREE_TARGET_PER_GENRE = 10;
+    const DEGREE_GENRES = [
+      { id: 'pop', name: 'Pop Titans', icon: 'fa-solid fa-microphone-lines', color: '#f59e0b', tag: 'pop' },
+      { id: 'rnb', name: 'R&B & Soul Masters', icon: 'fa-solid fa-compact-disc', color: '#ec4899', tag: 'rnb' },
+      { id: 'hiphop', name: 'Hip-Hop Architects', icon: 'fa-solid fa-headphones-simple', color: '#00f2fe', tag: 'hiphop' },
+      { id: 'rock', name: 'Rock & Counter-Culture', icon: 'fa-solid fa-guitar', color: '#ef4444', tag: 'rock' },
+      { id: 'country', name: 'Country & Roots Americana', icon: 'fa-solid fa-hat-cowboy', color: '#10b981', tag: 'country' }
+    ];
+
+    function getDegreeState() {
+      const defaultState = {
+        studentName: "Thunder House Fellow",
+        artistTasks: {},
+        masteredArtists: [],
+        examPassed: false,
+        examScore: 0,
+        examDate: null
+      };
+      try {
+        const raw = localStorage.getItem('thu_degree_progress_v2');
+        if (!raw) return defaultState;
+        return { ...defaultState, ...JSON.parse(raw) };
+      } catch (e) {
+        return defaultState;
+      }
+    }
+
+    function saveDegreeState(state) {
+      try {
+        localStorage.setItem('thu_degree_progress_v2', JSON.stringify(state));
+      } catch (e) {}
+      updateDegreeProgressUI();
+
+      // Automatically sync academic progress to Supabase student profile
+      if (window.supabaseClient && currentSession) {
+        const masteredSet = new Set(state.masteredArtists || []);
+        let cappedCredits = 0;
+        DEGREE_GENRES.forEach(g => {
+          let count = 0;
+          ALL_ARTISTS.forEach(a => {
+            if (masteredSet.has(a.id) && (a.category || '').toLowerCase() === g.id) count++;
+          });
+          cappedCredits += Math.min(count, DEGREE_TARGET_PER_GENRE);
+        });
+        const examBonus = state.examPassed ? 20 : 0;
+        const progressPct = Math.min(100, Math.round((cappedCredits / 50) * 80) + examBonus);
+        const isGraduated = (cappedCredits >= 50 && state.examPassed) || progressPct >= 100;
+
+        window.supabaseClient
+          .from('university_student_profiles')
+          .upsert({
+            id: currentSession.user.id,
+            user_id: currentSession.user.id,
+            email: currentSession.user.email,
+            display_name: state.studentName,
+            degree_progress: progressPct,
+            completed_credits: cappedCredits,
+            completed_artists: state.masteredArtists || [],
+            artist_tasks: state.artistTasks || {},
+            quiz_scores: {
+              examPassed: state.examPassed || false,
+              examScore: state.examScore || 0,
+              examDate: state.examDate || null
+            },
+            diploma_conferred: isGraduated,
+            updated_at: new Date().toISOString()
+          })
+          .then(({ error }) => {
+            if (error) console.warn('Student profile sync warning:', error);
+          })
+          .catch(e => console.warn('Student profile sync caught:', e));
+      }
+    }
+
+    function isArtistMastered(artistId) {
+      const state = getDegreeState();
+      return state.masteredArtists && state.masteredArtists.includes(artistId);
+    }
+
+    function getArtistTaskProgress(artistId) {
+      const state = getDegreeState();
+      const tasks = state.artistTasks[artistId] || { wiki: false, exhibit: false, notes: false, tracks: [] };
+      const tracksCount = (tasks.tracks || []).length;
+      const isMastered = state.masteredArtists.includes(artistId);
+      return {
+        wiki: tasks.wiki || false,
+        exhibit: tasks.exhibit || false,
+        notes: tasks.notes || false,
+        tracks: tasks.tracks || [],
+        tracksComplete: tracksCount >= 5,
+        isMastered: isMastered
+      };
+    }
+
+    function recordWikiRead(artistId) {
+      const state = getDegreeState();
+      if (!state.artistTasks[artistId]) state.artistTasks[artistId] = { wiki: false, exhibit: false, notes: false, tracks: [] };
+      state.artistTasks[artistId].wiki = true;
+      checkAndSaveArtistMastery(state, artistId);
+    }
+
+    function recordExhibitViewed(artistId) {
+      const state = getDegreeState();
+      if (!state.artistTasks[artistId]) state.artistTasks[artistId] = { wiki: false, exhibit: false, notes: false, tracks: [] };
+      state.artistTasks[artistId].exhibit = true;
+      checkAndSaveArtistMastery(state, artistId);
+    }
+
+    function recordTrackPlayed(artistId, trackIdx) {
+      const state = getDegreeState();
+      if (!state.artistTasks[artistId]) state.artistTasks[artistId] = { wiki: false, exhibit: false, notes: false, tracks: [] };
+      if (!state.artistTasks[artistId].tracks) state.artistTasks[artistId].tracks = [];
+      if (!state.artistTasks[artistId].tracks.includes(trackIdx)) {
+        state.artistTasks[artistId].tracks.push(trackIdx);
+      }
+      checkAndSaveArtistMastery(state, artistId);
+    }
+
+    function recordNotesReviewed(artistId) {
+      const state = getDegreeState();
+      if (!state.artistTasks[artistId]) state.artistTasks[artistId] = { wiki: false, exhibit: false, notes: false, tracks: [] };
+      state.artistTasks[artistId].notes = true;
+      checkAndSaveArtistMastery(state, artistId);
+    }
+
+    function toggleArtistTask(artistId, taskKey) {
+      const state = getDegreeState();
+      if (!state.artistTasks[artistId]) state.artistTasks[artistId] = { wiki: false, exhibit: false, notes: false, tracks: [] };
+      
+      if (taskKey === 'tracks') {
+        if ((state.artistTasks[artistId].tracks || []).length >= 5) {
+          state.artistTasks[artistId].tracks = [];
+        } else {
+          state.artistTasks[artistId].tracks = [0, 1, 2, 3, 4];
+        }
+      } else {
+        state.artistTasks[artistId][taskKey] = !state.artistTasks[artistId][taskKey];
+      }
+      
+      checkAndSaveArtistMastery(state, artistId);
+      refreshDossierChecklist(artistId);
+    }
+
+    function quickMasterArtist(artistId) {
+      const state = getDegreeState();
+      state.artistTasks[artistId] = { wiki: true, exhibit: true, notes: true, tracks: [0, 1, 2, 3, 4] };
+      checkAndSaveArtistMastery(state, artistId, true);
+      refreshDossierChecklist(artistId);
+    }
+
+    function checkAndSaveArtistMastery(state, artistId, forceMaster = false) {
+      const tasks = state.artistTasks[artistId] || {};
+      const allDone = forceMaster || (tasks.wiki && tasks.exhibit && tasks.notes && (tasks.tracks || []).length >= 5);
+      
+      const wasMastered = state.masteredArtists.includes(artistId);
+      if (allDone && !wasMastered) {
+        state.masteredArtists.push(artistId);
+        showDegreeToast(`🏆 Masterclass Complete! +1 Academic Credit recorded for ${artistId.replace(/-/g, ' ').toUpperCase()}.`);
+      } else if (!allDone && wasMastered) {
+        state.masteredArtists = state.masteredArtists.filter(id => id !== artistId);
+      }
+
+      saveDegreeState(state);
+    }
+
+    function showDegreeToast(msg) {
+      const toast = document.createElement('div');
+      toast.style.cssText = 'position: fixed; bottom: 85px; right: 25px; background: #0f172a; border: 2px solid var(--accent-gold); color: #fff; padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; box-shadow: 0 10px 30px rgba(0,0,0,0.9); z-index: 999999; display: flex; align-items: center; gap: 0.65rem; animation: slideInUp 0.3s ease;';
+      toast.innerHTML = `<i class="fa-solid fa-award" style="color: var(--accent-gold); font-size: 1.2rem;"></i> ${msg}`;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => toast.remove(), 500);
+      }, 3500);
+    }
+
+    function printOfficialDiploma() {
+      window.print();
+    }
+
+    function updateDegreeProgressUI() {
+      const state = getDegreeState();
+      const masteredSet = new Set(state.masteredArtists || []);
+
+      // Calculate genre distribution
+      const genreCounts = { pop: 0, rnb: 0, hiphop: 0, rock: 0, country: 0 };
+      ALL_ARTISTS.forEach(a => {
+        if (masteredSet.has(a.id)) {
+          const cat = a.category ? a.category.toLowerCase() : 'pop';
+          if (genreCounts[cat] !== undefined) {
+            genreCounts[cat]++;
+          } else {
+            genreCounts.pop++;
+          }
+        }
+      });
+
+      // Calculate capped credits (max 10 per genre)
+      let cappedCredits = 0;
+      DEGREE_GENRES.forEach(g => {
+        cappedCredits += Math.min(genreCounts[g.id], DEGREE_TARGET_PER_GENRE);
+      });
+
+      const totalArtistsMastered = state.masteredArtists.length;
+      const examBonus = state.examPassed ? 20 : 0;
+      const artistProgressPercent = Math.round((cappedCredits / 50) * 80);
+      const overallPercent = Math.min(100, artistProgressPercent + examBonus);
+      const isGraduated = (cappedCredits >= 50 && state.examPassed) || overallPercent >= 100;
+
+      // Update Overall Percent & Progress Fill
+      const pctEl = document.getElementById('degree-overall-percent');
+      const barFill = document.getElementById('degree-progress-bar-fill');
+      const statusPill = document.getElementById('degree-status-pill');
+      const reqSummary = document.getElementById('degree-req-summary');
+
+      if (pctEl) pctEl.textContent = `${overallPercent}%`;
+      if (barFill) barFill.style.width = `${overallPercent}%`;
+      if (reqSummary) {
+        reqSummary.textContent = `${cappedCredits} of 50 Genre Credits (${totalArtistsMastered} Total) • Capstone Exam: ${state.examPassed ? 'PASSED (100%)' : 'PENDING'}`;
+      }
+
+      if (statusPill) {
+        if (isGraduated) {
+          statusPill.textContent = 'CONFERRED: PRESIDENTIAL HONORS';
+          statusPill.style.background = 'rgba(16, 185, 129, 0.2)';
+          statusPill.style.borderColor = '#10b981';
+          statusPill.style.color = '#34d399';
+        } else if (overallPercent >= 50) {
+          statusPill.textContent = 'Advanced Degree Candidate';
+          statusPill.style.background = 'rgba(245, 158, 11, 0.15)';
+          statusPill.style.borderColor = 'var(--accent-gold)';
+          statusPill.style.color = 'var(--accent-gold)';
+        } else {
+          statusPill.textContent = 'Candidate in Progress';
+          statusPill.style.background = 'rgba(255,255,255,0.06)';
+          statusPill.style.borderColor = 'rgba(255,255,255,0.1)';
+          statusPill.style.color = '#cbd5e1';
+        }
+      }
+
+      // Update Student ID Card Stats
+      const studentNameDisplay = document.getElementById('student-display-name');
+      if (studentNameDisplay && state.studentName) {
+        studentNameDisplay.innerHTML = `${state.studentName} <i class="fa-solid fa-pen" style="font-size: 0.75rem; color: var(--primary);"></i>`;
+      }
+
+      // Update Genre Department Pillars
+      const pillarsContainer = document.getElementById('genre-pillars-container');
+      if (pillarsContainer) {
+        pillarsContainer.innerHTML = DEGREE_GENRES.map(g => {
+          const count = genreCounts[g.id] || 0;
+          const capped = Math.min(count, DEGREE_TARGET_PER_GENRE);
+          const pct = Math.round((capped / DEGREE_TARGET_PER_GENRE) * 100);
+          const isDone = capped >= DEGREE_TARGET_PER_GENRE;
+
+          return `
+            <div class="genre-pillar-card ${isDone ? 'completed' : ''}">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <i class="${g.icon}" style="color: ${g.color}; font-size: 1.1rem;"></i>
+                  <strong style="color: #fff; font-size: 0.88rem;">${g.name}</strong>
+                </div>
+                ${isDone ? `
+                  <span style="color: #34d399; font-size: 0.75rem; font-weight: 700;"><i class="fa-solid fa-circle-check"></i> Complete</span>
+                ` : `
+                  <span style="color: var(--text-muted); font-size: 0.75rem; font-weight: 600;">${count} / 10</span>
+                `}
+              </div>
+              <div style="height: 6px; background: rgba(0,0,0,0.5); border-radius: 999px; overflow: hidden; margin-bottom: 0.75rem;">
+                <div style="height: 100%; width: ${pct}%; background: ${isDone ? '#10b981' : g.color}; border-radius: 999px; transition: width 0.4s ease;"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.72rem; color: var(--text-muted);">${isDone ? '10 Credits Earned' : `${10 - capped} more to satisfy`}</span>
+                <button onclick="filterLibraryByGenre('${g.tag}')" style="background: none; border: none; color: var(--primary); font-size: 0.72rem; cursor: pointer; font-weight: 600; text-decoration: underline; padding: 0;">
+                  Study ${g.name.split(' ')[0]} &rarr;
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Update Capstone Exam Box in Quad
+      const examIcon = document.getElementById('exam-status-icon');
+      const examDesc = document.getElementById('exam-status-desc');
+      if (examIcon && examDesc) {
+        if (state.examPassed) {
+          examIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+          examIcon.style.background = 'rgba(16, 185, 129, 0.2)';
+          examIcon.style.borderColor = '#10b981';
+          examIcon.style.color = '#34d399';
+          examDesc.innerHTML = `<strong style="color: #34d399;">CLEARED (100% Honors):</strong> Capstone examination successfully passed on ${state.examDate || '2026'}.`;
+        } else {
+          examIcon.innerHTML = '<i class="fa-solid fa-clipboard-question"></i>';
+          examIcon.style.background = 'rgba(255,255,255,0.05)';
+          examIcon.style.borderColor = 'rgba(255,255,255,0.1)';
+          examIcon.style.color = '#94a3b8';
+          examDesc.textContent = 'Located at the end of the Courses department. Score 100% on the 5 capstone questions to complete this requirement.';
+        }
+      }
+
+      // Render Diploma Vault
+      renderDiplomaVault(isGraduated, state, cappedCredits, totalArtistsMastered);
+    }
+
+    function renderDiplomaVault(isGraduated, state, cappedCredits, totalArtistsMastered) {
+      const container = document.getElementById('diploma-vault-container');
+      if (!container) return;
+
+      if (!isGraduated) {
+        container.innerHTML = `
+          <div style="border: 2px dashed rgba(245, 158, 11, 0.35); border-radius: var(--radius-lg); padding: 2.5rem; text-align: center; background: rgba(0, 0, 0, 0.4); position: relative;">
+            <div style="width: 70px; height: 70px; border-radius: 50%; background: rgba(245, 158, 11, 0.1); border: 2px solid var(--border-gold); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem auto;">
+              <i class="fa-solid fa-lock" style="font-size: 1.8rem; color: var(--accent-gold);"></i>
+            </div>
+            <h3 style="font-family: var(--font-display); font-size: 1.6rem; color: #fff; margin-bottom: 0.5rem;">
+              Conferred Degree Diploma Locked
+            </h3>
+            <p style="color: #94a3b8; max-width: 600px; margin: 0 auto 1.5rem auto; font-size: 0.92rem; line-height: 1.6;">
+              The official gold-sealed Presidential Diploma is awarded upon completing <strong style="color: #fff;">10 Mastered Artists across each genre (50 total)</strong> and passing the <strong style="color: #fff;">Collegiate Comprehensive Final Exam</strong> at the end of Courses.
+            </p>
+            <div style="display: inline-flex; align-items: center; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+              <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; color: #cbd5e1;">
+                <i class="${cappedCredits >= 50 ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'}" style="color: ${cappedCredits >= 50 ? '#34d399' : 'var(--text-muted)'};"></i> 
+                Genre Credits: <strong>${cappedCredits} / 50</strong>
+              </div>
+              <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; color: #cbd5e1;">
+                <i class="${state.examPassed ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'}" style="color: ${state.examPassed ? '#34d399' : 'var(--text-muted)'};"></i> 
+                Capstone Exam: <strong>${state.examPassed ? 'PASSED (100%)' : 'PENDING'}</strong>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <div id="printable-diploma-frame" style="background: linear-gradient(135deg, #0f172a 0%, #030712 100%); border: 10px double var(--accent-gold); border-radius: var(--radius-lg); padding: 3.5rem 2.5rem; text-align: center; box-shadow: 0 0 60px rgba(245, 158, 11, 0.35); position: relative; margin-top: 1rem;">
+            
+            <div style="position: absolute; top: 1.5rem; right: 1.5rem;" class="no-print">
+              <button class="btn btn-gold" onclick="printOfficialDiploma()" style="box-shadow: 0 4px 15px rgba(0,0,0,0.6);">
+                <i class="fa-solid fa-print"></i> Print / Save Official Diploma
+              </button>
+            </div>
+
+            <img src="assets/images/branding/thunder-university-crest.jpg" style="width: 105px; height: 105px; border-radius: 50%; border: 3px solid var(--accent-gold); margin-bottom: 1.25rem; box-shadow: 0 0 25px rgba(245, 158, 11, 0.5);" alt="Presidential Seal">
+            
+            <div style="font-size: 0.9rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-muted); font-weight: 600;">The Board of Regents and Faculty of</div>
+            <div style="font-family: var(--font-display); font-size: 3rem; color: var(--accent-gold); margin: 0.5rem 0; letter-spacing: 0.05em; text-shadow: 0 2px 15px rgba(0,0,0,0.9);">THUNDER UNIVERSITY</div>
+            <div style="font-size: 1rem; color: #cbd5e1; font-style: italic;">Hereby confers upon</div>
+            
+            <div style="font-family: var(--font-heading); font-size: 2.6rem; color: #fff; margin: 1.25rem 0; text-decoration: underline; text-decoration-color: var(--accent-gold); text-underline-offset: 8px;">
+              ${state.studentName || 'Thunder House Fellow'}
+            </div>
+            
+            <div style="font-size: 1.35rem; color: var(--accent-gold); font-family: var(--font-display); margin-bottom: 1rem; font-weight: 700;">
+              The Degree of Doctor of Modern Musicology & Sonic Architecture
+            </div>
+            
+            <p style="max-width: 720px; margin: 0 auto 2rem auto; font-size: 0.95rem; color: #cbd5e1; line-height: 1.7;">
+              Having successfully completed rigorous study across all five foundational music departments (Pop, R&B/Soul, Hip-Hop, Rock, and Country Americana) and demonstrated flawless 100% mastery on the Collegiate Comprehensive Capstone Examination.
+            </p>
+
+            <div style="display: flex; justify-content: space-around; max-width: 650px; margin: 0 auto; border-top: 1px solid rgba(255, 183, 3, 0.4); padding-top: 1.5rem; flex-wrap: wrap; gap: 1.5rem;">
+              <div>
+                <div style="font-family: 'Cinzel', serif; font-size: 1rem; color: #fff; font-weight: 700;">Dean of Sonic Architecture</div>
+                <div style="font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 0.05em;">Thunder House Conservatory</div>
+              </div>
+              <div>
+                <div style="font-family: 'Cinzel', serif; font-size: 1.3rem; color: #10b981; font-weight: 800;"><i class="fa-solid fa-stamp"></i> OFFICIAL SEAL</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Verified Academic Record</div>
+              </div>
+              <div>
+                <div style="font-family: 'Cinzel', serif; font-size: 1rem; color: #fff; font-weight: 700;">Class of 2026</div>
+                <div style="font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 0.05em;">Presidential Honors (GPA 4.0)</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function filterLibraryByGenre(genreTag) {
+      showDepartment('library');
+      const searchInput = document.getElementById('library-search');
+      if (searchInput) {
+        searchInput.value = '';
+      }
+      const filtered = ALL_ARTISTS.filter(a => (a.category || '').toLowerCase() === genreTag.toLowerCase());
+      renderLibrary(filtered);
+      window.scrollTo({ top: 350, behavior: 'smooth' });
+    }
+
+    function refreshDossierChecklist(artistId) {
+      const container = document.getElementById(`dossier-checklist-wrapper-${artistId}`);
+      if (!container) return;
+      const artist = ALL_ARTISTS.find(a => a.id === artistId);
+      if (!artist) return;
+      container.innerHTML = renderStudyChecklistHtml(artist);
+    }
+
+    function renderStudyChecklistHtml(artist) {
+      const p = getArtistTaskProgress(artist.id);
+      const tracksPlayed = (p.tracks || []).length;
+
+      return `
+        <div class="study-checklist-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <h4 style="font-size: 1.15rem; color: #fff; margin: 0; font-family: var(--font-display); display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-graduation-cap" style="color: var(--accent-gold);"></i> Academic Study Checklist (${p.isMastered ? '🏆 Mastered' : 'In Progress'})
+              </h4>
+              <p style="font-size: 0.8rem; color: #94a3b8; margin: 0.25rem 0 0 0;">
+                Complete all 4 academic study tasks to earn +1 Degree Credit in the ${artist.category.toUpperCase()} department.
+              </p>
+            </div>
+            <div>
+              ${p.isMastered ? `
+                <span style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399; padding: 6px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.45rem;">
+                  <i class="fa-solid fa-circle-check"></i> Masterclass Credit Conferred
+                </span>
+              ` : `
+                <button class="btn btn-sm btn-gold" onclick="quickMasterArtist('${artist.id}')" title="Mark all 4 tasks completed">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Mark All 4 Done
+                </button>
+              `}
+            </div>
+          </div>
+
+          <!-- Task 1: Wiki & Academic Dossier -->
+          <div class="study-task-item ${p.wiki ? 'completed' : ''}">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <i class="${p.wiki ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'}" style="color: ${p.wiki ? '#34d399' : 'var(--text-muted)'}; font-size: 1.15rem;"></i>
+              <div>
+                <strong style="color: #fff; font-size: 0.88rem;">1. Read Academic Dossier & Historical Context</strong>
+                <div style="color: var(--text-muted); font-size: 0.78rem;">Inspect legal roots, family pedigree, and Wikipedia archives.</div>
+              </div>
+            </div>
+            <button class="task-status-btn ${p.wiki ? 'done' : ''}" onclick="toggleArtistTask('${artist.id}', 'wiki')">
+              <i class="${p.wiki ? 'fa-solid fa-check' : 'fa-solid fa-book-open'}"></i> ${p.wiki ? 'Completed' : 'Mark Completed'}
+            </button>
+          </div>
+
+          <!-- Task 2: Archival Photography Exhibit -->
+          <div class="study-task-item ${p.exhibit ? 'completed' : ''}">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <i class="${p.exhibit ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'}" style="color: ${p.exhibit ? '#34d399' : 'var(--text-muted)'}; font-size: 1.15rem;"></i>
+              <div>
+                <strong style="color: #fff; font-size: 0.88rem;">2. Analyze Archival Photography Exhibit</strong>
+                <div style="color: var(--text-muted); font-size: 0.78rem;">Inspect the high-resolution portrait or photo exhibit in the lightbox.</div>
+              </div>
+            </div>
+            <button class="task-status-btn ${p.exhibit ? 'done' : ''}" onclick="toggleArtistTask('${artist.id}', 'exhibit')">
+              <i class="${p.exhibit ? 'fa-solid fa-check' : 'fa-solid fa-camera'}"></i> ${p.exhibit ? 'Completed' : 'Mark Completed'}
+            </button>
+          </div>
+
+          <!-- Task 3: Sonic Ear Training (5 Tracks) -->
+          <div class="study-task-item ${p.tracksComplete ? 'completed' : ''}">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <i class="${p.tracksComplete ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'}" style="color: ${p.tracksComplete ? '#34d399' : 'var(--text-muted)'}; font-size: 1.15rem;"></i>
+              <div>
+                <strong style="color: #fff; font-size: 0.88rem;">3. Sonic Ear Training: Play All 5 Curated Study Tracks</strong>
+                <div style="color: var(--text-muted); font-size: 0.78rem;">
+                  Tracks Listened: <strong>${tracksPlayed} / 5</strong>
+                  <span style="margin-left: 0.5rem;">
+                    ${[0, 1, 2, 3, 4].map(idx => `
+                      <span style="display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 4px; font-size: 0.7rem; font-weight: 700; margin-right: 2px; background: ${(p.tracks || []).includes(idx) ? '#10b981' : 'rgba(255,255,255,0.08)'}; color: ${(p.tracks || []).includes(idx) ? '#000' : '#888'};">
+                        ${idx + 1}
+                      </span>
+                    `).join('')}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <button class="task-status-btn ${p.tracksComplete ? 'done' : ''}" onclick="toggleArtistTask('${artist.id}', 'tracks')">
+              <i class="${p.tracksComplete ? 'fa-solid fa-check' : 'fa-solid fa-play'}"></i> ${p.tracksComplete ? '5/5 Listened' : 'Mark 5/5 Done'}
+            </button>
+          </div>
+
+          <!-- Task 4: Masterclass Teacher Notes Review -->
+          <div class="study-task-item ${p.notes ? 'completed' : ''}">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <i class="${p.notes ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'}" style="color: ${p.notes ? '#34d399' : 'var(--text-muted)'}; font-size: 1.15rem;"></i>
+              <div>
+                <strong style="color: #fff; font-size: 0.88rem;">4. Masterclass Notes & Technique Review</strong>
+                <div style="color: var(--text-muted); font-size: 0.78rem;">Study the analytical listening notes and breakthrough history.</div>
+              </div>
+            </div>
+            <button class="task-status-btn ${p.notes ? 'done' : ''}" onclick="toggleArtistTask('${artist.id}', 'notes')">
+              <i class="${p.notes ? 'fa-solid fa-check' : 'fa-solid fa-pen-nib'}"></i> ${p.notes ? 'Completed' : 'Mark Completed'}
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderArtistSocialLinks(artist, isCard = false) {
+      const socials = artist.socials || {};
+      const wiki = artist.wikipedia;
+      const site = artist.website;
+      const links = [];
+
+      if (wiki) {
+        links.push({
+          label: 'Wikipedia',
+          url: wiki,
+          icon: 'fa-brands fa-wikipedia-w',
+          color: '#e2e8f0',
+          bg: 'rgba(255,255,255,0.08)'
+        });
+      }
+      if (site) {
+        links.push({
+          label: 'Official Website',
+          url: site,
+          icon: 'fa-solid fa-globe',
+          color: 'var(--accent-gold)',
+          bg: 'rgba(245, 158, 11, 0.12)'
+        });
+      }
+      if (socials.spotify) {
+        links.push({
+          label: 'Spotify',
+          url: socials.spotify,
+          icon: 'fa-brands fa-spotify',
+          color: '#1DB954',
+          bg: 'rgba(29, 185, 84, 0.12)'
+        });
+      }
+      if (socials.instagram) {
+        links.push({
+          label: 'Instagram',
+          url: socials.instagram,
+          icon: 'fa-brands fa-instagram',
+          color: '#E1306C',
+          bg: 'rgba(225, 48, 108, 0.12)'
+        });
+      }
+      if (socials.twitter) {
+        links.push({
+          label: 'X (Twitter)',
+          url: socials.twitter,
+          icon: 'fa-brands fa-x-twitter',
+          color: '#ffffff',
+          bg: 'rgba(255, 255, 255, 0.08)'
+        });
+      }
+      if (socials.youtube) {
+        links.push({
+          label: 'YouTube',
+          url: socials.youtube,
+          icon: 'fa-brands fa-youtube',
+          color: '#FF0000',
+          bg: 'rgba(255, 0, 0, 0.12)'
+        });
+      }
+
+      if (isCard) {
+        if (!links.length) return '';
+        return `
+          <div class="artist-card-socials" style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; margin-top: 0.95rem; margin-bottom: 0.95rem; padding-top: 0.65rem; border-top: 1px solid rgba(255,255,255,0.06);">
+            <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-right: 0.2rem;">Links:</span>
+            ${links.map(l => `
+              <a href="${l.url}" target="_blank" rel="noopener noreferrer" ${l.label === "Wikipedia" ? `onclick="recordWikiRead('${artist.id}'); refreshDossierChecklist('${artist.id}');"` : ""} title="${l.label} · ${artist.name}" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 8px; background: ${l.bg}; color: ${l.color}; border: 1px solid rgba(255,255,255,0.1); text-decoration: none; font-size: 0.85rem; transition: all 0.2s ease;" onmouseover="this.style.transform='scale(1.15)'; this.style.borderColor='${l.color}';" onmouseout="this.style.transform='scale(1)'; this.style.borderColor='rgba(255,255,255,0.1)';">
+                <i class="${l.icon}"></i>
+              </a>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      if (!links.length) return '';
+      return `
+        <div class="dossier-links-bar" style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap; margin-top: 0.85rem;">
+          ${links.map(l => `
+            <a href="${l.url}" target="_blank" rel="noopener noreferrer" ${l.label === "Wikipedia" ? `onclick="recordWikiRead('${artist.id}'); refreshDossierChecklist('${artist.id}');"` : ""} style="display: inline-flex; align-items: center; gap: 0.45rem; padding: 6px 14px; border-radius: 999px; background: ${l.bg}; color: ${l.color}; border: 1px solid rgba(255,255,255,0.12); font-size: 0.82rem; font-weight: 600; text-decoration: none; transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.borderColor='${l.color}'; this.style.boxShadow='0 4px 14px rgba(0,0,0,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.12)'; this.style.boxShadow='none';">
+              <i class="${l.icon}"></i>
+              <span>${l.label}</span>
+              <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.65rem; opacity: 0.65;"></i>
+            </a>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderArtistCardHtml(artist) {
+      return `
+        <div class="artist-card" data-id="${artist.id}">
+          <div>
+            <div class="artist-card-header">
+              <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+                <span class="course-code">${artist.subgenre || artist.category.toUpperCase()}</span>
+                ${isArtistMastered(artist.id) ? `
+                  <span style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399; padding: 2px 8px; border-radius: 999px; font-size: 0.68rem; font-weight: 700; text-transform: uppercase;">
+                    <i class="fa-solid fa-award"></i> Mastered
+                  </span>
+                ` : ''}
+              </div>
+              ${artist.photo_url ? `
+                <img src="${artist.photo_url}" alt="${artist.name}" class="artist-badge-avatar" style="width: 54px; height: 54px; border-radius: 14px; object-fit: cover; object-position: top center; border: 2px solid var(--border-gold); background: #0c101b; flex-shrink: 0; display: block;" onerror="this.outerHTML='<div class=\'artist-badge-avatar\'>${artist.avatar_icon || '🎵'}</div>';" />
+              ` : `
+                <div class="artist-badge-avatar">${artist.avatar_icon || '🎵'}</div>
+              `}
+            </div>
+
+            <h3 class="artist-name">${artist.name}</h3>
+            <div class="artist-real-name"><i class="fa-solid fa-id-card"></i> ${artist.real_name}</div>
+
+            <div class="artist-meta-list">
+              <div class="meta-item">
+                <span>Hometown / Roots</span>
+                <strong>${artist.birthplace}</strong>
+              </div>
+              <div class="meta-item">
+                <span>Active Eras</span>
+                <strong>${artist.active_years}</strong>
+              </div>
+            </div>
+
+            <p class="artist-bio-snippet">${artist.bio}</p>
+
+            <div class="tracks-preview-box">
+              <div class="tracks-box-title"><i class="fa-solid fa-headphones"></i> Top 5 Study Tracks</div>
+              ${(artist.tracks || []).slice(0, 5).map((t, idx) => `
+                <div class="track-row" onclick="playUniversityTrack('${artist.id}', ${idx})">
+                  <div style="display: flex; align-items: center; gap: 0.65rem;">
+                    <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); width: 16px;">${idx + 1}.</span>
+                    <span class="track-title">${t.title} <small style="color: var(--text-muted);">(${t.year})</small></span>
+                  </div>
+                  <i class="fa-solid fa-circle-play" style="color: var(--primary);"></i>
+                </div>
+              `).join('')}
+            </div>
+
+            ${renderArtistSocialLinks(artist, true)}
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; width: 100%; margin-top: auto;">
+            <button class="btn btn-outline" style="flex: 1; justify-content: center;" onclick="openArtistDossier('${artist.id}')">
+              <i class="fa-solid fa-folder-open"></i> Open Full Academic Dossier
+            </button>
+            ${isSuperuser ? `
+              <button class="btn btn-gold btn-sm" style="padding: 0 14px; justify-content: center; font-weight: 700;" onclick="event.stopPropagation(); openArtistEditor('${artist.id}')" title="Staff Edit Artist Profile">
+                <i class="fa-solid fa-pen-to-square"></i> Edit
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCourses() {
+      const container = document.getElementById('courses-container');
+      const core = ALL_ARTISTS.slice(0, 5);
+      container.innerHTML = core.map(renderArtistCardHtml).join('');
+    }
+
+    function renderLibrary(artistsToRender = ALL_ARTISTS) {
+      const container = document.getElementById('library-container');
+      document.getElementById('library-count-badge').textContent = `${artistsToRender.length} Verified Artist Records`;
+      document.getElementById('total-artists-stat').textContent = ALL_ARTISTS.length;
+
+      if (!artistsToRender.length) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; color: var(--text-muted);">
+            <i class="fa-solid fa-compact-disc" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--border-cyan);"></i>
+            <h3>No Artists Found</h3>
+            <p>Try searching another name, city, or clearing the genre filter.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = artistsToRender.map(renderArtistCardHtml).join('');
+    }
+
+    let activeGenreFilter = 'all';
+
+    function filterLibraryGenre(genre, btnEl) {
+      activeGenreFilter = genre;
+      document.querySelectorAll('.genre-filter-bar .filter-pill').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      handleLibrarySearch();
+    }
+
+    function handleLibrarySearch() {
+      const query = (document.getElementById('library-search-input').value || '').toLowerCase().trim();
+      let results = ALL_ARTISTS;
+
+      if (activeGenreFilter !== 'all') {
+        results = results.filter(a => a.category === activeGenreFilter);
+      }
+
+      if (query) {
+        results = results.filter(a => {
+          return (
+            a.name.toLowerCase().includes(query) ||
+            a.real_name.toLowerCase().includes(query) ||
+            a.birthplace.toLowerCase().includes(query) ||
+            (a.subgenre && a.subgenre.toLowerCase().includes(query)) ||
+            (a.bio && a.bio.toLowerCase().includes(query))
+          );
+        });
+      }
+
+      renderLibrary(results);
+    }
+
+    function filterCourseSyllabi(courseName) {
+      document.querySelectorAll('.course-filter-bar .filter-pill').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      const container = document.getElementById('courses-container');
+      const core = ALL_ARTISTS.slice(0, 5);
+
+      if (courseName === 'all') {
+        container.innerHTML = core.map(renderArtistCardHtml).join('');
+      } else if (courseName === 'Course 101') {
+        container.innerHTML = core.filter(a => a.id === 'michael-jackson' || a.id === 'bruno-mars').map(renderArtistCardHtml).join('');
+      } else if (courseName === 'Course 201') {
+        container.innerHTML = core.filter(a => a.id === 'pharrell-williams' || a.id === 'kanye-west').map(renderArtistCardHtml).join('');
+      } else if (courseName === 'Course 301') {
+        container.innerHTML = core.filter(a => a.id === 'juice-wrld').map(renderArtistCardHtml).join('');
+      }
+    }
+
+    function renderCinema() {
+      document.getElementById('cinema-container').innerHTML = WATERSHED_CINEMA.map(c => `
+        <div class="cinema-card">
+          <div class="cinema-thumb-wrap">
+            <iframe src="https://www.youtube.com/embed/${c.youtube_id}" title="${c.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+          <div class="cinema-body">
+            <div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #f87171; margin-bottom: 0.4rem;">
+              <i class="fa-solid fa-radiation"></i> ${c.badge}
+            </div>
+            <h4 style="font-family: var(--font-heading); font-size: 1.25rem; color: #fff; margin-bottom: 0.6rem;">${c.title}</h4>
+            <p style="font-size: 0.85rem; color: var(--text-light); line-height: 1.6;">${c.desc}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderAlumni() {
+      document.getElementById('alumni-container').innerHTML = ALUMNI_DATA.map(a => `
+        <div class="alumni-card">
+          <div class="alumni-avatar">${a.icon}</div>
+          <div>
+            <div style="font-size: 1rem; font-weight: 700; color: #fff;">${a.name}</div>
+            <div style="font-size: 0.78rem; color: var(--accent-gold); font-family: var(--font-display);">${a.degree}</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted);">${a.classYear} • Distinguished Honors</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderQuiz() {
+      document.getElementById('quiz-container').innerHTML = QUIZ_QUESTIONS.map((q, qIdx) => `
+        <div class="quiz-question-box" id="q-box-${qIdx}">
+          <div style="font-size: 1.05rem; font-weight: 700; color: #fff;">${q.q}</div>
+          <div class="quiz-options">
+            ${q.options.map((opt, optIdx) => `
+              <button class="quiz-opt-btn" onclick="selectQuizOption(${qIdx}, ${optIdx}, this)">
+                ${String.fromCharCode(65 + optIdx)}. ${opt}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+        // =========================================================================
+    // 3. AUDIO PLAYBACK & CONSERVATORY LISTENING LAB (YOUTUBE STREAM + LOCAL VAULT)
+    // =========================================================================
+    let currentArtistObj = null;
+    let currentTrackIdx = 0;
+    let currentAudioMode = 'stream'; // 'stream' (YouTube Master Audio) or 'local' (Local MP3 Vault)
+    let currentPlaybackRate = 1.0;
+    let isLoopingTrack = false;
+    let isVideoDockOpen = false;
+
+    const audioEl = document.getElementById('univ-audio-element');
+    const dockEl = document.getElementById('listening-dock');
+    const playPauseBtn = document.getElementById('dock-play-pause-btn');
+
+    function playUniversityTrack(artistId, trackIdx, preferredMode = null) {
+      const artist = ALL_ARTISTS.find(a => a.id === artistId);
+      if (!artist || !artist.tracks || !artist.tracks[trackIdx]) return;
+
+      currentArtistObj = artist;
+      currentTrackIdx = trackIdx;
+      const track = artist.tracks[trackIdx];
+      if (preferredMode) currentAudioMode = preferredMode;
+
+      // Update UI Titles
+      const titleEl = document.getElementById('dock-track-title');
+      const artistEl = document.getElementById('dock-artist-name');
+      const coachEl = document.getElementById('dock-coach-note');
+
+      if (titleEl) titleEl.textContent = track.title;
+      if (artistEl) artistEl.textContent = `${artist.name} • ${track.album} (${track.year})`;
+      if (coachEl) {
+        coachEl.innerHTML = `<strong style="color: var(--primary);"><i class="fa-solid fa-headphones"></i> Listening Coach:</strong> ${track.note}`;
+      }
+
+      // Record study progress for Degree
+      recordTrackPlayed(artist.id, trackIdx);
+      refreshDossierChecklist(artist.id);
+
+      dockEl.classList.add('active');
+
+      if (currentAudioMode === 'local') {
+        playLocalAudioTrack(artist, track);
+      } else {
+        playYouTubeAudioStream(artist, track);
+      }
+    }
+
+    function playYouTubeAudioStream(artist, track) {
+      currentAudioMode = 'stream';
+      // Stop local audio
+      if (audioEl) {
+        audioEl.pause();
+        audioEl.src = '';
+      }
+
+      const query = `${artist.name} - ${track.title} official audio`;
+      const embedUrl = `https://www.youtube-nocookie.com/embed?listType=search&list=${encodeURIComponent(query)}&autoplay=1&enablejsapi=1`;
+      
+      const iframe = document.getElementById('dock-youtube-iframe');
+      if (iframe) iframe.src = embedUrl;
+
+      const badge = document.getElementById('dock-source-badge');
+      if (badge) {
+        badge.style.background = 'rgba(255, 0, 0, 0.15)';
+        badge.style.borderColor = 'rgba(255, 0, 0, 0.4)';
+        badge.style.color = '#ff6b6b';
+        const ytDirect = `https://www.youtube.com/results?search_query=${encodeURIComponent(artist.name + ' ' + track.title + ' audio')}`;
+        badge.innerHTML = `<i class="fa-brands fa-youtube"></i> YouTube Master Audio <a href="${ytDirect}" target="_blank" rel="noopener" style="color: #ff6b6b; margin-left: 6px; text-decoration: none;" title="Open directly on YouTube (if label restricts embeds)"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>`;
+      }
+
+      dockEl.classList.add('playing');
+      if (playPauseBtn) playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+      
+      // Update simulated total time
+      document.getElementById('dock-cur-time').textContent = 'Stream';
+      document.getElementById('dock-total-time').textContent = 'Live';
+      document.getElementById('dock-progress-fill').style.width = '100%';
+    }
+
+    function playLocalAudioTrack(artist, track) {
+      currentAudioMode = 'local';
+      // Stop YouTube iframe
+      const iframe = document.getElementById('dock-youtube-iframe');
+      if (iframe) iframe.src = '';
+
+      const trackSlug = track.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const pathFolder = `assets/audio/library/${artist.id}/${trackSlug}.mp3`;
+      const pathFlat = `assets/audio/library/${artist.id}-${trackSlug}.mp3`;
+      const fallbackSample = track.audio_url || 'assets/audio/song1.mp3';
+
+      const updateLocalBadge = () => {
+        dockEl.classList.add('playing');
+        if (playPauseBtn) playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+        const badge = document.getElementById('dock-source-badge');
+        if (badge) {
+          badge.style.background = 'rgba(0, 242, 254, 0.15)';
+          badge.style.borderColor = 'rgba(0, 242, 254, 0.4)';
+          badge.style.color = '#00f2fe';
+          badge.innerHTML = '<i class="fa-solid fa-file-audio"></i> Local Studio Vault';
+        }
+      };
+
+      audioEl.src = pathFolder;
+      audioEl.playbackRate = currentPlaybackRate;
+      audioEl.loop = isLoopingTrack;
+
+      audioEl.play().then(updateLocalBadge).catch(() => {
+        // Try flat filename
+        audioEl.src = pathFlat;
+        audioEl.play().then(updateLocalBadge).catch(() => {
+          // If neither local path exists, try fallback sample or switch to YouTube
+          audioEl.src = fallbackSample;
+          audioEl.play().then(updateLocalBadge).catch(() => {
+            showDegreeToast("Local file not found. Auto-engaging YouTube Master stream...");
+            playYouTubeAudioStream(artist, track);
+          });
+        });
+      });
+    }
+
+    function toggleAudioMode() {
+      if (!currentArtistObj) return;
+      const track = currentArtistObj.tracks[currentTrackIdx];
+      if (currentAudioMode === 'stream') {
+        showDegreeToast("Switched to Local Studio Vault Mode.");
+        playLocalAudioTrack(currentArtistObj, track);
+      } else {
+        showDegreeToast("Switched to YouTube Master Stream Mode.");
+        playYouTubeAudioStream(currentArtistObj, track);
+      }
+    }
+
+    function toggleVideoDock() {
+      const container = document.getElementById('dock-youtube-container');
+      if (!container) return;
+      isVideoDockOpen = !isVideoDockOpen;
+      container.style.display = isVideoDockOpen ? 'block' : 'none';
+      const btn = document.getElementById('dock-video-toggle-btn');
+      if (btn) {
+        btn.style.color = isVideoDockOpen ? '#00f2fe' : 'inherit';
+        btn.style.borderColor = isVideoDockOpen ? '#00f2fe' : 'rgba(255,255,255,0.2)';
+      }
+    }
+
+    function cyclePlaybackSpeed() {
+      const speeds = [0.75, 1.0, 1.25];
+      const idx = speeds.indexOf(currentPlaybackRate);
+      currentPlaybackRate = speeds[(idx + 1) % speeds.length];
+      if (audioEl) audioEl.playbackRate = currentPlaybackRate;
+      const btn = document.getElementById('dock-speed-btn');
+      if (btn) btn.textContent = `${currentPlaybackRate}x`;
+      showDegreeToast(`Ear Training playback tempo set to ${currentPlaybackRate}x.`);
+    }
+
+    function toggleAudioLoop() {
+      isLoopingTrack = !isLoopingTrack;
+      if (audioEl) audioEl.loop = isLoopingTrack;
+      const btn = document.getElementById('dock-loop-btn');
+      if (btn) {
+        btn.style.color = isLoopingTrack ? 'var(--accent-gold)' : 'var(--text-muted)';
+      }
+      showDegreeToast(isLoopingTrack ? "Track Loop Enabled (Repeat 1)." : "Track Loop Disabled.");
+    }
+
+    function togglePlayPause() {
+      if (currentAudioMode === 'stream') {
+        const iframe = document.getElementById('dock-youtube-iframe');
+        if (!iframe || !iframe.src) {
+          if (currentArtistObj) playUniversityTrack(currentArtistObj.id, currentTrackIdx);
+          return;
+        }
+        if (dockEl.classList.contains('playing')) {
+          dockEl.classList.remove('playing');
+          if (playPauseBtn) playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+          // Mute iframe or pause
+          iframe.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+        } else {
+          dockEl.classList.add('playing');
+          if (playPauseBtn) playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+          iframe.contentWindow?.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+        }
+        return;
+      }
+
+      if (!audioEl.src) return;
+      if (audioEl.paused) {
+        audioEl.play();
+        dockEl.classList.add('playing');
+        if (playPauseBtn) playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+      } else {
+        audioEl.pause();
+        dockEl.classList.remove('playing');
+        if (playPauseBtn) playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+      }
+    }
+
+    function skipTrack(direction) {
+      if (!currentArtistObj || !currentArtistObj.tracks) return;
+      let nextIdx = currentTrackIdx + direction;
+      if (nextIdx < 0) nextIdx = currentArtistObj.tracks.length - 1;
+      if (nextIdx >= currentArtistObj.tracks.length) nextIdx = 0;
+      playUniversityTrack(currentArtistObj.id, nextIdx);
+    }
+
+    audioEl.addEventListener('timeupdate', () => {
+      const cur = audioEl.currentTime || 0;
+      const dur = audioEl.duration || 60;
+      const pct = (cur / dur) * 100;
+      document.getElementById('dock-progress-fill').style.width = pct + '%';
+      document.getElementById('dock-cur-time').textContent = formatAudioTime(cur);
+      document.getElementById('dock-total-time').textContent = formatAudioTime(dur);
+    });
+
+    audioEl.addEventListener('ended', () => { skipTrack(1); });
+
+    function seekAudio(e) {
+      const bar = document.getElementById('dock-progress-bar');
+      const rect = bar.getBoundingClientRect();
+      const pct = (e.clientX - rect.left) / rect.width;
+      if (audioEl.duration) audioEl.currentTime = pct * audioEl.duration;
+    }
+
+    function formatAudioTime(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      return `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    // =========================================================================
+    // 4. FULL MASTERCLASS DOSSIER MODAL
+    // =========================================================================
+        // Helper functions for safely opening lightbox without escaping bugs
+    function openArtistPortraitLightbox(artistId) {
+      recordExhibitViewed(artistId);
+      refreshDossierChecklist(artistId);
+      const artist = ALL_ARTISTS.find(a => a.id === artistId);
+      if (!artist || !artist.photo_url) return;
+      openLightbox(artist.photo_url, artist.name, `Official Conservatory Archival Portrait • ${artist.subgenre || ''}`);
+    }
+
+    function openArtistGalleryLightbox(artistId, galleryIdx) {
+      recordExhibitViewed(artistId);
+      refreshDossierChecklist(artistId);
+      const artist = ALL_ARTISTS.find(a => a.id === artistId);
+      if (!artist || !artist.gallery || !artist.gallery[galleryIdx]) return;
+      const item = artist.gallery[galleryIdx];
+      openLightbox(item.url, `${artist.name}: ${item.title}`, item.desc || '');
+    }
+
+    function openArtistDossier(artistId) {
+      const artist = ALL_ARTISTS.find(a => a.id === artistId);
+      if (!artist) return;
+
+      const photo = artist.photo_url || '';
+      const avatarFallback = artist.avatar_icon || '🎵';
+      const gallery = (artist.gallery || []).filter(g => g.url && !g.url.includes('unsplash.com'));
+
+      document.getElementById('dossier-modal-body').innerHTML = `
+        <!-- Top Hero Banner with Atmospheric Ambient Layers (Zero Crop, Ambient Aura) -->
+        <div class="dossier-hero-banner" style="position: relative; height: 240px; overflow: hidden; background: linear-gradient(135deg, #090d16 0%, #030712 100%);">
+          ${photo ? `
+            <div style="position: absolute; inset: -25px; background-image: url('${photo}'); background-size: cover; background-position: center 20%; filter: blur(30px) brightness(0.28) saturate(1.4); opacity: 0.75; transform: scale(1.15);"></div>
+          ` : `
+            <div style="position: absolute; inset: 0; background: radial-gradient(circle at 25% 40%, rgba(0, 242, 254, 0.08) 0%, transparent 65%);"></div>
+          `}
+          <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,12,20,0.15) 0%, rgba(10,12,20,0.65) 60%, rgba(10,12,20,0.98) 100%);"></div>
+          <div style="position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 20px 20px; opacity: 0.35; pointer-events: none;"></div>
+          
+          <!-- Top badges on banner -->
+          <div style="position: absolute; top: 1.25rem; left: 1.75rem; display: flex; align-items: center; gap: 0.65rem; z-index: 2;">
+            <span class="course-code" style="background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); border: 1px solid var(--border-gold); padding: 4px 12px; font-weight: 700; color: var(--accent-gold);">
+              <i class="fa-solid fa-certificate" style="color: var(--accent-gold);"></i> ${artist.subgenre || artist.category.toUpperCase()} MASTERCLASS
+            </span>
+            <span style="background: rgba(0,242,254,0.15); border: 1px solid rgba(0,242,254,0.4); color: #00f2fe; padding: 4px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+              <i class="fa-solid fa-wave-square"></i> Conservatory Archive
+            </span>
+          </div>
+
+          <!-- Top right controls inside dossier (Staff Edit button) -->
+          ${isSuperuser ? `
+            <div style="position: absolute; top: 1.25rem; right: 4.5rem; z-index: 5;">
+              <button class="btn btn-gold btn-sm" onclick="openArtistEditor('${artist.id}')" style="box-shadow: 0 4px 15px rgba(0,0,0,0.8); font-weight: 700;">
+                <i class="fa-solid fa-pen-to-square"></i> Edit Profile (Staff)
+              </button>
+            </div>
+          ` : ''}
+
+          <!-- Watermark Crest -->
+          <div style="position: absolute; right: 2rem; bottom: 1.25rem; opacity: 0.15; pointer-events: none; z-index: 1;">
+            <img src="assets/images/branding/thunder-university-crest.jpg" style="height: 110px; filter: grayscale(100%); border-radius: 50%;" />
+          </div>
+        </div>
+
+        <!-- Main Content Container with Overlapping Profile Avatar -->
+        <div style="padding: 0 2rem 2.5rem 2rem;">
+          <div style="display: flex; align-items: flex-end; gap: 1.75rem; margin-top: -85px; margin-bottom: 1.75rem; position: relative; z-index: 2;">
+            
+            <!-- Profile Photo Portrait Card (Full Head Fully Visible, No Circular Crop) -->
+            <div class="dossier-profile-wrapper" style="position: relative; flex-shrink: 0; cursor: pointer;" onclick="openArtistPortraitLightbox('${artist.id}')" \'")}', 'Official Conservatory Portrait · ${artist.subgenre.replace(/'/g, "\'")}')" title="Click to inspect archival photo in full-screen high-res">
+              ${photo ? `
+                <div style="width: 145px; height: 180px; border-radius: 18px; border: 3px solid var(--border-gold); box-shadow: 0 16px 40px rgba(0,0,0,0.92), 0 0 25px rgba(255, 183, 3, 0.25); background: #0c101b; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='scale(1.03)'; this.style.boxShadow='0 20px 48px rgba(0,0,0,0.95), 0 0 35px rgba(0,242,254,0.4)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 16px 40px rgba(0,0,0,0.92), 0 0 25px rgba(255, 183, 3, 0.25)';">
+                  <img src="${photo}" alt="${artist.name}" class="dossier-profile-img" style="width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block;" onerror="this.parentElement.outerHTML='<div class=\'artist-badge-avatar\' style=\'width: 145px; height: 180px; font-size: 3.5rem; border-radius: 18px; border: 3px solid var(--border-gold); display: flex; align-items: center; justify-content: center;\'>${avatarFallback}</div>';" />
+                </div>
+              ` : `
+                <div class="artist-badge-avatar" style="width: 145px; height: 180px; font-size: 3.5rem; border-radius: 18px; border: 3px solid var(--border-gold); box-shadow: 0 16px 40px rgba(0,0,0,0.92); display: flex; align-items: center; justify-content: center;">${avatarFallback}</div>
+              `}
+              <div style="position: absolute; bottom: 8px; right: 8px; background: #0b0f19; border: 2px solid var(--border-gold); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.85);" title="Verified Conservatory Archive">
+                <i class="fa-solid fa-circle-check" style="color: #00f2fe; font-size: 1.05rem;"></i>
+              </div>
+            </div>
+
+            <!-- Name & Details Header -->
+            <div style="flex-grow: 1; padding-bottom: 0.25rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                <h2 style="font-family: var(--font-heading); font-size: 2.35rem; color: #fff; margin: 0; line-height: 1.1; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">${artist.name}</h2>
+                <span style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: var(--accent-gold); padding: 3px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;">
+                  ${artist.active_years}
+                </span>
+              </div>
+              <div style="color: #94a3b8; font-weight: 500; font-size: 0.95rem; margin-top: 0.4rem;">
+                <span style="color: var(--primary); font-weight: 600;"><i class="fa-solid fa-id-badge"></i> Legal Name:</span> ${artist.real_name} • <span style="color: var(--accent-gold); font-weight: 600;"><i class="fa-solid fa-location-dot"></i> Roots:</span> ${artist.birthplace}
+              </div>
+
+              ${renderArtistSocialLinks(artist, false)}
+            </div>
+          </div>
+
+          <!-- Quick Stats & Lineage Grid -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; background: rgba(0,0,0,0.35); border: 1px solid var(--border-subtle); padding: 1.25rem; border-radius: var(--radius-md);">
+            <div>
+              <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--accent-gold); letter-spacing: 0.08em; font-weight: 700;">Family & Music Lineage</span>
+              <p style="color: #cbd5e1; font-size: 0.9rem; margin-top: 0.35rem; line-height: 1.6;">${artist.family || 'Documented music industry lineage.'}</p>
+            </div>
+            <div>
+              <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--accent-gold); letter-spacing: 0.08em; font-weight: 700;">Primary Sound & Epoch</span>
+              <p style="color: #cbd5e1; font-size: 0.9rem; margin-top: 0.35rem; line-height: 1.6;">${artist.subgenre || artist.category.toUpperCase()} • ${artist.active_years}</p>
+            </div>
+          </div>
+
+          
+          <!-- Interactive Academic Study Checklist Wrapper -->
+          <div id="dossier-checklist-wrapper-${artist.id}">
+            ${renderStudyChecklistHtml(artist)}
+          </div>
+
+          <!-- Education & Craft -->
+          <div style="margin-bottom: 2rem;">
+            <h4 style="font-size: 1.15rem; color: #fff; margin-bottom: 0.5rem; font-family: var(--font-display);"><i class="fa-solid fa-graduation-cap" style="color: var(--primary);"></i> Formal & Street Music Education</h4>
+            <p style="color: var(--text-light); line-height: 1.7; font-size: 0.95rem;">${artist.education}</p>
+          </div>
+
+          <!-- Breakthrough Hustle -->
+          <div style="margin-bottom: 2rem;">
+            <h4 style="font-size: 1.15rem; color: #fff; margin-bottom: 0.5rem; font-family: var(--font-display);"><i class="fa-solid fa-door-open" style="color: var(--accent-gold);"></i> The Breakthrough Hustle (How They Made It In)</h4>
+            <p style="color: var(--text-light); line-height: 1.7; font-size: 0.95rem;">${artist.breakout}</p>
+          </div>
+
+          <!-- Verified Archival Image Gallery Section (Rendered ONLY when authentic verified photos exist) -->
+          ${gallery && gallery.length > 0 ? `
+            <div style="margin-bottom: 2.25rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h4 style="font-size: 1.15rem; color: #fff; margin: 0; font-family: var(--font-display);">
+                  <i class="fa-solid fa-camera-retro" style="color: var(--primary);"></i> Verified Archival Photography & Historical Exhibits
+                </h4>
+                <span style="color: var(--text-muted); font-size: 0.78rem;"><i class="fa-solid fa-expand"></i> Click photo to inspect full uncropped resolution</span>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.15rem;">
+                ${gallery.map((g, gIdx) => `
+                  <div class="dossier-gallery-card" onclick="openArtistGalleryLightbox(\'${artist.id}\', ${gIdx})" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); overflow: hidden; cursor: pointer; transition: all 0.3s ease; position: relative;" onmouseover="this.style.borderColor='var(--primary)'; this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 28px rgba(0,0,0,0.75)';" onmouseout="this.style.borderColor='var(--border-subtle)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                    <div style="position: relative; height: 160px; overflow: hidden; background: #0c101b;">
+                      <img src="${g.url}" alt="${g.title}" style="width: 100%; height: 100%; object-fit: cover; object-position: top center; transition: transform 0.4s ease;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'" />
+                      <span style="position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); border-radius: 4px; padding: 2px 7px; font-size: 0.68rem; font-weight: 700; color: #00f2fe; border: 1px solid rgba(0,242,254,0.3);">
+                        ${g.tag || 'Historical Archive'}
+                      </span>
+                    </div>
+                    <div style="padding: 0.85rem;">
+                      <strong style="color: #fff; font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">${g.title}</strong>
+                      <p style="color: #94a3b8; font-size: 0.75rem; margin: 0; line-height: 1.4;">${g.desc || ''}</p>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- Official Music Video Masterclasses (Up to 5) -->
+          ${artist.videos && artist.videos.length > 0 ? `
+            <div style="margin-bottom: 2.25rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                <h4 style="font-size: 1.15rem; color: #fff; margin: 0; font-family: var(--font-display); display: flex; align-items: center; gap: 0.5rem;">
+                  <i class="fa-brands fa-youtube" style="color: #ff0000;"></i> Official Music Video Masterclasses (${artist.videos.length})
+                </h4>
+                <span style="color: var(--text-muted); font-size: 0.78rem;">
+                  <i class="fa-solid fa-play-circle"></i> Click thumbnail to stream in full resolution
+                </span>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.15rem;">
+                ${artist.videos.map((v, vIdx) => `
+                  <div class="dossier-video-card" onclick="playMasterclassVideo('${v.youtube_id}', '${(v.title || '').replace(/'/g, "\\'")}', '${(artist.name || '').replace(/'/g, "\\'")}', '${(v.curator_note || '').replace(/'/g, "\\'")}')" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); overflow: hidden; cursor: pointer; transition: all 0.25s ease;" onmouseover="this.style.borderColor='var(--primary)'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='var(--border-subtle)'; this.style.transform='translateY(0)';">
+                    <div style="position: relative; aspect-ratio: 16/9; background: #000; overflow: hidden;">
+                      <img src="https://img.youtube.com/vi/${v.youtube_id}/hqdefault.jpg" alt="${v.title}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://img.youtube.com/vi/${v.youtube_id}/mqdefault.jpg'" />
+                      <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; transition: background 0.2s ease;">
+                        <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(255,0,0,0.9); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.6); font-size: 1.1rem; padding-left: 3px;">
+                          <i class="fa-solid fa-play"></i>
+                        </div>
+                      </div>
+                      ${v.year ? `<span style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.85); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 0.7rem; font-weight: 700; padding: 2px 7px; border-radius: 4px;">${v.year}</span>` : ''}
+                    </div>
+                    <div style="padding: 0.9rem;">
+                      <strong style="color: #fff; font-size: 0.9rem; display: block; margin-bottom: 0.35rem; line-height: 1.3;">${v.title}</strong>
+                      ${v.curator_note ? `<p style="color: #94a3b8; font-size: 0.78rem; margin: 0; line-height: 1.45;"><strong style="color: var(--accent-gold);">Curator Note:</strong> ${v.curator_note}</p>` : ''}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : (isSuperuser ? `
+            <div style="margin-bottom: 2.25rem; background: rgba(255, 183, 3, 0.05); border: 1px dashed var(--border-gold); padding: 1.25rem; border-radius: var(--radius-sm); text-align: center;">
+              <p style="color: var(--accent-gold); font-size: 0.88rem; margin-bottom: 0.5rem;"><i class="fa-brands fa-youtube"></i> No Music Video Masterclasses linked yet.</p>
+              <button class="btn btn-gold btn-sm" onclick="openArtistEditor('${artist.id}')"><i class="fa-solid fa-plus"></i> Add YouTube Videos (Staff)</button>
+            </div>
+          ` : '')}
+
+          <!-- Curriculum Listening Tracks -->
+          <div>
+            <h4 style="font-size: 1.15rem; color: #fff; margin-bottom: 1rem; font-family: var(--font-display);"><i class="fa-solid fa-list-ol" style="color: var(--primary);"></i> The Essential 5 Listening Curriculum</h4>
+            <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+              ${(artist.tracks || []).map((t, idx) => `
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 1rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+                  <div>
+                    <strong style="color: #fff; font-size: 1rem; display: block;">${idx + 1}. "${t.title}" (${t.year})</strong>
+                    <div style="color: var(--text-muted); font-size: 0.78rem; margin-bottom: 0.35rem;">Album: ${t.album}</div>
+                    <div style="color: #94a3b8; font-size: 0.85rem;"><strong>Teacher's Listening Note:</strong> ${t.note}</div>
+                  </div>
+                  <button class="btn btn-cyan btn-sm" onclick="playUniversityTrack('${artist.id}', ${idx}); document.getElementById('dossier-modal').classList.remove('active');">
+                    <i class="fa-solid fa-play"></i> Play
+                  </button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('dossier-modal').classList.add('active');
+    }
+
+    function openLightbox(url, title, desc) {
+      document.getElementById('lightbox-img').src = url;
+      document.getElementById('lightbox-title').textContent = title || 'Conservatory Visual Exhibit';
+      document.getElementById('lightbox-desc').textContent = desc || '';
+      document.getElementById('conservatory-lightbox').style.display = 'flex';
+    }
+
+    function closeLightbox(e) {
+      if (e.target.id === 'conservatory-lightbox') {
+        document.getElementById('conservatory-lightbox').style.display = 'none';
+      }
+    }
+
+    function closeDossierModal(e) {
+      if (e.target.id === 'dossier-modal') {
+        document.getElementById('dossier-modal').classList.remove('active');
+      }
+    }
+
+    // =========================================================================
+    // 5. VIDEO MASTERCLASS PLAYBACK
+    // =========================================================================
+    function playMasterclassVideo(youtubeId, title, artistName, curatorNote) {
+      const modal = document.getElementById('video-masterclass-modal');
+      const iframe = document.getElementById('masterclass-youtube-iframe');
+      const titleEl = document.getElementById('masterclass-video-title');
+      const artistEl = document.getElementById('masterclass-artist-name');
+      const noteEl = document.getElementById('masterclass-curator-note');
+
+      if (titleEl) titleEl.textContent = title;
+      if (artistEl) artistEl.textContent = artistName;
+      if (noteEl) noteEl.textContent = curatorNote || 'Study the visual rhythm, camera direction, and sonic integration.';
+
+      if (iframe) {
+        iframe.src = `https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0&enablejsapi=1`;
+      }
+
+      if (modal) modal.classList.add('active');
+    }
+
+    function closeVideoMasterclassModal(e) {
+      if (!e || e.target.id === 'video-masterclass-modal' || e.target.closest('.dossier-close-btn')) {
+        const modal = document.getElementById('video-masterclass-modal');
+        const iframe = document.getElementById('masterclass-youtube-iframe');
+        if (iframe) iframe.src = '';
+        if (modal) modal.classList.remove('active');
+      }
+    }
+
+    // =========================================================================
+    // 6. STAFF IN-PLACE ARTIST EDITOR (SUPERUSER ONLY - NO AUTOSAVE)
+    // =========================================================================
+    let pendingEditArtist = null;
+
+    function parseYouTubeId(input) {
+      if (!input) return '';
+      const str = input.trim();
+      const match = str.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+      if (match && match[1]) return match[1];
+      if (/^[a-zA-Z0-9_-]{11}$/.test(str)) return str;
+      return str;
+    }
+
+    function openArtistEditor(artistId) {
+      if (!isSuperuser) {
+        alert("Access Restricted: Only University Superusers and Faculty may edit artist profiles.");
+        return;
+      }
+
+      const artist = ALL_ARTISTS.find(a => a.id === artistId);
+      if (!artist) return;
+
+      document.getElementById('edit-artist-id').value = artist.id;
+      document.getElementById('edit-artist-name').value = artist.name || '';
+      document.getElementById('edit-artist-real-name').value = artist.real_name || '';
+      document.getElementById('edit-artist-subgenre').value = artist.subgenre || '';
+      document.getElementById('edit-artist-years').value = artist.active_years || '';
+      document.getElementById('edit-artist-birthplace').value = artist.birthplace || '';
+      document.getElementById('edit-artist-photo').value = artist.photo_url || '';
+      document.getElementById('edit-artist-bio').value = artist.bio || '';
+      document.getElementById('edit-artist-education').value = artist.education || '';
+      document.getElementById('edit-artist-breakout').value = artist.breakout || '';
+
+      // Clear & populate videos
+      const container = document.getElementById('edit-videos-container');
+      container.innerHTML = '';
+
+      const videos = artist.videos || [];
+      videos.slice(0, 5).forEach(v => addVideoInputRow(v));
+
+      if (videos.length === 0) {
+        addVideoInputRow(); // start with 1 blank row
+      }
+
+      updateVideoBadgeCount();
+      document.getElementById('artist-edit-modal').classList.add('active');
+    }
+
+    function closeArtistEditorModal(e) {
+      if (!e || e.target.id === 'artist-edit-modal' || e.target.closest('.dossier-close-btn') || e.type === 'click') {
+        document.getElementById('artist-edit-modal').classList.remove('active');
+      }
+    }
+
+    function addVideoInputRow(video = { title: '', youtube_id: '', year: '', curator_note: '' }) {
+      const container = document.getElementById('edit-videos-container');
+      if (!container) return;
+      const currentCount = container.querySelectorAll('.video-edit-row').length;
+      if (currentCount >= 5) {
+        showDegreeToast("Maximum of 5 curated music videos allowed per artist.");
+        return;
+      }
+
+      const row = document.createElement('div');
+      row.className = 'video-edit-row';
+      row.style.cssText = 'background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 0.85rem;';
+      row.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <strong style="color: var(--primary); font-size: 0.82rem;"><i class="fa-brands fa-youtube" style="color: #ff0000;"></i> Masterclass Video #${currentCount + 1}</strong>
+          <button type="button" class="btn btn-outline btn-sm" onclick="removeVideoInputRow(this)" style="padding: 2px 8px; font-size: 0.72rem; color: #ff6b6b; border-color: rgba(255,107,107,0.3);">
+            <i class="fa-solid fa-trash"></i> Remove
+          </button>
+        </div>
+        <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 0.65rem; margin-bottom: 0.5rem;">
+          <input type="text" class="video-row-title" placeholder="Song / Video Title (e.g. Billie Jean)" value="${video.title || ''}" style="background: #07090e; border: 1px solid var(--border-subtle); color: #fff; padding: 0.45rem 0.65rem; border-radius: 6px; font-size: 0.82rem;" required />
+          <input type="text" class="video-row-yt" placeholder="YouTube URL or 11-char Video ID" value="${video.youtube_id || ''}" style="background: #07090e; border: 1px solid var(--border-subtle); color: #fff; padding: 0.45rem 0.65rem; border-radius: 6px; font-size: 0.82rem;" required />
+          <input type="text" class="video-row-year" placeholder="Year (1983)" value="${video.year || ''}" style="background: #07090e; border: 1px solid var(--border-subtle); color: #fff; padding: 0.45rem 0.65rem; border-radius: 6px; font-size: 0.82rem;" />
+        </div>
+        <textarea class="video-row-note" rows="2" placeholder="Curator's Listening / Choreography / Sonic Architecture Note..." style="width: 100%; background: #07090e; border: 1px solid var(--border-subtle); color: #cbd5e1; padding: 0.45rem 0.65rem; border-radius: 6px; font-size: 0.8rem; font-family: inherit; line-height: 1.4;">${video.curator_note || ''}</textarea>
+      `;
+
+      container.appendChild(row);
+      updateVideoBadgeCount();
+    }
+
+    function removeVideoInputRow(btn) {
+      const row = btn.closest('.video-edit-row');
+      if (row) {
+        row.remove();
+        updateVideoBadgeCount();
+        const container = document.getElementById('edit-videos-container');
+        container.querySelectorAll('.video-edit-row').forEach((r, idx) => {
+          const label = r.querySelector('strong');
+          if (label) label.innerHTML = `<i class="fa-brands fa-youtube" style="color: #ff0000;"></i> Masterclass Video #${idx + 1}`;
+        });
+      }
+    }
+
+    function updateVideoBadgeCount() {
+      const container = document.getElementById('edit-videos-container');
+      const count = container ? container.querySelectorAll('.video-edit-row').length : 0;
+      const badge = document.getElementById('edit-video-count-badge');
+      if (badge) badge.textContent = `${count}/5`;
+      const addBtn = document.getElementById('btn-add-edit-video');
+      if (addBtn) addBtn.style.display = count >= 5 ? 'none' : 'inline-flex';
+    }
+
+    // =========================================================================
+    // 7. CUSTOM WARNING CONFIRMATION MODAL (NO AUTOSAVE)
+    // =========================================================================
+    function promptConfirmSaveArtist() {
+      const artistId = document.getElementById('edit-artist-id').value;
+      const artist = ALL_ARTISTS.find(a => a.id === artistId);
+      if (!artist) return;
+
+      const artistName = document.getElementById('edit-artist-name').value.trim() || artist.name;
+      document.getElementById('warning-artist-name').textContent = artistName;
+
+      // Extract video rows
+      const rows = document.querySelectorAll('.video-edit-row');
+      const videos = [];
+      rows.forEach(r => {
+        const title = r.querySelector('.video-row-title')?.value.trim();
+        const ytRaw = r.querySelector('.video-row-yt')?.value.trim();
+        const year = r.querySelector('.video-row-year')?.value.trim();
+        const note = r.querySelector('.video-row-note')?.value.trim();
+        if (title && ytRaw) {
+          videos.push({
+            title: title,
+            youtube_id: parseYouTubeId(ytRaw),
+            year: year,
+            curator_note: note
+          });
+        }
+      });
+
+      // Prepare in-memory draft (NOT saved yet)
+      pendingEditArtist = {
+        ...artist,
+        name: artistName,
+        real_name: document.getElementById('edit-artist-real-name').value.trim() || artist.real_name,
+        subgenre: document.getElementById('edit-artist-subgenre').value.trim() || artist.subgenre,
+        active_years: document.getElementById('edit-artist-years').value.trim() || artist.active_years,
+        birthplace: document.getElementById('edit-artist-birthplace').value.trim() || artist.birthplace,
+        photo_url: document.getElementById('edit-artist-photo').value.trim() || artist.photo_url,
+        bio: document.getElementById('edit-artist-bio').value.trim() || artist.bio,
+        education: document.getElementById('edit-artist-education').value.trim() || artist.education,
+        breakout: document.getElementById('edit-artist-breakout').value.trim() || artist.breakout,
+        videos: videos
+      };
+
+      // Open custom confirmation warning modal
+      document.getElementById('artist-warning-modal').classList.add('active');
+    }
+
+    function closeWarningModal() {
+      document.getElementById('artist-warning-modal').classList.remove('active');
+    }
+
+    async function executeSaveArtistOverride() {
+      if (!pendingEditArtist) return;
+      const btn = document.getElementById('btn-confirm-save-artist');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Publishing...';
+
+      try {
+        if (!window.supabaseClient) throw new Error("Supabase client is not loaded.");
+        if (!currentSession) throw new Error("You must be logged in as staff to publish revisions.");
+
+        const { error } = await window.supabaseClient
+          .from('university_artist_overrides')
+          .upsert({
+            artist_id: pendingEditArtist.id,
+            data: pendingEditArtist,
+            updated_by: currentSession.user.id,
+            updated_by_email: currentSession.user.email,
+            updated_at: new Date().toISOString()
+          });
+
+        if (error) throw error;
+
+        // Merge into in-memory collection
+        const idx = ALL_ARTISTS.findIndex(a => a.id === pendingEditArtist.id);
+        if (idx !== -1) {
+          ALL_ARTISTS[idx] = pendingEditArtist;
+        } else {
+          ALL_ARTISTS.push(pendingEditArtist);
+        }
+
+        closeWarningModal();
+        closeArtistEditorModal();
+
+        // Refresh views
+        renderLibrary(ALL_ARTISTS);
+        renderCourses();
+        openArtistDossier(pendingEditArtist.id);
+
+        showDegreeToast(`✅ Success! Canonical profile for ${pendingEditArtist.name} updated and published live.`);
+      } catch (err) {
+        alert("Error publishing changes: " + (err.message || err));
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+
+    // =========================================================================
+    // 8. STUDENT PROFILE & SUPABASE SYNC (FOLLOWS EMPLOYEE LOGIN)
+    // =========================================================================
+    async function syncStudentProfile(session) {
+      if (!window.supabaseClient || !session) return;
+      try {
+        const { data: profile, error } = await window.supabaseClient
+          .from('university_student_profiles')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+
+        if (profile) {
+          currentStudentProfile = profile;
+          const state = getDegreeState();
+          state.studentName = profile.display_name || state.studentName;
+          state.masteredArtists = profile.completed_artists || state.masteredArtists || [];
+          state.artistTasks = profile.artist_tasks || state.artistTasks || {};
+          if (profile.quiz_scores) {
+            state.examPassed = profile.quiz_scores.examPassed || false;
+            state.examScore = profile.quiz_scores.examScore || 0;
+            state.examDate = profile.quiz_scores.examDate || null;
+          }
+          localStorage.setItem('thu_degree_progress_v2', JSON.stringify(state));
+          localStorage.setItem('thunder_univ_student_name', state.studentName);
+
+          const dn = document.getElementById('student-display-name');
+          if (dn) dn.innerHTML = `${state.studentName} <i class="fa-solid fa-pen" style="font-size: 0.75rem; color: var(--primary);"></i>`;
+          const dip = document.getElementById('diploma-name');
+          if (dip) dip.textContent = state.studentName.toUpperCase();
+          updateDegreeProgressUI();
+        } else {
+          // Initialize fresh student profile for new login
+          const state = getDegreeState();
+          const initialName = localStorage.getItem('thunder_univ_student_name') || session.user.email.split('@')[0];
+          const newProfile = {
+            id: session.user.id,
+            user_id: session.user.id,
+            email: session.user.email,
+            display_name: initialName,
+            degree_progress: 0,
+            completed_credits: 0,
+            completed_artists: state.masteredArtists || [],
+            artist_tasks: state.artistTasks || {},
+            quiz_scores: { examPassed: state.examPassed, examScore: state.examScore, examDate: state.examDate },
+            diploma_conferred: false
+          };
+          const { data: created } = await window.supabaseClient
+            .from('university_student_profiles')
+            .upsert(newProfile)
+            .select()
+            .single();
+          if (created) currentStudentProfile = created;
+        }
+      } catch (err) {
+        console.warn('Student profile sync notice:', err);
+      }
+    }
+
+    function editStudentName() {
+      const state = getDegreeState();
+      const cur = state.studentName || 'Thunder House Fellow';
+      const newName = prompt("Enter student name for your official Student ID & Conferred Degree Diploma:", cur);
+      if (newName && newName.trim()) {
+        const trimmed = newName.trim();
+        state.studentName = trimmed;
+        saveDegreeState(state);
+        localStorage.setItem('thunder_univ_student_name', trimmed);
+        const dn = document.getElementById('student-display-name');
+        if (dn) dn.innerHTML = `${trimmed} <i class="fa-solid fa-pen" style="font-size: 0.75rem; color: var(--primary);"></i>`;
+        const dip = document.getElementById('diploma-name');
+        if (dip) dip.textContent = trimmed.toUpperCase();
+        updateDegreeProgressUI();
+      }
+    }
+
+    const userAnswers = {};
+    function selectQuizOption(qIdx, optIdx, btnEl) {
+      userAnswers[qIdx] = optIdx;
+      const box = document.getElementById(`q-box-${qIdx}`);
+      box.querySelectorAll('.quiz-opt-btn').forEach(b => b.classList.remove('active', 'correct', 'wrong'));
+      btnEl.classList.add('active');
+    }
+
+    function checkExamResults() {
+      let score = 0;
+      QUIZ_QUESTIONS.forEach((q, qIdx) => {
+        const selected = userAnswers[qIdx];
+        const box = document.getElementById(`q-box-${qIdx}`);
+        if (!box) return;
+        const buttons = box.querySelectorAll('.quiz-opt-btn');
+
+        if (selected !== undefined) {
+          if (selected === q.correct) {
+            score++;
+            buttons[selected].classList.add('correct');
+          } else {
+            buttons[selected].classList.add('wrong');
+            buttons[q.correct].classList.add('correct');
+          }
+        }
+      });
+
+      const scorePill = document.getElementById('quiz-score-pill');
+      if (scorePill) scorePill.textContent = `Score: ${score} / ${QUIZ_QUESTIONS.length}`;
+
+      const feedback = document.getElementById('exam-feedback-msg');
+
+      if (score === QUIZ_QUESTIONS.length) {
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+        }
+
+        const state = getDegreeState();
+        state.examPassed = true;
+        state.examScore = score;
+        state.examDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        saveDegreeState(state);
+
+        if (feedback) {
+          feedback.innerHTML = `<span style="color: #34d399; font-size: 1rem;"><i class="fa-solid fa-circle-check"></i> 100% PERFECT SCORE! Capstone Examination requirement satisfied (+20% Degree Credit recorded).</span>`;
+        }
+
+        showDegreeToast("🎓 100% Perfect Score! Capstone Exam requirement recorded.");
+
+        const masteredSet = new Set(state.masteredArtists || []);
+        let capped = 0;
+        DEGREE_GENRES.forEach(g => {
+          let count = 0;
+          ALL_ARTISTS.forEach(a => {
+            if (masteredSet.has(a.id) && (a.category || '').toLowerCase() === g.id) count++;
+          });
+          capped += Math.min(count, DEGREE_TARGET_PER_GENRE);
+        });
+
+        if (capped >= 50) {
+          alert(`🎓 CONGRATULATIONS! ALL DEGREE REQUIREMENTS MET!\n\nYou scored 100% on the Comprehensive Final Exam and completed all 50 Artist Masterclasses!\n\nYour official Doctor of Modern Musicology Diploma has been CONFERRED and unlocked on the Campus Quad!`);
+          showDepartment('quad');
+          setTimeout(() => {
+            document.getElementById('diploma-vault-container')?.scrollIntoView({ behavior: 'smooth' });
+          }, 300);
+        } else {
+          alert(`🎓 100% PERFECT SCORE!\n\nYour Capstone Examination has been recorded to your official Academic Record on the Campus Quad (+20% Degree Progress).\n\nYou currently have ${capped} of 50 required genre credits. Return to the Campus Quad to view your progress audit, or continue exploring the University Library to complete your remaining artist masterclasses!`);
+        }
+      } else {
+        if (feedback) {
+          feedback.innerHTML = `<span style="color: #f87171; font-size: 0.95rem;"><i class="fa-solid fa-circle-xmark"></i> Score: ${score} / ${QUIZ_QUESTIONS.length}. Review the highlighted correct answers above to reach 100% and earn your degree credit!</span>`;
+        }
+        alert(`You scored ${score} out of ${QUIZ_QUESTIONS.length}. The Conservatory Faculty requires a 100% score to satisfy graduation requirements. Review the correct answers and try again!`);
+      }
+    }
+
+    async function handleUniversitySignOut() {
+      if (window.supabaseClient) {
+        await window.supabaseClient.auth.signOut();
+      }
+      window.location.href = 'login.html';
+    }
+
+    // =========================================================================
+    // 9. INITIALIZATION & ROUTING
+    // =========================================================================
+    document.addEventListener('DOMContentLoaded', async () => {
+      const savedName = localStorage.getItem('thunder_univ_student_name');
+      if (savedName) {
+        const dn = document.getElementById('student-display-name');
+        if (dn) dn.innerHTML = `${savedName} <i class="fa-solid fa-pen" style="font-size: 0.75rem; color: var(--primary);"></i>`;
+        const dip = document.getElementById('diploma-name');
+        if (dip) dip.textContent = savedName.toUpperCase();
+      }
+
+      // Check URL hash for direct department routing (e.g. #library, #bursar)
+      const hash = window.location.hash ? window.location.hash.substring(1) : 'quad';
+      const cleanHash = (hash === 'exam') ? 'courses' : hash;
+      if (['quad', 'courses', 'library', 'cinema', 'bursar', 'alumni'].includes(cleanHash)) {
+        showDepartment(cleanHash);
+      }
+
+      // Supabase Auth Guard & Overrides Loader
+      if (window.supabaseClient) {
+        try {
+          const { data: { session } } = await window.supabaseClient.auth.getSession();
+          if (!session) {
+            console.log("No active session, redirecting to login.html");
+            window.location.href = 'login.html';
+            return;
+          }
+
+          currentSession = session;
+          const userEmail = session.user.email.toLowerCase();
+          document.getElementById('univ-user-email').textContent = session.user.email;
+          const isHardcodedSuper = (userEmail === 'blackrader@gmail.com' || userEmail === 'olifedigital@gmail.com');
+
+          // Check thunderhouse_staff table for role
+          const { data: staffMember } = await window.supabaseClient
+            .from('thunderhouse_staff')
+            .select('role, display_name')
+            .eq('id', session.user.id)
+            .maybeSingle();
+
+          isSuperuser = isHardcodedSuper || (staffMember && staffMember.role === 'superuser');
+
+          // Check overall access (Superusers + Staff + Employees + Users)
+          const hasAccess = isSuperuser || (staffMember && (staffMember.role === 'staff' || staffMember.role === 'employee' || staffMember.role === 'user'));
+
+          if (!hasAccess && !isSuperuser) {
+            alert('Access Restricted: Thunder University is reserved for Thunder House staff, employees, and authorized scholars.');
+            window.location.href = 'login.html';
+            return;
+          }
+
+          // Update Role Badge & Navigation
+          const roleBadge = document.getElementById('univ-role-badge');
+          const adminBtn = document.getElementById('staff-admin-nav-btn');
+
+          if (isSuperuser) {
+            if (roleBadge) {
+              roleBadge.style.background = 'rgba(255, 183, 3, 0.15)';
+              roleBadge.style.borderColor = 'var(--accent-gold)';
+              roleBadge.style.color = 'var(--accent-gold)';
+              roleBadge.innerHTML = '<i class="fa-solid fa-crown"></i> Staff / Faculty';
+            }
+            if (adminBtn) adminBtn.style.display = 'inline-flex';
+          } else {
+            if (roleBadge) {
+              roleBadge.style.background = 'rgba(0, 229, 255, 0.15)';
+              roleBadge.style.borderColor = 'var(--primary)';
+              roleBadge.style.color = 'var(--primary)';
+              roleBadge.innerHTML = '<i class="fa-solid fa-graduation-cap"></i> Student';
+            }
+            if (adminBtn) adminBtn.style.display = 'none';
+          }
+
+          // Fetch live artist overrides from Supabase
+          try {
+            const { data: overrides, error: ovErr } = await window.supabaseClient
+              .from('university_artist_overrides')
+              .select('*');
+
+            if (!ovErr && overrides && overrides.length > 0) {
+              overrides.forEach(ov => {
+                const idx = ALL_ARTISTS.findIndex(a => a.id === ov.artist_id);
+                if (idx !== -1) {
+                  ALL_ARTISTS[idx] = { ...ALL_ARTISTS[idx], ...ov.data };
+                } else if (ov.data) {
+                  ALL_ARTISTS.push(ov.data);
+                }
+              });
+            }
+          } catch (ovEx) {
+            console.warn('Overrides fetch note:', ovEx);
+          }
+
+          // Sync student profile from Supabase
+          await syncStudentProfile(session);
+
+        } catch (err) {
+          console.warn('Auth guard check error:', err);
+        }
+      }
+
+      renderCourses();
+      renderLibrary(ALL_ARTISTS);
+      renderCinema();
+      renderAlumni();
+      renderQuiz();
+      updateDegreeProgressUI();
+    });
+  </script>
+</body>
+</html>

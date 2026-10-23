@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gigs & Run-of-Show · Thunder House Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+  <style>
+    .gig-list a { display: block; padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid transparent; margin-bottom: 0.35rem; transition: all 0.2s ease; }
+    .gig-list a:hover { background: rgba(255, 255, 255, 0.04); }
+    .gig-list a.on { background: rgba(0, 229, 255, 0.08); border-color: var(--border-glow); }
+    .cue { display: grid; grid-template-columns: 80px 14px minmax(0, 1fr); gap: 0.85rem; align-items: start; padding: 0.65rem 0; border-top: 1px solid var(--border-subtle); }
+    .cue:first-of-type { border-top: none; }
+    .cue time { font-family: var(--font-heading); font-weight: 700; font-size: 0.88rem; color: var(--primary); text-align: right; }
+    .cue .dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--primary); margin-top: 0.35rem; background: var(--bg-surface); }
+    .cue.key .dot { background: var(--accent-gold); border-color: var(--accent-gold); box-shadow: 0 0 10px rgba(255, 183, 3, 0.5); }
+    .cue.key time { color: var(--accent-gold); }
+  </style>
+</head>
+<body data-page="gigs">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>Gigs & Run-of-Show</h1>
+        <p>Execution console for booked events. Timeline cues, playlist rules, and gear packs staged for load-in.</p>
+      </div>
+      <div class="head-actions">
+        <button class="btn" id="btn-print-gig"><i class="fa-solid fa-print"></i> Print Gig Pack</button>
+        <button class="btn btn-primary" id="btn-start-live"><i class="fa-solid fa-play"></i> Start Live Mode</button>
+      </div>
+    </div>
+
+    <div class="grid" style="grid-template-columns:minmax(0, 260px) minmax(0, 1fr)">
+      <!-- Gigs Left Roster -->
+      <aside class="card gig-list" style="padding:0.85rem">
+        <div class="label" style="font-size:0.7rem; margin:0.25rem 0.5rem 0.65rem">Upcoming Gigs</div>
+        <div id="upcoming-gigs-roster">
+          <div style="padding:1rem 0; text-align:center" class="muted small">Loading gigs…</div>
+        </div>
+
+        <div class="label muted" style="font-size:0.7rem; margin:1.25rem 0.5rem 0.65rem">Past Gigs</div>
+        <div id="past-gigs-roster"></div>
+      </aside>
+
+      <!-- Active Gig Center Console -->
+      <div>
+        <!-- Gig Header Banner -->
+        <section class="card glow mb" id="gig-hero-card">
+          <div style="display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap">
+            <div>
+              <div class="eyebrow" id="g-date-header">Saturday, October 24 · in 2 days</div>
+              <h2 class="num" id="g-title" style="font-size:1.55rem; margin:0.25rem 0">Vance 40th Birthday</h2>
+              <div class="muted small" id="g-venue-meta">
+                <i class="fa-solid fa-location-dot"></i> <span id="g-venue-name">The Grand Hall, Edmond, OK</span> · <a class="cyan" href="#" id="g-maps-link" target="_blank">Directions <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+              </div>
+            </div>
+            <div class="head-actions" style="align-items:flex-start">
+              <span class="pill pill-green" id="g-pill-paid">Paid in Full</span>
+              <span class="pill pill-green" id="g-pill-contract">Contract Signed</span>
+            </div>
+          </div>
+
+          <div class="grid g-4" style="margin-top:1.15rem">
+            <div><div class="small muted">Load-in</div><div class="num" id="g-stat-loadin">4:30 PM</div></div>
+            <div><div class="small muted">Music Hours</div><div class="num" id="g-stat-music">6:00–11:00 PM</div></div>
+            <div><div class="small muted">Guests</div><div class="num" id="g-stat-guests">120</div></div>
+            <div><div class="small muted">Day-of Contact</div><div class="num" id="g-stat-contact" style="font-size:0.95rem">Tanya · 405-555-0142</div></div>
+          </div>
+        </section>
+
+        <!-- Run of Show & Details Split -->
+        <div class="grid g-main-side">
+          <!-- Timeline Cues -->
+          <section class="card">
+            <div class="card-head">
+              <span class="label"><i class="fa-solid fa-stopwatch cyan"></i> Run of Show Timeline</span>
+              <button class="btn btn-sm" id="btn-add-cue"><i class="fa-solid fa-plus"></i> Add Cue</button>
+            </div>
+            <div id="cues-timeline">
+              <div class="cue"><time>4:30 PM</time><span class="dot"></span><div><strong>Load-in & Setup</strong><div class="small muted">Stage left, check power breakers</div></div></div>
+              <div class="cue"><time>6:00 PM</time><span class="dot"></span><div><strong>Doors & Cocktail Lounge</strong><div class="small muted">Low tempo R&amp;B & warm uplighting</div></div></div>
+              <div class="cue key"><time>7:00 PM</time><span class="dot"></span><div><strong class="gold">Grand Entrance</strong><div class="small gold">Announce VIPs · High energy drop</div></div></div>
+              <div class="cue"><time>7:15 PM</time><span class="dot"></span><div><strong>Dinner Service</strong><div class="small muted">Smooth soul & requested playlist</div></div></div>
+              <div class="cue key"><time>8:15 PM</time><span class="dot"></span><div><strong class="gold">Toasts & Speeches</strong><div class="small gold">Hand wireless mic #1 to family host</div></div></div>
+              <div class="cue"><time>8:30 PM</time><span class="dot"></span><div><strong>Open Dance Floor</strong><div class="small muted">Party anthems & crowd requests</div></div></div>
+              <div class="cue key"><time>10:50 PM</time><span class="dot"></span><div><strong class="gold">Grand Finale Last Song</strong><div class="small gold">Send-off circle</div></div></div>
+            </div>
+          </section>
+
+          <!-- Sidebar Panels -->
+          <div>
+            <!-- Checklist -->
+            <section class="card mb">
+              <div class="label mb" style="font-size:0.7rem">Event Checklist</div>
+              <div class="check ok"><i class="fa-solid fa-circle-check"></i> Retainer & Balance Received</div>
+              <div class="check ok"><i class="fa-solid fa-circle-check"></i> Contract & Terms Executed</div>
+              <div class="check ok"><i class="fa-solid fa-circle-check"></i> Song List & Guest Requests Ready</div>
+              <div class="check warn"><i class="fa-solid fa-circle-exclamation"></i> Gear Pack Verified in Van</div>
+              <div class="check todo"><i class="fa-regular fa-circle"></i> 24h Venue Contact Confirmation</div>
+            </section>
+
+            <!-- Music Notes -->
+            <section class="card mb">
+              <div class="label mb" style="font-size:0.7rem">Music Direction</div>
+              <div class="small muted" style="font-weight:700">Must Play</div>
+              <p class="small" id="g-must-play" style="margin-bottom:0.6rem">90s Hip Hop, Frankie Beverly, Beyoncé, Afrobeat hits</p>
+              <div class="small pink" style="font-weight:700">Do Not Play</div>
+              <p class="small" id="g-do-not-play">Cha Cha Slide, line dances, explicit lyrics before 9 PM</p>
+            </section>
+
+            <!-- Crew & Gear -->
+            <section class="card">
+              <div class="label mb" style="font-size:0.7rem">Crew & Sound Gear</div>
+              <div class="row small"><div class="avatar">TH</div><span class="grow">Lead DJ / Master of Ceremonies</span></div>
+              <div class="row small"><div class="avatar gold">MA</div><span class="grow">Marcus · Lighting & Audio Assist</span></div>
+              <div class="row small"><i class="fa-solid fa-volume-high cyan"></i><span class="grow">2 Tops, 1 Sub, 8 Wireless Uplights, 2 Mics</span></div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal: Add Cue -->
+<div id="add-cue-modal" class="modal-scrim" style="display:none">
+  <div class="modal-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem">
+      <div class="label"><i class="fa-solid fa-clock cyan"></i> Add Run-of-Show Cue</div>
+      <button class="btn btn-icon" id="btn-close-cue-modal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="add-cue-form">
+      <div class="grid g-2">
+        <div class="field">
+          <label>Time</label>
+          <input class="input" id="cue-time" placeholder="e.g. 7:45 PM" required>
+        </div>
+        <div class="field">
+          <label>Importance</label>
+          <select class="input" id="cue-key">
+            <option value="false">Standard Cue</option>
+            <option value="true">Key Moment (Gold Highlight)</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Cue Title</label>
+        <input class="input" id="cue-title" placeholder="e.g. First Dance" required>
+      </div>
+      <div class="field">
+        <label>Instruction / Song Note</label>
+        <textarea class="input" id="cue-note" placeholder="Announce couple, song: 'At Last', fade lights to blue"></textarea>
+      </div>
+      <div class="head-actions" style="justify-content:flex-end; margin-top:1.25rem">
+        <button type="button" class="btn" id="btn-cancel-cue-modal">Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Save Cue</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Supabase CDN Client & Config -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="assets/shell.js"></script>
+
+<script>
+  let gigsData = [];
+  let selectedGig = null;
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Print button
+    document.getElementById('btn-print-gig').onclick = () => window.print();
+
+    // Live mode button
+    document.getElementById('btn-start-live').onclick = () => {
+      window.location.href = '../gigs.html';
+    };
+
+    // Cue modal
+    const cueModal = document.getElementById('add-cue-modal');
+    document.getElementById('btn-add-cue').onclick = () => cueModal.style.display = 'flex';
+    document.getElementById('btn-close-cue-modal').onclick = () => cueModal.style.display = 'none';
+    document.getElementById('btn-cancel-cue-modal').onclick = () => cueModal.style.display = 'none';
+
+    document.getElementById('add-cue-form').onsubmit = (e) => {
+      e.preventDefault();
+      const time = document.getElementById('cue-time').value.trim();
+      const isKey = document.getElementById('cue-key').value === 'true';
+      const title = document.getElementById('cue-title').value.trim();
+      const note = document.getElementById('cue-note').value.trim();
+
+      const timeline = document.getElementById('cues-timeline');
+      const div = document.createElement('div');
+      div.className = `cue ${isKey ? 'key' : ''}`;
+      div.innerHTML = `
+        <time>${escapeHtml(time)}</time>
+        <span class="dot"></span>
+        <div>
+          <strong class="${isKey ? 'gold' : ''}">${escapeHtml(title)}</strong>
+          <div class="small ${isKey ? 'gold' : 'muted'}">${escapeHtml(note)}</div>
+        </div>
+      `;
+      timeline.appendChild(div);
+      cueModal.style.display = 'none';
+      document.getElementById('add-cue-form').reset();
+      window.showToast('Cue added to Run of Show!', 'success');
+    };
+
+    await loadGigs();
+  });
+
+  async function loadGigs() {
+    if (!window.supabaseClient) return;
+
+    try {
+      const { data } = await window.supabaseClient
+        .from('thunderhouse_contracts')
+        .select('*')
+        .order('event_date', { ascending: true });
+
+      gigsData = data || [];
+      renderGigsRoster();
+    } catch (e) {
+      console.error('Error loading gigs:', e);
+    }
+  }
+
+  function renderGigsRoster() {
+    const today = new Date().toISOString().split('T')[0];
+    const upcoming = gigsData.filter(g => (g.event_date || '9999') >= today);
+    const past = gigsData.filter(g => (g.event_date || '0000') < today);
+
+    const upcomingContainer = document.getElementById('upcoming-gigs-roster');
+    const pastContainer = document.getElementById('past-gigs-roster');
+
+    if (upcoming.length === 0) {
+      upcomingContainer.innerHTML = `
+        <div style="padding:0.75rem 0.5rem" class="small muted">
+          No upcoming booked gigs currently scheduled.
+        </div>
+      `;
+    } else {
+      upcomingContainer.innerHTML = upcoming.map((g, idx) => `
+        <a href="#" class="${idx === 0 ? 'on' : ''}" onclick="selectGigById('${g.id}'); return false;">
+          <strong>${escapeHtml(g.client_name || 'Event')}</strong>
+          <div class="small muted">${g.event_date} · ${escapeHtml(g.venue_name || 'OKC')}</div>
+          <span class="pill pill-green" style="margin-top:0.35rem">Ready</span>
+        </a>
+      `).join('');
+      selectGig(upcoming[0]);
+    }
+
+    if (past.length > 0) {
+      pastContainer.innerHTML = past.map(g => `
+        <a href="#" style="opacity:0.6" onclick="selectGigById('${g.id}'); return false;">
+          <strong>${escapeHtml(g.client_name || 'Past Gig')}</strong>
+          <div class="small muted">${g.event_date} · Played</div>
+        </a>
+      `).join('');
+    }
+  }
+
+  window.selectGigById = function (id) {
+    const match = gigsData.find(g => g.id === id);
+    if (match) selectGig(match);
+  };
+
+  function selectGig(gig) {
+    selectedGig = gig;
+    document.querySelectorAll('#upcoming-gigs-roster a, #past-gigs-roster a').forEach(a => a.classList.remove('on'));
+
+    document.getElementById('g-title').textContent = `${gig.client_name || 'Client'} · ${gig.event_type || 'Event'}`;
+    document.getElementById('g-date-header').textContent = gig.event_date ? `Event Date · ${gig.event_date}` : 'Event Date TBD';
+    document.getElementById('g-venue-name').textContent = gig.venue_name || gig.venue_address || 'Oklahoma City, OK';
+    document.getElementById('g-maps-link').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(gig.venue_address || gig.venue_name || 'Oklahoma City')}`;
+
+    document.getElementById('g-stat-loadin').textContent = gig.event_start_time ? `Pre-show` : '4:30 PM';
+    document.getElementById('g-stat-music').textContent = `${gig.event_start_time || '6:00 PM'}–${gig.event_end_time || '11:00 PM'}`;
+    document.getElementById('g-stat-contact').textContent = `${gig.client_name} · ${gig.client_phone || 'Call'}`;
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[s]));
+  }
+</script>
+</body>
+</html>

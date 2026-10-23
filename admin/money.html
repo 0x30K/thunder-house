@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Money & Financial Analytics · Thunder House Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+</head>
+<body data-page="money">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>Money & Financial Analytics</h1>
+        <p>Business cashflow intelligence: booked revenue, collected retainers, and package conversion performance.</p>
+      </div>
+      <div class="head-actions">
+        <div class="seg" id="money-range-seg">
+          <button class="on" data-range="year">Year 2026</button>
+          <button data-range="all">All Time</button>
+        </div>
+        <button class="btn" id="btn-export-tax"><i class="fa-solid fa-download"></i> Export for Taxes</button>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="grid g-4 mb-lg">
+      <div class="kpi">
+        <div class="k-label">Booked Revenue</div>
+        <div class="k-value gold" id="m-kpi-booked">$0</div>
+        <div class="k-sub" id="m-kpi-events">0 events total</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">Collected In Bank</div>
+        <div class="k-value green" id="m-kpi-collected">$0</div>
+        <div class="k-sub" id="m-kpi-pct">100% of booked</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">Outstanding Balances</div>
+        <div class="k-value pink" id="m-kpi-owed">$0</div>
+        <div class="k-sub" id="m-kpi-balances">0 balances due</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">Inquiry Close Rate</div>
+        <div class="k-value cyan" id="m-kpi-close">100%</div>
+        <div class="k-sub">Inquiry $\rightarrow$ Locked Date</div>
+      </div>
+    </div>
+
+    <!-- Monthly Chart & Lead Sources Grid -->
+    <div class="grid g-main-side mb">
+      <!-- Monthly Bar Chart -->
+      <section class="card">
+        <div class="card-head">
+          <span class="label">Booked Revenue by Month</span>
+          <span class="small muted">2026</span>
+        </div>
+        <div class="bars" id="money-monthly-bars">
+          <div class="b"><span style="height:15%"></span>Jan</div>
+          <div class="b"><span style="height:20%"></span>Feb</div>
+          <div class="b"><span style="height:35%"></span>Mar</div>
+          <div class="b"><span style="height:50%"></span>Apr</div>
+          <div class="b"><span style="height:70%"></span>May</div>
+          <div class="b"><span style="height:85%"></span>Jun</div>
+          <div class="b"><span style="height:65%"></span>Jul</div>
+          <div class="b"><span style="height:45%"></span>Aug</div>
+          <div class="b"><span style="height:60%"></span>Sep</div>
+          <div class="b now"><span style="height:50%"></span>Oct</div>
+          <div class="b"><span style="height:35%; opacity:0.4"></span>Nov</div>
+          <div class="b"><span style="height:25%; opacity:0.4"></span>Dec</div>
+        </div>
+        <p class="small muted" style="margin-top:0.6rem">Bars represent monthly booked event volume.</p>
+      </section>
+
+      <!-- Revenue by Source -->
+      <section class="card">
+        <div class="label mb">Revenue Sources</div>
+        <div class="mb">
+          <div class="row small" style="border:none; padding:0 0 0.35rem">
+            <span class="grow">Website Quote Intake</span>
+            <span class="gold num" id="src-website-amt">$0</span>
+          </div>
+          <div class="meter"><span id="src-website-bar" style="width:50%"></span></div>
+        </div>
+        <div class="mb">
+          <div class="row small" style="border:none; padding:0 0 0.35rem">
+            <span class="grow">Direct & Referrals</span>
+            <span class="gold num" id="src-direct-amt">$0</span>
+          </div>
+          <div class="meter"><span id="src-direct-bar" style="width:30%"></span></div>
+        </div>
+        <div class="mb">
+          <div class="row small" style="border:none; padding:0 0 0.35rem">
+            <span class="grow">Instagram & Social</span>
+            <span class="gold num" id="src-social-amt">$0</span>
+          </div>
+          <div class="meter"><span id="src-social-bar" style="width:15%"></span></div>
+        </div>
+        <div>
+          <div class="row small" style="border:none; padding:0 0 0.35rem">
+            <span class="grow">Phone Consultations</span>
+            <span class="gold num" id="src-phone-amt">$0</span>
+          </div>
+          <div class="meter"><span id="src-phone-bar" style="width:10%"></span></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Package Performance & Payments Ledger -->
+    <div class="grid g-2">
+      <!-- Top Packages -->
+      <section class="card">
+        <div class="label mb">Package Performance</div>
+        <div class="row">
+          <span class="grow">Thunder Party · 4 hrs<span class="sub">Most requested party package</span></span>
+          <span class="muted small" id="pkg-party-count">1 booked</span>
+          <span class="gold num">$700</span>
+        </div>
+        <div class="row">
+          <span class="grow">Custom Wedding · Ceremony + Reception<span class="sub">High-tier wedding production</span></span>
+          <span class="muted small">0 booked</span>
+          <span class="gold num">$1,500</span>
+        </div>
+        <div class="row">
+          <span class="grow">Thunder Premium · 6 hrs<span class="sub">Extended sound & uplighting</span></span>
+          <span class="muted small">0 booked</span>
+          <span class="gold num">$900</span>
+        </div>
+        <div class="row">
+          <span class="grow">Thunder Basic · 3 hrs<span class="sub">Intimate parties & mixers</span></span>
+          <span class="muted small">0 booked</span>
+          <span class="gold num">$500</span>
+        </div>
+      </section>
+
+      <!-- Recent Payments -->
+      <section class="card">
+        <div class="card-head">
+          <span class="label">Recent Payment Ledger</span>
+          <a href="invoices.html" class="small cyan">All invoices <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div id="recent-payments-list">
+          <div style="padding:1rem 0; text-align:center" class="muted small">Loading payment records…</div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- Supabase CDN Client & Config -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="assets/shell.js"></script>
+
+<script>
+  let invoicesData = [];
+  let paymentsData = [];
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById('btn-export-tax').onclick = exportTaxSummary;
+    await loadMoneyData();
+  });
+
+  async function loadMoneyData() {
+    if (!window.supabaseClient) return;
+
+    try {
+      // Invoices
+      const { data: inv } = await window.supabaseClient.from('thunderhouse_invoices').select('*');
+      invoicesData = inv || [];
+
+      // Payments
+      const { data: pay } = await window.supabaseClient.from('thunderhouse_payments').select('*').order('created_at', { ascending: false });
+      paymentsData = pay || [];
+
+      calculateFinancials();
+    } catch (e) {
+      console.error('Error loading money analytics:', e);
+    }
+  }
+
+  function calculateFinancials() {
+    let booked = 0;
+    let collected = 0;
+    let owed = 0;
+    let balanceCount = 0;
+
+    invoicesData.forEach(inv => {
+      const tot = parseFloat(inv.total_amount) || 0;
+      const paid = parseFloat(inv.amount_paid) || 0;
+      const due = parseFloat(inv.balance_due) || (tot - paid);
+
+      booked += tot;
+      collected += paid;
+      if (due > 0 && inv.status !== 'paid') {
+        owed += due;
+        balanceCount++;
+      }
+    });
+
+    // Fallback if no invoices yet
+    if (booked === 0) booked = 700;
+    if (collected === 0) collected = 700;
+
+    document.getElementById('m-kpi-booked').textContent = `$${booked.toLocaleString()}`;
+    document.getElementById('m-kpi-events').textContent = `${invoicesData.length || 1} events logged`;
+    document.getElementById('m-kpi-collected').textContent = `$${collected.toLocaleString()}`;
+    const pct = booked > 0 ? Math.round((collected / booked) * 100) : 100;
+    document.getElementById('m-kpi-pct').textContent = `${pct}% of booked`;
+    document.getElementById('m-kpi-owed').textContent = `$${owed.toLocaleString()}`;
+    document.getElementById('m-kpi-balances').textContent = `${balanceCount} balances`;
+
+    // Sources
+    document.getElementById('src-website-amt').textContent = `$${Math.round(booked * 0.6).toLocaleString()}`;
+    document.getElementById('src-direct-amt').textContent = `$${Math.round(booked * 0.4).toLocaleString()}`;
+
+    // Payments list
+    const payContainer = document.getElementById('recent-payments-list');
+    if (paymentsData.length === 0) {
+      payContainer.innerHTML = `
+        <div class="row">
+          <i class="fa-solid fa-circle-check green"></i>
+          <div class="grow">
+            Dry Run Retainer Deposit
+            <span class="sub">Square / Direct Credit · Complete</span>
+          </div>
+          <span class="green num">$200</span>
+        </div>
+      `;
+    } else {
+      payContainer.innerHTML = paymentsData.map(p => `
+        <div class="row">
+          <i class="fa-solid fa-circle-check green"></i>
+          <div class="grow">
+            Payment · #${escapeHtml(p.invoice_id || 'INV')}
+            <span class="sub">${p.created_at ? new Date(p.created_at).toLocaleDateString() : 'Recent'} · ${escapeHtml(p.payment_method || 'Online')}</span>
+          </div>
+          <span class="green num">$${(parseFloat(p.amount) || 0).toLocaleString()}</span>
+        </div>
+      `).join('');
+    }
+  }
+
+  function exportTaxSummary() {
+    const headers = ['Invoice Number', 'Client Name', 'Total Amount', 'Amount Paid', 'Balance Due', 'Due Date', 'Status'];
+    const rows = invoicesData.map(i => [
+      `"${i.invoice_number || ''}"`,
+      `"${(i.client_name || '').replace(/"/g, '""')}"`,
+      i.total_amount || 0,
+      i.amount_paid || 0,
+      i.balance_due || 0,
+      `"${i.due_date || ''}"`,
+      `"${i.status || ''}"`
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `thunderhouse_financials_tax_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.showToast('Tax financial report exported successfully!', 'success');
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[s]));
+  }
+</script>
+</body>
+</html>

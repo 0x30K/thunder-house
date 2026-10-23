@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Today · Thunder House Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+</head>
+<body data-page="today">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow" id="today-date-str">Thunder House Operational Hub</div>
+        <h1 id="today-greeting">Good evening</h1>
+        <p id="today-subhead">Loading live business pulse…</p>
+      </div>
+      <div class="head-actions">
+        <div class="search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="global-search-input" placeholder="Search clients, dates, invoices…">
+        </div>
+        <button class="btn btn-primary" id="btn-today-new-lead"><i class="fa-solid fa-plus"></i> New lead</button>
+      </div>
+    </div>
+
+    <div class="grid g-main-side mb">
+      <!-- Needs action -->
+      <section class="card">
+        <div class="card-head">
+          <span class="label">Needs Action</span>
+          <span class="muted small">Sorted by urgency</span>
+        </div>
+        <div id="needs-action-list">
+          <div style="padding:1.5rem 0; text-align:center" class="muted small">
+            <i class="fa-solid fa-circle-notch fa-spin"></i> Checking live pipeline & holds…
+          </div>
+        </div>
+      </section>
+
+      <!-- Next gig -->
+      <section class="card glow" id="next-gig-card">
+        <div class="eyebrow" id="next-gig-date">Next Gig</div>
+        <h2 class="num" id="next-gig-title" style="font-size:1.35rem; margin:0.3rem 0 0.1rem">No Upcoming Gigs</h2>
+        <div class="muted small" id="next-gig-meta"><i class="fa-regular fa-clock"></i> All dates open for booking</div>
+        <div class="muted small" id="next-gig-venue" style="margin-top:0.25rem"><i class="fa-solid fa-location-dot"></i> Thunder House Territory</div>
+        <div style="margin:1rem 0 0.75rem" id="next-gig-checklist">
+          <div class="check todo"><i class="fa-regular fa-circle"></i> Retainer & Date Lock</div>
+          <div class="check todo"><i class="fa-regular fa-circle"></i> Contract Execution</div>
+          <div class="check todo"><i class="fa-regular fa-circle"></i> Song List & Guest Requests</div>
+          <div class="check todo"><i class="fa-regular fa-circle"></i> Gear Pack Staged</div>
+        </div>
+        <a href="gigs.html" class="btn btn-primary btn-block"><i class="fa-solid fa-stopwatch"></i> Open Run of Show</a>
+      </section>
+    </div>
+
+    <!-- Pipeline strip -->
+    <section class="card mb">
+      <div class="card-head">
+        <span class="label">Pipeline Overview</span>
+        <a href="leads.html" class="small cyan">Open leads board <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <div class="grid g-4" id="pipeline-strip">
+        <div><div class="small muted">New · <span id="pipe-new-count">0</span></div><div class="num" id="pipe-new-sum" style="font-size:1.3rem">$0</div></div>
+        <div><div class="small muted">Quoted · <span id="pipe-quoted-count">0</span></div><div class="num" id="pipe-quoted-sum" style="font-size:1.3rem">$0</div></div>
+        <div><div class="small pink">On hold · <span id="pipe-hold-count">0</span></div><div class="num pink" id="pipe-hold-sum" style="font-size:1.3rem">$0</div></div>
+        <div><div class="small green">Booked · <span id="pipe-booked-count">0</span></div><div class="num gold" id="pipe-booked-sum" style="font-size:1.3rem">$0</div></div>
+      </div>
+    </section>
+
+    <!-- KPIs -->
+    <div class="grid g-4 mb">
+      <div class="kpi">
+        <div class="k-label">Booked (Month)</div>
+        <div class="k-value gold" id="kpi-month-booked">$0</div>
+        <div class="k-sub" id="kpi-month-events">0 events</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">Collected</div>
+        <div class="k-value green" id="kpi-month-collected">$0</div>
+        <div class="k-sub" id="kpi-collected-pct">0% of booked</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">Outstanding</div>
+        <div class="k-value pink" id="kpi-month-owed">$0</div>
+        <div class="k-sub" id="kpi-owed-count">0 balances</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">Open Weekends</div>
+        <div class="k-value cyan" id="kpi-open-weekends">8</div>
+        <div class="k-sub">Next 60 days</div>
+      </div>
+    </div>
+
+    <!-- Coming up -->
+    <section class="card">
+      <div class="card-head">
+        <span class="label">Upcoming Schedule</span>
+        <a href="calendar.html" class="small cyan">Full calendar <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <div id="upcoming-events-list">
+        <div style="padding:1rem 0; text-align:center" class="muted small">Looking for booked events…</div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Supabase CDN Client & Config -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="assets/shell.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Set dates & greeting
+    const now = new Date();
+    const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+    const dateEl = document.getElementById('today-date-str');
+    if (dateEl) dateEl.textContent = now.toLocaleDateString('en-US', options);
+
+    const hours = now.getHours();
+    let greeting = 'Good morning';
+    if (hours >= 12 && hours < 17) greeting = 'Good afternoon';
+    if (hours >= 17) greeting = 'Good evening';
+    const greetEl = document.getElementById('today-greeting');
+    if (greetEl) greetEl.textContent = greeting;
+
+    // Search redirect
+    const searchInput = document.getElementById('global-search-input');
+    if (searchInput) {
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && searchInput.value.trim()) {
+          window.location.href = `leads.html?q=${encodeURIComponent(searchInput.value.trim())}`;
+        }
+      });
+    }
+
+    await loadLivePulse();
+  });
+
+  async function loadLivePulse() {
+    if (!window.supabaseClient) return;
+
+    try {
+      // 1. Fetch Inquiries
+      const { data: inquiries } = await window.supabaseClient
+        .from('thunderhouse_inquiries')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      // 2. Fetch Invoices
+      const { data: invoices } = await window.supabaseClient
+        .from('thunderhouse_invoices')
+        .select('*');
+
+      // 3. Fetch Contracts
+      const { data: contracts } = await window.supabaseClient
+        .from('thunderhouse_contracts')
+        .select('*')
+        .order('event_date', { ascending: true });
+
+      // 4. Calculate Pipeline
+      let newCount = 0, newSum = 0;
+      let quotedCount = 0, quotedSum = 0;
+      let holdCount = 0, holdSum = 0;
+      let bookedCount = 0, bookedSum = 0;
+
+      (inquiries || []).forEach(inq => {
+        const amt = parseFloat(inq.estimated_total) || 0;
+        const st = (inq.status || 'new').toLowerCase();
+        if (st === 'new') { newCount++; newSum += amt; }
+        else if (st === 'quoted') { quotedCount++; quotedSum += amt; }
+        else if (st === 'hold') { holdCount++; holdSum += amt; }
+        else if (st === 'booked') { bookedCount++; bookedSum += amt; }
+      });
+
+      document.getElementById('pipe-new-count').textContent = newCount;
+      document.getElementById('pipe-new-sum').textContent = `$${newSum.toLocaleString()}`;
+      document.getElementById('pipe-quoted-count').textContent = quotedCount;
+      document.getElementById('pipe-quoted-sum').textContent = `$${quotedSum.toLocaleString()}`;
+      document.getElementById('pipe-hold-count').textContent = holdCount;
+      document.getElementById('pipe-hold-sum').textContent = `$${holdSum.toLocaleString()}`;
+      document.getElementById('pipe-booked-count').textContent = bookedCount;
+      document.getElementById('pipe-booked-sum').textContent = `$${bookedSum.toLocaleString()}`;
+
+      // 5. Calculate Financials
+      let totalBooked = 0;
+      let totalCollected = 0;
+      let totalOwed = 0;
+      let balanceCount = 0;
+
+      (invoices || []).forEach(inv => {
+        const tot = parseFloat(inv.total_amount) || 0;
+        const paid = parseFloat(inv.amount_paid) || 0;
+        const due = parseFloat(inv.balance_due) || (tot - paid);
+        totalBooked += tot;
+        totalCollected += paid;
+        if (due > 0 && inv.status !== 'paid') {
+          totalOwed += due;
+          balanceCount++;
+        }
+      });
+
+      if (totalBooked === 0 && bookedSum > 0) {
+        totalBooked = bookedSum;
+      }
+
+      document.getElementById('kpi-month-booked').textContent = `$${totalBooked.toLocaleString()}`;
+      document.getElementById('kpi-month-events').textContent = `${bookedCount} events`;
+      document.getElementById('kpi-month-collected').textContent = `$${totalCollected.toLocaleString()}`;
+      const pct = totalBooked > 0 ? Math.round((totalCollected / totalBooked) * 100) : 0;
+      document.getElementById('kpi-collected-pct').textContent = `${pct}% of booked`;
+      document.getElementById('kpi-month-owed').textContent = `$${totalOwed.toLocaleString()}`;
+      document.getElementById('kpi-owed-count').textContent = `${balanceCount} balances`;
+
+      // 6. Build Needs Action List
+      const actionContainer = document.getElementById('needs-action-list');
+      const actionItems = [];
+
+      (inquiries || []).forEach(inq => {
+        const st = (inq.status || 'new').toLowerCase();
+        if (st === 'hold') {
+          actionItems.push({
+            type: 'hold',
+            pillClass: 'pill-pink',
+            icon: 'fa-hourglass-half',
+            label: 'Hold',
+            title: `${inq.full_name || 'Client'} · ${inq.event_type || 'Event'}`,
+            sub: `${inq.event_date ? 'Date: ' + inq.event_date + ' · ' : ''}Hold active · Retainer pending`,
+            actionLabel: 'Open Hold',
+            link: `leads.html#${inq.id}`
+          });
+        } else if (st === 'new') {
+          actionItems.push({
+            type: 'new',
+            pillClass: 'pill-cyan',
+            icon: 'fa-envelope',
+            label: 'New Lead',
+            title: `${inq.full_name || 'Lead'} · ${inq.event_type || 'Event Inquiry'}`,
+            sub: `${inq.venue_location ? inq.venue_location + ' · ' : ''}${inq.package_name || 'Quote pending'}`,
+            actionLabel: 'Reply / Quote',
+            link: `leads.html#${inq.id}`
+          });
+        }
+      });
+
+      // Check overdue invoices
+      (invoices || []).forEach(inv => {
+        const due = parseFloat(inv.balance_due) || 0;
+        if (due > 0 && inv.due_date && new Date(inv.due_date) < new Date()) {
+          actionItems.push({
+            type: 'overdue',
+            pillClass: 'pill-pink',
+            icon: 'fa-exclamation',
+            label: 'Overdue',
+            title: `${inv.client_name || 'Client'} · Balance Due`,
+            sub: `$${due.toLocaleString()} overdue since ${inv.due_date}`,
+            actionLabel: 'Remind',
+            link: 'invoices.html'
+          });
+        }
+      });
+
+      if (actionItems.length === 0) {
+        actionContainer.innerHTML = `
+          <div style="padding:1.5rem 0; text-align:center" class="muted small">
+            <i class="fa-solid fa-circle-check green" style="font-size:1.5rem; margin-bottom:0.5rem; display:block"></i>
+            All caught up! Zero urgent actions or overdue holds.
+          </div>
+        `;
+        document.getElementById('today-subhead').textContent = 'Zero urgent actions · Ready to book gigs';
+      } else {
+        document.getElementById('today-subhead').innerHTML = `<span class="pink">${actionItems.length} items need your attention</span> · Ready to book`;
+        actionContainer.innerHTML = actionItems.slice(0, 5).map(item => `
+          <div class="row">
+            <span class="pill ${item.pillClass}"><i class="fa-solid ${item.icon}"></i> ${item.label}</span>
+            <div class="grow">
+              ${item.title}
+              <span class="sub">${item.sub}</span>
+            </div>
+            <a href="${item.link}" class="btn btn-ghost btn-sm">${item.actionLabel}</a>
+          </div>
+        `).join('');
+      }
+
+      // 7. Find Next Gig
+      const upcomingEvents = (contracts || []).filter(c => c.event_date && new Date(c.event_date) >= new Date());
+      if (upcomingEvents.length > 0) {
+        const next = upcomingEvents[0];
+        document.getElementById('next-gig-date').textContent = `Next Gig · ${next.event_date}`;
+        document.getElementById('next-gig-title').textContent = `${next.client_name || 'Client Event'} · ${next.event_type || 'Gig'}`;
+        document.getElementById('next-gig-meta').innerHTML = `<i class="fa-regular fa-clock"></i> ${next.event_start_time || '6:00 PM'}–${next.event_end_time || '11:00 PM'}`;
+        document.getElementById('next-gig-venue').innerHTML = `<i class="fa-solid fa-location-dot"></i> ${next.venue_name || next.venue_address || 'Oklahoma City, OK'}`;
+        document.getElementById('next-gig-checklist').innerHTML = `
+          <div class="check ok"><i class="fa-solid fa-circle-check"></i> Contract Signed (${next.status || 'Active'})</div>
+          <div class="check ${next.balance_due == 0 ? 'ok' : 'warn'}"><i class="fa-solid ${next.balance_due == 0 ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i> ${next.balance_due == 0 ? 'Paid in full' : '$' + next.balance_due + ' balance remaining'}</div>
+          <div class="check todo"><i class="fa-regular fa-circle"></i> Song list & guest requests</div>
+          <div class="check todo"><i class="fa-regular fa-circle"></i> Gear pack loaded</div>
+        `;
+      }
+
+      // 8. Upcoming schedule list
+      const scheduleContainer = document.getElementById('upcoming-events-list');
+      if (upcomingEvents.length === 0) {
+        scheduleContainer.innerHTML = `
+          <div style="padding:1.25rem 0; text-align:center" class="muted small">
+            No gigs currently scheduled. Use "New Lead" to log inquiries or share your public booking link!
+          </div>
+        `;
+      } else {
+        scheduleContainer.innerHTML = upcomingEvents.slice(0, 4).map(ev => `
+          <div class="row">
+            <span class="pill pill-green">Booked</span>
+            <div class="grow">
+              <strong>${ev.client_name || 'Event'}</strong> · ${ev.event_type || 'Gig'}
+              <span class="sub"><i class="fa-regular fa-calendar"></i> ${ev.event_date} · ${ev.venue_name || 'Venue'}</span>
+            </div>
+            <span class="num gold">$${(parseFloat(ev.total_amount) || 0).toLocaleString()}</span>
+            <a href="gigs.html?id=${ev.id}" class="btn btn-sm">View Gig</a>
+          </div>
+        `).join('');
+      }
+
+    } catch (err) {
+      console.error('Error loading Today dashboard:', err);
+    }
+  }
+
+  window.addEventListener('thunderhouse:lead-created', () => {
+    loadLivePulse();
+  });
+</script>
+</body>
+</html>

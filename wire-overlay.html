@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
+  <title>Thunder Wire · OBS Broadcast Overlay</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Syne:wght@700;800&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background: transparent !important;
+      font-family: 'Outfit', sans-serif;
+      color: #fff;
+    }
+
+    /* Screen Canvas */
+    .obs-canvas {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      pointer-events: none;
+    }
+
+    /* Top Right On-Air Watermark / Bug */
+    .broadcast-bug {
+      position: absolute;
+      top: 48px;
+      right: 64px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(7, 9, 14, 0.85);
+      border: 1px solid rgba(0, 229, 255, 0.35);
+      backdrop-filter: blur(12px);
+      padding: 8px 18px;
+      border-radius: 9999px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 229, 255, 0.2);
+      transition: all 0.4s ease;
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    .broadcast-bug.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .on-air-dot {
+      width: 10px;
+      height: 10px;
+      background: #ff0055;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #ff0055, 0 0 20px #ff0055;
+      animation: pulse-red 1.2s infinite alternate;
+    }
+    @keyframes pulse-red {
+      from { opacity: 0.5; transform: scale(0.85); }
+      to { opacity: 1; transform: scale(1.15); }
+    }
+    .bug-brand {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: #00e5ff;
+    }
+    .bug-sub {
+      font-size: 11px;
+      font-weight: 700;
+      color: #ffb703;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-left: 1px solid rgba(255, 255, 255, 0.2);
+      padding-left: 10px;
+    }
+
+    /* Lower-Third Container */
+    .lower-third-wrap {
+      position: absolute;
+      bottom: 80px;
+      left: 80px;
+      right: 80px;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateY(120px);
+      opacity: 0;
+      pointer-events: auto;
+    }
+    .lower-third-wrap.active {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .lower-third-card {
+      display: grid;
+      grid-template-columns: 280px 1fr auto;
+      background: linear-gradient(135deg, rgba(7, 9, 14, 0.96) 0%, rgba(14, 18, 28, 0.94) 100%);
+      border: 1px solid rgba(0, 229, 255, 0.4);
+      border-left: 8px solid #00e5ff;
+      border-radius: 18px;
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 229, 255, 0.25);
+    }
+    .lower-third-card.cat-shade {
+      border-color: rgba(255, 0, 85, 0.5);
+      border-left-color: #ff0055;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 0, 85, 0.3);
+    }
+    .lower-third-card.cat-drops {
+      border-color: rgba(255, 183, 3, 0.5);
+      border-left-color: #ffb703;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 183, 3, 0.3);
+    }
+    .lower-third-card.cat-wild {
+      border-color: rgba(0, 255, 136, 0.5);
+      border-left-color: #00ff88;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 255, 136, 0.3);
+    }
+
+    /* Left Block: Show Segment & Branding */
+    .lt-block-brand {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .lt-show-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: #ffb703;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .lt-category-badge {
+      display: inline-block;
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: #00e5ff;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      line-height: 1.2;
+    }
+    .lt-category-badge.cat-shade { color: #ff0055; }
+    .lt-category-badge.cat-drops { color: #ffb703; }
+    .lt-category-badge.cat-wild { color: #00ff88; }
+
+    /* Middle Block: Headline & Prompt */
+    .lt-block-content {
+      padding: 22px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+    }
+    .lt-headline {
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1.25;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+    .lt-subtext {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.85);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .lt-source-tag {
+      background: rgba(255, 255, 255, 0.12);
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .lt-question-highlight {
+      color: #ffb703;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Right Block: Heat Meter Badge */
+    .lt-block-heat {
+      padding: 24px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.3);
+      border-left: 1px solid rgba(255, 255, 255, 0.08);
+      min-width: 140px;
+    }
+    .heat-val {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: #ffb703;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1;
+    }
+    .heat-val i {
+      font-size: 20px;
+      color: #ff0055;
+    }
+    .heat-lbl {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* Bottom Ticker Wire (Optional) */
+    .wire-ticker-wrap {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 44px;
+      background: rgba(4, 6, 10, 0.92);
+      border-top: 1px solid rgba(0, 229, 255, 0.3);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .wire-ticker-wrap.active {
+      opacity: 1;
+    }
+    .ticker-lead {
+      background: #00e5ff;
+      color: #041016;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      padding: 0 20px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      z-index: 10;
+    }
+    .ticker-track {
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+    }
+    .ticker-content {
+      display: inline-block;
+      white-space: nowrap;
+      animation: ticker-slide 35s linear infinite;
+      font-size: 14px;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: 48px;
+    }
+    .ticker-item i {
+      color: #ffb703;
+      font-size: 10px;
+    }
+    @keyframes ticker-slide {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+  </style>
+</head>
+<body>
+  <div class="obs-canvas">
+    <!-- Top Right Station On-Air Bug -->
+    <div class="broadcast-bug visible" id="broadcast-bug">
+      <div class="on-air-dot"></div>
+      <div class="bug-brand">THUNDER WIRE</div>
+      <div class="bug-sub">#WAKEITUP LIVE</div>
+    </div>
+
+    <!-- Main Dynamic Lower-Third Card -->
+    <div class="lower-third-wrap" id="lower-third-wrap">
+      <div class="lower-third-card" id="lower-third-card">
+        
+        <!-- Left Brand / Category Block -->
+        <div class="lt-block-brand">
+          <div class="lt-show-title" id="lt-show-title">
+            <i class="fa-solid fa-bolt"></i> #WAKEITUP WIRE
+          </div>
+          <div class="lt-category-badge" id="lt-category-badge">
+            THE OPENING BELL
+          </div>
+        </div>
+
+        <!-- Middle Content Block -->
+        <div class="lt-block-content">
+          <div class="lt-headline" id="lt-headline">
+            Loading Live Story Headline…
+          </div>
+          <div class="lt-subtext">
+            <span class="lt-source-tag" id="lt-source-tag">Rolling Stone</span>
+            <span class="lt-question-highlight" id="lt-question-highlight">
+              <i class="fa-solid fa-microphone-lines"></i>
+              <span id="lt-question-text">Listener Call-in: Is this chess or pure panic?</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Right Virality Heat Block -->
+        <div class="lt-block-heat">
+          <div class="heat-val" id="lt-heat-val">
+            <i class="fa-solid fa-fire"></i> 94
+          </div>
+          <div class="heat-lbl">VIRAL HEAT</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Bottom Continuous Ticker -->
+    <div class="wire-ticker-wrap active" id="wire-ticker-wrap">
+      <div class="ticker-lead">
+        <i class="fa-solid fa-bolt"></i> THUNDER WIRE
+      </div>
+      <div class="ticker-track">
+        <div class="ticker-content" id="ticker-content">
+          <span class="ticker-item"><i class="fa-solid fa-circle"></i> Kendrick Lamar announces surprise 2026 stadium run</span>
+          <span class="ticker-item"><i class="fa-solid fa-circle"></i> Spotify hits 650M monthly active listeners amid new royalty updates</span>
+          <span class="ticker-item"><i class="fa-solid fa-circle"></i> Drake countersues UMG over algorithmic promotion controversy</span>
+          <span class="ticker-item"><i class="fa-solid fa-circle"></i> Metro Boomin teases unreleased collaboration project</span>
+          <span class="ticker-item"><i class="fa-solid fa-circle"></i> Kendrick Lamar announces surprise 2026 stadium run</span>
+          <span class="ticker-item"><i class="fa-solid fa-circle"></i> Spotify hits 650M monthly active listeners amid new royalty updates</span>
+          <span class="ticker-item"><i class="fa-solid fa-circle"></i> Drake countersues UMG over algorithmic promotion controversy</span>
+          <span class="ticker-item"><i class="fa-solid fa-circle"></i> Metro Boomin teases unreleased collaboration project</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase CDN Client & Config -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+
+  <script>
+    const elWrap = document.getElementById('lower-third-wrap');
+    const elCard = document.getElementById('lower-third-card');
+    const elCategory = document.getElementById('lt-category-badge');
+    const elHeadline = document.getElementById('lt-headline');
+    const elSource = document.getElementById('lt-source-tag');
+    const elQuestion = document.getElementById('lt-question-text');
+    const elHeat = document.getElementById('lt-heat-val');
+    const elTicker = document.getElementById('ticker-content');
+
+    // BroadcastChannel for instant zero-latency local communication across tabs/windows
+    let localChannel = null;
+    try {
+      localChannel = new BroadcastChannel('thunder_wire_obs');
+      localChannel.onmessage = (event) => {
+        if (event.data) applyOverlayState(event.data);
+      };
+    } catch(e) {}
+
+    // Check localStorage fallback
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'thunder_wire_live_state' && e.newValue) {
+        try {
+          applyOverlayState(JSON.parse(e.newValue));
+        } catch(err) {}
+      }
+    });
+
+    function applyOverlayState(state) {
+      if (!state) return;
+
+      if (state.show_overlay) {
+        elWrap.classList.add('active');
+      } else {
+        elWrap.classList.remove('active');
+      }
+
+      if (state.headline) elHeadline.textContent = state.headline;
+      if (state.source) elSource.textContent = state.source;
+      if (state.category_title) elCategory.textContent = state.category_title;
+      if (state.host_question) elQuestion.textContent = state.host_question;
+      if (state.virality_score) elHeat.innerHTML = `<i class="fa-solid fa-fire"></i> ${state.virality_score}`;
+
+      // Card color themes by category
+      elCard.className = 'lower-third-card';
+      elCategory.className = 'lt-category-badge';
+      if (state.category === 'shade') {
+        elCard.classList.add('cat-shade');
+        elCategory.classList.add('cat-shade');
+      } else if (state.category === 'drops') {
+        elCard.classList.add('cat-drops');
+        elCategory.classList.add('cat-drops');
+      } else if (state.category === 'wild') {
+        elCard.classList.add('cat-wild');
+        elCategory.classList.add('cat-wild');
+      }
+
+      if (state.ticker_items && Array.isArray(state.ticker_items) && state.ticker_items.length > 0) {
+        const double = [...state.ticker_items, ...state.ticker_items];
+        elTicker.innerHTML = double.map(t => `<span class="ticker-item"><i class="fa-solid fa-circle"></i> ${escapeHtml(t)}</span>`).join('');
+      }
+    }
+
+    // Polling Supabase for cross-machine sync (for Production PC)
+    let lastUpdated = null;
+    async function pollCloudState() {
+      if (!window.supabaseClient) return;
+
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('thunderwire_broadcast_state')
+          .select('*')
+          .eq('id', 'live')
+          .maybeSingle();
+
+        if (!error && data) {
+          if (!lastUpdated || data.updated_at !== lastUpdated) {
+            lastUpdated = data.updated_at;
+            applyOverlayState({
+              show_overlay: data.show_overlay,
+              headline: data.banner_title,
+              category: data.category,
+              category_title: getCategoryDisplayName(data.category),
+              source: data.banner_subtitle,
+              host_question: data.ticker_text || (data.active_story ? data.active_story.host_question : ''),
+              virality_score: data.active_story ? (data.active_story.virality_score || 92) : 92
+            });
+          }
+        }
+      } catch (err) {}
+    }
+
+    function getCategoryDisplayName(cat) {
+      const map = {
+        lead: 'THE OPENING BELL',
+        shade: 'THE SHADE STORM',
+        drops: 'THE DROP ZONE',
+        wild: 'ARE YOU OUT YOUR MIND?!',
+        realtalk: 'REAL TALK'
+      };
+      return map[cat] || 'THUNDER WIRE';
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, s => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[s]));
+    }
+
+    // Initial check from localStorage
+    try {
+      const saved = localStorage.getItem('thunder_wire_live_state');
+      if (saved) applyOverlayState(JSON.parse(saved));
+    } catch(e) {}
+
+    // Poll cloud every 1.5 seconds for cross-machine updates
+    setInterval(pollCloudState, 1500);
+    pollCloudState();
+  </script>
+</body>
+</html>

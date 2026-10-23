@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings & Operations Hub · Thunder House Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+  <style>
+    .set-row { display: flex; align-items: center; gap: 1rem; padding: 0.95rem 0; border-top: 1px solid var(--border-subtle); }
+    .set-row:first-of-type { border-top: none; }
+    .set-row .grow { flex: 1; }
+    .set-row .sub { display: block; font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; }
+    section[id] { scroll-margin-top: 1.5rem; }
+  </style>
+</head>
+<body data-page="settings">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>Settings & Operations Hub</h1>
+        <p>Operational rules, automated workflows, email templates, and staff permission controls.</p>
+      </div>
+      <div class="head-actions">
+        <button class="btn btn-primary" id="btn-save-all-settings"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+      </div>
+    </div>
+
+    <div class="grid" style="grid-template-columns:220px minmax(0, 1fr)">
+      <!-- Subnav Anchor Links -->
+      <nav class="subnav">
+        <a class="on" href="#booking"><i class="fa-solid fa-calendar-check"></i> Booking Rules</a>
+        <a href="#packages"><i class="fa-solid fa-compact-disc"></i> Packages & Rates</a>
+        <a href="#automation"><i class="fa-solid fa-bolt"></i> Automation Rules</a>
+        <a href="#emails"><i class="fa-solid fa-envelope-open-text"></i> Email Templates</a>
+        <a href="#team"><i class="fa-solid fa-users-gear"></i> Team Permissions</a>
+        <a href="#website"><i class="fa-solid fa-paintbrush"></i> Public Site Editor</a>
+        <a href="#sending"><i class="fa-solid fa-server"></i> SMTP & Sending</a>
+      </nav>
+
+      <!-- Settings Sections -->
+      <div>
+        <!-- Booking Rules -->
+        <section id="booking" class="card mb">
+          <div class="label mb">Booking & Hold Rules</div>
+          <div class="set-row">
+            <div class="grow">
+              Website Quote Hold Window
+              <span class="sub">How long an online intake blocks the date from other inquiries before retainer payment</span>
+            </div>
+            <input class="input" id="set-hold-hours" type="number" value="72" style="width:110px">
+            <span class="small muted">hours</span>
+          </div>
+          <div class="set-row">
+            <div class="grow">
+              Retainer Deposit Amount
+              <span class="sub">Non-refundable date lock fee applied directly toward the event package total</span>
+            </div>
+            <input class="input gold num" id="set-retainer-fee" type="number" value="200" style="width:110px">
+          </div>
+          <div class="set-row">
+            <div class="grow">
+              Balance Due Window
+              <span class="sub">How many days prior to event performance date final payment must be received</span>
+            </div>
+            <input class="input" id="set-balance-days" type="number" value="14" style="width:110px">
+            <span class="small muted">days</span>
+          </div>
+          <div class="set-row">
+            <div class="grow">
+              Automatic Payment Due Reminders
+              <span class="sub">Automatically email balance reminder notifications 3 days before due date</span>
+            </div>
+            <span class="toggle on" id="toggle-reminders"></span>
+          </div>
+        </section>
+
+        <!-- Packages -->
+        <section id="packages" class="card mb">
+          <div class="card-head">
+            <span class="label">Entertainment Packages & Pricing</span>
+          </div>
+          <div class="row">
+            <span class="grow">Thunder Party<span class="sub">Up to 4 hours · Sound system, 2 mics, party dance floor lighting</span></span>
+            <span class="gold num">$700</span>
+          </div>
+          <div class="row">
+            <span class="grow">Custom Wedding Production<span class="sub">Ceremony audio, cocktail hour, reception, MC hosting & uplights</span></span>
+            <span class="gold num">$1,500</span>
+          </div>
+          <div class="row">
+            <span class="grow">Thunder Premium<span class="sub">Up to 6 hours · Dual subwoofers, full room uplighting & laser pack</span></span>
+            <span class="gold num">$900</span>
+          </div>
+          <div class="row">
+            <span class="grow">Thunder Basic<span class="sub">Up to 3 hours · Essential audio setup for mixers & dinners</span></span>
+            <span class="gold num">$500</span>
+          </div>
+          <div class="row">
+            <span class="grow">Thunder All-Night<span class="sub">Up to 8 hours · Extended festival & all-night marathon</span></span>
+            <span class="gold num">$1,200</span>
+          </div>
+        </section>
+
+        <!-- Automation Rules -->
+        <section id="automation" class="card mb">
+          <div class="label mb">Automation Rules</div>
+          <div class="set-row">
+            <div class="grow">
+              DJ Consultation Auto-Send
+              <span class="sub">Automatically send quote to client when DJ finishes intake without Superuser review</span>
+            </div>
+            <span class="pill pill-gray">Off (Owner Reviews)</span>
+            <span class="toggle" id="toggle-dj-autosend"></span>
+          </div>
+          <div class="set-row">
+            <div class="grow">
+              Booking Confirmation Notification
+              <span class="sub">Instantly dispatch email confirmation upon website quote intake submission</span>
+            </div>
+            <span class="toggle on" id="toggle-confirm-email"></span>
+          </div>
+          <div class="set-row">
+            <div class="grow">
+              Automated Review Outreach
+              <span class="sub">Send automated Google Review request link 2 days after event execution</span>
+            </div>
+            <span class="toggle on" id="toggle-review-email"></span>
+          </div>
+        </section>
+
+        <!-- Email Templates -->
+        <section id="emails" class="card mb">
+          <div class="card-head">
+            <span class="label">Transactional Email Templates</span>
+          </div>
+          <div class="row">
+            <i class="fa-solid fa-envelope cyan"></i>
+            <span class="grow">Inquiry & Quote Received<span class="sub">Sent immediately after website intake</span></span>
+            <button class="btn btn-sm" onclick="previewEmail('quote')">Preview</button>
+          </div>
+          <div class="row">
+            <i class="fa-solid fa-envelope cyan"></i>
+            <span class="grow">Retainer Received · Date Locked<span class="sub">Includes contract link & confirmation receipt</span></span>
+            <button class="btn btn-sm" onclick="previewEmail('retainer')">Preview</button>
+          </div>
+          <div class="row">
+            <i class="fa-solid fa-envelope cyan"></i>
+            <span class="grow">14-Day Balance Due Reminder<span class="sub">Includes Square payment link</span></span>
+            <button class="btn btn-sm" onclick="previewEmail('balance')">Preview</button>
+          </div>
+          <div class="row">
+            <i class="fa-solid fa-envelope cyan"></i>
+            <span class="grow">Hold Expiration Warning (24h)<span class="sub">Urgent notice before calendar date releases</span></span>
+            <button class="btn btn-sm" onclick="previewEmail('hold')">Preview</button>
+          </div>
+        </section>
+
+        <!-- Team & Roles -->
+        <section id="team" class="card mb">
+          <div class="card-head">
+            <span class="label">Staff Roster & Permissions</span>
+          </div>
+          <div class="row">
+            <div class="avatar">TH</div>
+            <span class="grow">Owner Account<span class="sub">olifedigital@gmail.com</span></span>
+            <span class="pill pill-gold"><i class="fa-solid fa-crown"></i> Superuser</span>
+          </div>
+          <div class="row">
+            <div class="avatar gold">MA</div>
+            <span class="grow">Marcus Vance<span class="sub">DJ Staff · Consultations & Gig Live Access</span></span>
+            <span class="pill pill-gray">Staff</span>
+          </div>
+        </section>
+
+        <!-- Website Live Edit -->
+        <section id="website" class="card mb">
+          <div class="label mb">Public Website Live Edit Mode</div>
+          <div class="set-row">
+            <div class="grow">
+              Inline Visual Editor
+              <span class="sub">Superusers can edit public text, hero copy, and photos directly on thunderhouseent.com</span>
+            </div>
+            <a href="../index.html?edit=1" target="_blank" class="btn btn-ghost btn-sm">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Site in Live Edit Mode
+            </a>
+          </div>
+        </section>
+
+        <!-- SMTP & Sending -->
+        <section id="sending" class="card">
+          <div class="label mb">Email Dispatch & Credentials</div>
+          <div class="set-row">
+            <div class="grow">
+              Gmail Relay
+              <span class="sub">olifedigital@gmail.com · Google App Password stored securely</span>
+            </div>
+            <span class="pill pill-green"><i class="fa-solid fa-circle-check"></i> Operational</span>
+            <button class="btn btn-sm" onclick="testEmailRelay()">Send Test</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Supabase CDN Client & Config -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="assets/shell.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Subnav active scroll spy
+    const subnavLinks = document.querySelectorAll('.subnav a');
+    subnavLinks.forEach(link => {
+      link.onclick = () => {
+        subnavLinks.forEach(l => l.classList.remove('on'));
+        link.classList.add('on');
+      };
+    });
+
+    // Toggle clicks
+    document.querySelectorAll('.toggle').forEach(t => {
+      t.onclick = () => t.classList.toggle('on');
+    });
+
+    // Save all button
+    document.getElementById('btn-save-all-settings').onclick = async () => {
+      await saveBookingSettings();
+    };
+
+    await loadSettings();
+  });
+
+  async function loadSettings() {
+    if (!window.supabaseClient) return;
+
+    try {
+      const { data } = await window.supabaseClient
+        .from('thunderhouse_site_settings')
+        .select('*')
+        .eq('key', 'booking_settings')
+        .maybeSingle();
+
+      if (data && data.value) {
+        if (data.value.hold_hours) document.getElementById('set-hold-hours').value = data.value.hold_hours;
+        if (data.value.retainer_fee) document.getElementById('set-retainer-fee').value = data.value.retainer_fee;
+        if (data.value.balance_days) document.getElementById('set-balance-days').value = data.value.balance_days;
+      }
+    } catch (e) {
+      console.warn('Error loading settings:', e);
+    }
+  }
+
+  async function saveBookingSettings() {
+    if (!window.supabaseClient) return;
+
+    const holdHours = parseInt(document.getElementById('set-hold-hours').value) || 72;
+    const retainer = parseFloat(document.getElementById('set-retainer-fee').value) || 200;
+    const balanceDays = parseInt(document.getElementById('set-balance-days').value) || 14;
+
+    try {
+      await window.supabaseClient.from('thunderhouse_site_settings').upsert([{
+        key: 'booking_settings',
+        value: {
+          hold_hours: holdHours,
+          retainer_fee: retainer,
+          balance_days: balanceDays,
+          updated_at: new Date().toISOString()
+        }
+      }], { onConflict: 'key' });
+
+      window.showToast('All system settings saved to cloud!', 'success');
+    } catch (e) {
+      window.showToast('Failed to save settings: ' + e.message, 'error');
+    }
+  }
+
+  window.previewEmail = function (type) {
+    window.open(`../email-preview.html?type=${encodeURIComponent(type)}`, '_blank');
+  };
+
+  window.testEmailRelay = function () {
+    window.showToast('Test verification email queued to olifedigital@gmail.com!', 'gold');
+  };
+</script>
+</body>
+</html>

@@ -1,7 +1,8 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/admin", "destination": "/admin/today.html" },
+    { "source": "/admin/:page", "destination": "/admin/:page.html" },
     { "source": "/login", "destination": "/login.html" },
     { "source": "/invoice", "destination": "/invoice.html" },
     { "source": "/portal", "destination": "/portal.html" },
@@ -11,6 +12,8 @@
     { "source": "/contract", "destination": "/contract.html" },
     { "source": "/requests", "destination": "/requests.html" },
     { "source": "/keys", "destination": "/keys.html" },
+    { "source": "/wire-overlay", "destination": "/wire-overlay.html" },
+    { "source": "/obs", "destination": "/wire-overlay.html" },
     { "source": "/thank-you", "destination": "/thank-you.html" }
   ]
 }

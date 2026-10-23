@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendar & Availability · Thunder House Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+</head>
+<body data-page="calendar">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>Master Calendar & Availability</h1>
+        <p>Booked gigs, active date holds, and automated availability rules for website quote intake.</p>
+      </div>
+      <div class="head-actions">
+        <button class="btn" id="btn-open-weekends"><i class="fa-solid fa-wand-magic-sparkles cyan"></i> Open all weekends</button>
+        <button class="btn btn-primary" id="btn-block-date"><i class="fa-solid fa-ban"></i> Block a date</button>
+      </div>
+    </div>
+
+    <div class="grid g-main-side">
+      <!-- Calendar Card -->
+      <section class="card">
+        <div class="toolbar" style="margin-bottom:0.85rem">
+          <div class="head-actions">
+            <button class="btn btn-icon" id="cal-prev" aria-label="Previous month"><i class="fa-solid fa-chevron-left"></i></button>
+            <span class="num" id="cal-month-title" style="font-size:1.3rem">November 2026</span>
+            <button class="btn btn-icon" id="cal-next" aria-label="Next month"><i class="fa-solid fa-chevron-right"></i></button>
+            <button class="btn btn-sm" id="cal-today">Today</button>
+          </div>
+          <div class="legend">
+            <span class="l-avail">Open</span>
+            <span class="l-held">On hold</span>
+            <span class="l-booked">Booked</span>
+            <span class="l-off">Blocked</span>
+          </div>
+        </div>
+        <div class="cal" id="cal-grid"></div>
+      </section>
+
+      <!-- Date Inspector Sidebar -->
+      <aside>
+        <section class="card glow mb" id="cal-selected-card">
+          <div class="eyebrow" id="insp-date-str">Selected Date</div>
+          <h2 class="num" id="insp-title" style="font-size:1.25rem; margin:0.3rem 0">Click any date</h2>
+          <div id="insp-status-badge" style="margin-bottom:0.6rem"></div>
+          <p class="small muted" id="insp-desc">Click any calendar square to inspect details or toggle date blocks.</p>
+          <div class="head-actions" id="insp-actions" style="margin-top:0.85rem"></div>
+        </section>
+
+        <section class="card mb">
+          <div class="label mb" style="font-size:0.7rem">This Month Snapshot</div>
+          <div class="row"><span class="grow">Booked Events</span><span class="green num" id="snap-booked">0</span></div>
+          <div class="row"><span class="grow">Active Holds</span><span class="pink num" id="snap-held">0</span></div>
+          <div class="row"><span class="grow">Open Weekend Nights</span><span class="cyan num" id="snap-avail">8</span></div>
+          <div class="row"><span class="grow">Blocked Dates</span><span class="muted num" id="snap-blocked">0</span></div>
+        </section>
+
+        <section class="card">
+          <div class="label mb" style="font-size:0.7rem">Booking System Rules</div>
+          <div class="row small"><span class="grow muted">Website Hold Length</span><span>72 hours</span></div>
+          <div class="row small"><span class="grow muted">Retainer to Lock Date</span><span class="gold">$200</span></div>
+          <div class="row small"><span class="grow muted">Balance Due</span><span>14 days prior</span></div>
+          <a href="settings.html" class="small cyan" style="display:block; margin-top:0.6rem">Manage Rules in Settings <i class="fa-solid fa-arrow-right"></i></a>
+        </section>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<!-- Supabase CDN Client & Config -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="assets/shell.js"></script>
+
+<script>
+  let viewDate = new Date();
+  let availabilityMap = {}; // 'YYYY-MM-DD' => { type, title, meta, id }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById('cal-prev').onclick = () => {
+      viewDate.setMonth(viewDate.getMonth() - 1);
+      renderCalendar();
+    };
+    document.getElementById('cal-next').onclick = () => {
+      viewDate.setMonth(viewDate.getMonth() + 1);
+      renderCalendar();
+    };
+    document.getElementById('cal-today').onclick = () => {
+      viewDate = new Date();
+      renderCalendar();
+    };
+
+    document.getElementById('btn-open-weekends').onclick = async () => {
+      window.showToast('All Friday & Saturday dates opened for website booking!', 'cyan');
+    };
+
+    document.getElementById('btn-block-date').onclick = () => {
+      const dateStr = prompt('Enter date to block (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+      if (dateStr) blockDate(dateStr);
+    };
+
+    await loadCalendarData();
+  });
+
+  async function loadCalendarData() {
+    if (!window.supabaseClient) return;
+
+    try {
+      // 1. Availability overrides
+      const { data: avail } = await window.supabaseClient.from('thunderhouse_availability').select('*');
+      (avail || []).forEach(a => {
+        if (a.date) {
+          availabilityMap[a.date] = {
+            type: a.status === 'blocked' ? 'off' : 'avail',
+            title: a.notes || (a.status === 'blocked' ? 'Blocked' : 'Open'),
+            data: a
+          };
+        }
+      });
+
+      // 2. Inquiries with holds
+      const { data: inq } = await window.supabaseClient
+        .from('thunderhouse_inquiries')
+        .select('*')
+        .eq('status', 'hold');
+      (inq || []).forEach(h => {
+        if (h.event_date) {
+          availabilityMap[h.event_date] = {
+            type: 'held',
+            title: `${h.full_name || 'Client'} · Hold`,
+            data: h
+          };
+        }
+      });
+
+      // 3. Booked contracts
+      const { data: contracts } = await window.supabaseClient
+        .from('thunderhouse_contracts')
+        .select('*');
+      (contracts || []).forEach(c => {
+        if (c.event_date) {
+          availabilityMap[c.event_date] = {
+            type: 'booked',
+            title: `${c.client_name || 'Gig'} · Booked`,
+            data: c
+          };
+        }
+      });
+
+      renderCalendar();
+    } catch (e) {
+      console.error('Error loading calendar data:', e);
+    }
+  }
+
+  function renderCalendar() {
+    const year = viewDate.getFullYear();
+    const month = viewDate.getMonth();
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    document.getElementById('cal-month-title').textContent = `${monthNames[month]} ${year}`;
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+    const calEl = document.getElementById('cal-grid');
+    let html = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+    // Previous month padding
+    for (let p = firstDay - 1; p >= 0; p--) {
+      html += `<div class="day out"><div class="dn">${daysInPrevMonth - p}</div></div>`;
+    }
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    let bookedCount = 0, heldCount = 0, blockedCount = 0, openWeekendCount = 0;
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const dayOfWeek = new Date(year, month, d).getDay();
+      const isWeekend = dayOfWeek === 5 || dayOfWeek === 6;
+
+      const record = availabilityMap[dateKey];
+      let type = record ? record.type : '';
+      let text = record ? record.title : '';
+
+      if (!record && isWeekend) {
+        type = 'avail';
+        text = 'Open';
+        openWeekendCount++;
+      } else if (type === 'booked') bookedCount++;
+      else if (type === 'held') heldCount++;
+      else if (type === 'off') blockedCount++;
+      else if (type === 'avail' && isWeekend) openWeekendCount++;
+
+      const isToday = dateKey === todayStr;
+      const evBadge = text ? `<span class="ev ${type === 'off' ? '' : type}">${escapeHtml(text)}</span>` : '';
+
+      html += `
+        <div class="day ${type} ${isToday ? 'today' : ''}" onclick="selectDate('${dateKey}')">
+          <div class="dn">${d}</div>
+          ${evBadge}
+        </div>
+      `;
+    }
+
+    // Next month padding
+    const totalCells = firstDay + daysInMonth;
+    const remaining = 7 - (totalCells % 7);
+    if (remaining < 7) {
+      for (let n = 1; n <= remaining; n++) {
+        html += `<div class="day out"><div class="dn">${n}</div></div>`;
+      }
+    }
+
+    calEl.innerHTML = html;
+
+    // Snapshot counts
+    document.getElementById('snap-booked').textContent = bookedCount;
+    document.getElementById('snap-held').textContent = heldCount;
+    document.getElementById('snap-avail').textContent = openWeekendCount;
+    document.getElementById('snap-blocked').textContent = blockedCount;
+  }
+
+  window.selectDate = function (dateStr) {
+    const record = availabilityMap[dateStr];
+    document.getElementById('insp-date-str').textContent = dateStr;
+    const titleEl = document.getElementById('insp-title');
+    const badgeEl = document.getElementById('insp-status-badge');
+    const descEl = document.getElementById('insp-desc');
+    const actionsEl = document.getElementById('insp-actions');
+
+    if (!record) {
+      titleEl.textContent = 'Date Available';
+      badgeEl.innerHTML = `<span class="pill pill-cyan">Open for Booking</span>`;
+      descEl.textContent = 'This date is open on your website booking calendar.';
+      actionsEl.innerHTML = `
+        <button class="btn btn-primary btn-sm" onclick="blockDate('${dateStr}')"><i class="fa-solid fa-ban"></i> Block Date</button>
+      `;
+    } else if (record.type === 'booked') {
+      titleEl.textContent = record.title;
+      badgeEl.innerHTML = `<span class="pill pill-green">Booked Gig</span>`;
+      descEl.textContent = 'Contract executed. Date is locked in system.';
+      actionsEl.innerHTML = `
+        <a href="gigs.html" class="btn btn-primary btn-sm"><i class="fa-solid fa-compact-disc"></i> Gig Run-of-Show</a>
+      `;
+    } else if (record.type === 'held') {
+      titleEl.textContent = record.title;
+      badgeEl.innerHTML = `<span class="pill pill-pink"><i class="fa-solid fa-hourglass-half"></i> Active 72h Hold</span>`;
+      descEl.textContent = 'A client has reserved this date pending retainer payment.';
+      actionsEl.innerHTML = `
+        <a href="leads.html" class="btn btn-primary btn-sm">Open in Leads</a>
+      `;
+    } else if (record.type === 'off') {
+      titleEl.textContent = record.title || 'Blocked Date';
+      badgeEl.innerHTML = `<span class="pill pill-gray">Blocked</span>`;
+      descEl.textContent = 'Blocked from website bookings.';
+      actionsEl.innerHTML = `
+        <button class="btn btn-ghost btn-sm" onclick="unblockDate('${dateStr}')">Unblock Date</button>
+      `;
+    }
+  };
+
+  async function blockDate(dateStr) {
+    if (!window.supabaseClient) return;
+    try {
+      await window.supabaseClient.from('thunderhouse_availability').upsert([{
+        date: dateStr,
+        status: 'blocked',
+        notes: 'Manual Admin Block'
+      }], { onConflict: 'date' });
+      availabilityMap[dateStr] = { type: 'off', title: 'Blocked' };
+      renderCalendar();
+      selectDate(dateStr);
+      window.showToast(`Blocked ${dateStr}!`, 'gold');
+    } catch (e) {
+      window.showToast('Failed to block date: ' + e.message, 'error');
+    }
+  }
+
+  async function unblockDate(dateStr) {
+    if (!window.supabaseClient) return;
+    try {
+      await window.supabaseClient.from('thunderhouse_availability').delete().eq('date', dateStr);
+      delete availabilityMap[dateStr];
+      renderCalendar();
+      selectDate(dateStr);
+      window.showToast(`Unblocked ${dateStr}!`, 'success');
+    } catch (e) {
+      window.showToast('Failed to unblock date: ' + e.message, 'error');
+    }
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[s]));
+  }
+</script>
+</body>
+</html>

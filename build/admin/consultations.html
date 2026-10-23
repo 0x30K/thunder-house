@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consultations & DJ Intakes · Thunder House Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+</head>
+<body data-page="consultations">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>Consultations & DJ Intakes</h1>
+        <p>Client intake notes taken by your DJ crew. Price the package, approve terms, and trigger official quote.</p>
+      </div>
+      <div class="head-actions">
+        <a href="../intake.html" target="_blank" class="btn btn-primary"><i class="fa-solid fa-clipboard-question"></i> Open DJ Intake Form</a>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="seg" id="consult-seg">
+        <button class="on" data-status="pending">Needs Pricing · <span id="consult-pending-count">0</span></button>
+        <button data-status="approved">Approved</button>
+        <button data-status="all">All Intakes</button>
+      </div>
+      <div class="head-actions">
+        <span class="small muted">Auto-send approved quotes</span>
+        <span class="toggle" id="toggle-autosend"></span>
+      </div>
+    </div>
+
+    <div class="grid g-main-side">
+      <!-- Active Review Container -->
+      <section class="card glow" id="consult-detail-card">
+        <div style="display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap">
+          <div>
+            <span class="pill pill-gold" id="c-pill-status">Needs Pricing</span>
+            <h2 class="num" id="c-title" style="font-size:1.45rem; margin:0.4rem 0 0.1rem">Select a consultation</h2>
+            <div class="small muted" id="c-meta">Awaiting intake selection</div>
+          </div>
+          <div class="head-actions" style="align-items:flex-start">
+            <a href="#" id="c-btn-call" class="btn btn-sm"><i class="fa-solid fa-phone"></i> Call client</a>
+          </div>
+        </div>
+
+        <div class="grid g-2" style="margin-top:1.25rem">
+          <div>
+            <div class="row small"><span class="grow muted">Event Date</span><span id="c-date">—</span></div>
+            <div class="row small"><span class="grow muted">Venue</span><span id="c-venue">—</span></div>
+            <div class="row small"><span class="grow muted">Hours</span><span id="c-hours">—</span></div>
+            <div class="row small"><span class="grow muted">Guests</span><span id="c-guests">—</span></div>
+          </div>
+          <div>
+            <div class="row small"><span class="grow muted">Uplighting</span><span id="c-uplights" class="green">No</span></div>
+            <div class="row small"><span class="grow muted">Ceremony Audio</span><span id="c-ceremony" class="green">No</span></div>
+            <div class="row small"><span class="grow muted">MC Hosting</span><span id="c-mc" class="green">Yes</span></div>
+            <div class="row small"><span class="grow muted">Client Budget</span><span id="c-budget" class="gold num">—</span></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:1.15rem; background:rgba(0,0,0,0.3)">
+          <div class="small muted" style="font-weight:700; margin-bottom:0.25rem">DJ Intake Notes</div>
+          <p class="small" id="c-notes">Select an intake from the sidebar to review full details.</p>
+        </div>
+
+        <!-- Pricing Form -->
+        <div style="border-top:1px solid var(--border-subtle); margin-top:1.35rem; padding-top:1.15rem">
+          <div class="label mb" style="font-size:0.75rem">Owner / Superuser Price Determination</div>
+          <div class="grid g-3">
+            <div class="field">
+              <label>Recommended Package</label>
+              <select class="input" id="c-set-pkg">
+                <option value="Thunder Party · 4 hrs">Thunder Party ($700)</option>
+                <option value="Thunder Premium · 6 hrs">Thunder Premium ($900)</option>
+                <option value="Custom Wedding · 6+ hrs">Custom Wedding ($1,500)</option>
+                <option value="Thunder Basic · 3 hrs">Thunder Basic ($500)</option>
+                <option value="Thunder All-Night · 8 hrs">Thunder All-Night ($1,200)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Add-ons & Sound</label>
+              <input class="input" id="c-set-addons" placeholder="Uplights, wireless mic pack...">
+            </div>
+            <div class="field">
+              <label>Total Price ($)</label>
+              <input class="input gold num" type="number" id="c-set-price" value="700">
+            </div>
+          </div>
+          <div class="head-actions" style="justify-content:flex-end; margin-top:0.75rem">
+            <button type="button" class="btn" id="btn-c-back">Send back to DJ</button>
+            <button type="button" class="btn btn-primary" id="btn-c-approve"><i class="fa-solid fa-check"></i> Approve & Issue Quote</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sidebar -->
+      <aside>
+        <section class="card mb">
+          <div class="label mb" style="font-size:0.7rem">Consultations Roster</div>
+          <div id="consult-sidebar-list">
+            <div style="padding:1rem 0; text-align:center" class="muted small">Checking intakes…</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="label mb" style="font-size:0.7rem">Official Price Guide</div>
+          <div class="row small"><span class="grow">Thunder Basic · 3 hrs</span><span class="gold num">$500</span></div>
+          <div class="row small"><span class="grow">Thunder Party · 4 hrs</span><span class="gold num">$700</span></div>
+          <div class="row small"><span class="grow">Thunder Premium · 6 hrs</span><span class="gold num">$900</span></div>
+          <div class="row small"><span class="grow">Thunder All-Night · 8 hrs</span><span class="gold num">$1,200</span></div>
+          <div class="row small"><span class="grow">Custom Wedding · Ceremony + Reception</span><span class="gold num">$1,500+</span></div>
+          <div class="row small"><span class="grow">Uplighting Addon (8 pods)</span><span class="gold num">$200</span></div>
+        </section>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<!-- Supabase CDN Client & Config -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="assets/shell.js"></script>
+
+<script>
+  let intakesList = [];
+  let selectedIntake = null;
+  let activeFilter = 'pending';
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Segment buttons
+    document.querySelectorAll('#consult-seg button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#consult-seg button').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        activeFilter = btn.dataset.status;
+        renderIntakesList();
+      };
+    });
+
+    // Auto-send toggle
+    const toggle = document.getElementById('toggle-autosend');
+    if (toggle) {
+      toggle.onclick = () => {
+        toggle.classList.toggle('on');
+        window.showToast(`Auto-send quotes ${toggle.classList.contains('on') ? 'enabled' : 'disabled'}!`, 'cyan');
+      };
+    }
+
+    // Approve button
+    document.getElementById('btn-c-approve').onclick = async () => {
+      if (!selectedIntake) {
+        window.showToast('Select an intake first!', 'error');
+        return;
+      }
+      await approveIntake();
+    };
+
+    // Send back button
+    document.getElementById('btn-c-back').onclick = () => {
+      if (!selectedIntake) return;
+      window.showToast('Intake flagged for DJ revision!', 'gold');
+    };
+
+    await loadIntakes();
+  });
+
+  async function loadIntakes() {
+    if (!window.supabaseClient) return;
+
+    try {
+      const { data, error } = await window.supabaseClient
+        .from('thunderhouse_intakes')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      intakesList = data || [];
+      renderIntakesList();
+
+      if (intakesList.length > 0) {
+        selectIntake(intakesList[0]);
+      }
+    } catch (e) {
+      console.error('Error loading intakes:', e);
+    }
+  }
+
+  function renderIntakesList() {
+    const filtered = intakesList.filter(i => {
+      if (activeFilter === 'pending') return (i.status || 'pending') === 'pending';
+      if (activeFilter === 'approved') return i.status === 'approved';
+      return true;
+    });
+
+    const pendingCount = intakesList.filter(i => (i.status || 'pending') === 'pending').length;
+    document.getElementById('consult-pending-count').textContent = pendingCount;
+
+    const container = document.getElementById('consult-sidebar-list');
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div style="padding:1rem 0; text-align:center" class="muted small">
+          No intakes in this category.
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = filtered.map(item => `
+      <div class="row" style="cursor:pointer" onclick="selectIntakeById('${item.id}')">
+        <div class="avatar gold">${(item.client_name || 'CO').substring(0, 2).toUpperCase()}</div>
+        <div class="grow">
+          <strong>${escapeHtml(item.client_name || 'Client')}</strong>
+          <span class="sub">${escapeHtml(item.consultant_name || 'Staff')} · ${item.event_date || 'Date TBD'}</span>
+        </div>
+        <i class="fa-solid fa-chevron-right muted"></i>
+      </div>
+    `).join('');
+  }
+
+  window.selectIntakeById = function (id) {
+    const match = intakesList.find(i => i.id === id);
+    if (match) selectIntake(match);
+  };
+
+  function selectIntake(intake) {
+    selectedIntake = intake;
+
+    document.getElementById('c-title').textContent = `${intake.client_name || 'Client'} · ${intake.event_type || 'Event'}`;
+    document.getElementById('c-meta').textContent = `Taken by ${intake.consultant_name || 'DJ Staff'} · ${intake.created_at ? new Date(intake.created_at).toLocaleDateString() : 'Recent'}`;
+    document.getElementById('c-btn-call').href = intake.client_phone ? `tel:${intake.client_phone}` : '#';
+
+    document.getElementById('c-date').textContent = intake.event_date || 'TBD';
+    document.getElementById('c-venue').textContent = intake.venue_location || 'Oklahoma City, OK';
+    document.getElementById('c-hours').textContent = intake.event_duration ? `${intake.event_duration} hrs` : '4 hrs';
+    document.getElementById('c-guests').textContent = intake.guest_count || '100+';
+
+    document.getElementById('c-notes').textContent = intake.notes || 'No special DJ notes recorded.';
+    document.getElementById('c-budget').textContent = intake.budget ? `$${intake.budget}` : '~$700';
+
+    if (intake.estimated_price) {
+      document.getElementById('c-set-price').value = intake.estimated_price;
+    }
+  }
+
+  async function approveIntake() {
+    if (!window.supabaseClient || !selectedIntake) return;
+
+    const finalPrice = parseFloat(document.getElementById('c-set-price').value) || 700;
+    const finalPkg = document.getElementById('c-set-pkg').value;
+
+    try {
+      // 1. Update intake status
+      await window.supabaseClient
+        .from('thunderhouse_intakes')
+        .update({ status: 'approved', final_price: finalPrice })
+        .eq('id', selectedIntake.id);
+
+      // 2. Create official inquiry lead
+      await window.supabaseClient.from('thunderhouse_inquiries').insert([{
+        full_name: selectedIntake.client_name,
+        email: selectedIntake.client_email,
+        phone: selectedIntake.client_phone,
+        event_type: selectedIntake.event_type,
+        event_date: selectedIntake.event_date,
+        venue_location: selectedIntake.venue_location,
+        package_name: finalPkg,
+        estimated_total: finalPrice,
+        notes: `DJ Intake: ${selectedIntake.notes || ''}`,
+        status: 'quoted',
+        source: 'consultation'
+      }]);
+
+      // 3. Upsert into Clients CRM
+      await window.supabaseClient.from('thunderhouse_clients').upsert([{
+        full_name: selectedIntake.client_name,
+        email: (selectedIntake.client_email || '').toLowerCase(),
+        phone: selectedIntake.client_phone,
+        source: 'consultation',
+        status: 'lead'
+      }], { onConflict: 'email' });
+
+      selectedIntake.status = 'approved';
+      window.showToast(`Approved quote ($${finalPrice}) for ${selectedIntake.client_name}!`, 'success');
+      renderIntakesList();
+      if (window.refreshAdminBadges) window.refreshAdminBadges();
+    } catch (err) {
+      window.showToast('Error approving intake: ' + err.message, 'error');
+    }
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[s]));
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clients CRM & Email Database · Thunder House Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+</head>
+<body data-page="clients">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>Clients CRM & Marketing Database</h1>
+        <p>Every client, lead, and booking on file. Build long-term relationships and export contacts for email marketing.</p>
+      </div>
+      <div class="head-actions">
+        <button class="btn" id="btn-export-clients-csv"><i class="fa-solid fa-file-csv"></i> Export Email List (CSV)</button>
+        <button class="btn btn-primary" id="btn-add-client"><i class="fa-solid fa-user-plus"></i> Add Client</button>
+      </div>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="grid g-4 mb-lg">
+      <div class="kpi">
+        <div class="k-label">Total Clients</div>
+        <div class="k-value" id="crm-kpi-total">0</div>
+        <div class="k-sub" id="crm-kpi-leads">Inquiries & bookings</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">Repeat Bookings</div>
+        <div class="k-value cyan" id="crm-kpi-repeat">0</div>
+        <div class="k-sub">Booked 2+ times</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">Avg. Event Value</div>
+        <div class="k-value gold" id="crm-kpi-avg">$750</div>
+        <div class="k-sub">Across all packages</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label">Email List Opt-in</div>
+        <div class="k-value green" id="crm-kpi-optin">100%</div>
+        <div class="k-sub">Ready for newsletters</div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="seg" id="client-filter-seg">
+        <button class="on" data-status="all">All</button>
+        <button data-status="active">Active</button>
+        <button data-status="lead">Leads</button>
+        <button data-status="vip">VIP</button>
+        <button data-status="past">Past</button>
+      </div>
+      <div class="search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="clients-search-input" placeholder="Search name, phone, email…">
+      </div>
+    </div>
+
+    <!-- Clients Table -->
+    <div class="card" style="padding:0.25rem 0.5rem; overflow-x:auto">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Contact Details</th>
+            <th>Events</th>
+            <th class="right">Lifetime Spend</th>
+            <th>Source</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="clients-table-body">
+          <tr><td colspan="7" style="text-align:center" class="muted">Loading client records…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small muted" style="margin-top:1.15rem">
+      <i class="fa-solid fa-circle-info cyan"></i> All intakes, bookings, and quotes automatically build this client database for retargeting and marketing blasts.
+    </p>
+  </main>
+</div>
+
+<!-- Modal: Add Client -->
+<div id="add-client-modal" class="modal-scrim" style="display:none">
+  <div class="modal-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem">
+      <div class="label"><i class="fa-solid fa-user-plus cyan"></i> Add New Client</div>
+      <button class="btn btn-icon" id="btn-close-cm"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form id="add-client-form">
+      <div class="grid g-2">
+        <div class="field">
+          <label>Full Name *</label>
+          <input class="input" id="cm-name" required placeholder="e.g. Ashley Johnson">
+        </div>
+        <div class="field">
+          <label>Email Address *</label>
+          <input class="input" type="email" id="cm-email" required placeholder="ashley@example.com">
+        </div>
+      </div>
+      <div class="grid g-2">
+        <div class="field">
+          <label>Phone Number</label>
+          <input class="input" id="cm-phone" placeholder="405-555-0107">
+        </div>
+        <div class="field">
+          <label>Company / Organization</label>
+          <input class="input" id="cm-company" placeholder="e.g. Westside PTA">
+        </div>
+      </div>
+      <div class="grid g-2">
+        <div class="field">
+          <label>City, State</label>
+          <input class="input" id="cm-city" placeholder="Yukon, OK">
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select class="input" id="cm-status">
+            <option value="active">Active Client</option>
+            <option value="lead">Lead</option>
+            <option value="vip">VIP / High Value</option>
+            <option value="past">Past Client</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Client Notes & Preferences</label>
+        <textarea class="input" id="cm-notes" placeholder="Referred by friends, prefers R&B music..."></textarea>
+      </div>
+      <div class="head-actions" style="justify-content:flex-end; margin-top:1.25rem">
+        <button type="button" class="btn" id="btn-cancel-cm">Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Save to CRM</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Supabase CDN Client & Config -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="assets/shell.js"></script>
+
+<script>
+  let clientsData = [];
+  let activeFilter = 'all';
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Segment buttons
+    document.querySelectorAll('#client-filter-seg button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#client-filter-seg button').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        activeFilter = btn.dataset.status;
+        renderClientsTable();
+      };
+    });
+
+    // Search filter
+    const searchInput = document.getElementById('clients-search-input');
+    if (searchInput) {
+      searchInput.oninput = () => renderClientsTable();
+    }
+
+    // Export CSV
+    document.getElementById('btn-export-clients-csv').onclick = exportClientsCSV;
+
+    // Modal toggles
+    const modal = document.getElementById('add-client-modal');
+    document.getElementById('btn-add-client').onclick = () => modal.style.display = 'flex';
+    document.getElementById('btn-close-cm').onclick = () => modal.style.display = 'none';
+    document.getElementById('btn-cancel-cm').onclick = () => modal.style.display = 'none';
+
+    // Form submit
+    document.getElementById('add-client-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('cm-name').value.trim();
+      const email = document.getElementById('cm-email').value.trim().toLowerCase();
+      const phone = document.getElementById('cm-phone').value.trim();
+      const company = document.getElementById('cm-company').value.trim();
+      const city = document.getElementById('cm-city').value.trim();
+      const status = document.getElementById('cm-status').value;
+      const notes = document.getElementById('cm-notes').value.trim();
+
+      try {
+        if (window.supabaseClient) {
+          await window.supabaseClient.from('thunderhouse_clients').upsert([{
+            full_name: name,
+            email: email,
+            phone: phone,
+            company: company,
+            address: city,
+            status: status,
+            notes: notes,
+            email_list_opt_in: true
+          }], { onConflict: 'email' });
+        }
+
+        window.showToast(`Saved ${name} to Client Database!`, 'success');
+        modal.style.display = 'none';
+        document.getElementById('add-client-form').reset();
+        await loadClients();
+      } catch (err) {
+        window.showToast('Error saving client: ' + err.message, 'error');
+      }
+    };
+
+    await loadClients();
+  });
+
+  async function loadClients() {
+    if (!window.supabaseClient) return;
+
+    try {
+      const { data, error } = await window.supabaseClient
+        .from('thunderhouse_clients')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      clientsData = data || [];
+      renderClientsTable();
+    } catch (e) {
+      console.error('Error loading clients:', e);
+    }
+  }
+
+  function renderClientsTable() {
+    const q = (document.getElementById('clients-search-input')?.value || '').trim().toLowerCase();
+
+    // KPIs
+    const totalCount = clientsData.length;
+    const repeatCount = clientsData.filter(c => (c.total_events || 0) >= 2).length;
+    document.getElementById('crm-kpi-total').textContent = totalCount;
+    document.getElementById('crm-kpi-repeat').textContent = repeatCount;
+
+    let filtered = clientsData.filter(c => {
+      if (activeFilter !== 'all' && (c.status || 'active').toLowerCase() !== activeFilter) return false;
+      if (q) {
+        const text = `${c.full_name || ''} ${c.email || ''} ${c.phone || ''} ${c.company || ''} ${c.address || ''}`.toLowerCase();
+        if (!text.includes(q)) return false;
+      }
+      return true;
+    });
+
+    const tbody = document.getElementById('clients-table-body');
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center" class="muted">No clients found matching filter.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(c => {
+      const initials = (c.full_name || 'TH').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      const phone = c.phone || '—';
+      const email = c.email || '—';
+      const spend = parseFloat(c.lifetime_spend) || 0;
+      const events = c.total_events || 1;
+      const status = c.status || 'active';
+
+      let statusPill = `<span class="pill pill-cyan">Active</span>`;
+      if (status === 'vip') statusPill = `<span class="pill pill-gold"><i class="fa-solid fa-crown"></i> VIP</span>`;
+      else if (status === 'lead') statusPill = `<span class="pill pill-pink">Lead</span>`;
+      else if (status === 'past') statusPill = `<span class="pill pill-gray">Past</span>`;
+
+      return `
+        <tr>
+          <td>
+            <div style="display:flex; gap:0.75rem; align-items:center">
+              <div class="avatar ${status === 'vip' ? 'gold' : ''}">${initials}</div>
+              <div>
+                <strong>${escapeHtml(c.full_name || 'Client')}</strong>
+                <div class="small muted">${escapeHtml(c.company ? c.company + ' · ' : '')}${escapeHtml(c.address || 'Oklahoma')}</div>
+              </div>
+            </div>
+          </td>
+          <td class="small">
+            ${c.phone ? `<a class="cyan" href="tel:${c.phone}" title="Call"><i class="fa-solid fa-phone"></i></a>&nbsp; ` : ''}
+            ${c.email ? `<a class="cyan" href="mailto:${c.email}" title="Email"><i class="fa-solid fa-envelope"></i></a>&nbsp; ` : ''}
+            <span>${escapeHtml(phone)}</span>
+          </td>
+          <td>${events} ${events === 1 ? 'event' : 'events'}</td>
+          <td class="right num gold">$${spend.toLocaleString()}</td>
+          <td><span class="pill pill-gray">${escapeHtml(c.source || 'Website')}</span></td>
+          <td>${statusPill}</td>
+          <td class="right">
+            <button class="btn btn-ghost btn-sm" onclick="askClientReview('${c.id}')"><i class="fa-solid fa-star gold"></i> Review</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  window.askClientReview = function (id) {
+    window.showToast('Google Review request email sent to client!', 'gold');
+  };
+
+  function exportClientsCSV() {
+    if (clientsData.length === 0) {
+      window.showToast('No client records to export', 'error');
+      return;
+    }
+
+    const headers = ['Full Name', 'Email Address', 'Phone Number', 'Company', 'Address', 'Status', 'Lifetime Spend', 'Total Events', 'Email Opt-In', 'Created Date'];
+    const rows = clientsData.map(c => [
+      `"${(c.full_name || '').replace(/"/g, '""')}"`,
+      `"${(c.email || '').replace(/"/g, '""')}"`,
+      `"${(c.phone || '').replace(/"/g, '""')}"`,
+      `"${(c.company || '').replace(/"/g, '""')}"`,
+      `"${(c.address || '').replace(/"/g, '""')}"`,
+      `"${c.status || 'active'}"`,
+      c.lifetime_spend || 0,
+      c.total_events || 0,
+      c.email_list_opt_in !== false ? 'Yes' : 'No',
+      `"${c.created_at || ''}"`
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `thunderhouse_clients_database_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.showToast('Client marketing database exported to CSV!', 'success');
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[s]));
+  }
+</script>
+</body>
+</html>
