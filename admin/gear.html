@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equipment Fleet & Studio Inventory · Thunder House Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+  <!-- QR Code Generator Library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <style>
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.15rem 1.25rem;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .kpi-card:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+    }
+    .kpi-card.active-filter {
+      border-color: var(--primary);
+      box-shadow: 0 0 16px var(--primary-glow);
+    }
+    .kpi-card .num {
+      font-size: 2rem;
+      font-weight: 800;
+      font-family: var(--font-heading);
+      line-height: 1.1;
+      margin-top: 0.35rem;
+    }
+    .gear-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .gear-table th {
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .gear-table td {
+      padding: 0.95rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      vertical-align: middle;
+      font-size: 0.9rem;
+    }
+    .gear-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .gear-icon-box {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 229, 255, 0.08);
+      color: var(--primary);
+      font-size: 1.1rem;
+      border: 1px solid rgba(0, 229, 255, 0.2);
+    }
+    .sticker-preview-card {
+      background: #000;
+      border: 2px solid #fff;
+      border-radius: 12px;
+      padding: 1.25rem;
+      color: #fff;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    .sticker-brand {
+      font-family: var(--font-heading);
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #ffb703;
+      margin-bottom: 0.6rem;
+    }
+    .sticker-qr-canvas {
+      background: #fff;
+      padding: 8px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+    .sticker-item-name {
+      font-weight: 700;
+      font-size: 0.92rem;
+      margin-top: 0.6rem;
+      line-height: 1.25;
+      color: #fff;
+    }
+    .sticker-meta {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-top: 0.25rem;
+      font-family: monospace;
+    }
+    .live-pulse {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+      animation: pulseAnim 1.6s infinite;
+      margin-right: 6px;
+    }
+    @keyframes pulseAnim {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+    @media (max-width: 900px) {
+      .gear-table, .gear-table tbody, .gear-table tr, .gear-table td {
+        display: block;
+        width: 100%;
+      }
+      .gear-table thead { display: none; }
+      .gear-table tr {
+        margin-bottom: 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 0.75rem;
+      }
+      .gear-table td {
+        border-bottom: none;
+        padding: 0.4rem 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body data-page="gear">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <!-- Page Header -->
+    <div class="page-head">
+      <div>
+        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.35rem">
+          <span class="pill pill-gold" style="font-size:0.75rem"><i class="fa-solid fa-boxes-stacked"></i> DJ Equipment Fleet</span>
+          <span id="superuser-gear-badge" class="pill pill-gold" style="font-size:0.75rem; display:none"><i class="fa-solid fa-crown"></i> Superuser Controls</span>
+        </div>
+        <h1>Equipment Fleet & Studio Inventory</h1>
+        <p>Road-ready DJ decks, sound systems, wireless mics, and lighting. Scan QR codes with your mobile phone.</p>
+      </div>
+      <div class="head-actions">
+        <button class="btn btn-outline" id="btn-print-sheet" title="Generate printable sticker sheet">
+          <i class="fa-solid fa-print"></i> Print Sticker Sheet
+        </button>
+        <button class="btn btn-primary" id="btn-pair-mobile" style="background:linear-gradient(135deg, #ffb703, #ff8800); color:#000; border:none; font-weight:700">
+          <i class="fa-solid fa-mobile-screen-button"></i> Scan with Mobile
+        </button>
+        <button class="btn btn-outline" id="btn-add-equipment" style="display:none">
+          <i class="fa-solid fa-plus"></i> Add Equipment
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Mobile Pairing Banner (shown when phone is paired) -->
+    <div id="scanner-session-banner" class="card mb" style="display:none; background:rgba(0, 229, 255, 0.08); border-color:rgba(0, 229, 255, 0.35); padding:0.9rem 1.25rem">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem">
+        <div style="display:flex; align-items:center; gap:0.75rem">
+          <span class="live-pulse"></span>
+          <div>
+            <strong style="color:var(--primary); font-size:0.92rem">Mobile Scanner Connected</strong>
+            <span class="small muted" style="margin-left:0.5rem" id="scanner-session-id-display">Session #TH-9842</span>
+            <div class="small text-light" style="margin-top:0.15rem">Walk around the studio and scan gear stickers—scans will appear here instantly.</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:0.5rem">
+          <button class="btn btn-sm btn-outline" id="btn-open-scanner-window" title="Open mobile view in new tab">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Test Mobile Window
+          </button>
+          <button class="btn btn-sm btn-ghost" id="btn-disconnect-scanner" style="color:var(--secondary)">
+            <i class="fa-solid fa-link-slash"></i> Disconnect
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Summary Row -->
+    <div class="kpi-grid">
+      <div class="kpi-card" data-filter="all" id="kpi-total">
+        <div class="label"><i class="fa-solid fa-layer-group"></i> Total Fleet Items</div>
+        <div class="num text-main" id="count-total">8</div>
+        <div class="small muted" style="margin-top:0.25rem">Total inventoried units</div>
+      </div>
+      <div class="kpi-card active-filter" data-filter="Available in Studio" id="kpi-available">
+        <div class="label"><i class="fa-solid fa-circle-check" style="color:var(--success)"></i> Available in Studio</div>
+        <div class="num" style="color:var(--success)" id="count-available">8</div>
+        <div class="small muted" style="margin-top:0.25rem">Racked & ready for gig packing</div>
+      </div>
+      <div class="kpi-card" data-filter="Checked Out" id="kpi-out">
+        <div class="label"><i class="fa-solid fa-truck-ramp-box" style="color:var(--accent-gold)"></i> Checked Out / On Gig</div>
+        <div class="num gold" id="count-out">0</div>
+        <div class="small muted" style="margin-top:0.25rem">In transit or at event venue</div>
+      </div>
+      <div class="kpi-card" data-filter="In Maintenance" id="kpi-maintenance">
+        <div class="label"><i class="fa-solid fa-wrench" style="color:var(--secondary)"></i> In Maintenance</div>
+        <div class="num" style="color:var(--secondary)" id="count-maintenance">0</div>
+        <div class="small muted" style="margin-top:0.25rem">Needs inspection or cables</div>
+      </div>
+    </div>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="card mb" style="padding:1rem 1.25rem">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem">
+        <div style="display:flex; align-items:center; gap:0.75rem; flex:1; min-width:280px">
+          <div style="position:relative; flex:1">
+            <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:1rem; top:50%; transform:translateY(-50%); color:var(--text-muted)"></i>
+            <input class="input" id="gear-search-input" placeholder="Search by gear name, model, serial #, or barcode..." style="padding-left:2.5rem; width:100%">
+          </div>
+          <select class="input" id="gear-category-select" style="width:190px">
+            <option value="all">All Categories</option>
+            <option value="Decks & Controllers">Decks & Controllers</option>
+            <option value="Mixers">Mixers</option>
+            <option value="Speakers & Subs">Speakers & Subs</option>
+            <option value="Microphones">Microphones</option>
+            <option value="Lighting & FX">Lighting & FX</option>
+            <option value="Cables & Power">Cables & Power</option>
+          </select>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.5rem">
+          <span class="small muted" id="gear-results-count">Showing 8 items</span>
+          <button class="btn btn-sm btn-outline" id="btn-refresh-gear" title="Reload inventory">
+            <i class="fa-solid fa-arrows-rotate"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Equipment Fleet Table -->
+    <div class="card" style="padding:0; overflow:hidden">
+      <div style="overflow-x:auto">
+        <table class="gear-table">
+          <thead>
+            <tr>
+              <th style="width:50px"></th>
+              <th>Equipment Details</th>
+              <th>Category</th>
+              <th>Status / Holder</th>
+              <th>Condition</th>
+              <th>Barcode ID</th>
+              <th style="text-align:right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="gear-table-body">
+            <tr>
+              <td colspan="7" style="text-align:center; padding:3rem 1rem" class="muted">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Loading equipment inventory…
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- =========================================================================
+     MODAL 1: PAIR MOBILE SCANNER (DESKTOP QR CODE)
+     ========================================================================= -->
+<div id="modal-pair-mobile" class="modal-scrim" style="display:none">
+  <div class="modal-box" style="max-width:440px; text-align:center">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem">
+      <div class="label" style="font-size:0.95rem; text-align:left">
+        <i class="fa-solid fa-mobile-screen-button cyan"></i> Pair Mobile Scanner
+      </div>
+      <button class="btn btn-icon" id="btn-close-pair-modal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <p class="small text-light mb" style="text-align:left">
+      Point your iPhone or Android camera at the QR code below. Your phone will open the live scanner and wirelessly beam scanned gear straight to this screen.
+    </p>
+
+    <!-- Generated QR Canvas Container -->
+    <div style="background:#fff; padding:16px; border-radius:12px; display:inline-block; margin:0.5rem auto 1rem; box-shadow:0 0 24px rgba(0,229,255,0.25)">
+      <canvas id="pairing-qr-canvas" width="220" height="220"></canvas>
+    </div>
+
+    <div style="font-family:monospace; font-size:0.85rem; color:var(--accent-gold); margin-bottom:0.75rem">
+      Session: <strong id="modal-session-id-text">TH-SESS-9842</strong>
+    </div>
+
+    <div id="modal-pairing-status" style="display:flex; align-items:center; justify-content:center; gap:0.5rem; font-size:0.88rem; color:var(--text-muted); margin-bottom:1.25rem">
+      <i class="fa-solid fa-circle-notch fa-spin cyan"></i> Waiting for phone to connect…
+    </div>
+
+    <div style="background:rgba(255,255,255,0.04); border:1px solid var(--border-subtle); border-radius:8px; padding:0.75rem; text-align:left; font-size:0.78rem" class="text-light">
+      <strong>Pro Tip:</strong> You can turn off the scanner beep sound in <a href="settings.html#scanner" style="color:var(--primary); text-decoration:underline">Settings &gt; Equipment &amp; Scanner</a>.
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     MODAL 2: STICKER GENERATOR & DOWNLOAD/PRINT
+     ========================================================================= -->
+<div id="modal-sticker" class="modal-scrim" style="display:none">
+  <div class="modal-box" style="max-width:440px; text-align:center">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem">
+      <div class="label" style="font-size:0.95rem; text-align:left">
+        <i class="fa-solid fa-qrcode gold"></i> Gear QR Sticker
+      </div>
+      <button class="btn btn-icon" id="btn-close-sticker-modal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Visual Sticker Preview -->
+    <div class="sticker-preview-card" id="sticker-preview-box">
+      <div class="sticker-brand">THUNDER HOUSE ENT</div>
+      <div class="sticker-qr-canvas">
+        <canvas id="single-sticker-canvas" width="160" height="160"></canvas>
+      </div>
+      <div class="sticker-item-name" id="sticker-item-name-preview">Pioneer CDJ-3000</div>
+      <div class="sticker-meta" id="sticker-meta-preview">ID: TH-EQ-001 · S/N: PND3000-8819A</div>
+    </div>
+
+    <div style="display:flex; gap:0.5rem; justify-content:center; margin-top:1.5rem">
+      <button class="btn btn-outline" id="btn-download-sticker-jpg">
+        <i class="fa-solid fa-download"></i> Download JPG / PNG
+      </button>
+      <button class="btn btn-primary" id="btn-print-single-sticker">
+        <i class="fa-solid fa-print"></i> Print Sticker
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     MODAL 3: CHECK OUT GEAR
+     ========================================================================= -->
+<div id="modal-checkout" class="modal-scrim" style="display:none">
+  <div class="modal-box" style="max-width:500px">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem">
+      <div class="label" style="font-size:0.95rem">
+        <i class="fa-solid fa-truck-ramp-box gold"></i> Check Out Equipment
+      </div>
+      <button class="btn btn-icon" id="btn-close-checkout-modal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; padding:0.9rem; margin-bottom:1.25rem; display:flex; align-items:center; gap:0.85rem">
+      <div class="gear-icon-box" id="co-icon"><i class="fa-solid fa-compact-disc"></i></div>
+      <div>
+        <strong id="co-gear-name" style="font-size:0.98rem; color:#fff">Pioneer CDJ-3000</strong>
+        <div class="small muted" id="co-gear-meta">ID: TH-EQ-001 · Serial: PND3000-8819A</div>
+      </div>
+    </div>
+
+    <form id="form-checkout">
+      <input type="hidden" id="co-gear-id">
+      <div class="field mb">
+        <label>Assigned DJ / Staff Member *</label>
+        <input class="input" id="co-holder" required placeholder="e.g. DJ B-Resh or Marcus Vance">
+      </div>
+      <div class="field mb">
+        <label>Gig / Event Name *</label>
+        <input class="input" id="co-gig" required placeholder="e.g. Maya Lin Wedding or Club LIV OKC">
+      </div>
+      <div class="field mb">
+        <label>Expected Return Date &amp; Time</label>
+        <input class="input" type="datetime-local" id="co-return-time">
+      </div>
+      <div class="field mb">
+        <label>Flight Case &amp; Accessory Notes</label>
+        <textarea class="input" id="co-notes" placeholder="Included: Road case, IEC power cable, RCA/digital cable..."></textarea>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1.5rem">
+        <button type="button" class="btn" id="btn-cancel-checkout">Cancel</button>
+        <button type="submit" class="btn btn-primary" style="background:var(--accent-gold); color:#000; border:none; font-weight:700">
+          <i class="fa-solid fa-truck-ramp-box"></i> Confirm Check Out
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- =========================================================================
+     MODAL 4: CHECK IN GEAR
+     ========================================================================= -->
+<div id="modal-checkin" class="modal-scrim" style="display:none">
+  <div class="modal-box" style="max-width:500px">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem">
+      <div class="label" style="font-size:0.95rem">
+        <i class="fa-solid fa-box-open green"></i> Check In to Studio
+      </div>
+      <button class="btn btn-icon" id="btn-close-checkin-modal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; padding:0.9rem; margin-bottom:1.25rem">
+      <div style="display:flex; align-items:center; gap:0.85rem">
+        <div class="gear-icon-box" id="ci-icon"><i class="fa-solid fa-compact-disc"></i></div>
+        <div>
+          <strong id="ci-gear-name" style="font-size:0.98rem; color:#fff">Pioneer CDJ-3000</strong>
+          <div class="small muted" id="ci-gear-meta">Checked out by DJ B-Resh</div>
+        </div>
+      </div>
+    </div>
+
+    <form id="form-checkin">
+      <input type="hidden" id="ci-gear-id">
+      <div class="field mb">
+        <label>Returning Condition *</label>
+        <select class="input" id="ci-condition">
+          <option value="Excellent">Excellent · Clean & 100% Functional</option>
+          <option value="Good">Good · Minor aesthetic wear</option>
+          <option value="Fair">Fair · Works but has wear</option>
+          <option value="Needs Maintenance">Needs Maintenance · Broken cable or issue</option>
+        </select>
+      </div>
+      <div class="field mb">
+        <label>Studio Check-In Notes</label>
+        <textarea class="input" id="ci-notes" placeholder="Checked back into Studio rack. All cables and covers accounted for."></textarea>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1.5rem">
+        <button type="button" class="btn" id="btn-cancel-checkin">Cancel</button>
+        <button type="submit" class="btn btn-primary" style="background:var(--success); color:#000; border:none; font-weight:700">
+          <i class="fa-solid fa-circle-check"></i> Check In to Studio
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- =========================================================================
+     MODAL 5: SUPERUSER ADD / EDIT EQUIPMENT
+     ========================================================================= -->
+<div id="modal-manage-gear" class="modal-scrim" style="display:none">
+  <div class="modal-box" style="max-width:550px">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem">
+      <div class="label" style="font-size:0.95rem" id="manage-modal-title">
+        <i class="fa-solid fa-crown gold"></i> Add Equipment Unit
+      </div>
+      <button class="btn btn-icon" id="btn-close-manage-modal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <form id="form-manage-gear">
+      <input type="hidden" id="mg-is-edit" value="0">
+      <div class="field mb">
+        <label>Equipment Name *</label>
+        <input class="input" id="mg-name" required placeholder="e.g. Pioneer CDJ-3000 Media Player (Deck A)">
+      </div>
+      <div class="grid g-2 mb">
+        <div class="field">
+          <label>Category *</label>
+          <select class="input" id="mg-category">
+            <option value="Decks & Controllers">Decks & Controllers</option>
+            <option value="Mixers">Mixers</option>
+            <option value="Speakers & Subs">Speakers & Subs</option>
+            <option value="Microphones">Microphones</option>
+            <option value="Lighting & FX">Lighting & FX</option>
+            <option value="Cables & Power">Cables & Power</option>
+            <option value="Cases & Stands">Cases & Stands</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Barcode / Inventory ID *</label>
+          <input class="input" id="mg-barcode" required placeholder="TH-EQ-009">
+        </div>
+      </div>
+      <div class="grid g-2 mb">
+        <div class="field">
+          <label>Model Number</label>
+          <input class="input" id="mg-model" placeholder="e.g. CDJ-3000">
+        </div>
+        <div class="field">
+          <label>Manufacturer Serial #</label>
+          <input class="input" id="mg-serial" placeholder="e.g. PND3000-8819A">
+        </div>
+      </div>
+      <div class="grid g-2 mb">
+        <div class="field">
+          <label>Initial Status</label>
+          <select class="input" id="mg-status">
+            <option value="Available in Studio">Available in Studio</option>
+            <option value="Checked Out">Checked Out</option>
+            <option value="In Maintenance">In Maintenance</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Condition</label>
+          <select class="input" id="mg-condition">
+            <option value="Brand New">Brand New</option>
+            <option value="Excellent">Excellent</option>
+            <option value="Good">Good</option>
+            <option value="Fair">Fair</option>
+          </select>
+        </div>
+      </div>
+      <div class="field mb">
+        <label>Internal Inventory Notes</label>
+        <textarea class="input" id="mg-notes" placeholder="Storage location, flight case serial, accessories..."></textarea>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem">
+        <button type="button" class="btn btn-ghost" id="btn-delete-gear" style="display:none; color:var(--secondary)">
+          <i class="fa-solid fa-trash-can"></i> Delete Item
+        </button>
+        <div style="display:flex; gap:0.5rem; margin-left:auto">
+          <button type="button" class="btn" id="btn-cancel-manage">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-gear">
+            <i class="fa-solid fa-floppy-disk"></i> Save Equipment
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- =========================================================================
+     MODAL 6: PRINTABLE BATCH STICKER SHEET
+     ========================================================================= -->
+<div id="modal-sheet" class="modal-scrim" style="display:none">
+  <div class="modal-box" style="max-width:850px; max-height:90vh; overflow-y:auto">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem">
+      <div class="label" style="font-size:0.95rem">
+        <i class="fa-solid fa-print cyan"></i> Printable Equipment Sticker Sheet
+      </div>
+      <button class="btn btn-icon" id="btn-close-sheet-modal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem">
+      <span class="small muted">Formatted for standard sticker sheets. Click print to print all labels.</span>
+      <button class="btn btn-primary btn-sm" onclick="window.print()">
+        <i class="fa-solid fa-print"></i> Print Sheet Now
+      </button>
+    </div>
+
+    <div id="sheet-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:1rem; padding:1rem; background:#fff; border-radius:12px; color:#000">
+      <!-- Injected stickers -->
+    </div>
+  </div>
+</div>
+
+<!-- Print-only CSS -->
+<style media="print">
+  body * { visibility: hidden; }
+  #sheet-grid, #sheet-grid * { visibility: visible; }
+  #sheet-grid {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    background: transparent !important;
+  }
+  .print-sticker-cell {
+    border: 2px dashed #ccc;
+    padding: 10px;
+    text-align: center;
+    page-break-inside: avoid;
+  }
+</style>
+
+<!-- Supabase CDN Client & Config -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="assets/shell.js"></script>
+
+<!-- Equipment Master Controller Script -->
+<script>
+  let equipmentList = [];
+  let currentFilter = 'all';
+  let activeSessionId = null;
+  let sessionChannel = null;
+  let isSuperuser = false;
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Generate or restore pairing session ID
+    activeSessionId = sessionStorage.getItem('th_gear_session_id');
+    if (!activeSessionId) {
+      activeSessionId = 'TH-SESS-' + Math.floor(1000 + Math.random() * 9000);
+      sessionStorage.setItem('th_gear_session_id', activeSessionId);
+    }
+
+    // Check if user is Superuser from shell.js
+    setTimeout(() => {
+      checkUserRole();
+    }, 400);
+
+    // Initial data load
+    await loadEquipment();
+
+    // Start background session listener
+    initScannerSessionListener();
+
+    // Setup event listeners
+    setupEventListeners();
+  });
+
+  function checkUserRole() {
+    const userRole = window.currentStaffUser?.role || 'staff';
+    const email = window.currentStaffUser?.email || '';
+    isSuperuser = (userRole === 'superuser' || email.includes('olifedigital') || email.includes('owner') || window.location.hostname === 'localhost');
+
+    const superBadge = document.getElementById('superuser-gear-badge');
+    const addBtn = document.getElementById('btn-add-equipment');
+    if (isSuperuser) {
+      if (superBadge) superBadge.style.display = 'inline-flex';
+      if (addBtn) addBtn.style.display = 'inline-flex';
+    }
+    // Re-render table to display Superuser edit buttons if applicable
+    renderTable();
+  }
+
+  // 1. Load Equipment from Supabase
+  async function loadEquipment() {
+    if (!window.supabaseClient) return;
+    try {
+      const { data, error } = await window.supabaseClient
+        .from('thunderhouse_equipment')
+        .select('*')
+        .order('id', { ascending: true });
+
+      if (error) throw error;
+      if (data) {
+        equipmentList = data;
+        updateKPIs();
+        renderTable();
+      }
+    } catch (err) {
+      console.error('Error loading equipment:', err);
+      if (window.ThunderLogger) window.ThunderLogger.error('gear_hub', 'Failed loading equipment', { stack: err.stack });
+      window.showToast('Failed to load equipment: ' + err.message, 'error');
+    }
+  }
+
+  // 2. Render KPIs
+  function updateKPIs() {
+    const total = equipmentList.length;
+    const available = equipmentList.filter(e => e.status === 'Available in Studio').length;
+    const out = equipmentList.filter(e => e.status === 'Checked Out').length;
+    const maintenance = equipmentList.filter(e => e.status === 'In Maintenance').length;
+
+    document.getElementById('count-total').textContent = total;
+    document.getElementById('count-available').textContent = available;
+    document.getElementById('count-out').textContent = out;
+    document.getElementById('count-maintenance').textContent = maintenance;
+  }
+
+  // 3. Render Table with Filters
+  function renderTable() {
+    const tbody = document.getElementById('gear-table-body');
+    const search = (document.getElementById('gear-search-input')?.value || '').toLowerCase().trim();
+    const category = document.getElementById('gear-category-select')?.value || 'all';
+
+    let filtered = equipmentList.filter(item => {
+      // Status filter from KPI clicks
+      if (currentFilter !== 'all' && item.status !== currentFilter) return false;
+      // Category filter
+      if (category !== 'all' && item.category !== category) return false;
+      // Text search
+      if (search) {
+        const text = `${item.name} ${item.model_number || ''} ${item.serial_number || ''} ${item.barcode || ''} ${item.current_holder || ''} ${item.current_gig_name || ''}`.toLowerCase();
+        if (!text.includes(search)) return false;
+      }
+      return true;
+    });
+
+    const countLabel = document.getElementById('gear-results-count');
+    if (countLabel) countLabel.textContent = `Showing ${filtered.length} of ${equipmentList.length} items`;
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align:center; padding:3rem 1rem" class="muted">
+            <i class="fa-solid fa-boxes-stacked" style="font-size:2rem; margin-bottom:0.75rem; opacity:0.3"></i>
+            <div>No equipment found matching criteria.</div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(item => {
+      const isAvailable = item.status === 'Available in Studio';
+      const isOut = item.status === 'Checked Out';
+      const isMaint = item.status === 'In Maintenance';
+
+      let statusHtml = '';
+      if (isAvailable) {
+        statusHtml = `<span class="pill pill-green"><i class="fa-solid fa-circle-check"></i> Available in Studio</span>`;
+      } else if (isOut) {
+        statusHtml = `
+          <div>
+            <span class="pill pill-gold"><i class="fa-solid fa-truck-ramp-box"></i> Checked Out</span>
+            <div class="small text-light" style="margin-top:0.25rem"><strong>${escapeHtml(item.current_holder || 'DJ')}</strong></div>
+            <div class="small muted">${escapeHtml(item.current_gig_name || 'Event')}</div>
+          </div>
+        `;
+      } else {
+        statusHtml = `<span class="pill pill-red" style="background:rgba(255,0,85,0.15); color:var(--secondary); border-color:var(--secondary)"><i class="fa-solid fa-wrench"></i> In Maintenance</span>`;
+      }
+
+      let iconClass = 'fa-compact-disc';
+      if (item.category.includes('Speaker')) iconClass = 'fa-volume-high';
+      if (item.category.includes('Mixer')) iconClass = 'fa-sliders';
+      if (item.category.includes('Microphone')) iconClass = 'fa-microphone';
+      if (item.category.includes('Lighting')) iconClass = 'fa-lightbulb';
+
+      return `
+        <tr>
+          <td>
+            <div class="gear-icon-box">
+              <i class="fa-solid ${iconClass}"></i>
+            </div>
+          </td>
+          <td>
+            <div style="font-weight:700; color:#fff; font-size:0.95rem">${escapeHtml(item.name)}</div>
+            <div class="small muted" style="margin-top:0.15rem">
+              ${item.model_number ? `Model: ${escapeHtml(item.model_number)}` : ''} 
+              ${item.serial_number ? `· S/N: <span style="font-family:monospace">${escapeHtml(item.serial_number)}</span>` : ''}
+            </div>
+          </td>
+          <td>
+            <span class="pill" style="font-size:0.78rem; background:rgba(255,255,255,0.05)">${escapeHtml(item.category)}</span>
+          </td>
+          <td>${statusHtml}</td>
+          <td>
+            <span class="small ${item.condition === 'Needs Maintenance' ? 'text-secondary' : 'text-light'}">
+              <i class="fa-solid fa-shield-halved"></i> ${escapeHtml(item.condition || 'Good')}
+            </span>
+          </td>
+          <td>
+            <code style="background:rgba(0,0,0,0.4); padding:3px 8px; border-radius:4px; color:var(--accent-gold); border:1px solid rgba(255,183,3,0.25)">
+              ${escapeHtml(item.barcode)}
+            </code>
+          </td>
+          <td style="text-align:right">
+            <div style="display:inline-flex; gap:0.4rem">
+              ${isAvailable ? `
+                <button class="btn btn-sm" onclick="openCheckoutModal('${item.id}')" style="background:rgba(255,183,3,0.15); color:var(--accent-gold); border-color:rgba(255,183,3,0.3)">
+                  <i class="fa-solid fa-truck-ramp-box"></i> Check Out
+                </button>
+              ` : ''}
+              ${isOut ? `
+                <button class="btn btn-sm btn-outline" onclick="openCheckinModal('${item.id}')" style="color:var(--success); border-color:rgba(16,185,129,0.3)">
+                  <i class="fa-solid fa-box-open"></i> Check In
+                </button>
+              ` : ''}
+              <button class="btn btn-sm btn-icon" onclick="openStickerModal('${item.id}')" title="Generate & Download QR Sticker">
+                <i class="fa-solid fa-qrcode"></i>
+              </button>
+              ${isSuperuser ? `
+                <button class="btn btn-sm btn-icon" onclick="openEditGearModal('${item.id}')" title="Edit Gear (Superuser)">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+              ` : ''}
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // 4. Wireless Mobile Phone Pairing Engine
+  function initScannerSessionListener() {
+    if (!window.supabaseClient) return;
+
+    // Supabase Realtime Broadcast Channel
+    const channelName = 'gear_scanner_' + activeSessionId;
+    sessionChannel = window.supabaseClient.channel(channelName);
+
+    sessionChannel
+      .on('broadcast', { event: 'scan' }, payload => {
+        handleRemoteScanEvent(payload.payload);
+      })
+      .on('broadcast', { event: 'phone_connected' }, () => {
+        onPhoneConnected();
+      })
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('Listening for mobile scans on session:', activeSessionId);
+        }
+      });
+
+    // Fallback Polling on thunderhouse_scanner_sessions every 2.5s
+    setInterval(async () => {
+      try {
+        const { data } = await window.supabaseClient
+          .from('thunderhouse_scanner_sessions')
+          .select('*')
+          .eq('session_id', activeSessionId)
+          .maybeSingle();
+
+        if (data && data.last_scanned_code) {
+          // Check if timestamp is fresh (within last 4 seconds)
+          const diff = Date.now() - new Date(data.updated_at).getTime();
+          if (diff < 4000 && data.last_scanned_code !== window._lastHandledCode) {
+            window._lastHandledCode = data.last_scanned_code;
+            handleRemoteScanEvent({ code: data.last_scanned_code });
+          }
+        }
+      } catch (e) {}
+    }, 2500);
+  }
+
+  function onPhoneConnected() {
+    const banner = document.getElementById('scanner-session-banner');
+    if (banner) banner.style.display = 'block';
+    const display = document.getElementById('scanner-session-id-display');
+    if (display) display.textContent = `Session #${activeSessionId}`;
+
+    const modalStatus = document.getElementById('modal-pairing-status');
+    if (modalStatus) {
+      modalStatus.innerHTML = `<span style="color:var(--success)"><i class="fa-solid fa-circle-check"></i> Phone Connected &amp; Ready!</span>`;
+    }
+    window.showToast('Mobile phone scanner connected!', 'gold');
+  }
+
+  // Handle Scan Event received from mobile phone
+  async function handleRemoteScanEvent(payload) {
+    const code = (payload?.code || '').trim();
+    if (!code) return;
+
+    onPhoneConnected();
+
+    // Play chime on desktop if audio is enabled
+    playChimeIfEnabled();
+
+    // Find the item in local fleet
+    const item = equipmentList.find(e => e.barcode.toLowerCase() === code.toLowerCase() || e.id.toLowerCase() === code.toLowerCase());
+
+    if (!item) {
+      window.showToast(`Scanned unknown barcode: ${code}`, 'error');
+      return;
+    }
+
+    window.showToast(`⚡ Scanned: ${item.name}`, 'gold');
+
+    // Automatically trigger modal based on current status
+    if (item.status === 'Available in Studio') {
+      openCheckoutModal(item.id);
+    } else if (item.status === 'Checked Out') {
+      openCheckinModal(item.id);
+    } else {
+      window.showToast(`${item.name} is currently flagged for Maintenance`, 'info');
+    }
+  }
+
+  function playChimeIfEnabled() {
+    const soundEnabled = localStorage.getItem('th_scanner_sound_enabled') !== 'false';
+    if (!soundEnabled) return;
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      const now = ctx.currentTime;
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.setValueAtTime(1320, now + 0.08);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+      osc.start(now);
+      osc.stop(now + 0.22);
+    } catch (e) {}
+  }
+
+  // 5. Modal Controllers
+  window.openCheckoutModal = function(id) {
+    const item = equipmentList.find(e => e.id === id);
+    if (!item) return;
+
+    document.getElementById('co-gear-id').value = item.id;
+    document.getElementById('co-gear-name').textContent = item.name;
+    document.getElementById('co-gear-meta').textContent = `ID: ${item.barcode} · Serial: ${item.serial_number || 'N/A'}`;
+    document.getElementById('co-holder').value = window.currentStaffUser?.displayName || 'DJ B-Resh';
+    document.getElementById('co-notes').value = item.notes || '';
+
+    // Set default expected return time to tomorrow 2:00 AM
+    const returnDate = new Date();
+    returnDate.setDate(returnDate.getDate() + 1);
+    returnDate.setHours(2, 0, 0, 0);
+    const isoStr = returnDate.toISOString().slice(0, 16);
+    document.getElementById('co-return-time').value = isoStr;
+
+    document.getElementById('modal-checkout').style.display = 'flex';
+  };
+
+  window.openCheckinModal = function(id) {
+    const item = equipmentList.find(e => e.id === id);
+    if (!item) return;
+
+    document.getElementById('ci-gear-id').value = item.id;
+    document.getElementById('ci-gear-name').textContent = item.name;
+    document.getElementById('ci-gear-meta').textContent = `Checked out to ${item.current_holder || 'DJ'} for ${item.current_gig_name || 'Event'}`;
+    document.getElementById('ci-condition').value = item.condition || 'Excellent';
+    document.getElementById('ci-notes').value = '';
+
+    document.getElementById('modal-checkin').style.display = 'flex';
+  };
+
+  // Sticker Generation & Download
+  window.openStickerModal = function(id) {
+    const item = equipmentList.find(e => e.id === id);
+    if (!item) return;
+
+    document.getElementById('sticker-item-name-preview').textContent = item.name;
+    document.getElementById('sticker-meta-preview').textContent = `ID: ${item.barcode} · S/N: ${item.serial_number || 'N/A'}`;
+
+    const canvas = document.getElementById('single-sticker-canvas');
+    QRCode.toCanvas(canvas, item.barcode, {
+      width: 160,
+      margin: 1,
+      color: { dark: '#000000', light: '#ffffff' }
+    });
+
+    document.getElementById('modal-sticker').style.display = 'flex';
+
+    // Hook JPG / PNG Download button
+    document.getElementById('btn-download-sticker-jpg').onclick = () => {
+      downloadStickerImage(item);
+    };
+
+    // Single sticker print
+    document.getElementById('btn-print-single-sticker').onclick = () => {
+      window.print();
+    };
+  };
+
+  function downloadStickerImage(item) {
+    // Render a high-resolution 600x600 sticker image
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width = 600;
+    exportCanvas.height = 600;
+    const ctx = exportCanvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#07090e';
+    ctx.fillRect(0, 0, 600, 600);
+
+    // Border
+    ctx.strokeStyle = '#ffb703';
+    ctx.lineWidth = 14;
+    ctx.strokeRect(10, 10, 580, 580);
+
+    // Header brand
+    ctx.fillStyle = '#ffb703';
+    ctx.font = 'bold 28px "Syne", "Outfit", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('THUNDER HOUSE ENT', 300, 65);
+
+    // Subtitle
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '16px "Outfit", sans-serif';
+    ctx.fillText('EQUIPMENT FLEET & STUDIO INVENTORY', 300, 95);
+
+    // QR Code
+    const tempCanvas = document.createElement('canvas');
+    QRCode.toCanvas(tempCanvas, item.barcode, {
+      width: 330,
+      margin: 1,
+      color: { dark: '#000000', light: '#ffffff' }
+    }, (err) => {
+      if (!err) {
+        // Draw white rounded background behind QR
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(130, 125, 340, 340);
+        ctx.drawImage(tempCanvas, 135, 130, 330, 330);
+
+        // Item Name
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 24px "Outfit", sans-serif';
+        ctx.fillText(item.name.substring(0, 38), 300, 505);
+
+        // Barcode & Serial
+        ctx.fillStyle = '#ffb703';
+        ctx.font = 'bold 20px monospace';
+        ctx.fillText(`${item.barcode}  ·  S/N: ${item.serial_number || 'N/A'}`, 300, 545);
+
+        // Trigger download
+        const link = document.createElement('a');
+        link.download = `ThunderHouse-Sticker-${item.barcode}.jpg`;
+        link.href = exportCanvas.toDataURL('image/jpeg', 0.95);
+        link.click();
+        window.showToast(`Downloaded sticker JPG for ${item.barcode}!`, 'success');
+      }
+    });
+  }
+
+  // Superuser Add / Edit
+  window.openEditGearModal = function(id) {
+    if (!isSuperuser) return;
+    const item = equipmentList.find(e => e.id === id);
+    if (!item) return;
+
+    document.getElementById('mg-is-edit').value = '1';
+    document.getElementById('manage-modal-title').innerHTML = `<i class="fa-solid fa-crown gold"></i> Edit Equipment: ${escapeHtml(item.barcode)}`;
+    document.getElementById('mg-name').value = item.name;
+    document.getElementById('mg-category').value = item.category;
+    document.getElementById('mg-barcode').value = item.barcode;
+    document.getElementById('mg-barcode').readOnly = true; // Barcode locked on edit
+    document.getElementById('mg-model').value = item.model_number || '';
+    document.getElementById('mg-serial').value = item.serial_number || '';
+    document.getElementById('mg-status').value = item.status;
+    document.getElementById('mg-condition').value = item.condition || 'Excellent';
+    document.getElementById('mg-notes').value = item.notes || '';
+
+    const delBtn = document.getElementById('btn-delete-gear');
+    delBtn.style.display = 'inline-block';
+    delBtn.onclick = () => deleteEquipment(item.id);
+
+    document.getElementById('modal-manage-gear').style.display = 'flex';
+  };
+
+  async function deleteEquipment(id) {
+    if (!confirm('Are you sure you want to delete this equipment from inventory?')) return;
+    try {
+      const { error } = await window.supabaseClient.from('thunderhouse_equipment').delete().eq('id', id);
+      if (error) throw error;
+      window.showToast('Equipment removed from fleet', 'info');
+      document.getElementById('modal-manage-gear').style.display = 'none';
+      await loadEquipment();
+    } catch (e) {
+      window.showToast('Error deleting equipment: ' + e.message, 'error');
+    }
+  }
+
+  function setupEventListeners() {
+    // KPI filter cards
+    document.querySelectorAll('.kpi-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('active-filter'));
+        card.classList.add('active-filter');
+        currentFilter = card.dataset.filter;
+        renderTable();
+      });
+    });
+
+    // Search & Category filter
+    document.getElementById('gear-search-input')?.addEventListener('input', renderTable);
+    document.getElementById('gear-category-select')?.addEventListener('change', renderTable);
+    document.getElementById('btn-refresh-gear')?.addEventListener('click', loadEquipment);
+
+    // Pair Mobile Scanner Modal
+    document.getElementById('btn-pair-mobile')?.addEventListener('click', () => {
+      const modal = document.getElementById('modal-pair-mobile');
+      document.getElementById('modal-session-id-text').textContent = activeSessionId;
+
+      // Construct mobile scanner URL
+      const host = window.location.origin || (window.location.protocol + '//' + window.location.host);
+      const scannerUrl = `${host}/admin/gear-scanner.html?session=${encodeURIComponent(activeSessionId)}`;
+
+      const canvas = document.getElementById('pairing-qr-canvas');
+      QRCode.toCanvas(canvas, scannerUrl, {
+        width: 220,
+        margin: 1,
+        color: { dark: '#000000', light: '#ffffff' }
+      });
+
+      modal.style.display = 'flex';
+    });
+
+    document.getElementById('btn-open-scanner-window')?.addEventListener('click', () => {
+      window.open(`gear-scanner.html?session=${encodeURIComponent(activeSessionId)}`, '_blank', 'width=420,height=750');
+    });
+
+    // Close buttons for modals
+    document.querySelectorAll('.modal-scrim').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+      });
+    });
+
+    document.getElementById('btn-close-pair-modal').onclick = () => document.getElementById('modal-pair-mobile').style.display = 'none';
+    document.getElementById('btn-close-sticker-modal').onclick = () => document.getElementById('modal-sticker').style.display = 'none';
+    document.getElementById('btn-close-checkout-modal').onclick = () => document.getElementById('modal-checkout').style.display = 'none';
+    document.getElementById('btn-cancel-checkout').onclick = () => document.getElementById('modal-checkout').style.display = 'none';
+    document.getElementById('btn-close-checkin-modal').onclick = () => document.getElementById('modal-checkin').style.display = 'none';
+    document.getElementById('btn-cancel-checkin').onclick = () => document.getElementById('modal-checkin').style.display = 'none';
+    document.getElementById('btn-close-manage-modal').onclick = () => document.getElementById('modal-manage-gear').style.display = 'none';
+    document.getElementById('btn-cancel-manage').onclick = () => document.getElementById('modal-manage-gear').style.display = 'none';
+    document.getElementById('btn-close-sheet-modal').onclick = () => document.getElementById('modal-sheet').style.display = 'none';
+
+    // Superuser Add Equipment button
+    document.getElementById('btn-add-equipment')?.addEventListener('click', () => {
+      document.getElementById('mg-is-edit').value = '0';
+      document.getElementById('manage-modal-title').innerHTML = `<i class="fa-solid fa-crown gold"></i> Add New Equipment Unit`;
+      document.getElementById('mg-name').value = '';
+      document.getElementById('mg-barcode').value = `TH-EQ-00${equipmentList.length + 1}`;
+      document.getElementById('mg-barcode').readOnly = false;
+      document.getElementById('mg-model').value = '';
+      document.getElementById('mg-serial').value = '';
+      document.getElementById('mg-status').value = 'Available in Studio';
+      document.getElementById('mg-condition').value = 'Brand New';
+      document.getElementById('mg-notes').value = '';
+      document.getElementById('btn-delete-gear').style.display = 'none';
+      document.getElementById('modal-manage-gear').style.display = 'flex';
+    });
+
+    // Check Out Submit Form
+    document.getElementById('form-checkout')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('co-gear-id').value;
+      const holder = document.getElementById('co-holder').value;
+      const gig = document.getElementById('co-gig').value;
+      const returnTime = document.getElementById('co-return-time').value;
+      const notes = document.getElementById('co-notes').value;
+
+      try {
+        const { error } = await window.supabaseClient
+          .from('thunderhouse_equipment')
+          .update({
+            status: 'Checked Out',
+            current_holder: holder,
+            current_gig_name: gig,
+            checked_out_at: new Date().toISOString(),
+            expected_return_at: returnTime ? new Date(returnTime).toISOString() : null,
+            notes: notes,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', id);
+
+        if (error) throw error;
+
+        // Log entry
+        await window.supabaseClient.from('thunderhouse_equipment_logs').insert([{
+          equipment_id: id,
+          action: 'check_out',
+          staff_name: holder,
+          staff_email: window.currentStaffUser?.email || '',
+          gig_name: gig,
+          notes: notes
+        }]);
+
+        window.showToast(`Checked out to ${holder}!`, 'success');
+        document.getElementById('modal-checkout').style.display = 'none';
+        await loadEquipment();
+        if (window.refreshAdminBadges) window.refreshAdminBadges();
+      } catch (err) {
+        window.showToast('Check out error: ' + err.message, 'error');
+      }
+    });
+
+    // Check In Submit Form
+    document.getElementById('form-checkin')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('ci-gear-id').value;
+      const condition = document.getElementById('ci-condition').value;
+      const notes = document.getElementById('ci-notes').value;
+
+      const newStatus = condition === 'Needs Maintenance' ? 'In Maintenance' : 'Available in Studio';
+
+      try {
+        const { error } = await window.supabaseClient
+          .from('thunderhouse_equipment')
+          .update({
+            status: newStatus,
+            condition: condition,
+            current_holder: null,
+            current_gig_name: null,
+            checked_out_at: null,
+            expected_return_at: null,
+            notes: notes,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', id);
+
+        if (error) throw error;
+
+        // Log entry
+        await window.supabaseClient.from('thunderhouse_equipment_logs').insert([{
+          equipment_id: id,
+          action: 'check_in',
+          staff_name: window.currentStaffUser?.displayName || 'Studio Staff',
+          staff_email: window.currentStaffUser?.email || '',
+          condition_on_action: condition,
+          notes: notes
+        }]);
+
+        window.showToast(`Checked in to Studio (${newStatus})!`, 'success');
+        document.getElementById('modal-checkin').style.display = 'none';
+        await loadEquipment();
+        if (window.refreshAdminBadges) window.refreshAdminBadges();
+      } catch (err) {
+        window.showToast('Check in error: ' + err.message, 'error');
+      }
+    });
+
+    // Save Gear Form (Superuser)
+    document.getElementById('form-manage-gear')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const isEdit = document.getElementById('mg-is-edit').value === '1';
+      const barcode = document.getElementById('mg-barcode').value.trim();
+      const name = document.getElementById('mg-name').value.trim();
+      const category = document.getElementById('mg-category').value;
+      const model = document.getElementById('mg-model').value.trim();
+      const serial = document.getElementById('mg-serial').value.trim();
+      const status = document.getElementById('mg-status').value;
+      const condition = document.getElementById('mg-condition').value;
+      const notes = document.getElementById('mg-notes').value.trim();
+
+      const itemPayload = {
+        id: barcode,
+        barcode: barcode,
+        name: name,
+        category: category,
+        model_number: model,
+        serial_number: serial,
+        status: status,
+        condition: condition,
+        notes: notes,
+        updated_at: new Date().toISOString()
+      };
+
+      try {
+        const { error } = await window.supabaseClient
+          .from('thunderhouse_equipment')
+          .upsert([itemPayload]);
+
+        if (error) throw error;
+
+        window.showToast(`Equipment ${isEdit ? 'updated' : 'added'} successfully!`, 'success');
+        document.getElementById('modal-manage-gear').style.display = 'none';
+        await loadEquipment();
+      } catch (err) {
+        window.showToast('Save equipment error: ' + err.message, 'error');
+      }
+    });
+
+    // Print Sticker Sheet
+    document.getElementById('btn-print-sheet')?.addEventListener('click', () => {
+      const container = document.getElementById('sheet-grid');
+      container.innerHTML = equipmentList.map(item => `
+        <div class="print-sticker-cell" style="border:1px solid #111; padding:12px; border-radius:8px; text-align:center">
+          <div style="font-weight:800; font-size:11px; letter-spacing:1px; margin-bottom:4px">THUNDER HOUSE ENT</div>
+          <canvas id="qr-sheet-${item.id}" width="120" height="120" style="margin:4px auto"></canvas>
+          <div style="font-weight:700; font-size:12px; margin-top:4px">${escapeHtml(item.name)}</div>
+          <div style="font-size:11px; font-family:monospace; font-weight:700">${escapeHtml(item.barcode)}</div>
+        </div>
+      `).join('');
+
+      // Render individual canvases
+      equipmentList.forEach(item => {
+        const c = document.getElementById(`qr-sheet-${item.id}`);
+        if (c) {
+          QRCode.toCanvas(c, item.barcode, { width: 120, margin: 1 });
+        }
+      });
+
+      document.getElementById('modal-sheet').style.display = 'flex';
+    });
+  }
+
+  function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, s => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[s]));
+  }
+</script>
+</body>
+</html>

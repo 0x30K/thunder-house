@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mobile QR Scanner · Thunder House Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- HTML5 QR Scanner Library -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+
+  <style>
+    :root {
+      --primary: #00e5ff;
+      --accent-gold: #ffb703;
+      --success: #10b981;
+      --secondary: #ff0055;
+      --bg: #07090e;
+      --bg-card: rgba(18, 24, 38, 0.92);
+      --border: rgba(255, 255, 255, 0.1);
+      --font-heading: 'Syne', 'Outfit', sans-serif;
+      --font-body: 'Outfit', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: #000;
+      color: #fff;
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Header Bar */
+    .scanner-topbar {
+      padding: 0.85rem 1rem;
+      background: rgba(7, 9, 14, 0.95);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+    }
+
+    .brand-title {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: var(--accent-gold);
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .sound-toggle-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: #fff;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+    .sound-toggle-btn.muted {
+      color: #64748b;
+      border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Camera Viewfinder View */
+    .viewfinder-container {
+      flex: 1;
+      position: relative;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #reader {
+      width: 100% !important;
+      height: 100% !important;
+      border: none !important;
+    }
+    #reader video {
+      object-fit: cover !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* Custom Laser Reticle Overlay */
+    .scanner-reticle {
+      position: absolute;
+      width: 250px;
+      height: 250px;
+      border: 2px solid rgba(0, 229, 255, 0.5);
+      border-radius: 18px;
+      box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.55);
+      pointer-events: none;
+      z-index: 5;
+    }
+    .scanner-reticle::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+      box-shadow: 0 0 12px var(--primary);
+      animation: laserScan 2s infinite ease-in-out;
+    }
+    @keyframes laserScan {
+      0% { top: 5%; opacity: 0.8; }
+      50% { top: 92%; opacity: 1; }
+      100% { top: 5%; opacity: 0.8; }
+    }
+
+    /* Four Reticle Corners */
+    .corner {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: var(--accent-gold);
+      border-style: solid;
+      pointer-events: none;
+    }
+    .corner.tl { top: -2px; left: -2px; border-width: 4px 0 0 4px; border-top-left-radius: 12px; }
+    .corner.tr { top: -2px; right: -2px; border-width: 4px 4px 0 0; border-top-right-radius: 12px; }
+    .corner.bl { bottom: -2px; left: -2px; border-width: 0 0 4px 4px; border-bottom-left-radius: 12px; }
+    .corner.br { bottom: -2px; right: -2px; border-width: 0 4px 4px 0; border-bottom-right-radius: 12px; }
+
+    /* Bottom Control & Last Scanned Card */
+    .scanner-bottom-panel {
+      padding: 1rem;
+      background: rgba(7, 9, 14, 0.95);
+      border-top: 1px solid var(--border);
+      z-index: 10;
+    }
+
+    .last-scan-card {
+      background: rgba(18, 24, 38, 0.95);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .action-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      cursor: pointer;
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, #ffb703, #ff8800);
+      color: #000;
+      border: none;
+    }
+
+    /* Pulse dot */
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="scanner-topbar">
+    <div class="brand-title">
+      <i class="fa-solid fa-bolt" style="color:var(--accent-gold)"></i> THUNDER WIRELESS
+    </div>
+    <div style="display:flex; align-items:center; gap:0.6rem">
+      <div class="status-pill" id="session-badge">
+        <span class="live-dot"></span>
+        <span id="session-label">Connecting…</span>
+      </div>
+      <button class="sound-toggle-btn" id="btn-toggle-sound" title="Toggle Beep Sound">
+        <i class="fa-solid fa-volume-high" id="sound-icon"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Camera Viewfinder -->
+  <div class="viewfinder-container">
+    <div id="reader"></div>
+
+    <!-- Targeting Reticle -->
+    <div class="scanner-reticle">
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+    </div>
+
+    <!-- Aiming Guidance Text -->
+    <div style="position:absolute; bottom:1.25rem; left:0; right:0; text-align:center; z-index:6; pointer-events:none">
+      <span style="background:rgba(0,0,0,0.75); padding:6px 14px; border-radius:9999px; font-size:0.75rem; letter-spacing:0.04em; color:#cbd5e1; border:1px solid rgba(255,255,255,0.1)">
+        Aim camera at gear QR sticker
+      </span>
+    </div>
+  </div>
+
+  <!-- Bottom Panel -->
+  <div class="scanner-bottom-panel">
+    <!-- Last Scanned Banner -->
+    <div id="last-scanned-container" style="display:none">
+      <div class="last-scan-card">
+        <div style="width:36px; height:36px; border-radius:8px; background:rgba(16,185,129,0.2); color:var(--success); display:flex; align-items:center; justify-content:center; font-size:1.1rem">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div style="flex:1; min-width:0">
+          <div style="font-weight:700; color:#fff; font-size:0.92rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis" id="scanned-code-title">TH-EQ-001</div>
+          <div style="font-size:0.75rem; color:var(--success)" id="scanned-code-status">Transmitted to Studio Desktop</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manual Barcode Input Trigger -->
+    <div class="action-row">
+      <button class="btn" id="btn-manual-code">
+        <i class="fa-solid fa-keyboard"></i> Type Barcode
+      </button>
+      <button class="btn" id="btn-restart-camera">
+        <i class="fa-solid fa-camera-rotate"></i> Flip Camera
+      </button>
+    </div>
+  </div>
+
+  <!-- Manual Code Modal (hidden by default) -->
+  <div id="manual-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99; align-items:center; justify-content:center; padding:1.5rem">
+    <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:1.25rem; width:100%; max-width:340px">
+      <div style="font-weight:700; margin-bottom:0.75rem; display:flex; justify-content:space-between; align-items:center">
+        <span>Enter Barcode Manually</span>
+        <button id="btn-close-manual" style="background:none; border:none; color:#fff; font-size:1.1rem; cursor:pointer"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <input type="text" id="manual-barcode-input" placeholder="e.g. TH-EQ-001" style="width:100%; padding:0.85rem; border-radius:8px; border:1px solid var(--border); background:rgba(255,255,255,0.06); color:#fff; font-size:1rem; font-family:monospace; margin-bottom:1rem; text-transform:uppercase">
+      <button class="btn btn-gold" id="btn-submit-manual" style="width:100%">
+        <i class="fa-solid fa-paper-plane"></i> Send to Desktop
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let html5QrCode = null;
+    let sessionId = null;
+    let soundEnabled = true;
+    let vibrateEnabled = true;
+    let isScanningCooldown = false;
+    let currentFacingMode = "environment";
+    let channel = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Get Session ID from URL query: ?session=TH-SESS-xxxx
+      const params = new URLSearchParams(window.location.search);
+      sessionId = params.get('session');
+
+      if (!sessionId) {
+        sessionId = prompt('Enter Studio Pairing Session ID (e.g. TH-SESS-9842):', 'TH-SESS-9842') || 'TH-SESS-STUDIO';
+      }
+
+      document.getElementById('session-label').textContent = sessionId;
+
+      // 2. Load Sound & Vibrate Preferences
+      loadSoundPreferences();
+
+      // 3. Connect Supabase Realtime Channel
+      initSupabaseConnection();
+
+      // 4. Start HTML5 Camera Scanner
+      startScanner();
+
+      // 5. Setup Action Buttons
+      setupControls();
+    });
+
+    // Load Sound Settings (respecting global user settings in settings.html)
+    async function loadSoundPreferences() {
+      // Check localStorage first
+      const storedSound = localStorage.getItem('th_scanner_sound_enabled');
+      if (storedSound !== null) {
+        soundEnabled = (storedSound !== 'false');
+      } else {
+        soundEnabled = true;
+      }
+
+      const storedVibrate = localStorage.getItem('th_scanner_vibrate_enabled');
+      if (storedVibrate !== null) {
+        vibrateEnabled = (storedVibrate !== 'false');
+      } else {
+        vibrateEnabled = true;
+      }
+
+      updateSoundButtonUI();
+
+      // Also sync from cloud settings if available
+      if (window.supabaseClient) {
+        try {
+          const { data } = await window.supabaseClient
+            .from('thunderhouse_site_settings')
+            .select('value')
+            .eq('key', 'equipment_scanner_settings')
+            .maybeSingle();
+
+          if (data && data.value) {
+            if (typeof data.value.sound_enabled === 'boolean') {
+              soundEnabled = data.value.sound_enabled;
+              updateSoundButtonUI();
+            }
+            if (typeof data.value.vibrate_enabled === 'boolean') {
+              vibrateEnabled = data.value.vibrate_enabled;
+            }
+          }
+        } catch (e) {}
+      }
+    }
+
+    function updateSoundButtonUI() {
+      const btn = document.getElementById('btn-toggle-sound');
+      const icon = document.getElementById('sound-icon');
+      if (soundEnabled) {
+        btn.classList.remove('muted');
+        icon.className = 'fa-solid fa-volume-high';
+        icon.style.color = 'var(--primary)';
+      } else {
+        btn.classList.add('muted');
+        icon.className = 'fa-solid fa-volume-xmark';
+        icon.style.color = '#64748b';
+      }
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      localStorage.setItem('th_scanner_sound_enabled', soundEnabled ? 'true' : 'false');
+      updateSoundButtonUI();
+      if (soundEnabled) {
+        playBeepChime(true);
+      }
+    }
+
+    // High performance Web Audio API beep chime (works offline, no external mp3 needed)
+    function playBeepChime(force = false) {
+      if (!soundEnabled && !force) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        const now = ctx.currentTime;
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.setValueAtTime(1320, now + 0.08);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+        osc.start(now);
+        osc.stop(now + 0.22);
+      } catch (e) {
+        console.warn('Audio chime issue:', e);
+      }
+    }
+
+    function triggerHaptic() {
+      if (vibrateEnabled && navigator.vibrate) {
+        try {
+          navigator.vibrate(80);
+        } catch (e) {}
+      }
+    }
+
+    // Supabase Realtime Handshake & Broadcast
+    function initSupabaseConnection() {
+      if (!window.supabaseClient) return;
+
+      const channelName = 'gear_scanner_' + sessionId;
+      channel = window.supabaseClient.channel(channelName);
+
+      channel.subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          // Announce phone presence to desktop
+          channel.send({
+            type: 'broadcast',
+            event: 'phone_connected',
+            payload: { timestamp: Date.now(), device: navigator.userAgent }
+          });
+        }
+      });
+    }
+
+    // Start Camera
+    function startScanner() {
+      html5QrCode = new Html5Qrcode("reader");
+
+      const config = {
+        fps: 15,
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0
+      };
+
+      html5QrCode.start(
+        { facingMode: currentFacingMode },
+        config,
+        onScanSuccess,
+        onScanFailure
+      ).catch(err => {
+        console.error("Camera start failed:", err);
+        alert("Camera permission required: " + err);
+      });
+    }
+
+    // Triggered when a QR code sticker is successfully recognized
+    async function onScanSuccess(decodedText) {
+      if (isScanningCooldown) return;
+
+      const code = decodedText.trim();
+      if (!code) return;
+
+      // 1.2s cooldown to avoid multi-fire on same sticker
+      isScanningCooldown = true;
+
+      // Sound & Haptic
+      playBeepChime();
+      triggerHaptic();
+
+      // UI Update
+      showScannedCard(code);
+
+      // Send to Desktop via Supabase Realtime Broadcast
+      if (channel) {
+        channel.send({
+          type: 'broadcast',
+          event: 'scan',
+          payload: { code: code, scanned_at: new Date().toISOString() }
+        });
+      }
+
+      // Also persist to thunderhouse_scanner_sessions as fallback
+      if (window.supabaseClient) {
+        window.supabaseClient
+          .from('thunderhouse_scanner_sessions')
+          .upsert([{
+            session_id: sessionId,
+            last_scanned_code: code,
+            updated_at: new Date().toISOString()
+          }], { onConflict: 'session_id' })
+          .then(() => {});
+      }
+
+      setTimeout(() => {
+        isScanningCooldown = false;
+      }, 1400);
+    }
+
+    function onScanFailure(error) {
+      // Normal per-frame no-code match; keep silent
+    }
+
+    function showScannedCard(code) {
+      const container = document.getElementById('last-scanned-container');
+      const title = document.getElementById('scanned-code-title');
+      container.style.display = 'block';
+      title.textContent = code;
+    }
+
+    function setupControls() {
+      // Toggle sound
+      document.getElementById('btn-toggle-sound').onclick = toggleSound;
+
+      // Flip camera (back/front)
+      document.getElementById('btn-restart-camera').onclick = async () => {
+        if (!html5QrCode) return;
+        try {
+          await html5QrCode.stop();
+          currentFacingMode = (currentFacingMode === "environment" ? "user" : "environment");
+          startScanner();
+        } catch (e) {
+          console.error('Flip camera error:', e);
+        }
+      };
+
+      // Manual Barcode Entry Modal
+      const modal = document.getElementById('manual-modal');
+      const input = document.getElementById('manual-barcode-input');
+
+      document.getElementById('btn-manual-code').onclick = () => {
+        modal.style.display = 'flex';
+        input.focus();
+      };
+      document.getElementById('btn-close-manual').onclick = () => {
+        modal.style.display = 'none';
+      };
+
+      document.getElementById('btn-submit-manual').onclick = () => {
+        const val = input.value.trim().toUpperCase();
+        if (val) {
+          onScanSuccess(val);
+          input.value = '';
+          modal.style.display = 'none';
+        }
+      };
+    }
+  </script>
+</body>
+</html>

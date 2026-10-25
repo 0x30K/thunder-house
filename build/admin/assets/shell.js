@@ -23,6 +23,7 @@
     { group: 'Perform' },
     { id: 'calendar', href: 'calendar.html', icon: 'fa-calendar-days', label: 'Calendar' },
     { id: 'gigs', href: 'gigs.html', icon: 'fa-compact-disc', label: 'Gigs Run-of-Show' },
+    { id: 'gear', href: 'gear.html', icon: 'fa-boxes-stacked', label: 'Equipment Fleet', badgeId: 'nav-gear-count' },
     { id: 'consultations', href: 'consultations.html', icon: 'fa-clipboard-list', label: 'Consultations', badgeId: 'nav-consult-count', gold: true },
     { group: 'Business' },
     { id: 'clients', href: 'clients.html', icon: 'fa-users', label: 'Clients CRM' },
@@ -372,6 +373,20 @@
         wireBadge.textContent = `${wireCount}/5`;
         wireBadge.style.display = 'inline-flex';
       }
+
+      // Count Equipment out on gig or in maintenance
+      try {
+        const { count: gearOutCount } = await window.supabaseClient
+          .from('thunderhouse_equipment')
+          .select('*', { count: 'exact', head: true })
+          .neq('status', 'Available in Studio');
+
+        const gearBadge = document.getElementById('nav-gear-count');
+        if (gearBadge && gearOutCount && gearOutCount > 0) {
+          gearBadge.textContent = gearOutCount;
+          gearBadge.style.display = 'inline-flex';
+        }
+      } catch (err) {}
     } catch (e) {
       console.warn('Badge count refresh:', e);
     }

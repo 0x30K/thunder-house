@@ -42,6 +42,7 @@
         <a href="#team"><i class="fa-solid fa-users-gear"></i> Team Permissions</a>
         <a href="#website"><i class="fa-solid fa-paintbrush"></i> Public Site Editor</a>
         <a href="#sending"><i class="fa-solid fa-server"></i> SMTP & Sending</a>
+        <a href="#scanner"><i class="fa-solid fa-qrcode"></i> Equipment & Scanner</a>
         <a href="#logs"><i class="fa-solid fa-triangle-exclamation"></i> Error Logs</a>
       </nav>
 
@@ -207,6 +208,44 @@
           </div>
         </section>
 
+        <!-- Equipment & Mobile QR Scanner Preferences -->
+        <section id="scanner" class="card mb" style="margin-top:1.5rem">
+          <div class="label mb" style="display:flex; align-items:center; gap:0.5rem">
+            <i class="fa-solid fa-qrcode cyan"></i> DJ Equipment & Mobile QR Scanner Preferences
+          </div>
+          <div class="set-row">
+            <div class="grow">
+              Scanner Audio Confirmation (Beep Sound)
+              <span class="sub">Play audible confirmation chime when a QR sticker is detected on your mobile camera</span>
+            </div>
+            <button class="btn btn-sm btn-outline" onclick="testScannerAudio()" style="margin-right:0.75rem" title="Preview scanner beep sound">
+              <i class="fa-solid fa-volume-high"></i> Test Sound
+            </button>
+            <span class="toggle on" id="toggle-scanner-sound"></span>
+          </div>
+          <div class="set-row">
+            <div class="grow">
+              Scanner Haptic Vibration
+              <span class="sub">Vibrate mobile phone when a gear QR code sticker is successfully recognized</span>
+            </div>
+            <span class="toggle on" id="toggle-scanner-vibrate"></span>
+          </div>
+          <div class="set-row">
+            <div class="grow">
+              Continuous Batch Scan Mode
+              <span class="sub">Allow rapid continuous scanning of multiple gear items without closing the camera viewfinder</span>
+            </div>
+            <span class="toggle on" id="toggle-scanner-batch"></span>
+          </div>
+          <div class="set-row">
+            <div class="grow">
+              Studio Location & Status
+              <span class="sub">Default on-premises inventory status for gear ready to pack</span>
+            </div>
+            <span class="pill pill-green"><i class="fa-solid fa-circle-check"></i> Available in Studio</span>
+          </div>
+        </section>
+
         <!-- System Error Logs & Health Monitor -->
         <section id="logs" class="card" style="margin-top:1.5rem">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.75rem">
@@ -275,44 +314,122 @@
   });
 
   async function loadSettings() {
+    // Load scanner settings from localStorage
+    const soundOn = localStorage.getItem('th_scanner_sound_enabled') !== 'false';
+    const vibrateOn = localStorage.getItem('th_scanner_vibrate_enabled') !== 'false';
+    const batchOn = localStorage.getItem('th_scanner_batch_enabled') !== 'false';
+
+    const soundToggle = document.getElementById('toggle-scanner-sound');
+    const vibrateToggle = document.getElementById('toggle-scanner-vibrate');
+    const batchToggle = document.getElementById('toggle-scanner-batch');
+    if (soundToggle) soundToggle.classList.toggle('on', soundOn);
+    if (vibrateToggle) vibrateToggle.classList.toggle('on', vibrateOn);
+    if (batchToggle) batchToggle.classList.toggle('on', batchOn);
+
     if (!window.supabaseClient) return;
 
     try {
       const { data } = await window.supabaseClient
         .from('thunderhouse_site_settings')
         .select('*')
-        .eq('key', 'booking_settings')
-        .maybeSingle();
+        .in('key', ['booking_settings', 'equipment_scanner_settings']);
 
-      if (data && data.value) {
-        if (data.value.hold_hours) document.getElementById('set-hold-hours').value = data.value.hold_hours;
-        if (data.value.retainer_fee) document.getElementById('set-retainer-fee').value = data.value.retainer_fee;
-        if (data.value.balance_days) document.getElementById('set-balance-days').value = data.value.balance_days;
+      if (data) {
+        data.forEach(item => {
+          if (item.key === 'booking_settings' && item.value) {
+            if (item.value.hold_hours) document.getElementById('set-hold-hours').value = item.value.hold_hours;
+            if (item.value.retainer_fee) document.getElementById('set-retainer-fee').value = item.value.retainer_fee;
+            if (item.value.balance_days) document.getElementById('set-balance-days').value = item.value.balance_days;
+          }
+          if (item.key === 'equipment_scanner_settings' && item.value) {
+            if (typeof item.value.sound_enabled === 'boolean') {
+              if (soundToggle) soundToggle.classList.toggle('on', item.value.sound_enabled);
+              localStorage.setItem('th_scanner_sound_enabled', item.value.sound_enabled ? 'true' : 'false');
+            }
+            if (typeof item.value.vibrate_enabled === 'boolean') {
+              if (vibrateToggle) vibrateToggle.classList.toggle('on', item.value.vibrate_enabled);
+              localStorage.setItem('th_scanner_vibrate_enabled', item.value.vibrate_enabled ? 'true' : 'false');
+            }
+            if (typeof item.value.batch_enabled === 'boolean') {
+              if (batchToggle) batchToggle.classList.toggle('on', item.value.batch_enabled);
+              localStorage.setItem('th_scanner_batch_enabled', item.value.batch_enabled ? 'true' : 'false');
+            }
+          }
+        });
       }
     } catch (e) {
       console.warn('Error loading settings:', e);
     }
   }
 
+  window.testScannerAudio = function () {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) {
+        window.showToast('Audio API not available in this browser', 'info');
+        return;
+      }
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      const now = ctx.currentTime;
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.setValueAtTime(1320, now + 0.08);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+      osc.start(now);
+      osc.stop(now + 0.22);
+      window.showToast('Scanner confirmation beep played!', 'gold');
+    } catch (e) {
+      window.showToast('Audio test error: ' + e.message, 'error');
+    }
+  };
+
   async function saveBookingSettings() {
-    if (!window.supabaseClient) return;
+    // Save scanner preferences locally
+    const soundOn = document.getElementById('toggle-scanner-sound')?.classList.contains('on') ?? true;
+    const vibrateOn = document.getElementById('toggle-scanner-vibrate')?.classList.contains('on') ?? true;
+    const batchOn = document.getElementById('toggle-scanner-batch')?.classList.contains('on') ?? true;
+
+    localStorage.setItem('th_scanner_sound_enabled', soundOn ? 'true' : 'false');
+    localStorage.setItem('th_scanner_vibrate_enabled', vibrateOn ? 'true' : 'false');
+    localStorage.setItem('th_scanner_batch_enabled', batchOn ? 'true' : 'false');
+
+    if (!window.supabaseClient) {
+      window.showToast('Preferences saved locally!', 'success');
+      return;
+    }
 
     const holdHours = parseInt(document.getElementById('set-hold-hours').value) || 72;
     const retainer = parseFloat(document.getElementById('set-retainer-fee').value) || 200;
     const balanceDays = parseInt(document.getElementById('set-balance-days').value) || 14;
 
     try {
-      await window.supabaseClient.from('thunderhouse_site_settings').upsert([{
-        key: 'booking_settings',
-        value: {
-          hold_hours: holdHours,
-          retainer_fee: retainer,
-          balance_days: balanceDays,
-          updated_at: new Date().toISOString()
+      await window.supabaseClient.from('thunderhouse_site_settings').upsert([
+        {
+          key: 'booking_settings',
+          value: {
+            hold_hours: holdHours,
+            retainer_fee: retainer,
+            balance_days: balanceDays,
+            updated_at: new Date().toISOString()
+          }
+        },
+        {
+          key: 'equipment_scanner_settings',
+          value: {
+            sound_enabled: soundOn,
+            vibrate_enabled: vibrateOn,
+            batch_enabled: batchOn,
+            updated_at: new Date().toISOString()
+          }
         }
-      }], { onConflict: 'key' });
+      ], { onConflict: 'key' });
 
-      window.showToast('All system settings saved to cloud!', 'success');
+      window.showToast('All system & scanner settings saved!', 'success');
     } catch (e) {
       window.showToast('Failed to save settings: ' + e.message, 'error');
     }
