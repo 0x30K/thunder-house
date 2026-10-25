@@ -164,10 +164,11 @@ def fetch_fresh_releases(max_days_old=4):
     tracks.sort(key=lambda x: x["release_dt"], reverse=True)
     return tracks
 
-def download_audio_version(artist, title, date_formatted, version_type, target_dir):
+def download_audio_version(artist, title, date_formatted, version_type, target_dir, genre="Hip-Hop/Rap"):
     """
     Downloads Clean or Dirty version from YouTube with release date in title:
     e.g. "Toosii - Let Me Close (Clean) [10-23-2026].mp3"
+    Injects Genre into TCON and Song Description into COMM frames.
     """
     if not yt_dlp:
         log("yt-dlp is not installed in Python environment.", "ERROR")
@@ -186,7 +187,7 @@ def download_audio_version(artist, title, date_formatted, version_type, target_d
         log(f"Already exists on disk: {final_mp3}")
         return final_mp3
 
-    # Build targeted search query
+    # Build targeted search query prioritizing official audio/topics
     if version_type.lower() == "clean":
         query = f"ytsearch1:{artist} {title} clean radio edit official audio"
     else:
@@ -210,20 +211,50 @@ def download_audio_version(artist, title, date_formatted, version_type, target_d
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(query, download=True)
-            if not info or 'entries' not in info or len(info['entries']) == 0:
+            # Extract video metadata first to verify upload date
+            search_info = ydl.extract_info(query, download=False)
+            if not search_info or 'entries' not in search_info or len(search_info['entries']) == 0:
                 log(f"No YouTube match found for {artist} - {title} ({version_type})", "WARN")
                 return None
-            
-            # Tag MP3 with Mutagen ID3
-            if os.path.exists(final_mp3) and EasyID3:
+
+            entry = search_info['entries'][0]
+            upload_date = entry.get('upload_date') or ''
+            current_year = datetime.now().year
+
+            # Sanity guard: Verify video is a current release (not an old 2007 throwback)
+            if upload_date and len(upload_date) >= 4:
                 try:
-                    audio = MP3(final_mp3, ID3=EasyID3)
-                    audio['artist'] = artist
-                    audio['title'] = f"{title} ({version_type}) [{date_formatted}]"
-                    audio['album'] = "Thunder House Music of the Week"
-                    audio['genre'] = "Hip-Hop / Urban"
-                    audio.save()
+                    upload_year = int(upload_date[:4])
+                    if upload_year < (current_year - 1):
+                        log(f"Skipping '{entry.get('title')}' - Upload year is {upload_year} (old classic, not a {current_year} drop)", "WARN")
+                        return None
+                except ValueError:
+                    pass
+
+            # Proceed to download
+            ydl.download([entry['webpage_url'] or entry['url']])
+
+            # Tag MP3 with Mutagen ID3 (Title, Artist, Album, Genre, Subtitle, and Description/Comment)
+            if os.path.exists(final_mp3):
+                try:
+                    from mutagen.id3 import ID3, TIT2, TIT3, TPE1, TALB, TCON, TDRC, COMM
+                    try:
+                        audio = ID3(final_mp3)
+                    except Exception:
+                        audio = ID3()
+
+                    audio.add(TIT2(encoding=3, text=f"{title} ({version_type}) [{date_formatted}]"))
+                    audio.add(TPE1(encoding=3, text=artist))
+                    audio.add(TALB(encoding=3, text="Thunder House Music of the Week"))
+                    audio.add(TCON(encoding=3, text=genre))
+                    audio.add(TDRC(encoding=3, text=date_formatted[-4:]))
+                    
+                    # Embed Genre into Description, Comments, and Subtitle frames for Serato, Rekordbox, Apple Music, and Windows Explorer
+                    desc_text = f"Genre: {genre} · Version: {version_type} · Thunder House ENT Music of the Week · Released: {date_formatted}"
+                    audio.add(COMM(encoding=3, lang='eng', desc='', text=desc_text))
+                    audio.add(COMM(encoding=3, lang='eng', desc='Description', text=desc_text))
+                    audio.add(TIT3(encoding=3, text=f"Genre: {genre} · {version_type} · Released {date_formatted}"))
+                    audio.save(final_mp3)
                 except Exception as tag_err:
                     log(f"Failed tagging {final_mp3}: {tag_err}", "WARN")
 
@@ -327,9 +358,10 @@ def run_scout_cycle(max_tracks=8):
         }])
         record_id = inserted[0]["id"] if inserted and len(inserted) > 0 else None
 
-        # Download Clean & Dirty pair with release date in filename
-        clean_path = download_audio_version(track["artist"], track["title"], date_str, "Clean", clean_dir)
-        dirty_path = download_audio_version(track["artist"], track["title"], date_str, "Dirty", dirty_dir)
+        # Download Clean & Dirty pair with release date in filename and genre tagged
+        track_genre = track.get("genre", "Hip-Hop/Rap")
+        clean_path = download_audio_version(track["artist"], track["title"], date_str, "Clean", clean_dir, genre=track_genre)
+        dirty_path = download_audio_version(track["artist"], track["title"], date_str, "Dirty", dirty_dir, genre=track_genre)
 
         status = "downloaded" if (clean_path or dirty_path) else "skipped"
 
