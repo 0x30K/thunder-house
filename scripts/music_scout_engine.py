@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """
 Thunder House ENT - New Music Scout & Ingestion Engine
-Scouts weekly Hip-Hop, R&B, and Pop drops, downloads Clean & Dirty audio pairs
+Scouts new Hip-Hop, R&B, and Pop drops from the last 24-72 hours,
+downloads Clean & Dirty audio pairs with release date in title:
+e.g. "Drake - First Person Shooter (Clean) [10-23-2026].mp3"
 directly to E:\\Thunder House - Music\\Music of the Week, and auto-archives
 previous week music into alphabetical artist folders.
 """
@@ -13,7 +15,7 @@ import json
 import re
 import urllib.request
 import urllib.error
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 import subprocess
 
 # Dependencies
@@ -76,47 +78,96 @@ def get_settings():
 def sanitize_filename(name):
     return re.sub(r'[\\/*?:"<>|]', "", name).strip()
 
-def fetch_trending_releases():
-    """Fetch new releases from official Hip-Hop and R&B feeds (iTunes Top Feeds)"""
-    genres = [
-        {"id": "18", "name": "Hip-Hop/Rap"},
-        {"id": "15", "name": "R&B/Soul"},
-        {"id": "14", "name": "Pop"}
+def format_date_us(iso_str):
+    """Converts ISO date (2026-10-23T12:00:00Z) to MM-DD-YYYY format (10-23-2026)"""
+    if not iso_str:
+        return datetime.now().strftime("%m-%d-%Y")
+    try:
+        # Strip timezone if present
+        clean_iso = iso_str.replace("Z", "+00:00")
+        dt = datetime.fromisoformat(clean_iso)
+        return dt.strftime("%m-%d-%Y")
+    except Exception:
+        # Fallback regex extraction
+        match = re.search(r'(\d{4})-(\d{2})-(\d{2})', iso_str)
+        if match:
+            y, m, d = match.groups()
+            return f"{m}-{d}-{y}"
+        return datetime.now().strftime("%m-%d-%Y")
+
+def fetch_fresh_releases(max_days_old=4):
+    """
+    Scouts tracks released in the last 24-72 hours across Hip-Hop, Rap, and R&B.
+    Ensures tracks are brand new releases from major or trending artists,
+    NOT decades-old catalog tracks.
+    """
+    search_queries = [
+        {"term": "hip hop", "genre": "Hip-Hop/Rap"},
+        {"term": "rap", "genre": "Hip-Hop/Rap"},
+        {"term": "r&b", "genre": "R&B/Soul"}
     ]
+
     tracks = []
     seen = set()
+    now_utc = datetime.now(timezone.utc)
+    cutoff_date = now_utc - timedelta(days=max_days_old)
 
-    for g in genres:
-        url = f"https://itunes.apple.com/us/rss/topsongs/limit=25/genre={g['id']}/json"
+    for q in search_queries:
+        encoded_term = urllib.parse.quote_plus(q["term"])
+        url = f"https://itunes.apple.com/search?term={encoded_term}&entity=song&sort=recent&limit=50"
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "ThunderHouseMusicScout/1.0"})
-            with urllib.request.urlopen(req, timeout=10) as resp:
+            req = urllib.request.Request(url, headers={"User-Agent": "ThunderHouseMusicScout/2.0"})
+            with urllib.request.urlopen(req, timeout=12) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
-                entries = data.get("feed", {}).get("entry", [])
-                for entry in entries:
-                    artist = entry.get("im:artist", {}).get("label", "").strip()
-                    title = entry.get("im:name", {}).get("label", "").strip()
-                    release_date = entry.get("im:releaseDate", {}).get("label", "")
-                    
-                    # Clean up titles (e.g. remove "(feat. ...)" duplicates if needed)
-                    key = f"{artist.lower()} - {title.lower()}"
-                    if artist and title and key not in seen:
-                        seen.add(key)
-                        tracks.append({
-                            "artist": artist,
-                            "title": title,
-                            "genre": g["name"],
-                            "release_date": release_date
-                        })
-        except Exception as e:
-            log(f"Failed fetching {g['name']} feed: {e}", "WARN")
+                results = data.get("results", [])
 
+                for item in results:
+                    artist = item.get("artistName", "").strip()
+                    title = item.get("trackName", "").strip()
+                    raw_release = item.get("releaseDate", "")
+                    primary_genre = item.get("primaryGenreName", q["genre"])
+
+                    if not artist or not title or not raw_release:
+                        continue
+
+                    # Parse release date
+                    try:
+                        clean_iso = raw_release.replace("Z", "+00:00")
+                        release_dt = datetime.fromisoformat(clean_iso)
+                    except Exception:
+                        continue
+
+                    # Filter: ONLY last 24-72 hours (recent drops)
+                    if release_dt < cutoff_date:
+                        continue
+
+                    # Deduplicate
+                    key = f"{artist.lower()} - {title.lower()}"
+                    if key in seen:
+                        continue
+                    seen.add(key)
+
+                    formatted_date = format_date_us(raw_release)
+
+                    tracks.append({
+                        "artist": artist,
+                        "title": title,
+                        "genre": primary_genre,
+                        "raw_release_date": raw_release,
+                        "date_str": formatted_date,
+                        "release_dt": release_dt
+                    })
+        except Exception as e:
+            log(f"Failed querying recent {q['genre']}: {e}", "WARN")
+
+    # Sort tracks newest first
+    tracks.sort(key=lambda x: x["release_dt"], reverse=True)
     return tracks
 
-def download_audio_version(artist, title, version_type, target_dir):
+def download_audio_version(artist, title, date_formatted, version_type, target_dir):
     """
-    Downloads either Clean or Dirty version from YouTube using yt-dlp and ffmpeg.
-    version_type: 'Clean' or 'Dirty'
+    Downloads Clean or Dirty version from YouTube with release date in title:
+    e.g. "Toosii - Let Me Close (Clean) [10-23-2026].mp3"
     """
     if not yt_dlp:
         log("yt-dlp is not installed in Python environment.", "ERROR")
@@ -125,7 +176,9 @@ def download_audio_version(artist, title, version_type, target_dir):
     os.makedirs(target_dir, exist_ok=True)
     clean_artist = sanitize_filename(artist)
     clean_title = sanitize_filename(title)
-    filename_base = f"{clean_artist} - {clean_title} ({version_type})"
+
+    # Format title with release date
+    filename_base = f"{clean_artist} - {clean_title} ({version_type}) [{date_formatted}]"
     out_template = os.path.join(target_dir, f"{filename_base}.%(ext)s")
     final_mp3 = os.path.join(target_dir, f"{filename_base}.mp3")
 
@@ -133,13 +186,13 @@ def download_audio_version(artist, title, version_type, target_dir):
         log(f"Already exists on disk: {final_mp3}")
         return final_mp3
 
-    # Build search query
+    # Build targeted search query
     if version_type.lower() == "clean":
         query = f"ytsearch1:{artist} {title} clean radio edit official audio"
     else:
         query = f"ytsearch1:{artist} {title} explicit official audio"
 
-    log(f"Searching YouTube for {version_type}: {query}...")
+    log(f"Searching YouTube for {version_type} [{date_formatted}]: {query}...")
 
     ydl_opts = {
         'format': 'bestaudio/best',
@@ -162,19 +215,19 @@ def download_audio_version(artist, title, version_type, target_dir):
                 log(f"No YouTube match found for {artist} - {title} ({version_type})", "WARN")
                 return None
             
-            # Tag MP3 with Mutagen
+            # Tag MP3 with Mutagen ID3
             if os.path.exists(final_mp3) and EasyID3:
                 try:
                     audio = MP3(final_mp3, ID3=EasyID3)
                     audio['artist'] = artist
-                    audio['title'] = f"{title} ({version_type})"
+                    audio['title'] = f"{title} ({version_type}) [{date_formatted}]"
                     audio['album'] = "Thunder House Music of the Week"
                     audio['genre'] = "Hip-Hop / Urban"
                     audio.save()
                 except Exception as tag_err:
                     log(f"Failed tagging {final_mp3}: {tag_err}", "WARN")
 
-            log(f"Successfully downloaded {version_type} version: {final_mp3}", "SUCCESS")
+            log(f"Successfully downloaded {version_type}: {filename_base}.mp3", "SUCCESS")
             return final_mp3
 
     except Exception as e:
@@ -184,14 +237,14 @@ def download_audio_version(artist, title, version_type, target_dir):
 def archive_previous_week_music(music_root=DEFAULT_MUSIC_ROOT, save_folder=DEFAULT_SAVE_FOLDER):
     """
     Moves previous week's music from 'Music of the Week' into appropriate
-    alphabetical artist folders (E:\Thunder House - Music\A-Z\Artist\).
+    alphabetical artist folders (E:\\Thunder House - Music\\A-Z\\Artist\\).
     """
     clean_dir = os.path.join(save_folder, "Clean")
     dirty_dir = os.path.join(save_folder, "Dirty")
     dirs_to_check = [clean_dir, dirty_dir, save_folder]
 
     archived_count = 0
-    log("Scanning for completed week tracks to archive alphabetically...")
+    log(r"Scanning for completed week tracks to archive alphabetically into E:\Thunder House - Music\A-Z...")
 
     for d in dirs_to_check:
         if not os.path.exists(d):
@@ -201,8 +254,7 @@ def archive_previous_week_music(music_root=DEFAULT_MUSIC_ROOT, save_folder=DEFAU
                 continue
 
             full_path = os.path.join(d, fname)
-            # Inspect modification date - if older than 5 days or triggered
-            # Format usually: "Artist - Title (Version).mp3"
+            # Format: "Artist - Title (Version) [Date].mp3"
             parts = fname.split(" - ", 1)
             if len(parts) >= 2:
                 artist = parts[0].strip()
@@ -219,7 +271,6 @@ def archive_previous_week_music(music_root=DEFAULT_MUSIC_ROOT, save_folder=DEFAU
             dest_path = os.path.join(artist_folder, fname)
 
             try:
-                # Move file
                 os.replace(full_path, dest_path)
                 archived_count += 1
                 log(f"Archived: {fname} -> {first_char}\\{artist}\\")
@@ -229,8 +280,8 @@ def archive_previous_week_music(music_root=DEFAULT_MUSIC_ROOT, save_folder=DEFAU
     log(f"Archival complete. {archived_count} tracks moved to permanent library.")
     return archived_count
 
-def run_scout_cycle():
-    """Main scouting and ingestion pass"""
+def run_scout_cycle(max_tracks=8):
+    """Main scouting and ingestion pass for fresh 24-72h drops"""
     settings = get_settings()
     if not settings.get("enabled", True):
         log("Music Scout Engine is currently disabled in Settings. Skipping run.")
@@ -242,38 +293,43 @@ def run_scout_cycle():
     os.makedirs(clean_dir, exist_ok=True)
     os.makedirs(dirty_dir, exist_ok=True)
 
-    log(f"Starting New Music Scout cycle. Target: {save_folder}")
+    log(f"Starting New Music Scout cycle (Last 24-72h releases). Target: {save_folder}")
 
-    # 1. Fetch Trending Releases
-    releases = fetch_trending_releases()
-    log(f"Fetched {len(releases)} trending release candidates from charts.")
+    # 1. Fetch Fresh 24-72h Releases
+    releases = fetch_fresh_releases(max_days_old=4)
+    log(f"Fetched {len(releases)} brand-new release candidates from the last 72 hours.")
+
+    if not releases:
+        log("No fresh releases discovered in the last 72h window. Checking again next cycle.")
+        return
 
     # 2. Check existing scouted tracks in Supabase
     existing_db = supabase_request("thunderhouse_music_scout?select=artist,title,status") or []
     existing_set = {f"{r['artist'].lower()} - {r['title'].lower()}" for r in existing_db}
 
-    # 3. Process new tracks (limit to top 10 per run to respect bandwidth)
+    # 3. Process new tracks
     download_count = 0
-    for track in releases[:12]:
+    for track in releases[:max_tracks]:
         key = f"{track['artist'].lower()} - {track['title'].lower()}"
         if key in existing_set:
             continue
 
-        log(f"Discovered New Track: {track['artist']} - {track['title']} ({track['genre']})")
+        date_str = track["date_str"] # e.g. 10-23-2026
+        log(f"Processing Drop: {track['artist']} - {track['title']} (Released: {date_str})")
 
         # Record as pending in Supabase
         inserted = supabase_request("thunderhouse_music_scout", method="POST", payload=[{
             "artist": track["artist"],
-            "title": track["title"],
+            "title": f"{track['title']} [{date_str}]",
             "genre": track["genre"],
-            "release_date": track.get("release_date"),
+            "release_date": date_str,
             "status": "downloading"
         }])
         record_id = inserted[0]["id"] if inserted and len(inserted) > 0 else None
 
-        # Download Clean & Dirty pair
-        clean_path = download_audio_version(track["artist"], track["title"], "Clean", clean_dir)
-        dirty_path = download_audio_version(track["artist"], track["title"], "Dirty", dirty_dir)
+        # Download Clean & Dirty pair with release date in filename
+        clean_path = download_audio_version(track["artist"], track["title"], date_str, "Clean", clean_dir)
+        dirty_path = download_audio_version(track["artist"], track["title"], date_str, "Dirty", dirty_dir)
 
         status = "downloaded" if (clean_path or dirty_path) else "skipped"
 
@@ -319,8 +375,16 @@ def main():
                 if req_time:
                     log(f"Received manual scout trigger from admin ({req_time})!")
                     run_scout_cycle()
-                    # Clear trigger
                     supabase_request("thunderhouse_site_settings?key=eq.music_scout_trigger", method="PATCH", payload={"value": {}})
+
+            # Check for manual archive trigger
+            archive_trigger = supabase_request("thunderhouse_site_settings?key=eq.music_archive_trigger&select=*")
+            if archive_trigger and len(archive_trigger) > 0 and archive_trigger[0].get("value"):
+                req_time = archive_trigger[0]["value"].get("requested_at")
+                if req_time:
+                    log(f"Received manual archive trigger from admin ({req_time})!")
+                    archive_previous_week_music()
+                    supabase_request("thunderhouse_site_settings?key=eq.music_archive_trigger", method="PATCH", payload={"value": {}})
 
             # Check Daily Scheduled Time (Default 06:00 AM)
             target_time_str = settings.get("scout_time", "06:00")
@@ -336,13 +400,13 @@ def main():
                     log("Monday detected: Running end-of-week alphabetical library archive...")
                     archive_previous_week_music()
 
-            time.sleep(30)
+            time.sleep(15)
         except KeyboardInterrupt:
             log("Daemon stopped by user.")
             break
         except Exception as e:
             log(f"Unexpected daemon error: {e}", "ERROR")
-            time.sleep(30)
+            time.sleep(15)
 
 if __name__ == "__main__":
     main()
