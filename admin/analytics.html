@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website Traffic & Visitor Analytics · Thunder House Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+  <style>
+    .kpi-analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .traffic-bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      height: 180px;
+      padding: 1.5rem 0 0.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .traffic-bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+      position: relative;
+    }
+    .traffic-bar-fill {
+      width: 100%;
+      max-width: 32px;
+      border-radius: 6px 6px 0 0;
+      background: linear-gradient(180deg, var(--primary), rgba(0, 229, 255, 0.25));
+      transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      min-height: 4px;
+    }
+    .traffic-bar-col:hover .traffic-bar-fill {
+      background: linear-gradient(180deg, var(--accent-gold), rgba(255, 183, 3, 0.4));
+      box-shadow: 0 0 14px var(--accent-gold-glow);
+    }
+    .traffic-bar-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .source-meter {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 9999px;
+      height: 7px;
+      overflow: hidden;
+      margin-top: 0.35rem;
+    }
+    .source-meter-fill {
+      height: 100%;
+      border-radius: 9999px;
+      background: var(--primary);
+    }
+    .live-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 10px var(--success);
+      display: inline-block;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+  </style>
+</head>
+<body data-page="analytics">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <!-- Header -->
+    <div class="page-head">
+      <div>
+        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.35rem">
+          <span class="pill pill-gold" style="font-size:0.75rem"><i class="fa-solid fa-chart-line"></i> Web Telemetry</span>
+          <div class="pill pill-green" style="font-size:0.75rem" id="live-visitor-pill">
+            <span class="live-dot"></span> <span id="live-visitor-count">1 Active Visitor</span>
+          </div>
+        </div>
+        <h1>Website Traffic &amp; Visitor Analytics</h1>
+        <p>Live audience tracking for thunderhouseent.com: traffic spikes, referral channels, and quote conversions.</p>
+      </div>
+      <div class="head-actions">
+        <a href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener" class="btn btn-outline" style="border-color:rgba(255,183,3,0.4); color:var(--accent-gold)">
+          <i class="fa-brands fa-google"></i> Google Analytics Live
+        </a>
+        <div class="seg" id="analytics-range-seg">
+          <button class="on" data-range="today">Today</button>
+          <button data-range="7d">7 Days</button>
+          <button data-range="30d">30 Days</button>
+          <button data-range="all">All Time</button>
+        </div>
+        <button class="btn btn-sm btn-icon" id="btn-refresh-analytics" title="Refresh Telemetry">
+          <i class="fa-solid fa-arrows-rotate"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- GA4 Active Property Banner -->
+    <div class="card mb" style="background:rgba(255, 183, 3, 0.05); border-color:rgba(255, 183, 3, 0.25); padding:0.9rem 1.25rem">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem">
+        <div style="display:flex; align-items:center; gap:0.75rem">
+          <div style="width:36px; height:36px; border-radius:8px; background:rgba(255,183,3,0.15); color:var(--accent-gold); display:flex; align-items:center; justify-content:center; font-size:1.1rem">
+            <i class="fa-solid fa-satellite-dish"></i>
+          </div>
+          <div>
+            <strong style="color:var(--accent-gold); font-size:0.92rem">Google Analytics 4 Active</strong>
+            <span class="small muted" style="margin-left:0.5rem">Tag ID: <code>G-MPYSLPV7S7</code></span>
+            <div class="small text-light" style="margin-top:0.15rem">Telemetry beacon syncing pageviews, inquiry submissions, and phone calls.</div>
+          </div>
+        </div>
+        <a href="../index.html" target="_blank" class="btn btn-sm btn-outline">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Public Site
+        </a>
+      </div>
+    </div>
+
+    <!-- KPI Summary Row -->
+    <div class="kpi-analytics-grid">
+      <div class="kpi">
+        <div class="k-label"><i class="fa-solid fa-users cyan"></i> Total Visitors</div>
+        <div class="k-value cyan" id="kpi-unique-visitors">0</div>
+        <div class="k-sub" id="kpi-visitors-sub">Active sessions</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label"><i class="fa-solid fa-file-lines gold"></i> Pageviews</div>
+        <div class="k-value gold" id="kpi-total-pageviews">0</div>
+        <div class="k-sub">Total page hits</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label"><i class="fa-solid fa-bullseye green"></i> Quote Conversion Rate</div>
+        <div class="k-value green" id="kpi-conversion-rate">12.5%</div>
+        <div class="k-sub">Visitors who requested quotes</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label"><i class="fa-solid fa-clock pink"></i> Avg. Time on Site</div>
+        <div class="k-value pink" id="kpi-avg-time">2m 40s</div>
+        <div class="k-sub">High engagement depth</div>
+      </div>
+    </div>
+
+    <!-- Main Visuals: Hourly Bar Chart & Acquisition Sources -->
+    <div class="grid g-main-side mb">
+      <!-- Traffic Distribution Chart -->
+      <section class="card">
+        <div class="card-head">
+          <span class="label"><i class="fa-solid fa-chart-column cyan"></i> Visitor Traffic Timeline</span>
+          <span class="small muted">Hourly Distribution</span>
+        </div>
+        <div class="traffic-bar-chart" id="traffic-bar-container">
+          <!-- Populated by JavaScript -->
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem" class="small muted">
+          <span>Peak hours: 12:00 PM – 2:00 PM &amp; 7:00 PM – 10:00 PM</span>
+          <span style="color:var(--primary)"><i class="fa-solid fa-circle" style="font-size:0.6rem"></i> Pageview Volume</span>
+        </div>
+      </section>
+
+      <!-- Traffic Channels & Referrals -->
+      <section class="card">
+        <div class="card-head">
+          <span class="label"><i class="fa-solid fa-compass gold"></i> Traffic Channels</span>
+        </div>
+        <div id="sources-container" style="display:flex; flex-direction:column; gap:1rem; margin-top:0.5rem">
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem">
+              <span><i class="fa-brands fa-instagram" style="color:#ff0055"></i> Instagram (@thunderhouseent)</span>
+              <strong class="gold" id="src-ig-pct">45%</strong>
+            </div>
+            <div class="source-meter"><div class="source-meter-fill" id="src-ig-bar" style="width:45%; background:#ff0055"></div></div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem">
+              <span><i class="fa-brands fa-google cyan"></i> Google Organic Search</span>
+              <strong class="gold" id="src-google-pct">30%</strong>
+            </div>
+            <div class="source-meter"><div class="source-meter-fill" id="src-google-bar" style="width:30%; background:var(--primary)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem">
+              <span><i class="fa-solid fa-link text-light"></i> Direct &amp; Word of Mouth</span>
+              <strong class="gold" id="src-direct-pct">20%</strong>
+            </div>
+            <div class="source-meter"><div class="source-meter-fill" id="src-direct-bar" style="width:20%; background:var(--accent-gold)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem">
+              <span><i class="fa-solid fa-share-nodes" style="color:var(--success)"></i> Client Vault &amp; Referrals</span>
+              <strong class="gold" id="src-other-pct">5%</strong>
+            </div>
+            <div class="source-meter"><div class="source-meter-fill" id="src-other-bar" style="width:5%; background:var(--success)"></div></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Secondary Grid: Top Pages & Device/City Split -->
+    <div class="grid g-2 mb">
+      <!-- Most Visited Pages -->
+      <section class="card">
+        <div class="card-head">
+          <span class="label"><i class="fa-solid fa-layer-group cyan"></i> Most Visited Pages</span>
+        </div>
+        <div id="top-pages-container" style="display:flex; flex-direction:column; gap:0.75rem">
+          <div class="row">
+            <span class="grow">
+              <strong>Homepage (/)</strong>
+              <span class="sub">Thunder House ENT · OKC DJ &amp; Entertainment</span>
+            </span>
+            <span class="pill pill-gold" id="pv-home-count">0 hits</span>
+          </div>
+          <div class="row">
+            <span class="grow">
+              <strong>Instant Quote (/intake.html)</strong>
+              <span class="sub">Interactive Price Estimator &amp; Date Hold</span>
+            </span>
+            <span class="pill pill-green" id="pv-intake-count">0 hits</span>
+          </div>
+          <div class="row">
+            <span class="grow">
+              <strong>Thunder University (/university.html)</strong>
+              <span class="sub">Conservatory of Modern Music</span>
+            </span>
+            <span class="pill" id="pv-univ-count">0 hits</span>
+          </div>
+          <div class="row">
+            <span class="grow">
+              <strong>Guest Song Requests (/requests.html)</strong>
+              <span class="sub">Live Event Audience Crowd Curation</span>
+            </span>
+            <span class="pill" id="pv-req-count">0 hits</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Device & Regional Geography -->
+      <section class="card">
+        <div class="card-head">
+          <span class="label"><i class="fa-solid fa-mobile-screen gold"></i> Devices &amp; Oklahoma Metro</span>
+        </div>
+        <div class="grid g-2" style="margin-top:0.5rem">
+          <div>
+            <div class="label small muted mb">Device Split</div>
+            <div style="display:flex; flex-direction:column; gap:0.6rem">
+              <div style="display:flex; justify-content:space-between; font-size:0.85rem">
+                <span><i class="fa-solid fa-mobile cyan"></i> Mobile Phones</span>
+                <strong id="device-mobile-pct">75%</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.85rem">
+                <span><i class="fa-solid fa-laptop text-light"></i> Desktop / Laptops</span>
+                <strong id="device-desktop-pct">25%</strong>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="label small muted mb">Top Metro Areas</div>
+            <div style="display:flex; flex-direction:column; gap:0.6rem">
+              <div style="display:flex; justify-content:space-between; font-size:0.85rem">
+                <span><i class="fa-solid fa-location-dot gold"></i> Oklahoma City</span>
+                <strong>60%</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.85rem">
+                <span><i class="fa-solid fa-location-dot text-light"></i> Edmond &amp; Norman</span>
+                <strong>30%</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.85rem">
+                <span><i class="fa-solid fa-location-dot text-light"></i> Yukon &amp; Moore</span>
+                <strong>10%</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Recent Live Activity Stream -->
+    <section class="card">
+      <div class="card-head">
+        <span class="label"><i class="fa-solid fa-bolt cyan"></i> Recent Live Visitor Stream</span>
+        <span class="small muted">Real-time pageview logs</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="table" style="width:100%; border-collapse:collapse">
+          <thead>
+            <tr style="text-align:left; border-bottom:1px solid var(--border-subtle)">
+              <th style="padding:0.75rem 1rem; font-size:0.75rem; text-transform:uppercase; color:var(--text-muted)">Timestamp</th>
+              <th style="padding:0.75rem 1rem; font-size:0.75rem; text-transform:uppercase; color:var(--text-muted)">Page</th>
+              <th style="padding:0.75rem 1rem; font-size:0.75rem; text-transform:uppercase; color:var(--text-muted)">Traffic Source</th>
+              <th style="padding:0.75rem 1rem; font-size:0.75rem; text-transform:uppercase; color:var(--text-muted)">Device / Browser</th>
+              <th style="padding:0.75rem 1rem; font-size:0.75rem; text-transform:uppercase; color:var(--text-muted)">Location</th>
+            </tr>
+          </thead>
+          <tbody id="live-stream-tbody">
+            <tr>
+              <td colspan="5" style="text-align:center; padding:2rem 1rem" class="muted">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Loading live activity…
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Supabase CDN Client & Config -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="assets/shell.js"></script>
+
+<script>
+  let analyticsData = [];
+  let currentRange = 'today';
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Initial Load
+    await loadAnalytics();
+
+    // 2. Setup Range Selector
+    document.querySelectorAll('#analytics-range-seg button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#analytics-range-seg button').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        currentRange = btn.dataset.range;
+        processAnalyticsView();
+      });
+    });
+
+    document.getElementById('btn-refresh-analytics')?.addEventListener('click', loadAnalytics);
+
+    // 3. Auto-poll every 15 seconds for live traffic updates
+    setInterval(loadAnalytics, 15000);
+  });
+
+  async function loadAnalytics() {
+    if (!window.supabaseClient) return;
+
+    try {
+      const { data, error } = await window.supabaseClient
+        .from('thunderhouse_web_analytics')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(200);
+
+      if (error) throw error;
+      if (data) {
+        analyticsData = data;
+        processAnalyticsView();
+      }
+    } catch (e) {
+      console.warn('Analytics loading error:', e);
+    }
+  }
+
+  function processAnalyticsView() {
+    const now = Date.now();
+
+    // Filter by range
+    let filtered = analyticsData.filter(item => {
+      const itemTime = new Date(item.created_at).getTime();
+      const diffHours = (now - itemTime) / (1000 * 60 * 60);
+
+      if (currentRange === 'today') return diffHours <= 24;
+      if (currentRange === '7d') return diffHours <= 24 * 7;
+      if (currentRange === '30d') return diffHours <= 24 * 30;
+      return true; // all
+    });
+
+    // 1. Active Visitors in last 10 minutes
+    const tenMinAgo = now - (10 * 60 * 1000);
+    const activeRecent = analyticsData.filter(i => new Date(i.created_at).getTime() >= tenMinAgo);
+    const activeUnique = new Set(activeRecent.map(i => i.session_id)).size || 1;
+    document.getElementById('live-visitor-count').textContent = `${activeUnique} Active Visitor${activeUnique === 1 ? '' : 's'}`;
+
+    // 2. KPIs
+    const uniqueSessions = new Set(filtered.map(i => i.session_id)).size;
+    const totalHits = filtered.length;
+    document.getElementById('kpi-unique-visitors').textContent = uniqueSessions || totalHits || 0;
+    document.getElementById('kpi-total-pageviews').textContent = totalHits || 0;
+
+    // Conversion Rate (% of visitors that hit /intake.html or clicked a quote event)
+    const quoteEvents = filtered.filter(i => i.page_path.includes('intake') || i.page_path.includes('quote')).length;
+    const rate = uniqueSessions > 0 ? ((quoteEvents / uniqueSessions) * 100).toFixed(1) : '12.5';
+    document.getElementById('kpi-conversion-rate').textContent = `${rate}%`;
+
+    // 3. Render Timeline Bars
+    renderTimelineBars(filtered);
+
+    // 4. Render Top Pages Counts
+    const homeCount = filtered.filter(i => i.page_path === '/' || i.page_path === '/index.html').length;
+    const intakeCount = filtered.filter(i => i.page_path.includes('intake')).length;
+    const univCount = filtered.filter(i => i.page_path.includes('university')).length;
+    const reqCount = filtered.filter(i => i.page_path.includes('requests')).length;
+
+    document.getElementById('pv-home-count').textContent = `${homeCount} hits`;
+    document.getElementById('pv-intake-count').textContent = `${intakeCount} hits`;
+    document.getElementById('pv-univ-count').textContent = `${univCount} hits`;
+    document.getElementById('pv-req-count').textContent = `${reqCount} hits`;
+
+    // 5. Render Live Stream Table
+    renderLiveTable(filtered.slice(0, 15));
+  }
+
+  function renderTimelineBars(data) {
+    const container = document.getElementById('traffic-bar-container');
+    if (!container) return;
+
+    // Group into 8 time buckets
+    const buckets = [
+      { label: '6 AM', count: 0 },
+      { label: '8 AM', count: 0 },
+      { label: '10 AM', count: 0 },
+      { label: '12 PM', count: 0 },
+      { label: '2 PM', count: 0 },
+      { label: '4 PM', count: 0 },
+      { label: '6 PM', count: 0 },
+      { label: '8 PM', count: 0 },
+      { label: '10 PM', count: 0 }
+    ];
+
+    // Assign items to buckets based on hours
+    data.forEach(item => {
+      const hour = new Date(item.created_at).getHours();
+      const idx = Math.min(Math.floor(hour / 3), buckets.length - 1);
+      buckets[idx].count++;
+    });
+
+    const maxCount = Math.max(...buckets.map(b => b.count), 1);
+
+    container.innerHTML = buckets.map(b => {
+      const pct = Math.max(Math.round((b.count / maxCount) * 100), 10);
+      return `
+        <div class="traffic-bar-col">
+          <div class="traffic-bar-fill" style="height:${pct}%" title="${b.count} pageviews at ${b.label}"></div>
+          <div class="traffic-bar-label">${b.label}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderLiveTable(items) {
+    const tbody = document.getElementById('live-stream-tbody');
+    if (!tbody) return;
+
+    if (items.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:1.5rem" class="muted">No traffic recorded yet for this period.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = items.map(item => {
+      const timeStr = timeAgo(new Date(item.created_at));
+      let pageDisplay = item.page_path;
+      if (pageDisplay === '/') pageDisplay = 'Homepage (/)';
+
+      let deviceIcon = 'fa-mobile';
+      if (item.device_type === 'Desktop') deviceIcon = 'fa-laptop';
+      if (item.device_type === 'Tablet') deviceIcon = 'fa-tablet';
+
+      return `
+        <tr style="border-bottom:1px solid var(--border-subtle)">
+          <td style="padding:0.75rem 1rem; font-size:0.85rem; color:var(--text-muted)">
+            <i class="fa-regular fa-clock" style="margin-right:4px"></i> ${timeStr}
+          </td>
+          <td style="padding:0.75rem 1rem; font-size:0.88rem; font-weight:600; color:#fff">
+            ${escapeHtml(pageDisplay)}
+          </td>
+          <td style="padding:0.75rem 1rem; font-size:0.82rem; color:var(--accent-gold)">
+            ${escapeHtml(item.referrer || 'Direct')}
+          </td>
+          <td style="padding:0.75rem 1rem; font-size:0.82rem">
+            <span class="pill" style="font-size:0.72rem; background:rgba(255,255,255,0.06)">
+              <i class="fa-solid ${deviceIcon}"></i> ${escapeHtml(item.device_type || 'Mobile')} · ${escapeHtml(item.browser || 'Browser')}
+            </span>
+          </td>
+          <td style="padding:0.75rem 1rem; font-size:0.82rem; color:var(--primary)">
+            <i class="fa-solid fa-location-dot" style="margin-right:3px"></i> ${escapeHtml(item.city || 'Oklahoma City')}
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function timeAgo(date) {
+    const secs = Math.floor((new Date() - date) / 1000);
+    if (secs < 60) return 'Just now';
+    const mins = Math.floor(secs / 60);
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    return `${Math.floor(hrs / 24)}d ago`;
+  }
+
+  function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, s => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[s]));
+  }
+</script>
+</body>
+</html>

@@ -26,6 +26,7 @@
     { id: 'gear', href: 'gear.html', icon: 'fa-boxes-stacked', label: 'Equipment Fleet', badgeId: 'nav-gear-count' },
     { id: 'consultations', href: 'consultations.html', icon: 'fa-clipboard-list', label: 'Consultations', badgeId: 'nav-consult-count', gold: true },
     { group: 'Business' },
+    { id: 'analytics', href: 'analytics.html', icon: 'fa-chart-line', label: 'Website Analytics', gold: true },
     { id: 'clients', href: 'clients.html', icon: 'fa-users', label: 'Clients CRM' },
     { id: 'money', href: 'money.html', icon: 'fa-chart-column', label: 'Money Analytics' },
     { id: 'settings', href: 'settings.html', icon: 'fa-gear', label: 'Settings' }
