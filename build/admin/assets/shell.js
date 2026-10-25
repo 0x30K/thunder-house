@@ -24,6 +24,7 @@
     { id: 'calendar', href: 'calendar.html', icon: 'fa-calendar-days', label: 'Calendar' },
     { id: 'gigs', href: 'gigs.html', icon: 'fa-compact-disc', label: 'Gigs Run-of-Show' },
     { id: 'gear', href: 'gear.html', icon: 'fa-boxes-stacked', label: 'Equipment Fleet', badgeId: 'nav-gear-count' },
+    { id: 'music', href: 'music.html', icon: 'fa-music', label: 'Music of the Week', badgeId: 'nav-music-count', gold: true },
     { id: 'consultations', href: 'consultations.html', icon: 'fa-clipboard-list', label: 'Consultations', badgeId: 'nav-consult-count', gold: true },
     { group: 'Business' },
     { id: 'analytics', href: 'analytics.html', icon: 'fa-chart-line', label: 'Website Analytics', gold: true },

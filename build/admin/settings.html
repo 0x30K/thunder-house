@@ -43,6 +43,7 @@
         <a href="#website"><i class="fa-solid fa-paintbrush"></i> Public Site Editor</a>
         <a href="#sending"><i class="fa-solid fa-server"></i> SMTP & Sending</a>
         <a href="#scanner"><i class="fa-solid fa-qrcode"></i> Equipment & Scanner</a>
+        <a href="#music"><i class="fa-solid fa-music"></i> Music Scout Engine</a>
         <a href="#logs"><i class="fa-solid fa-triangle-exclamation"></i> Error Logs</a>
       </nav>
 
@@ -246,6 +247,65 @@
           </div>
         </section>
 
+        <!-- New Music Assistant & Auto-Ingest Engine -->
+        <section id="music" class="card mb" style="margin-top:1.5rem">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.75rem">
+            <div>
+              <div class="label" style="display:flex; align-items:center; gap:0.5rem; color:var(--text-main)">
+                <i class="fa-solid fa-music gold"></i> New Music Scout &amp; Automated Ingest Engine
+              </div>
+              <div class="small muted" style="margin-top:0.25rem">
+                Scouts trending Hip-Hop, R&amp;B, and Pop weekly releases, downloads Clean &amp; Dirty versions to your local PC.
+              </div>
+            </div>
+            <div style="display:flex; gap:0.5rem">
+              <button class="btn btn-sm btn-outline" id="btn-trigger-scout-now" onclick="triggerMusicScoutNow()">
+                <i class="fa-solid fa-bolt"></i> Scout &amp; Ingest Now
+              </button>
+            </div>
+          </div>
+
+          <div class="set-row">
+            <div class="grow">
+              Daily Automated Music Scout
+              <span class="sub">Enable or disable background discovery and automatic audio download</span>
+            </div>
+            <span class="toggle on" id="toggle-music-enabled"></span>
+          </div>
+
+          <div class="set-row">
+            <div class="grow">
+              Daily Run Time (CST)
+              <span class="sub">Time of day when the scout wakes up to check new drops (Default: 6:00 AM)</span>
+            </div>
+            <input class="input" type="time" id="set-music-time" value="06:00" style="width:130px">
+          </div>
+
+          <div class="set-row">
+            <div class="grow">
+              Local Studio Save Directory
+              <span class="sub">Folder on your Studio PC where new weekly downloads are placed</span>
+            </div>
+            <input class="input" id="set-music-folder" value="E:\Thunder House - Music\Music of the Week" style="width:340px; font-family:monospace; font-size:0.85rem">
+          </div>
+
+          <div class="set-row">
+            <div class="grow">
+              Clean &amp; Dirty Audio Pair Ingestion
+              <span class="sub">Download both Explicit (Dirty) and Radio Edit (Clean) audio cuts for every release</span>
+            </div>
+            <span class="pill pill-gold"><i class="fa-solid fa-check"></i> Clean + Dirty Pairs</span>
+          </div>
+
+          <div class="set-row">
+            <div class="grow">
+              End-of-Week Alphabetical Auto-Archive
+              <span class="sub">Move previous week's songs into appropriate artist alphabetical folders (E:\Thunder House - Music\A-Z)</span>
+            </div>
+            <span class="toggle on" id="toggle-music-auto-archive"></span>
+          </div>
+        </section>
+
         <!-- System Error Logs & Health Monitor -->
         <section id="logs" class="card" style="margin-top:1.5rem">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.75rem">
@@ -326,13 +386,29 @@
     if (vibrateToggle) vibrateToggle.classList.toggle('on', vibrateOn);
     if (batchToggle) batchToggle.classList.toggle('on', batchOn);
 
+    // Load music scout settings from localStorage
+    const musicEnabled = localStorage.getItem('th_music_scout_enabled') !== 'false';
+    const musicTime = localStorage.getItem('th_music_scout_time') || '06:00';
+    const musicFolder = localStorage.getItem('th_music_scout_folder') || 'E:\\Thunder House - Music\\Music of the Week';
+    const musicArchive = localStorage.getItem('th_music_auto_archive') !== 'false';
+
+    const musicToggle = document.getElementById('toggle-music-enabled');
+    const musicTimeEl = document.getElementById('set-music-time');
+    const musicFolderEl = document.getElementById('set-music-folder');
+    const musicArchiveToggle = document.getElementById('toggle-music-auto-archive');
+
+    if (musicToggle) musicToggle.classList.toggle('on', musicEnabled);
+    if (musicTimeEl) musicTimeEl.value = musicTime;
+    if (musicFolderEl) musicFolderEl.value = musicFolder;
+    if (musicArchiveToggle) musicArchiveToggle.classList.toggle('on', musicArchive);
+
     if (!window.supabaseClient) return;
 
     try {
       const { data } = await window.supabaseClient
         .from('thunderhouse_site_settings')
         .select('*')
-        .in('key', ['booking_settings', 'equipment_scanner_settings']);
+        .in('key', ['booking_settings', 'equipment_scanner_settings', 'music_scout_settings']);
 
       if (data) {
         data.forEach(item => {
@@ -353,6 +429,24 @@
             if (typeof item.value.batch_enabled === 'boolean') {
               if (batchToggle) batchToggle.classList.toggle('on', item.value.batch_enabled);
               localStorage.setItem('th_scanner_batch_enabled', item.value.batch_enabled ? 'true' : 'false');
+            }
+          }
+          if (item.key === 'music_scout_settings' && item.value) {
+            if (typeof item.value.enabled === 'boolean') {
+              if (musicToggle) musicToggle.classList.toggle('on', item.value.enabled);
+              localStorage.setItem('th_music_scout_enabled', item.value.enabled ? 'true' : 'false');
+            }
+            if (item.value.scout_time && musicTimeEl) {
+              musicTimeEl.value = item.value.scout_time;
+              localStorage.setItem('th_music_scout_time', item.value.scout_time);
+            }
+            if (item.value.save_folder && musicFolderEl) {
+              musicFolderEl.value = item.value.save_folder;
+              localStorage.setItem('th_music_scout_folder', item.value.save_folder);
+            }
+            if (typeof item.value.auto_archive === 'boolean') {
+              if (musicArchiveToggle) musicArchiveToggle.classList.toggle('on', item.value.auto_archive);
+              localStorage.setItem('th_music_auto_archive', item.value.auto_archive ? 'true' : 'false');
             }
           }
         });
@@ -388,6 +482,23 @@
     }
   };
 
+  window.triggerMusicScoutNow = async function () {
+    if (!window.supabaseClient) return;
+    try {
+      window.showToast('Triggering New Music Scout on Studio PC…', 'gold');
+      await window.supabaseClient.from('thunderhouse_site_settings').upsert([{
+        key: 'music_scout_trigger',
+        value: {
+          requested_at: new Date().toISOString(),
+          requested_by: window.currentStaffUser?.displayName || 'Superuser'
+        }
+      }], { onConflict: 'key' });
+      window.showToast('Scout command dispatched to local Studio PC engine!', 'success');
+    } catch (e) {
+      window.showToast('Error triggering scout: ' + e.message, 'error');
+    }
+  };
+
   async function saveBookingSettings() {
     // Save scanner preferences locally
     const soundOn = document.getElementById('toggle-scanner-sound')?.classList.contains('on') ?? true;
@@ -397,6 +508,17 @@
     localStorage.setItem('th_scanner_sound_enabled', soundOn ? 'true' : 'false');
     localStorage.setItem('th_scanner_vibrate_enabled', vibrateOn ? 'true' : 'false');
     localStorage.setItem('th_scanner_batch_enabled', batchOn ? 'true' : 'false');
+
+    // Save music scout preferences locally
+    const musicEnabled = document.getElementById('toggle-music-enabled')?.classList.contains('on') ?? true;
+    const musicTime = document.getElementById('set-music-time')?.value || '06:00';
+    const musicFolder = document.getElementById('set-music-folder')?.value || 'E:\\Thunder House - Music\\Music of the Week';
+    const musicArchive = document.getElementById('toggle-music-auto-archive')?.classList.contains('on') ?? true;
+
+    localStorage.setItem('th_music_scout_enabled', musicEnabled ? 'true' : 'false');
+    localStorage.setItem('th_music_scout_time', musicTime);
+    localStorage.setItem('th_music_scout_folder', musicFolder);
+    localStorage.setItem('th_music_auto_archive', musicArchive ? 'true' : 'false');
 
     if (!window.supabaseClient) {
       window.showToast('Preferences saved locally!', 'success');
@@ -426,10 +548,20 @@
             batch_enabled: batchOn,
             updated_at: new Date().toISOString()
           }
+        },
+        {
+          key: 'music_scout_settings',
+          value: {
+            enabled: musicEnabled,
+            scout_time: musicTime,
+            save_folder: musicFolder,
+            auto_archive: musicArchive,
+            updated_at: new Date().toISOString()
+          }
         }
       ], { onConflict: 'key' });
 
-      window.showToast('All system & scanner settings saved!', 'success');
+      window.showToast('All system, scanner, and music scout settings saved!', 'success');
     } catch (e) {
       window.showToast('Failed to save settings: ' + e.message, 'error');
     }

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music of the Week &amp; Ingest Crate · Thunder House Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+  <style>
+    .music-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .track-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.95rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background 0.15s ease;
+    }
+    .track-row:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .track-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 183, 3, 0.1);
+      color: var(--accent-gold);
+      font-size: 1.2rem;
+      border: 1px solid rgba(255, 183, 3, 0.25);
+      flex-shrink: 0;
+    }
+    .version-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.25rem 0.55rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .version-tag.clean {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .version-tag.dirty {
+      background: rgba(255, 0, 85, 0.15);
+      color: var(--secondary);
+      border: 1px solid rgba(255, 0, 85, 0.3);
+    }
+    .version-tag.missing {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .pulse-live {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+      display: inline-block;
+      animation: pulse 1.6s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+  </style>
+</head>
+<body data-page="music">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <!-- Page Header -->
+    <div class="page-head">
+      <div>
+        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.35rem">
+          <span class="pill pill-gold" style="font-size:0.75rem"><i class="fa-solid fa-music"></i> Automated DJ Music Ingest</span>
+          <span class="pill pill-green" id="engine-status-pill" style="font-size:0.75rem">
+            <span class="pulse-live"></span> Active · Daily 6:00 AM CST
+          </span>
+        </div>
+        <h1>Music of the Week &amp; Ingest Crate</h1>
+        <p>Scouts trending Hip-Hop, R&amp;B, and Pop weekly releases, downloads Clean &amp; Dirty versions to your studio folder, and archives weekly.</p>
+      </div>
+      <div class="head-actions">
+        <a href="settings.html#music" class="btn btn-outline" title="Engine schedule and directory settings">
+          <i class="fa-solid fa-gear"></i> Settings
+        </a>
+        <button class="btn btn-outline" id="btn-archive-now" title="Move previous week into permanent A-Z library">
+          <i class="fa-solid fa-folder-tree"></i> Archive to A-Z Library
+        </button>
+        <button class="btn btn-primary" id="btn-scout-now" style="background:linear-gradient(135deg, #ffb703, #ff8800); color:#000; border:none; font-weight:700">
+          <i class="fa-solid fa-bolt"></i> Scout &amp; Ingest Now
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Ingest Location Banner -->
+    <div class="card mb" style="background:rgba(255, 183, 3, 0.05); border-color:rgba(255, 183, 3, 0.25); padding:0.9rem 1.25rem">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem">
+        <div style="display:flex; align-items:center; gap:0.75rem">
+          <div class="track-icon-box" style="width:38px; height:38px; font-size:1.05rem">
+            <i class="fa-solid fa-folder-open"></i>
+          </div>
+          <div>
+            <strong style="color:var(--accent-gold); font-size:0.92rem">Active Studio PC Music Folder</strong>
+            <span class="small muted" style="margin-left:0.5rem"><code>E:\Thunder House - Music\Music of the Week</code></span>
+            <div class="small text-light" style="margin-top:0.15rem">Clean audio saved to <code>\Clean\</code> · Explicit audio saved to <code>\Dirty\</code>.</div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.5rem">
+          <span class="small muted" id="scout-enabled-label">Auto-Scout: ON</span>
+          <span class="toggle on" id="toggle-header-scout" title="Toggle Auto Scout"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Summary Row -->
+    <div class="music-kpi-grid">
+      <div class="kpi">
+        <div class="k-label"><i class="fa-solid fa-compact-disc cyan"></i> Ingested This Week</div>
+        <div class="k-value cyan" id="kpi-tracks-count">0</div>
+        <div class="k-sub" id="kpi-tracks-sub">New music releases</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label"><i class="fa-solid fa-shield-halved green"></i> Clean Versions Ready</div>
+        <div class="k-value green" id="kpi-clean-count">0</div>
+        <div class="k-sub">Radio edits for family &amp; school gigs</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label"><i class="fa-solid fa-fire pink"></i> Dirty Versions Ready</div>
+        <div class="k-value pink" id="kpi-dirty-count">0</div>
+        <div class="k-sub">Club &amp; festival explicit cuts</div>
+      </div>
+      <div class="kpi">
+        <div class="k-label"><i class="fa-solid fa-clock gold"></i> Daily Scout Schedule</div>
+        <div class="k-value gold" id="kpi-schedule-time">6:00 AM</div>
+        <div class="k-sub">Runs before morning show</div>
+      </div>
+    </div>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="card mb" style="padding:1rem 1.25rem">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem">
+        <div style="display:flex; align-items:center; gap:0.75rem; flex:1; min-width:280px">
+          <div style="position:relative; flex:1">
+            <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:1rem; top:50%; transform:translateY(-50%); color:var(--text-muted)"></i>
+            <input class="input" id="music-search-input" placeholder="Search by artist, song title, or genre..." style="padding-left:2.5rem; width:100%">
+          </div>
+          <select class="input" id="music-genre-select" style="width:190px">
+            <option value="all">All Genres</option>
+            <option value="Hip-Hop/Rap">Hip-Hop / Rap</option>
+            <option value="R&B/Soul">R&B / Soul</option>
+            <option value="Pop">Pop</option>
+          </select>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.5rem">
+          <span class="small muted" id="music-results-count">Loading tracks…</span>
+          <button class="btn btn-sm btn-outline" id="btn-refresh-music" title="Refresh List">
+            <i class="fa-solid fa-arrows-rotate"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Track List Container -->
+    <div class="card" style="padding:0; overflow:hidden">
+      <div id="music-list-container">
+        <div style="text-align:center; padding:3rem 1rem" class="muted">
+          <i class="fa-solid fa-circle-notch fa-spin"></i> Loading music of the week…
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Supabase CDN Client & Config -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="assets/shell.js"></script>
+
+<script>
+  let musicTracks = [];
+  let currentGenre = 'all';
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Initial Load
+    await loadSettingsState();
+    await loadMusicTracks();
+
+    // 2. Setup Events
+    setupEventListeners();
+
+    // 3. Poll every 10 seconds for live ingest progress
+    setInterval(loadMusicTracks, 10000);
+  });
+
+  async function loadSettingsState() {
+    if (!window.supabaseClient) return;
+    try {
+      const { data } = await window.supabaseClient
+        .from('thunderhouse_site_settings')
+        .select('*')
+        .eq('key', 'music_scout_settings')
+        .maybeSingle();
+
+      if (data && data.value) {
+        const enabled = data.value.enabled !== false;
+        const time = data.value.scout_time || '06:00';
+        document.getElementById('kpi-schedule-time').textContent = formatTime12(time);
+        const toggle = document.getElementById('toggle-header-scout');
+        if (toggle) toggle.classList.toggle('on', enabled);
+        document.getElementById('scout-enabled-label').textContent = `Auto-Scout: ${enabled ? 'ON' : 'OFF'}`;
+
+        const statusPill = document.getElementById('engine-status-pill');
+        if (enabled) {
+          statusPill.className = 'pill pill-green';
+          statusPill.innerHTML = `<span class="pulse-live"></span> Active · Daily ${formatTime12(time)} CST`;
+        } else {
+          statusPill.className = 'pill';
+          statusPill.innerHTML = `<i class="fa-solid fa-pause"></i> Engine Paused in Settings`;
+        }
+      }
+    } catch (e) {}
+  }
+
+  async function loadMusicTracks() {
+    if (!window.supabaseClient) return;
+
+    try {
+      const { data, error } = await window.supabaseClient
+        .from('thunderhouse_music_scout')
+        .select('*')
+        .order('scouted_at', { ascending: false });
+
+      if (error) throw error;
+      if (data) {
+        musicTracks = data;
+        updateKPIs();
+        renderTrackList();
+      }
+    } catch (e) {
+      console.warn('Error loading tracks:', e);
+    }
+  }
+
+  function updateKPIs() {
+    const total = musicTracks.length;
+    const clean = musicTracks.filter(t => t.clean_downloaded).length;
+    const dirty = musicTracks.filter(t => t.dirty_downloaded).length;
+
+    document.getElementById('kpi-tracks-count').textContent = total;
+    document.getElementById('kpi-clean-count').textContent = clean;
+    document.getElementById('kpi-dirty-count').textContent = dirty;
+  }
+
+  function renderTrackList() {
+    const container = document.getElementById('music-list-container');
+    const search = (document.getElementById('music-search-input')?.value || '').toLowerCase().trim();
+    const genre = document.getElementById('music-genre-select')?.value || 'all';
+
+    let filtered = musicTracks.filter(item => {
+      if (genre !== 'all' && item.genre !== genre) return false;
+      if (search) {
+        const text = `${item.artist} ${item.title} ${item.genre}`.toLowerCase();
+        if (!text.includes(search)) return false;
+      }
+      return true;
+    });
+
+    const countLabel = document.getElementById('music-results-count');
+    if (countLabel) countLabel.textContent = `Showing ${filtered.length} of ${musicTracks.length} tracks`;
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:3.5rem 1rem" class="muted">
+          <i class="fa-solid fa-music" style="font-size:2.2rem; margin-bottom:0.75rem; opacity:0.3"></i>
+          <div style="font-size:1rem; font-weight:600; color:#fff">No tracks in Music of the Week yet</div>
+          <div class="small" style="margin-top:0.3rem">Click "Scout &amp; Ingest Now" above to fetch this week's trending drops.</div>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = filtered.map(track => {
+      const isDownloaded = track.status === 'downloaded';
+      const isDownloading = track.status === 'downloading';
+      const isArchived = track.status === 'archived';
+
+      let statusBadge = '';
+      if (isDownloaded) {
+        statusBadge = `<span class="pill pill-green"><i class="fa-solid fa-circle-check"></i> In Music of the Week</span>`;
+      } else if (isDownloading) {
+        statusBadge = `<span class="pill pill-gold"><i class="fa-solid fa-circle-notch fa-spin"></i> Downloading from YouTube…</span>`;
+      } else if (isArchived) {
+        statusBadge = `<span class="pill"><i class="fa-solid fa-box-archive"></i> Archived to A-Z</span>`;
+      } else {
+        statusBadge = `<span class="pill pill-gray">Scouted</span>`;
+      }
+
+      return `
+        <div class="track-row">
+          <div class="track-icon-box">
+            <i class="fa-solid fa-music"></i>
+          </div>
+          <div style="flex:1; min-width:0">
+            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap">
+              <strong style="color:#fff; font-size:0.96rem">${escapeHtml(track.title)}</strong>
+              <span class="pill" style="font-size:0.72rem; background:rgba(255,255,255,0.06)">${escapeHtml(track.genre)}</span>
+            </div>
+            <div class="small text-light" style="margin-top:0.2rem">
+              <strong>${escapeHtml(track.artist)}</strong>
+              ${track.release_date ? `<span class="muted">· Released: ${escapeHtml(track.release_date)}</span>` : ''}
+            </div>
+          </div>
+
+          <!-- Clean & Dirty Version Tags -->
+          <div style="display:flex; gap:0.4rem; align-items:center">
+            ${track.clean_downloaded ? 
+              `<span class="version-tag clean" title="${escapeHtml(track.clean_file_path || '')}"><i class="fa-solid fa-circle-check"></i> Clean (Radio)</span>` : 
+              `<span class="version-tag missing"><i class="fa-solid fa-minus"></i> No Clean</span>`
+            }
+            ${track.dirty_downloaded ? 
+              `<span class="version-tag dirty" title="${escapeHtml(track.dirty_file_path || '')}"><i class="fa-solid fa-fire"></i> Dirty (Explicit)</span>` : 
+              `<span class="version-tag missing"><i class="fa-solid fa-minus"></i> No Dirty</span>`
+            }
+          </div>
+
+          <!-- Status -->
+          <div style="text-align:right">
+            ${statusBadge}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function setupEventListeners() {
+    document.getElementById('music-search-input')?.addEventListener('input', renderTrackList);
+    document.getElementById('music-genre-select')?.addEventListener('change', renderTrackList);
+    document.getElementById('btn-refresh-music')?.addEventListener('click', loadMusicTracks);
+
+    // Scout Now button
+    document.getElementById('btn-scout-now')?.addEventListener('click', async () => {
+      if (!window.supabaseClient) return;
+      window.showToast('Triggering New Music Scout on Studio PC…', 'gold');
+      try {
+        await window.supabaseClient.from('thunderhouse_site_settings').upsert([{
+          key: 'music_scout_trigger',
+          value: {
+            requested_at: new Date().toISOString(),
+            requested_by: window.currentStaffUser?.displayName || 'Superuser'
+          }
+        }], { onConflict: 'key' });
+        window.showToast('Scout command dispatched to local Studio PC engine!', 'success');
+        setTimeout(loadMusicTracks, 2500);
+      } catch (e) {
+        window.showToast('Error triggering scout: ' + e.message, 'error');
+      }
+    });
+
+    // Archive Now button
+    document.getElementById('btn-archive-now')?.addEventListener('click', async () => {
+      if (!confirm('Move all music from "Music of the Week" into permanent alphabetical artist folders (E:\\Thunder House - Music\\A-Z)?')) return;
+      window.showToast('Dispatching Archive command to Studio PC…', 'gold');
+      try {
+        await window.supabaseClient.from('thunderhouse_site_settings').upsert([{
+          key: 'music_archive_trigger',
+          value: {
+            requested_at: new Date().toISOString()
+          }
+        }], { onConflict: 'key' });
+        window.showToast('Archive command dispatched! Files moving to A-Z folders.', 'success');
+      } catch (e) {
+        window.showToast('Archive error: ' + e.message, 'error');
+      }
+    });
+
+    // Quick On/Off toggle in header
+    document.getElementById('toggle-header-scout')?.addEventListener('click', async function () {
+      this.classList.toggle('on');
+      const isOn = this.classList.contains('on');
+      document.getElementById('scout-enabled-label').textContent = `Auto-Scout: ${isOn ? 'ON' : 'OFF'}`;
+
+      if (window.supabaseClient) {
+        try {
+          const { data } = await window.supabaseClient.from('thunderhouse_site_settings').select('value').eq('key', 'music_scout_settings').maybeSingle();
+          const curr = data?.value || {};
+          curr.enabled = isOn;
+          await window.supabaseClient.from('thunderhouse_site_settings').upsert([{
+            key: 'music_scout_settings',
+            value: curr
+          }], { onConflict: 'key' });
+          window.showToast(`Auto-Scout turned ${isOn ? 'ON' : 'OFF'}`, isOn ? 'success' : 'info');
+        } catch (e) {}
+      }
+    });
+  }
+
+  function formatTime12(time24) {
+    if (!time24) return '6:00 AM';
+    const [h, m] = time24.split(':');
+    let hour = parseInt(h, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return `${hour}:${m} ${ampm}`;
+  }
+
+  function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, s => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[s]));
+  }
+</script>
+</body>
+</html>
