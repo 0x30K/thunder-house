@@ -149,10 +149,67 @@
 
         // Apply texts
         applyTexts(currentSiteSettings.texts);
+
+        // Check Coming Soon / Under Construction Mode
+        if (data.value.coming_soon && data.value.coming_soon.enabled) {
+          await checkComingSoonMode(data.value.coming_soon);
+        }
       }
     } catch (err) {
       console.warn('Site settings loader exception:', err);
     }
+  }
+
+  async function checkComingSoonMode(csConfig) {
+    if (!csConfig || !csConfig.enabled) return;
+    if (window.location.pathname.endsWith('coming-soon.html')) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasBypass = urlParams.get('bypass') === '1' || urlParams.get('preview') === '1' || urlParams.get('edit') === '1';
+
+    let isSuper = false;
+    if (window.supabaseClient) {
+      try {
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        if (session) {
+          const email = (session.user?.email || '').toLowerCase();
+          if (email === 'blackrader@gmail.com' || email === 'olifedigital@gmail.com') {
+            isSuper = true;
+          } else {
+            const { data: roleData } = await window.supabaseClient.rpc('admin_get_current_role');
+            if (roleData && roleData.is_superuser) isSuper = true;
+          }
+        }
+      } catch (e) {}
+    }
+
+    if (hasBypass || isSuper) {
+      mountComingSoonBypassBanner(csConfig);
+      return;
+    }
+
+    // Public visitor -> redirect to stylized coming-soon.html
+    window.location.replace('coming-soon.html');
+  }
+
+  function mountComingSoonBypassBanner(csConfig) {
+    if (document.getElementById('th-cs-bypass-bar')) return;
+    const bar = document.createElement('div');
+    bar.id = 'th-cs-bypass-bar';
+    bar.innerHTML = `
+      <div style="position:fixed; top:0; left:0; right:0; z-index:999999; background:linear-gradient(90deg, #ff0055, #ffb703); color:#000; font-family:'Outfit', sans-serif; font-size:0.82rem; font-weight:700; padding:0.45rem 1.25rem; display:flex; justify-content:space-between; align-items:center; box-shadow:0 6px 20px rgba(0,0,0,0.5)">
+        <div style="display:flex; align-items:center; gap:0.6rem">
+          <i class="fa-solid fa-person-digging" style="font-size:1.1rem"></i>
+          <span><strong>UNDER CONSTRUCTION MODE ACTIVE</strong> — Public visitors see the Coming Soon splash screen. You are browsing in Superuser Bypass.</span>
+        </div>
+        <div style="display:flex; gap:0.5rem; align-items:center">
+          <a href="coming-soon.html" target="_blank" style="background:#000; color:#00e5ff; padding:0.2rem 0.6rem; border-radius:4px; text-decoration:none; font-size:0.75rem"><i class="fa-solid fa-eye"></i> View Public Splash</a>
+          <a href="admin/settings.html#website" style="background:#fff; color:#000; padding:0.2rem 0.6rem; border-radius:4px; text-decoration:none; font-size:0.75rem"><i class="fa-solid fa-sliders"></i> Settings</a>
+        </div>
+      </div>
+    `;
+    document.body.prepend(bar);
+    document.body.style.paddingTop = (parseInt(document.body.style.paddingTop || '0') + 38) + 'px';
   }
 
   function applyColors(colors) {

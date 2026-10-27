@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Under Construction · Thunder House ENT</title>
+  <meta name="description" content="Thunder House ENT is fine-tuning our premier digital experience. Oklahoma City's high-energy DJ entertainment, sound systems, and MC services remain fully active and booking dates.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --primary: #00e5ff;
+      --secondary: #ff0055;
+      --gold: #ffb703;
+      --bg: #05070c;
+      --card-bg: rgba(10, 14, 24, 0.88);
+      --border-glow: rgba(0, 229, 255, 0.35);
+      --font-main: 'Outfit', sans-serif;
+      --font-display: 'Syne', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      font-family: var(--font-main);
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    /* Responsive Background Graphics */
+    .bg-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      transition: all 0.3s ease;
+    }
+
+    /* Desktop Graphic Default */
+    .bg-backdrop {
+      background-image: linear-gradient(180deg, rgba(5, 7, 12, 0.72) 0%, rgba(5, 7, 12, 0.85) 60%, rgba(5, 7, 12, 0.96) 100%),
+                        url('assets/images/branding/coming-soon-desktop.jpg');
+    }
+
+    /* Mobile Graphic Override */
+    @media (max-width: 768px) {
+      .bg-backdrop {
+        background-image: linear-gradient(180deg, rgba(5, 7, 12, 0.65) 0%, rgba(5, 7, 12, 0.88) 50%, rgba(5, 7, 12, 0.98) 100%),
+                          url('assets/images/branding/coming-soon-mobile.jpg');
+        background-position: center top;
+      }
+    }
+
+    /* Subtle Animated Lightning Ambient Mesh */
+    .ambient-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      background: radial-gradient(circle at 20% 20%, rgba(0, 229, 255, 0.12), transparent 45%),
+                  radial-gradient(circle at 80% 80%, rgba(255, 183, 3, 0.1), transparent 50%),
+                  radial-gradient(circle at 50% 50%, rgba(255, 0, 85, 0.08), transparent 60%);
+    }
+
+    /* Top Navigation Header */
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .brand-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      text-decoration: none;
+    }
+
+    .brand-logo-img {
+      height: 48px;
+      width: auto;
+      filter: drop-shadow(0 0 16px rgba(0, 229, 255, 0.4));
+    }
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 183, 3, 0.12);
+      border: 1px solid rgba(255, 183, 3, 0.35);
+      color: var(--gold);
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 8px var(--gold);
+      animation: pulseAnim 1.6s infinite;
+    }
+
+    @keyframes pulseAnim {
+      0% { transform: scale(0.9); opacity: 0.7; }
+      50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 14px var(--gold); }
+      100% { transform: scale(0.9); opacity: 0.7; }
+    }
+
+    /* Main Showcase Content */
+    main {
+      position: relative;
+      z-index: 10;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      max-width: 980px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .hero-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-glow);
+      border-radius: 24px;
+      padding: 3rem 2.5rem;
+      text-align: center;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.85), 0 0 45px rgba(0, 229, 255, 0.18);
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--primary), var(--gold), transparent);
+    }
+
+    .card-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      color: var(--primary);
+      padding: 0.45rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    .headline {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1.25rem;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff 30%, var(--primary) 70%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.7));
+    }
+
+    .subheadline {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: #cbd5e1;
+      max-width: 680px;
+      margin: 0 auto 2rem auto;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    /* Live Operational Banner */
+    .operational-strip {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 12px;
+      padding: 0.85rem 1.25rem;
+      margin: 0 auto 2.25rem auto;
+      max-width: 620px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+      color: #a7f3d0;
+    }
+
+    .operational-strip i {
+      color: #10b981;
+      font-size: 1.1rem;
+    }
+
+    /* Action Buttons */
+    .cta-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      font-family: var(--font-main);
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.95rem 1.85rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      border: none;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, #0099ff 100%);
+      color: #000;
+      box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 35px rgba(0, 229, 255, 0.65);
+      background: linear-gradient(135deg, #33ecff 0%, #00b4ff 100%);
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold) 0%, #ff8800 100%);
+      color: #000;
+      box-shadow: 0 0 25px rgba(255, 183, 3, 0.35);
+    }
+
+    .btn-gold:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 35px rgba(255, 183, 3, 0.6);
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.45);
+      transform: translateY(-2px);
+    }
+
+    /* Fast Features Grid */
+    .quick-specs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 2rem;
+      text-align: left;
+    }
+
+    @media (max-width: 640px) {
+      .quick-specs {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+    }
+
+    .spec-item {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 640px) {
+      .spec-item {
+        justify-content: center;
+      }
+    }
+
+    .spec-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: rgba(0, 229, 255, 0.1);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      flex-shrink: 0;
+    }
+
+    .spec-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #fff;
+    }
+
+    .spec-sub {
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    /* Footer */
+    footer {
+      position: relative;
+      z-index: 10;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+      font-size: 0.82rem;
+      color: #64748b;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .staff-link {
+      color: #94a3b8;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .staff-link:hover {
+      color: var(--primary);
+    }
+
+    /* Superuser Top Bar if viewing in bypass */
+    .superuser-banner {
+      background: linear-gradient(90deg, #ff0055, #ffb703);
+      color: #000;
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 0.5rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    /* Instant Booking Modal */
+    .modal-scrim {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 6, 12, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal-scrim.active { display: flex; }
+
+    .modal-box {
+      background: #0b0f19;
+      border: 1px solid var(--border-glow);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 540px;
+      padding: 2rem;
+      position: relative;
+      box-shadow: 0 30px 90px rgba(0,0,0,0.9);
+      animation: zoomIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .modal-close:hover { color: #fff; }
+
+    .form-group {
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+    .form-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 12px rgba(0,229,255,0.25);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient visual layers -->
+  <div class="bg-backdrop"></div>
+  <div class="ambient-glow"></div>
+
+  <!-- Superuser Notification (Dynamically shown if superuser visits) -->
+  <div id="superuser-bar" class="superuser-banner" style="display:none">
+    <div style="display:flex; align-items:center; gap:0.5rem">
+      <i class="fa-solid fa-crown"></i>
+      <span><strong>SUPERUSER PREVIEW:</strong> Coming Soon mode is currently active for the public.</span>
+    </div>
+    <div style="display:flex; gap:0.5rem">
+      <a href="index.html?bypass=1" style="background:#000; color:#00e5ff; padding:0.2rem 0.6rem; border-radius:4px; text-decoration:none; font-size:0.75rem"><i class="fa-solid fa-arrow-right-to-bracket"></i> Enter Live Site</a>
+      <a href="admin/settings.html#website" style="background:#fff; color:#000; padding:0.2rem 0.6rem; border-radius:4px; text-decoration:none; font-size:0.75rem"><i class="fa-solid fa-gear"></i> Settings</a>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <a href="index.html" class="brand-logo-wrap">
+      <img src="assets/images/branding/Thunder House Logo-PNG.png" alt="Thunder House ENT" class="brand-logo-img">
+    </a>
+    <div class="brand-badge">
+      <span class="pulse-dot"></span>
+      <span id="cs-badge-text">Upgrades In Progress</span>
+    </div>
+  </header>
+
+  <!-- Hero Content -->
+  <main>
+    <div class="hero-card">
+      <div class="card-eyebrow">
+        <i class="fa-solid fa-bolt cyan"></i> Soundstage &amp; Digital Overhaul
+      </div>
+
+      <h1 class="headline" id="cs-headline">SOMETHING BIG IS DROPPING</h1>
+
+      <p class="subheadline" id="cs-desc">
+        Thunder House ENT is currently upgrading our digital experience. Oklahoma City's high-energy DJ entertainment, sound systems, and MC services remain fully active and booking dates now.
+      </p>
+
+      <div class="operational-strip">
+        <i class="fa-solid fa-circle-check"></i>
+        <span><strong>Live Operations Active:</strong> We are currently accepting bookings for 2026 weddings, birthdays &amp; festivals.</span>
+      </div>
+
+      <div class="cta-group">
+        <button class="btn btn-primary" id="btn-open-intake" onclick="openDateHoldModal()">
+          <i class="fa-solid fa-calendar-check"></i> Hold Your Event Date
+        </button>
+        <a href="tel:4052832533" class="btn btn-outline">
+          <i class="fa-solid fa-phone"></i> (405) 283-2533
+        </a>
+        <a href="mailto:olifedigital@gmail.com" class="btn btn-outline">
+          <i class="fa-solid fa-envelope"></i> Email Inquiries
+        </a>
+      </div>
+
+      <div class="quick-specs">
+        <div class="spec-item">
+          <div class="spec-icon"><i class="fa-solid fa-headphones"></i></div>
+          <div>
+            <div class="spec-title">Club-Grade Audio</div>
+            <div class="spec-sub">Dual subwoofers &amp; wireless mics</div>
+          </div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-icon"><i class="fa-solid fa-compact-disc"></i></div>
+          <div>
+            <div class="spec-title">Seamless MC Hosting</div>
+            <div class="spec-sub">Polished timeline coordination</div>
+          </div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+          <div>
+            <div class="spec-title">Intelligent Lighting</div>
+            <div class="spec-sub">Uplighting &amp; dance-floor lasers</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div>
+      © 2026 Thunder House ENT • Oklahoma City, OK • Family-Owned &amp; Operated
+    </div>
+    <div style="display:flex; gap:1.25rem; align-items:center">
+      <a href="wire.html" class="staff-link"><i class="fa-solid fa-newspaper"></i> Live Wire</a>
+      <a href="login.html" class="staff-link"><i class="fa-solid fa-lock"></i> Staff &amp; DJ Login</a>
+    </div>
+  </footer>
+
+  <!-- Quick Date Hold Modal -->
+  <div class="modal-scrim" id="date-hold-modal">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeDateHoldModal()"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin-bottom:0.4rem; font-size:1.4rem; color:var(--primary); font-family:var(--font-display)">
+        <i class="fa-solid fa-bolt"></i> Hold Your Event Date
+      </h3>
+      <p style="font-size:0.85rem; color:#94a3b8; margin-bottom:1.5rem">
+        Lock in your date while our site upgrades are finishing. No payment required right now.
+      </p>
+
+      <form id="form-quick-intake" onsubmit="submitQuickIntake(event)">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" id="qi-name" required placeholder="Marcus Vance">
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="qi-email" required placeholder="name@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="tel" class="form-input" id="qi-phone" required placeholder="(405) 555-0199">
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem">
+          <div class="form-group">
+            <label class="form-label">Event Date</label>
+            <input type="date" class="form-input" id="qi-date" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Event Type</label>
+            <select class="form-input" id="qi-type" required style="background:#131826">
+              <option value="Wedding Reception">Wedding Reception</option>
+              <option value="Birthday / Milestone">Birthday / Milestone</option>
+              <option value="Corporate Event">Corporate Event</option>
+              <option value="Festival / Community">Festival / Community</option>
+              <option value="Private Celebration">Private Celebration</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Event Location / Venue</label>
+          <input type="text" class="form-input" id="qi-location" placeholder="e.g. Oklahoma City, Barn at the Woods, etc.">
+        </div>
+
+        <button type="submit" id="btn-submit-qi" class="btn btn-primary" style="width:100%; margin-top:0.75rem">
+          <i class="fa-solid fa-paper-plane"></i> Submit Date Hold Request
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Supabase Config & Integration -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Fetch live customization from site_overrides
+      if (window.supabaseClient) {
+        try {
+          const { data } = await window.supabaseClient
+            .from('thunderhouse_site_settings')
+            .select('value')
+            .eq('key', 'site_overrides')
+            .maybeSingle();
+
+          if (data && data.value && data.value.coming_soon) {
+            const cs = data.value.coming_soon;
+            if (cs.headline) document.getElementById('cs-headline').textContent = cs.headline;
+            if (cs.badge) document.getElementById('cs-badge-text').textContent = cs.badge;
+            if (cs.description) document.getElementById('cs-desc').textContent = cs.description;
+            if (cs.allow_inquiries === false) {
+              const btn = document.getElementById('btn-open-intake');
+              if (btn) btn.style.display = 'none';
+            }
+          }
+
+          // 2. Check if logged-in user is Superuser -> show superuser bypass banner
+          const { data: { session } } = await window.supabaseClient.auth.getSession();
+          if (session || window.location.hostname === 'localhost') {
+            document.getElementById('superuser-bar').style.display = 'flex';
+          }
+        } catch (e) {
+          console.warn('Config load note:', e);
+        }
+      }
+    });
+
+    function openDateHoldModal() {
+      document.getElementById('date-hold-modal').classList.add('active');
+    }
+
+    function closeDateHoldModal() {
+      document.getElementById('date-hold-modal').classList.remove('active');
+    }
+
+    async function submitQuickIntake(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('btn-submit-qi');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting Hold…';
+
+      const payload = {
+        client_name: document.getElementById('qi-name').value.trim(),
+        client_email: document.getElementById('qi-email').value.trim(),
+        client_phone: document.getElementById('qi-phone').value.trim(),
+        event_date: document.getElementById('qi-date').value,
+        event_type: document.getElementById('qi-type').value,
+        location: document.getElementById('qi-location').value.trim() || 'Oklahoma City',
+        status: 'new',
+        source: 'coming_soon_splash',
+        notes: 'Submitted via Under Construction Coming Soon splash page.'
+      };
+
+      try {
+        if (window.supabaseClient) {
+          const { error } = await window.supabaseClient
+            .from('thunderhouse_inquiries')
+            .insert([payload]);
+
+          if (error) throw error;
+        }
+
+        alert('Date Hold Request Received! We will contact you within 24 hours to confirm your event details.');
+        closeDateHoldModal();
+      } catch (err) {
+        console.error('Intake submission error:', err);
+        alert('Thank you! Your request has been queued. You can also reach us directly at (405) 283-2533.');
+        closeDateHoldModal();
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Submit Date Hold Request';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -5,14 +5,12 @@
  */
 
 window.ThunderWire = (function () {
-  // Curated Feed Endpoints
+  // Curated Feed Endpoints (strictly verified music journalism RSS feeds)
   const FEEDS = [
     { name: 'AllHipHop', url: 'https://allhiphop.com/feed/', type: 'rss', defaultCategory: 'lead' },
     { name: 'XXL Mag', url: 'https://www.xxlmag.com/feed/', type: 'rss', defaultCategory: 'lead' },
     { name: 'Billboard', url: 'https://www.billboard.com/feed/', type: 'rss', defaultCategory: 'drops' },
-    { name: 'HipHopDX', url: 'https://hiphopdx.com/rss/news.xml', type: 'rss', defaultCategory: 'shade' },
-    { name: 'r/hiphopheads', url: 'https://www.reddit.com/r/hiphopheads/hot.json?limit=15', type: 'reddit', defaultCategory: 'drops' },
-    { name: 'r/nottheonion', url: 'https://www.reddit.com/r/nottheonion/hot.json?limit=15', type: 'reddit', defaultCategory: 'wild' }
+    { name: 'HipHopDX', url: 'https://hiphopdx.com/rss/news.xml', type: 'rss', defaultCategory: 'shade' }
   ];
 
   // CORS proxies for cross-origin RSS fetching in browser
