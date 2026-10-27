@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="assets/admin.css">
+  <link rel="stylesheet" href="assets/music-player.css">
 </head>
 <body data-page="today">
 <div class="app">
@@ -98,6 +99,25 @@
       </div>
     </div>
 
+    <!-- Fresh Drops of the Week (Hot Crate) -->
+    <section class="card mb" id="fresh-drops-widget-card" style="border-color:rgba(255,183,3,0.3); background:radial-gradient(circle at top right, rgba(255,183,3,0.06), transparent 50%), var(--bg-surface)">
+      <div class="card-head">
+        <div style="display:flex; align-items:center; gap:0.6rem">
+          <span class="label"><i class="fa-solid fa-fire gold"></i> Fresh Drops · Music of the Week</span>
+          <span class="pill pill-gold" style="font-size:0.7rem"><i class="fa-solid fa-cloud-arrow-down"></i> 30-Day Stream Crate</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.6rem">
+          <span class="small muted" id="fresh-drops-count-badge">Loading drops…</span>
+          <a href="music.html" class="small cyan">Full Music Crate <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </div>
+      <div id="fresh-drops-list">
+        <div style="padding:1.5rem 0; text-align:center" class="muted small">
+          <i class="fa-solid fa-circle-notch fa-spin"></i> Checking live fresh drops…
+        </div>
+      </div>
+    </section>
+
     <!-- Coming up -->
     <section class="card">
       <div class="card-head">
@@ -115,6 +135,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabase-config.js"></script>
 <script src="assets/shell.js"></script>
+<script src="assets/music-player.js"></script>
 
 <script>
   document.addEventListener('DOMContentLoaded', async () => {
@@ -142,6 +163,7 @@
     }
 
     await loadLivePulse();
+    await loadFreshDropsWidget();
   });
 
   async function loadLivePulse() {
@@ -330,6 +352,103 @@
     } catch (err) {
       console.error('Error loading Today dashboard:', err);
     }
+  }
+
+  async function loadFreshDropsWidget() {
+    if (!window.supabaseClient) return;
+    const container = document.getElementById('fresh-drops-list');
+    const badge = document.getElementById('fresh-drops-count-badge');
+    if (!container) return;
+
+    try {
+      const { data, error } = await window.supabaseClient
+        .from('thunderhouse_music_scout')
+        .select('*')
+        .order('scouted_at', { ascending: false })
+        .limit(6);
+
+      if (error) throw error;
+      window.musicTracks = data || [];
+
+      if (!data || data.length === 0) {
+        if (badge) badge.textContent = '0 Drops this week';
+        container.innerHTML = `
+          <div style="padding:1.5rem 0; text-align:center" class="muted small">
+            <i class="fa-solid fa-music" style="font-size:1.4rem; margin-bottom:0.4rem; opacity:0.3; display:block"></i>
+            No fresh drops ingested yet this week.
+            <div style="margin-top:0.4rem"><a href="music.html" class="cyan">Open Music Crate to Run Scout</a></div>
+          </div>
+        `;
+        return;
+      }
+
+      const activeDrops = data.filter(d => d.status === 'downloaded' || d.status === 'downloading');
+      if (badge) badge.textContent = `${activeDrops.length} drops active in 30-day crate`;
+
+      container.innerHTML = data.map(track => {
+        const cleanTitle = (track.title || 'Untitled').replace(/\[.*?\]/g, '').trim();
+        const hasClean = track.clean_downloaded;
+        const hasDirty = track.dirty_downloaded;
+
+        return `
+          <div class="row" style="padding:0.75rem 0.5rem; border-bottom:1px solid var(--border-subtle)">
+            <div style="width:36px; height:36px; border-radius:8px; background:rgba(255,183,3,0.1); border:1px solid rgba(255,183,3,0.25); display:flex; align-items:center; justify-content:center; color:var(--accent-gold); flex-shrink:0">
+              <i class="fa-solid fa-music"></i>
+            </div>
+            <div class="grow" style="min-width:0">
+              <div style="display:flex; align-items:center; gap:0.45rem; flex-wrap:wrap">
+                <strong style="color:#fff; font-size:0.92rem">${escapeHtml(cleanTitle)}</strong>
+                <span class="pill" style="font-size:0.68rem; padding:0.15rem 0.45rem">${escapeHtml(track.genre || 'Hip-Hop')}</span>
+                ${track.release_date ? `<span class="small muted">· Drop: ${escapeHtml(track.release_date)}</span>` : ''}
+              </div>
+              <div class="small muted" style="margin-top:0.15rem">
+                ${escapeHtml(track.artist)}
+              </div>
+            </div>
+
+            <!-- Play & Download Action Buttons -->
+            <div style="display:flex; align-items:center; gap:0.4rem; flex-shrink:0; flex-wrap:wrap">
+              ${hasClean ? `
+                <button class="btn-track-action play-clean" onclick="window.ThunderPlayer.play('${track.id}', 'clean')" title="Stream Clean (Radio Edit)">
+                  <i class="fa-solid fa-play"></i> Clean
+                </button>
+                <button class="btn-track-action download-btn" onclick="window.ThunderPlayer.download('${track.id}', 'clean')" title="Download Clean MP3">
+                  <i class="fa-solid fa-download"></i>
+                </button>
+              ` : ''}
+
+              ${hasDirty ? `
+                <button class="btn-track-action play-dirty" onclick="window.ThunderPlayer.play('${track.id}', 'dirty')" title="Stream Dirty (Explicit Cut)">
+                  <i class="fa-solid fa-fire"></i> Dirty
+                </button>
+                <button class="btn-track-action download-btn" onclick="window.ThunderPlayer.download('${track.id}', 'dirty')" title="Download Dirty MP3">
+                  <i class="fa-solid fa-download"></i>
+                </button>
+              ` : ''}
+
+              ${!hasClean && !hasDirty ? `
+                <span class="pill pill-gold" style="font-size:0.7rem"><i class="fa-solid fa-circle-notch fa-spin"></i> Scouting</span>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+    } catch (err) {
+      console.warn('Error loading fresh drops widget:', err);
+      if (badge) badge.textContent = 'Music Crate Offline';
+      container.innerHTML = `<div style="padding:1rem 0; text-align:center" class="muted small">Could not load fresh drops.</div>`;
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
   window.addEventListener('thunderhouse:lead-created', () => {

@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="assets/admin.css">
+  <link rel="stylesheet" href="assets/music-player.css">
   <style>
     .music-kpi-grid {
       display: grid;
@@ -192,6 +193,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/supabase-config.js"></script>
 <script src="assets/shell.js"></script>
+<script src="assets/music-player.js"></script>
 
 <script>
   let musicTracks = [];
@@ -328,16 +330,29 @@
             </div>
           </div>
 
-          <!-- Clean & Dirty Version Tags -->
-          <div style="display:flex; gap:0.4rem; align-items:center">
-            ${track.clean_downloaded ? 
-              `<span class="version-tag clean" title="${escapeHtml(track.clean_file_path || '')}"><i class="fa-solid fa-circle-check"></i> Clean (Radio)</span>` : 
-              `<span class="version-tag missing"><i class="fa-solid fa-minus"></i> No Clean</span>`
-            }
-            ${track.dirty_downloaded ? 
-              `<span class="version-tag dirty" title="${escapeHtml(track.dirty_file_path || '')}"><i class="fa-solid fa-fire"></i> Dirty (Explicit)</span>` : 
-              `<span class="version-tag missing"><i class="fa-solid fa-minus"></i> No Dirty</span>`
-            }
+          <!-- Clean & Dirty Play/Download Controls -->
+          <div style="display:flex; gap:0.45rem; align-items:center; flex-wrap:wrap">
+            ${track.clean_downloaded ? `
+              <button class="btn-track-action play-clean" onclick="window.ThunderPlayer.play('${track.id}', 'clean')" title="Stream Clean (Radio Edit)">
+                <i class="fa-solid fa-play"></i> Clean
+              </button>
+              <button class="btn-track-action download-btn" onclick="window.ThunderPlayer.download('${track.id}', 'clean')" title="Download Clean MP3">
+                <i class="fa-solid fa-download"></i>
+              </button>
+            ` : `
+              <span class="version-tag missing"><i class="fa-solid fa-minus"></i> No Clean</span>
+            `}
+
+            ${track.dirty_downloaded ? `
+              <button class="btn-track-action play-dirty" onclick="window.ThunderPlayer.play('${track.id}', 'dirty')" title="Stream Dirty (Explicit Cut)">
+                <i class="fa-solid fa-fire"></i> Dirty
+              </button>
+              <button class="btn-track-action download-btn" onclick="window.ThunderPlayer.download('${track.id}', 'dirty')" title="Download Dirty MP3">
+                <i class="fa-solid fa-download"></i>
+              </button>
+            ` : `
+              <span class="version-tag missing"><i class="fa-solid fa-minus"></i> No Dirty</span>
+            `}
           </div>
 
           <!-- Status -->

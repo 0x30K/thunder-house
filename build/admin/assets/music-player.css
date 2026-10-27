@@ -1,0 +1,311 @@
+/* ==========================================================================
+   Thunder House ENT - Unified DJ Audio Player Component
+   High-performance, glassmorphic cyber-aesthetic audio player
+   ========================================================================== */
+
+.thunder-player-dock {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: rgba(8, 12, 22, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0, 229, 255, 0.25);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 229, 255, 0.08);
+  padding: 0.65rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  transform: translateY(110%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.thunder-player-dock.active {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Track Info Section */
+.tp-track-info {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 240px;
+  max-width: 320px;
+}
+
+.tp-art-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(255, 183, 3, 0.15), rgba(0, 229, 255, 0.15));
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-gold, #ffb703);
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated Equalizer Waveform Bars when playing */
+.tp-eq-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 18px;
+}
+
+.tp-eq-bar {
+  width: 3px;
+  background: var(--cyber-cyan, #00e5ff);
+  border-radius: 1px;
+  animation: eqJump 1s infinite ease-in-out;
+}
+
+.tp-eq-bar:nth-child(1) { height: 40%; animation-delay: 0.1s; }
+.tp-eq-bar:nth-child(2) { height: 90%; animation-delay: 0.3s; }
+.tp-eq-bar:nth-child(3) { height: 60%; animation-delay: 0.2s; }
+.tp-eq-bar:nth-child(4) { height: 100%; animation-delay: 0.4s; }
+
+.thunder-player-dock:not(.playing) .tp-eq-bar {
+  animation: none !important;
+  height: 3px !important;
+}
+
+@keyframes eqJump {
+  0%, 100% { height: 25%; }
+  50% { height: 100%; }
+}
+
+.tp-meta {
+  overflow: hidden;
+}
+
+.tp-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tp-artist {
+  font-size: 0.78rem;
+  color: var(--text-muted, #94a3b8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.1rem;
+}
+
+/* Center Playback Controls */
+.tp-controls {
+  flex: 1;
+  max-width: 580px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.tp-buttons-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tp-btn {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tp-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tp-btn-play {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-gold, #ffb703), #ff8800);
+  color: #05070b;
+  font-size: 1rem;
+  box-shadow: 0 0 16px rgba(255, 183, 3, 0.4);
+}
+
+.tp-btn-play:hover {
+  transform: scale(1.06);
+  background: linear-gradient(135deg, #ffc72c, #ffa01c);
+  color: #000;
+}
+
+.tp-progress-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tp-time {
+  font-family: var(--font-heading, sans-serif);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+  min-width: 36px;
+}
+
+.tp-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: height 0.15s ease;
+}
+
+.tp-progress-bar:hover {
+  height: 8px;
+}
+
+.tp-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyber-cyan, #00e5ff), var(--accent-gold, #ffb703));
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.1s linear;
+}
+
+/* Right Actions (Volume & Download) */
+.tp-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 200px;
+  justify-content: flex-end;
+}
+
+.tp-volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tp-vol-slider {
+  width: 75px;
+  accent-color: var(--cyber-cyan, #00e5ff);
+  cursor: pointer;
+  height: 4px;
+}
+
+.tp-download-btn {
+  background: rgba(0, 229, 255, 0.12);
+  border: 1px solid rgba(0, 229, 255, 0.35);
+  color: var(--cyber-cyan, #00e5ff);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.tp-download-btn:hover {
+  background: var(--cyber-cyan, #00e5ff);
+  color: #05070b;
+  box-shadow: 0 0 14px rgba(0, 229, 255, 0.4);
+}
+
+.tp-close-btn {
+  color: var(--text-muted, #94a3b8);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 0.3rem;
+  transition: color 0.15s ease;
+}
+
+.tp-close-btn:hover {
+  color: #fff;
+}
+
+/* Card Button Styles for Fresh Drops & Music of the Week */
+.btn-track-action {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.btn-track-action.play-clean {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #34d399;
+}
+
+.btn-track-action.play-clean:hover {
+  background: #10b981;
+  color: #05070b;
+}
+
+.btn-track-action.play-dirty {
+  background: rgba(255, 0, 85, 0.12);
+  border-color: rgba(255, 0, 85, 0.35);
+  color: #ff3377;
+}
+
+.btn-track-action.play-dirty:hover {
+  background: #ff0055;
+  color: #fff;
+}
+
+.btn-track-action.download-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+}
+
+.btn-track-action.download-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.btn-track-action.playing {
+  box-shadow: 0 0 12px currentColor;
+  transform: scale(1.04);
+}

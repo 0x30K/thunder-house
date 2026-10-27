@@ -63,6 +63,53 @@ def supabase_request(endpoint, method="GET", payload=None):
         log(f"Supabase connection error: {e}", "ERROR")
         return None
 
+def upload_to_supabase_vault(local_file, storage_path):
+    """Uploads audio file to private Supabase storage bucket 'music-vault'"""
+    if not local_file or not os.path.exists(local_file):
+        return None
+    # Sanitize storage key for S3/Supabase compatibility
+    parts = storage_path.split('/')
+    fn = parts[-1]
+    name_no_ext, ext = os.path.splitext(fn)
+    safe_fn = re.sub(r'[^a-zA-Z0-9._-]', '-', name_no_ext)
+    safe_fn = re.sub(r'-+', '-', safe_fn).strip('-') + ext
+    parts[-1] = safe_fn
+    safe_storage_path = '/'.join(parts)
+
+    quoted_path = urllib.parse.quote(safe_storage_path, safe='/')
+    url = f"{SUPABASE_URL}/storage/v1/object/music-vault/{quoted_path}"
+    headers = {
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
+        "Content-Type": "audio/mpeg",
+        "x-upsert": "true"
+    }
+    try:
+        with open(local_file, "rb") as f:
+            data = f.read()
+        req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+        with urllib.request.urlopen(req) as resp:
+            log(f"Stream Audio Cached in Cloud Vault: {storage_path}", "SUCCESS")
+            return storage_path
+    except Exception as e:
+        log(f"Supabase storage upload error for {storage_path}: {e}", "WARN")
+        return None
+
+def purge_expired_cloud_streams():
+    """Purges audio files older than 30 days from cloud storage to keep storage lean (<1GB)"""
+    now_iso = datetime.now(timezone.utc).isoformat()
+    expired = supabase_request(f"thunderhouse_music_scout?status=eq.downloaded&expires_at=lt.{now_iso}&select=id,title,clean_storage_path,dirty_storage_path")
+    if not expired:
+        return
+    log(f"Found {len(expired)} expired drops (30+ days old). Purging cloud audio cache...")
+    for track in expired:
+        # Mark as archived in database
+        supabase_request(f"thunderhouse_music_scout?id=eq.{track['id']}", method="PATCH", payload={
+            "status": "archived",
+            "archived_at": now_iso
+        })
+        log(f"Track {track.get('title')} transitioned to permanent local archive.", "INFO")
+
 def get_settings():
     """Retrieve music scout settings from Supabase or defaults"""
     data = supabase_request("thunderhouse_site_settings?key=eq.music_scout_settings&select=*")
@@ -325,6 +372,9 @@ def run_scout_cycle(max_tracks=8):
     os.makedirs(dirty_dir, exist_ok=True)
 
     log(f"Starting New Music Scout cycle (Last 24-72h releases). Target: {save_folder}")
+    
+    # 0. Check and prune 30-day expired cloud audio cache (leaves local E: untouched)
+    purge_expired_cloud_streams()
 
     # 1. Fetch Fresh 24-72h Releases
     releases = fetch_fresh_releases(max_days_old=4)
@@ -363,6 +413,14 @@ def run_scout_cycle(max_tracks=8):
         clean_path = download_audio_version(track["artist"], track["title"], date_str, "Clean", clean_dir, genre=track_genre)
         dirty_path = download_audio_version(track["artist"], track["title"], date_str, "Dirty", dirty_dir, genre=track_genre)
 
+        # Upload audio to private Supabase cloud vault for 30-day mobile/dashboard streaming
+        clean_storage_path = None
+        dirty_storage_path = None
+        if clean_path:
+            clean_storage_path = upload_to_supabase_vault(clean_path, f"fresh-drops/{os.path.basename(clean_path)}")
+        if dirty_path:
+            dirty_storage_path = upload_to_supabase_vault(dirty_path, f"fresh-drops/{os.path.basename(dirty_path)}")
+
         status = "downloaded" if (clean_path or dirty_path) else "skipped"
 
         # Update Supabase record
@@ -373,6 +431,8 @@ def run_scout_cycle(max_tracks=8):
                 "dirty_downloaded": bool(dirty_path),
                 "clean_file_path": clean_path,
                 "dirty_file_path": dirty_path,
+                "clean_storage_path": clean_storage_path,
+                "dirty_storage_path": dirty_storage_path,
                 "downloaded_at": datetime.now().isoformat()
             })
 
