@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 03: Today's Command Dashboard · Thunder House Manual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/manual.css">
+</head>
+<body data-chapter-id="chap3">
+
+  <header class="manual-header">
+    <div class="manual-header-inner">
+      <a href="index.html" class="manual-brand">
+        <img src="../assets/images/branding/Thunder%20House%20Logo-PNG.png" alt="Thunder House ENT">
+        <div>
+          <span class="manual-brand-title">THUNDER HOUSE ENT</span>
+          <span class="manual-brand-sub">Staff Operations Manual</span>
+        </div>
+      </a>
+      <div class="manual-header-actions">
+        <button class="mode-toggle-btn" id="manual-mode-toggle">
+          <i class="fa-solid fa-book-open"></i> <span>Standard Mode</span>
+        </button>
+        <a href="../admin/today.html" class="btn-header-link"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a>
+        <a href="../index.html" target="_blank" class="btn-header-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Public Site</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="manual-layout">
+    <nav class="manual-sidebar">
+      <div class="sidebar-search-box">
+        <i class="fa-solid fa-magnifying-glass sidebar-search-icon"></i>
+        <input type="text" id="sidebar-search" class="sidebar-search-input" placeholder="Search manual topics...">
+      </div>
+
+      <div class="chapter-group-title">Foundations</div>
+      <a href="index.html" class="chapter-link" data-chapter="intro"><span class="chap-num">00</span> Introduction &amp; Architecture</a>
+
+      <div class="chapter-group-title">Client-Facing Systems</div>
+      <a href="chapter-1-public-engine.html" class="chapter-link" data-chapter="chap1"><span class="chap-num">01</span> Public Website, Packages &amp; Holds</a>
+      <a href="chapter-2-client-journey.html" class="chapter-link" data-chapter="chap2"><span class="chap-num">02</span> Invoices, Contracts &amp; Portal</a>
+
+      <div class="chapter-group-title">Daily Operations</div>
+      <a href="chapter-3-today-command.html" class="chapter-link active" data-chapter="chap3"><span class="chap-num">03</span> Today's Command Dashboard</a>
+      <a href="chapter-4-thunder-wire.html" class="chapter-link" data-chapter="chap4"><span class="chap-num">04</span> Thunder Wire &amp; Broadcasting</a>
+      <a href="chapter-5-leads-crm.html" class="chapter-link" data-chapter="chap5"><span class="chap-num">05</span> Sales Pipeline &amp; Consultations</a>
+
+      <div class="chapter-group-title">Event Execution &amp; Gear</div>
+      <a href="chapter-6-gigs-runofshow.html" class="chapter-link" data-chapter="chap6"><span class="chap-num">06</span> Gigs Run-of-Show &amp; Requests</a>
+      <a href="chapter-7-gear-fleet.html" class="chapter-link" data-chapter="chap7"><span class="chap-num">07</span> Gear Fleet &amp; QR Scanner</a>
+
+      <div class="chapter-group-title">Media &amp; Automations</div>
+      <a href="chapter-8-thunder-crate.html" class="chapter-link" data-chapter="chap8"><span class="chap-num">08</span> Thunder Crate &amp; Music Engine</a>
+      <a href="chapter-9-automation-station.html" class="chapter-link" data-chapter="chap9"><span class="chap-num">09</span> Automation Station &amp; Daemons</a>
+      <a href="chapter-10-settings-security.html" class="chapter-link" data-chapter="chap10"><span class="chap-num">10</span> Settings, SMTP &amp; Security</a>
+    </nav>
+
+    <main class="manual-content">
+      <div class="manual-breadcrumbs">
+        <a href="index.html">Operations Manual</a>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span>Daily Operations</span>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span style="color:var(--text-main)">Chapter 03: Today's Command Dashboard</span>
+      </div>
+
+      <header class="chapter-header">
+        <div class="chapter-badge"><i class="fa-solid fa-gauge-high"></i> Chapter 03</div>
+        <h1 class="chapter-title">Today's Command Dashboard &amp; Daily Operational Triage</h1>
+        <p class="chapter-lead">Located at <code>admin/today.html</code>, the Command Dashboard is the operational cockpit of Thunder House ENT. Every staff member begins their working shift here to triage urgent inquiries, review upcoming gigs, monitor revenue metrics, and inspect the latest music drops.</p>
+      </header>
+
+      <section>
+        <h2><i class="fa-solid fa-bullseye gold"></i> 1. The Daily Morning Operational Routine</h2>
+        <p>Before checking personal email or messaging clients, every team member must execute the <strong>3-Step Morning Triage Protocol</strong> on the Today screen:</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/admin_today_command.png" alt="Today Operational Dashboard Overview">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 3.1</span>
+            <span>The Today's Command screen at <code>admin/today.html</code>. Notice the top two primary quadrants: Needs Action (left) and Next Gig Countdown (right).</span>
+          </div>
+        </div>
+
+        <div class="steps-container">
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-body">
+              <div class="step-title">Clear the "Needs Action" Triage List</div>
+              <p>The Needs Action section programmatically queries the database and sorts pending tasks strictly by time sensitivity:</p>
+              <ul>
+                <li><strong>Expiring Holds:</strong> Any quote hold with fewer than 24 hours remaining is flagged in pink. Staff can send a quick personal text or call to answer questions before the date releases.</li>
+                <li><strong>Unsigned Contracts:</strong> Booked gigs without an e-signature are surfaced so contracts can be executed.</li>
+                <li><strong>Outstanding Balances:</strong> Gigs within 14 days of performance date with an unpaid balance are prioritized for balance reminders.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-body">
+              <div class="step-title">Review the "Next Gig" Command Card</div>
+              <p>The right-hand card highlights the immediate upcoming event on our production calendar, displaying the venue name, performance date, and a 4-item readiness checklist:</p>
+              <ul>
+                <li><strong>Retainer &amp; Date Lock:</strong> Confirms $200 deposit received.</li>
+                <li><strong>Contract Execution:</strong> Confirms digital contract e-signed.</li>
+                <li><strong>Song List &amp; Guest Requests:</strong> Confirms the client submitted their portal playlist and VIP moments.</li>
+                <li><strong>Gear Pack Staged:</strong> Confirms equipment has been staged and scanned in the studio.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <div class="step-body">
+              <div class="step-title">Verify System Automations &amp; Fresh Drops</div>
+              <p>A quick glance at the <strong>Automation Status Strip</strong> confirms that all 8 background schedulers and scrapers ran smoothly overnight, and the <strong>Fresh Drops</strong> widget displays this week's new club and radio releases.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-chart-pie cyan"></i> 2. Sales Pipeline &amp; Revenue KPIs</h2>
+        <p>Directly beneath the triage cards sits the <strong>Pipeline Overview Strip</strong> and financial KPI metrics:</p>
+        <ul>
+          <li><strong>New Inquiries:</strong> Uncontacted website leads submitted within the past 24 hours.</li>
+          <li><strong>Quoted:</strong> Inquiries where custom pricing has been shared with the client.</li>
+          <li><strong>On Hold:</strong> Events currently protected by the 72-hour date hold window.</li>
+          <li><strong>Booked:</strong> Confirmed gigs with retainer paid and contracts locked.</li>
+          <li><strong>Monthly Revenue Targets:</strong> Displays current month collected funds, outstanding balances owed, and open weekend performance slots remaining in the next 60 days.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-fire gold"></i> 3. The Fresh Drops Hot Crate Widget</h2>
+        <p>DJs must always stay ahead of musical trends. The Today dashboard integrates a live widget connected directly to our automated Music Scout Engine:</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/admin_today_fresh_drops.png" alt="Fresh Drops of the Week Widget on Dashboard">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 3.2</span>
+            <span>The Fresh Drops Hot Crate widget. Staff can preview tracks immediately with Clean (Radio) and Dirty (Explicit) buttons, view artist research badges, and download files.</span>
+          </div>
+        </div>
+
+        <h3>Interactive Controls Available on Every Track:</h3>
+        <ul>
+          <li><strong>Clean (Radio Edit) Button:</strong> Click the green <code>Clean</code> button to play the radio-safe version in your headphones or laptop speakers.</li>
+          <li><strong>Dirty (Club Edit) Button:</strong> Click the red <code>Dirty</code> button to audition the uncut explicit festival version.</li>
+          <li><strong>The Floating Cyber Audio Dock:</strong> Playing any song summons the bottom audio dock with animated visualizer, seek scrubber, 10s skip, and a 1-click download button.</li>
+          <li><strong>Artist Research Chips:</strong> Click the branded badges under the artist name to inspect their official SoundCloud, Instagram, TikTok, or website before adding the track to a weekend crate.</li>
+        </ul>
+      </section>
+
+      <footer class="chapter-nav-footer">
+        <a href="chapter-2-client-journey.html" class="chapter-nav-card">
+          <div class="chapter-nav-label">Previous Chapter</div>
+          <div class="chapter-nav-title"><i class="fa-solid fa-arrow-left"></i> 02. Invoices, Contracts &amp; Client Portal</div>
+        </a>
+        <a href="chapter-4-thunder-wire.html" class="chapter-nav-card next">
+          <div class="chapter-nav-label">Next Chapter</div>
+          <div class="chapter-nav-title">04. Thunder Wire &amp; Broadcasting <i class="fa-solid fa-arrow-right"></i></div>
+        </a>
+      </footer>
+    </main>
+  </div>
+
+  <script src="assets/manual.js"></script>
+</body>
+</html>

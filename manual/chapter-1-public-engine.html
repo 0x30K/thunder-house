@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 01: Public Website &amp; Intake Engine · Thunder House Manual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/manual.css">
+</head>
+<body data-chapter-id="chap1">
+
+  <header class="manual-header">
+    <div class="manual-header-inner">
+      <a href="index.html" class="manual-brand">
+        <img src="../assets/images/branding/Thunder%20House%20Logo-PNG.png" alt="Thunder House ENT">
+        <div>
+          <span class="manual-brand-title">THUNDER HOUSE ENT</span>
+          <span class="manual-brand-sub">Staff Operations Manual</span>
+        </div>
+      </a>
+      <div class="manual-header-actions">
+        <button class="mode-toggle-btn" id="manual-mode-toggle">
+          <i class="fa-solid fa-book-open"></i> <span>Standard Mode</span>
+        </button>
+        <a href="../admin/today.html" class="btn-header-link"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a>
+        <a href="../index.html" target="_blank" class="btn-header-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Public Site</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="manual-layout">
+    <nav class="manual-sidebar">
+      <div class="sidebar-search-box">
+        <i class="fa-solid fa-magnifying-glass sidebar-search-icon"></i>
+        <input type="text" id="sidebar-search" class="sidebar-search-input" placeholder="Search manual topics...">
+      </div>
+
+      <div class="chapter-group-title">Foundations</div>
+      <a href="index.html" class="chapter-link" data-chapter="intro"><span class="chap-num">00</span> Introduction &amp; Architecture</a>
+
+      <div class="chapter-group-title">Client-Facing Systems</div>
+      <a href="chapter-1-public-engine.html" class="chapter-link active" data-chapter="chap1"><span class="chap-num">01</span> Public Website, Packages &amp; Holds</a>
+      <a href="chapter-2-client-journey.html" class="chapter-link" data-chapter="chap2"><span class="chap-num">02</span> Invoices, Contracts &amp; Portal</a>
+
+      <div class="chapter-group-title">Daily Operations</div>
+      <a href="chapter-3-today-command.html" class="chapter-link" data-chapter="chap3"><span class="chap-num">03</span> Today's Command Dashboard</a>
+      <a href="chapter-4-thunder-wire.html" class="chapter-link" data-chapter="chap4"><span class="chap-num">04</span> Thunder Wire &amp; Broadcasting</a>
+      <a href="chapter-5-leads-crm.html" class="chapter-link" data-chapter="chap5"><span class="chap-num">05</span> Sales Pipeline &amp; Consultations</a>
+
+      <div class="chapter-group-title">Event Execution &amp; Gear</div>
+      <a href="chapter-6-gigs-runofshow.html" class="chapter-link" data-chapter="chap6"><span class="chap-num">06</span> Gigs Run-of-Show &amp; Requests</a>
+      <a href="chapter-7-gear-fleet.html" class="chapter-link" data-chapter="chap7"><span class="chap-num">07</span> Gear Fleet &amp; QR Scanner</a>
+
+      <div class="chapter-group-title">Media &amp; Automations</div>
+      <a href="chapter-8-thunder-crate.html" class="chapter-link" data-chapter="chap8"><span class="chap-num">08</span> Thunder Crate &amp; Music Engine</a>
+      <a href="chapter-9-automation-station.html" class="chapter-link" data-chapter="chap9"><span class="chap-num">09</span> Automation Station &amp; Daemons</a>
+      <a href="chapter-10-settings-security.html" class="chapter-link" data-chapter="chap10"><span class="chap-num">10</span> Settings, SMTP &amp; Security</a>
+    </nav>
+
+    <main class="manual-content">
+      <div class="manual-breadcrumbs">
+        <a href="index.html">Operations Manual</a>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span>Client-Facing Systems</span>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span style="color:var(--text-main)">Chapter 01: Public Website, Packages &amp; Holds</span>
+      </div>
+
+      <header class="chapter-header">
+        <div class="chapter-badge"><i class="fa-solid fa-globe"></i> Chapter 01</div>
+        <h1 class="chapter-title">Public Website, Service Packages &amp; The 72-Hour Hold Rule</h1>
+        <p class="chapter-lead">The public web engine is the frontline of our sales funnel. It converts casual website visitors into qualified event reservations through transparent pricing, dynamic energy previews, and our proprietary calendar hold protection algorithm.</p>
+      </header>
+
+      <section>
+        <h2><i class="fa-solid fa-boxes-packing cyan"></i> 1. The 5 Core Entertainment Packages</h2>
+        <p>Thunder House ENT does not hide pricing behind ambiguous "Call for Quote" barriers. We provide upfront, transparent packages tailored to different event sizes. Every package comes standard with full professional DJ performance, pristine audio reinforcement, crowd-reading music programming, and complimentary setup and teardown:</p>
+
+        <div class="steps-container">
+          <div class="step-card">
+            <div class="step-number" style="font-size:0.85rem">$500</div>
+            <div class="step-body">
+              <div class="step-title">Thunder Basic (Up to 3 Hours)</div>
+              <p>Designed for compact, focused gatherings such as private dinners, networking mixers, retirement luncheons, and small corporate banquets. Includes 2 high-clarity PA speakers, 1 wireless microphone for speeches and announcements, and essential background-to-mixer music programming.</p>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number" style="font-size:0.85rem">$700</div>
+            <div class="step-body">
+              <div class="step-title">Thunder Party (Up to 4 Hours) · Most Popular for Birthdays</div>
+              <p>Our flagship party package for milestone birthdays (Sweet 16, 21st, 30th, 40th, 50th), graduation blowouts, and holiday parties. Features high-output main PA speakers, 2 wireless handheld microphones, dynamic sound-activated dance floor party lighting, and high-energy crowd MC hosting.</p>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number" style="font-size:0.85rem">$900</div>
+            <div class="step-body">
+              <div class="step-title">Thunder Premium (Up to 6 Hours)</div>
+              <p>For larger banquet halls, school dances, and high-energy club-style celebrations. Incorporates dual high-performance subwoofers for deep low-end bass, full perimeter room uplighting fixtures, laser show illumination, and extended performance time.</p>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number" style="font-size:0.85rem">$1,200</div>
+            <div class="step-body">
+              <div class="step-title">Thunder All-Night (Up to 8 Hours)</div>
+              <p>Built for festival marathons, all-night prom post-parties, and multi-stage corporate conventions requiring continuous music and staging across up to 8 continuous hours.</p>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number" style="font-size:0.85rem; background:rgba(255,183,3,0.15); border-color:var(--accent-gold); color:var(--accent-gold)">$1,500</div>
+            <div class="step-body">
+              <div class="step-title">Custom Wedding Production (Full Day Complete)</div>
+              <p>The complete luxury bridal experience. Includes dedicated secondary sound setup for the wedding ceremony, separate cocktail hour sound reinforcement, full reception sound system, wireless lapel and handheld microphones for officiant and vows, coordinated grand introductions, first dances, toast coordination, perimeter uplights, and comprehensive run-of-show timeline execution from prelude to send-off.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-calculator gold"></i> 2. The Interactive Price Estimator</h2>
+        <p>A major competitive advantage of our website is the interactive calculator on the homepage. As clients select their event category, package tier, and optional add-ons (such as ceremony sound or extra performance hours), the system calculates an instant, real-time total.</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/public_pricing_calculator.png" alt="Interactive Price Estimator Interface">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 1.1</span>
+            <span>The live client estimator component located on <code>thunderhouseent.com</code>. It updates price figures dynamically in memory without requiring page reloads or email gates.</span>
+          </div>
+        </div>
+
+        <p>When the user is satisfied with their calculation, clicking <strong>"Lock In Your Date With This Quote"</strong> carries their selected package, pricing tier, and add-on selections directly into the official intake form as URL query parameters (e.g., <code>intake.html?package=Thunder%20Party&total=700</code>).</p>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-clock-rotate-left secondary"></i> 3. The 72-Hour Date Hold Rule</h2>
+        <p>To avoid double-booking while giving prospective clients adequate time to review paperwork without feeling high-pressure sales tactics, our platform implements the **72-Hour Calendar Hold Mechanism**.</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/public_intake_form.png" alt="Public Intake Reservation Form">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 1.2</span>
+            <span>The official Event Reservation Intake form. Upon submission, the system stamps the record with a timestamp and calculates an expiration exactly 72 hours in the future.</span>
+          </div>
+        </div>
+
+        <div class="callout warning">
+          <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> Business Rule: Hold Expiration Logic</div>
+          <p>When a client submits the intake form, their selected performance date in <code>public.thunderhouse_availability</code> is flagged as <code>status = 'quote_held'</code>. This blocks any other client from reserving that date on the website.</p>
+          <p>However, <strong>a hold is not a confirmed booking</strong>. The client has exactly 72 hours to pay the $200 retainer fee. If 72 hours elapse without a payment, our automated background process (<code>quote_hold_releaser</code>) automatically releases the date back to open availability.</p>
+        </div>
+
+        <h3>Why 72 Hours?</h3>
+        <ul>
+          <li><strong>Prevents Calendar Paralysis:</strong> Unqualified leads cannot indefinitely freeze high-demand Saturday wedding dates without financial commitment.</li>
+          <li><strong>Creates Healthy Urgency:</strong> Prospective clients recognize that our dates are in high demand across the Oklahoma City metro, encouraging them to sign contracts promptly.</li>
+          <li><strong>Automated Courtesy Reminders:</strong> At the 48-hour mark (24 hours before expiration), the system dispatches an automated courtesy reminder email to the client warning them that their calendar hold will release the following morning if the retainer is unpaid.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-pen-to-square gold"></i> 4. Live Visual Editor Mode for Superusers</h2>
+        <p>Superusers can edit public website text, phone numbers, about copy, and service details directly on the live site without editing HTML source files:</p>
+        <ol>
+          <li>Ensure you are logged into your admin account.</li>
+          <li>Navigate to the homepage with the live edit parameter: <code>thunderhouseent.com/index.html?edit=1</code>.</li>
+          <li>Hover over any headline or paragraph to reveal an edit pencil. Click to modify text inline.</li>
+          <li>Click the floating <strong>"Save Live Website Overrides"</strong> button. The changes are saved immediately to <code>thunderhouse_site_settings</code> and reflected instantly for all public visitors!</li>
+        </ol>
+      </section>
+
+      <footer class="chapter-nav-footer">
+        <a href="index.html" class="chapter-nav-card">
+          <div class="chapter-nav-label">Previous Chapter</div>
+          <div class="chapter-nav-title"><i class="fa-solid fa-arrow-left"></i> 00. Foundations &amp; System Architecture</div>
+        </a>
+        <a href="chapter-2-client-journey.html" class="chapter-nav-card next">
+          <div class="chapter-nav-label">Next Chapter</div>
+          <div class="chapter-nav-title">02. Invoices, Contracts &amp; Client Portal <i class="fa-solid fa-arrow-right"></i></div>
+        </a>
+      </footer>
+    </main>
+  </div>
+
+  <script src="assets/manual.js"></script>
+</body>
+</html>

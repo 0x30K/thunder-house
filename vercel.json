@@ -14,6 +14,10 @@
     { "source": "/keys", "destination": "/keys.html" },
     { "source": "/wire-overlay", "destination": "/wire-overlay.html" },
     { "source": "/obs", "destination": "/wire-overlay.html" },
-    { "source": "/thank-you", "destination": "/thank-you.html" }
+    { "source": "/thank-you", "destination": "/thank-you.html" },
+    { "source": "/manual", "destination": "/manual/index.html" },
+    { "source": "/manual/:page", "destination": "/manual/:page.html" },
+    { "source": "/admin/manual", "destination": "/manual/index.html" },
+    { "source": "/help", "destination": "/manual/index.html" }
   ]
 }

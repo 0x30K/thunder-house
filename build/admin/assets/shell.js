@@ -55,6 +55,7 @@
       </a>
       ${links}
       <div class="sidebar-foot">
+        <a class="nav-link" href="../manual/index.html" style="color:var(--accent-gold)"><i class="fa-solid fa-book-open"></i>Staff Operations Manual</a>
         <a class="nav-link" href="../university.html"><i class="fa-solid fa-graduation-cap"></i>Thunder University</a>
         <a class="nav-link" href="../index.html" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i>View Public Website</a>
         <div class="user-chip" id="admin-user-chip">

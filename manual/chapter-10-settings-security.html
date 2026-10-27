@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 10: Settings, SMTP &amp; Security · Thunder House Manual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/manual.css">
+</head>
+<body data-chapter-id="chap10">
+
+  <header class="manual-header">
+    <div class="manual-header-inner">
+      <a href="index.html" class="manual-brand">
+        <img src="../assets/images/branding/Thunder%20House%20Logo-PNG.png" alt="Thunder House ENT">
+        <div>
+          <span class="manual-brand-title">THUNDER HOUSE ENT</span>
+          <span class="manual-brand-sub">Staff Operations Manual</span>
+        </div>
+      </a>
+      <div class="manual-header-actions">
+        <button class="mode-toggle-btn" id="manual-mode-toggle">
+          <i class="fa-solid fa-book-open"></i> <span>Standard Mode</span>
+        </button>
+        <a href="../admin/today.html" class="btn-header-link"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a>
+        <a href="../index.html" target="_blank" class="btn-header-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Public Site</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="manual-layout">
+    <nav class="manual-sidebar">
+      <div class="sidebar-search-box">
+        <i class="fa-solid fa-magnifying-glass sidebar-search-icon"></i>
+        <input type="text" id="sidebar-search" class="sidebar-search-input" placeholder="Search manual topics...">
+      </div>
+
+      <div class="chapter-group-title">Foundations</div>
+      <a href="index.html" class="chapter-link" data-chapter="intro"><span class="chap-num">00</span> Introduction &amp; Architecture</a>
+
+      <div class="chapter-group-title">Client-Facing Systems</div>
+      <a href="chapter-1-public-engine.html" class="chapter-link" data-chapter="chap1"><span class="chap-num">01</span> Public Website, Packages &amp; Holds</a>
+      <a href="chapter-2-client-journey.html" class="chapter-link" data-chapter="chap2"><span class="chap-num">02</span> Invoices, Contracts &amp; Portal</a>
+
+      <div class="chapter-group-title">Daily Operations</div>
+      <a href="chapter-3-today-command.html" class="chapter-link" data-chapter="chap3"><span class="chap-num">03</span> Today's Command Dashboard</a>
+      <a href="chapter-4-thunder-wire.html" class="chapter-link" data-chapter="chap4"><span class="chap-num">04</span> Thunder Wire &amp; Broadcasting</a>
+      <a href="chapter-5-leads-crm.html" class="chapter-link" data-chapter="chap5"><span class="chap-num">05</span> Sales Pipeline &amp; Consultations</a>
+
+      <div class="chapter-group-title">Event Execution &amp; Gear</div>
+      <a href="chapter-6-gigs-runofshow.html" class="chapter-link" data-chapter="chap6"><span class="chap-num">06</span> Gigs Run-of-Show &amp; Requests</a>
+      <a href="chapter-7-gear-fleet.html" class="chapter-link" data-chapter="chap7"><span class="chap-num">07</span> Gear Fleet &amp; QR Scanner</a>
+
+      <div class="chapter-group-title">Media &amp; Automations</div>
+      <a href="chapter-8-thunder-crate.html" class="chapter-link" data-chapter="chap8"><span class="chap-num">08</span> Thunder Crate &amp; Music Engine</a>
+      <a href="chapter-9-automation-station.html" class="chapter-link" data-chapter="chap9"><span class="chap-num">09</span> Automation Station &amp; Daemons</a>
+      <a href="chapter-10-settings-security.html" class="chapter-link active" data-chapter="chap10"><span class="chap-num">10</span> Settings, SMTP &amp; Security</a>
+    </nav>
+
+    <main class="manual-content">
+      <div class="manual-breadcrumbs">
+        <a href="index.html">Operations Manual</a>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span>Media &amp; Automations</span>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span style="color:var(--text-main)">Chapter 10: Settings, SMTP &amp; Security</span>
+      </div>
+
+      <header class="chapter-header">
+        <div class="chapter-badge"><i class="fa-solid fa-gear"></i> Chapter 10</div>
+        <h1 class="chapter-title">Settings Hub, Email SMTP Relays &amp; Disaster Recovery</h1>
+        <p class="chapter-lead">Located at <code>admin/settings.html</code>, the Settings Hub controls company-wide operational parameters, transactional email credentials, staff security permissions, and error logging.</p>
+      </header>
+
+      <section>
+        <h2><i class="fa-solid fa-gears cyan"></i> 1. The Operations Settings Hub</h2>
+        <p>The settings screen is divided into 10 specialized sections accessible via anchor subnavigation:</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/admin_settings_hub.png" alt="Settings and Operations Hub Interface">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 10.1</span>
+            <span>The Settings Hub at <code>admin/settings.html</code>. Controls booking rules, email dispatch, team permissions, and gear scanner preferences.</span>
+          </div>
+        </div>
+
+        <h3>Key Global Parameters:</h3>
+        <ul>
+          <li><strong>Hold Hours Window (Default: 72 hours):</strong> How long an online quote intake reserves the date on our calendar before releasing.</li>
+          <li><strong>Retainer Deposit Amount (Default: $200):</strong> The non-refundable date-lock fee applied directly toward package totals.</li>
+          <li><strong>Balance Due Window (Default: 14 days):</strong> Number of days prior to event performance date when final payment must be received.</li>
+          <li><strong>Automated Review Outreach:</strong> Sends Google Review links 2 days after event execution.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-envelope-open-text gold"></i> 2. Email SMTP Relays &amp; Google App Passwords</h2>
+        <p>All automated notifications (inquiry summaries, retainer receipts, balance reminders, and hold expiration warnings) are dispatched via our secure <strong>Gmail SMTP Relay</strong>:</p>
+        <ul>
+          <li><strong>Sending Address:</strong> <code>olifedigital@gmail.com</code></li>
+          <li><strong>Authentication:</strong> Uses a 16-character Google App Password stored securely in Supabase site settings.</li>
+          <li><strong>Testing the Relay:</strong> Superusers can click <strong>"Send Test"</strong> in <code>admin/settings.html</code> at any time to verify outgoing delivery.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-triangle-exclamation secondary"></i> 3. System Error Logs &amp; Health Monitor</h2>
+        <p>At the bottom of the Settings Hub sits our automated <strong>System Error Logger</strong>:</p>
+        <ul>
+          <li><strong>In-Memory Deduplication:</strong> Identical errors occurring within 60 seconds are collapsed into a single incident with an occurrence count counter to prevent log flooding.</li>
+          <li><strong>Auto-Pruning:</strong> The log table (<code>public.thunderhouse_error_logs</code>) automatically retains only the last 200 distinct events to conserve database space.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-life-ring green"></i> 4. Disaster Recovery Protocols for Live Gigs</h2>
+        <div class="callout warning">
+          <div class="callout-title"><i class="fa-solid fa-triangle-exclamation"></i> The Golden Rule: Always Have Local Redundancy</div>
+          <p>Venues occasionally experience cell network blackouts or Wi-Fi failures. Every Thunder House DJ must follow our redundancy checklist:</p>
+          <ol>
+            <li><strong>Dual USB Flash Drives:</strong> Every weekend crate from Thunder Crate must be exported to at least two high-speed USB 3.0 flash drives stored in separate road cases.</li>
+            <li><strong>Offline Master Library on E: Drive:</strong> The DJ laptop must have direct access to <code>E:\Thunder House - Music</code>. Never rely solely on cloud streaming during a live performance!</li>
+            <li><strong>Printed Run-of-Show:</strong> Always keep a printed or offline PDF copy of the bride's timeline, VIP moment cues, and bridal party names at the DJ booth.</li>
+          </ol>
+        </div>
+      </section>
+
+      <footer class="chapter-nav-footer">
+        <a href="chapter-9-automation-station.html" class="chapter-nav-card">
+          <div class="chapter-nav-label">Previous Chapter</div>
+          <div class="chapter-nav-title"><i class="fa-solid fa-arrow-left"></i> 09. Automation Station &amp; Daemons</div>
+        </a>
+        <a href="index.html" class="chapter-nav-card next" style="border-color:rgba(0,229,255,0.3)">
+          <div class="chapter-nav-label">Return to Start</div>
+          <div class="chapter-nav-title">00. System Foundations &amp; Overview <i class="fa-solid fa-arrow-up"></i></div>
+        </a>
+      </footer>
+    </main>
+  </div>
+
+  <script src="assets/manual.js"></script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 05: Sales Pipeline, CRM &amp; Consultations · Thunder House Manual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/manual.css">
+</head>
+<body data-chapter-id="chap5">
+
+  <header class="manual-header">
+    <div class="manual-header-inner">
+      <a href="index.html" class="manual-brand">
+        <img src="../assets/images/branding/Thunder%20House%20Logo-PNG.png" alt="Thunder House ENT">
+        <div>
+          <span class="manual-brand-title">THUNDER HOUSE ENT</span>
+          <span class="manual-brand-sub">Staff Operations Manual</span>
+        </div>
+      </a>
+      <div class="manual-header-actions">
+        <button class="mode-toggle-btn" id="manual-mode-toggle">
+          <i class="fa-solid fa-book-open"></i> <span>Standard Mode</span>
+        </button>
+        <a href="../admin/today.html" class="btn-header-link"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a>
+        <a href="../index.html" target="_blank" class="btn-header-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Public Site</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="manual-layout">
+    <nav class="manual-sidebar">
+      <div class="sidebar-search-box">
+        <i class="fa-solid fa-magnifying-glass sidebar-search-icon"></i>
+        <input type="text" id="sidebar-search" class="sidebar-search-input" placeholder="Search manual topics...">
+      </div>
+
+      <div class="chapter-group-title">Foundations</div>
+      <a href="index.html" class="chapter-link" data-chapter="intro"><span class="chap-num">00</span> Introduction &amp; Architecture</a>
+
+      <div class="chapter-group-title">Client-Facing Systems</div>
+      <a href="chapter-1-public-engine.html" class="chapter-link" data-chapter="chap1"><span class="chap-num">01</span> Public Website, Packages &amp; Holds</a>
+      <a href="chapter-2-client-journey.html" class="chapter-link" data-chapter="chap2"><span class="chap-num">02</span> Invoices, Contracts &amp; Portal</a>
+
+      <div class="chapter-group-title">Daily Operations</div>
+      <a href="chapter-3-today-command.html" class="chapter-link" data-chapter="chap3"><span class="chap-num">03</span> Today's Command Dashboard</a>
+      <a href="chapter-4-thunder-wire.html" class="chapter-link" data-chapter="chap4"><span class="chap-num">04</span> Thunder Wire &amp; Broadcasting</a>
+      <a href="chapter-5-leads-crm.html" class="chapter-link active" data-chapter="chap5"><span class="chap-num">05</span> Sales Pipeline &amp; Consultations</a>
+
+      <div class="chapter-group-title">Event Execution &amp; Gear</div>
+      <a href="chapter-6-gigs-runofshow.html" class="chapter-link" data-chapter="chap6"><span class="chap-num">06</span> Gigs Run-of-Show &amp; Requests</a>
+      <a href="chapter-7-gear-fleet.html" class="chapter-link" data-chapter="chap7"><span class="chap-num">07</span> Gear Fleet &amp; QR Scanner</a>
+
+      <div class="chapter-group-title">Media &amp; Automations</div>
+      <a href="chapter-8-thunder-crate.html" class="chapter-link" data-chapter="chap8"><span class="chap-num">08</span> Thunder Crate &amp; Music Engine</a>
+      <a href="chapter-9-automation-station.html" class="chapter-link" data-chapter="chap9"><span class="chap-num">09</span> Automation Station &amp; Daemons</a>
+      <a href="chapter-10-settings-security.html" class="chapter-link" data-chapter="chap10"><span class="chap-num">10</span> Settings, SMTP &amp; Security</a>
+    </nav>
+
+    <main class="manual-content">
+      <div class="manual-breadcrumbs">
+        <a href="index.html">Operations Manual</a>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span>Daily Operations</span>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span style="color:var(--text-main)">Chapter 05: Sales Pipeline, CRM &amp; Consultations</span>
+      </div>
+
+      <header class="chapter-header">
+        <div class="chapter-badge"><i class="fa-solid fa-inbox"></i> Chapter 05</div>
+        <h1 class="chapter-title">Sales Pipeline, DJ Consultations &amp; Client CRM</h1>
+        <p class="chapter-lead">Every booking begins with a human conversation. This chapter details our intake Kanban board, how to conduct professional client consultations, and how client records are maintained inside our CRM.</p>
+      </header>
+
+      <section>
+        <h2><i class="fa-solid fa-table-columns cyan"></i> 1. The Leads Pipeline Kanban Board</h2>
+        <p>Inquiries received from the website flow directly into our visual pipeline at <code>admin/leads.html</code>. Each inquiry card is classified into one of 6 lifecycle stages:</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/admin_leads_kanban.png" alt="Leads Pipeline Kanban Board">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 5.1</span>
+            <span>The Leads Pipeline Board at <code>admin/leads.html</code>. Staff can drag cards between columns or click to inspect client notes, phone numbers, and package preferences.</span>
+          </div>
+        </div>
+
+        <ol>
+          <li><strong>New Inquiries:</strong> Brand-new web submissions waiting for initial staff outreach. Staff must contact new inquiries within <strong>2 hours</strong> during standard business hours.</li>
+          <li><strong>Contacted:</strong> Initial phone call, text, or email consultation scheduled.</li>
+          <li><strong>Quoted:</strong> Formal price estimate and event proposal dispatched to the client.</li>
+          <li><strong>On Hold:</strong> The client has submitted their intake form and their calendar date is temporarily locked under the 72-hour protection window.</li>
+          <li><strong>Booked:</strong> The $200 retainer deposit is paid and the digital contract is fully executed.</li>
+          <li><strong>Lost / Archived:</strong> Inquiries where the date was unavailable, the client chose another vendor, or the 72-hour hold expired without communication.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-clipboard-list gold"></i> 2. The DJ Consultation Suite</h2>
+        <p>Located at <code>admin/consultations.html</code>, this specialized tool guides our DJs through structured phone, video, or in-person consultations with prospective clients.</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/admin_consultations_suite.png" alt="DJ Intake and Consultation Suite">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 5.2</span>
+            <span>The DJ Consultation Questionnaire. Allows staff to record venue logistics, guest demographics, and music vibes to formulate accurate package recommendations.</span>
+          </div>
+        </div>
+
+        <div class="callout rule">
+          <div class="callout-title"><i class="fa-solid fa-lock"></i> Business Rule: DJ Auto-Send vs. Superuser Review</div>
+          <p>Under <strong>Settings &gt; Automation Rules</strong>, the system maintains a safety toggle called <code>DJ Consultation Auto-Send</code>:</p>
+          <ul>
+            <li><strong>When OFF (Default / Recommended):</strong> When a staff DJ completes an intake questionnaire, the quote is marked as <em>"Pending Superuser Review"</em>. The owner verifies package pricing and availability before sending the formal proposal to the client.</li>
+            <li><strong>When ON:</strong> Experienced staff DJs can submit quotes directly to the client's inbox immediately upon ending the consultation call.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-users green"></i> 3. The Clients CRM</h2>
+        <p>Located at <code>admin/clients.html</code>, the CRM acts as our long-term memory for every person, corporate planner, or family that hires Thunder House ENT.</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/admin_clients_crm.png" alt="Clients CRM Database and History Records">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 5.3</span>
+            <span>The Clients CRM view. Tracks lifetime customer value, past event dates, notes, and direct contact options.</span>
+          </div>
+        </div>
+
+        <h3>Why Long-Term CRM Records Matter:</h3>
+        <ul>
+          <li><strong>Milestone Anniversaries:</strong> A wedding client today becomes an anniversary party or baby shower client tomorrow. Keeping detailed notes enables personalized annual outreach.</li>
+          <li><strong>Corporate Rebookings:</strong> Companies host annual holiday banquets and summer employee appreciation picnics. The CRM logs their typical budget, venue contacts, and music preferences so rebooking takes only minutes.</li>
+        </ul>
+      </section>
+
+      <footer class="chapter-nav-footer">
+        <a href="chapter-4-thunder-wire.html" class="chapter-nav-card">
+          <div class="chapter-nav-label">Previous Chapter</div>
+          <div class="chapter-nav-title"><i class="fa-solid fa-arrow-left"></i> 04. Thunder Wire &amp; Broadcasting</div>
+        </a>
+        <a href="chapter-6-gigs-runofshow.html" class="chapter-nav-card next">
+          <div class="chapter-nav-label">Next Chapter</div>
+          <div class="chapter-nav-title">06. Gigs Run-of-Show &amp; Live Requests <i class="fa-solid fa-arrow-right"></i></div>
+        </a>
+      </footer>
+    </main>
+  </div>
+
+  <script src="assets/manual.js"></script>
+</body>
+</html>

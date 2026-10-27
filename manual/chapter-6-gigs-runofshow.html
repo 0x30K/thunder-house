@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 06: Gigs Run-of-Show &amp; Live Requests · Thunder House Manual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/manual.css">
+</head>
+<body data-chapter-id="chap6">
+
+  <header class="manual-header">
+    <div class="manual-header-inner">
+      <a href="index.html" class="manual-brand">
+        <img src="../assets/images/branding/Thunder%20House%20Logo-PNG.png" alt="Thunder House ENT">
+        <div>
+          <span class="manual-brand-title">THUNDER HOUSE ENT</span>
+          <span class="manual-brand-sub">Staff Operations Manual</span>
+        </div>
+      </a>
+      <div class="manual-header-actions">
+        <button class="mode-toggle-btn" id="manual-mode-toggle">
+          <i class="fa-solid fa-book-open"></i> <span>Standard Mode</span>
+        </button>
+        <a href="../admin/today.html" class="btn-header-link"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a>
+        <a href="../index.html" target="_blank" class="btn-header-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Public Site</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="manual-layout">
+    <nav class="manual-sidebar">
+      <div class="sidebar-search-box">
+        <i class="fa-solid fa-magnifying-glass sidebar-search-icon"></i>
+        <input type="text" id="sidebar-search" class="sidebar-search-input" placeholder="Search manual topics...">
+      </div>
+
+      <div class="chapter-group-title">Foundations</div>
+      <a href="index.html" class="chapter-link" data-chapter="intro"><span class="chap-num">00</span> Introduction &amp; Architecture</a>
+
+      <div class="chapter-group-title">Client-Facing Systems</div>
+      <a href="chapter-1-public-engine.html" class="chapter-link" data-chapter="chap1"><span class="chap-num">01</span> Public Website, Packages &amp; Holds</a>
+      <a href="chapter-2-client-journey.html" class="chapter-link" data-chapter="chap2"><span class="chap-num">02</span> Invoices, Contracts &amp; Portal</a>
+
+      <div class="chapter-group-title">Daily Operations</div>
+      <a href="chapter-3-today-command.html" class="chapter-link" data-chapter="chap3"><span class="chap-num">03</span> Today's Command Dashboard</a>
+      <a href="chapter-4-thunder-wire.html" class="chapter-link" data-chapter="chap4"><span class="chap-num">04</span> Thunder Wire &amp; Broadcasting</a>
+      <a href="chapter-5-leads-crm.html" class="chapter-link" data-chapter="chap5"><span class="chap-num">05</span> Sales Pipeline &amp; Consultations</a>
+
+      <div class="chapter-group-title">Event Execution &amp; Gear</div>
+      <a href="chapter-6-gigs-runofshow.html" class="chapter-link active" data-chapter="chap6"><span class="chap-num">06</span> Gigs Run-of-Show &amp; Requests</a>
+      <a href="chapter-7-gear-fleet.html" class="chapter-link" data-chapter="chap7"><span class="chap-num">07</span> Gear Fleet &amp; QR Scanner</a>
+
+      <div class="chapter-group-title">Media &amp; Automations</div>
+      <a href="chapter-8-thunder-crate.html" class="chapter-link" data-chapter="chap8"><span class="chap-num">08</span> Thunder Crate &amp; Music Engine</a>
+      <a href="chapter-9-automation-station.html" class="chapter-link" data-chapter="chap9"><span class="chap-num">09</span> Automation Station &amp; Daemons</a>
+      <a href="chapter-10-settings-security.html" class="chapter-link" data-chapter="chap10"><span class="chap-num">10</span> Settings, SMTP &amp; Security</a>
+    </nav>
+
+    <main class="manual-content">
+      <div class="manual-breadcrumbs">
+        <a href="index.html">Operations Manual</a>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span>Event Execution &amp; Gear</span>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span style="color:var(--text-main)">Chapter 06: Gigs Run-of-Show &amp; Requests</span>
+      </div>
+
+      <header class="chapter-header">
+        <div class="chapter-badge"><i class="fa-solid fa-compact-disc"></i> Chapter 06</div>
+        <h1 class="chapter-title">Live Gig Execution, Master Timelines &amp; VIP Moment Cues</h1>
+        <p class="chapter-lead">When it is showtime, the DJ booth relies on <code>admin/gigs.html</code>. This chapter covers how our performers manage minute-by-minute event timelines, execute flawless VIP moment audio cues, and triage live crowd requests in the heat of a performance.</p>
+      </header>
+
+      <section>
+        <h2><i class="fa-solid fa-timeline cyan"></i> 1. The Live Gig Run-of-Show Cockpit</h2>
+        <p>The Run of Show screen transforms all client portal submissions into an actionable, live-performance timeline on the DJ's laptop or tablet:</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/admin_gigs_timeline.png" alt="Gigs Run of Show Master Timeline">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 6.1</span>
+            <span>The live Run-of-Show interface at <code>admin/gigs.html</code>. Provides stage-by-stage countdown timers, VIP moment song cues, and live crowd request moderation.</span>
+          </div>
+        </div>
+
+        <h3>The Anatomy of an Event Timeline:</h3>
+        <ol>
+          <li><strong>Prelude &amp; Guest Arrival:</strong> Warm, inviting background instrumental music setting the ambiance as family and guests enter the venue.</li>
+          <li><strong>Ceremony Audio Cues:</strong> Exact start cues for grandparents, bridal party processional, and the dramatic pause before the bride's processional.</li>
+          <li><strong>Cocktail Hour &amp; Mingling:</strong> Upbeat, stylish acoustic or soul/R&amp;B vibes while photos are taken.</li>
+          <li><strong>Grand Introductions:</strong> High-energy entrance track with names of bridal party members, parents, and newlyweds pronounced correctly.</li>
+          <li><strong>Dinner &amp; Background Speeches:</strong> Low-volume dining music and crisp wireless microphone handoffs to toast speakers.</li>
+          <li><strong>VIP Moments:</strong> Formal First Dance, Father-Daughter dance, Mother-Son dance, Cake Cutting, and Bouquet Toss.</li>
+          <li><strong>Dance Floor Open:</strong> High-energy party programming, beatmatching, reading the room, and taking the party to peak energy.</li>
+          <li><strong>Last Dance &amp; Exit:</strong> The couple's private final slow dance or high-energy confetti grand exit.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-star gold"></i> 2. Executing VIP Moment Audio Cues</h2>
+        <p>VIP moments are the emotional centerpiece of any wedding or formal banquet. A missed audio cue or playing the wrong edit can ruin a once-in-a-lifetime moment.</p>
+
+        <div class="callout warning">
+          <div class="callout-title"><i class="fa-solid fa-headphones"></i> The Headphone Audition Rule</div>
+          <p>Every VIP song has a direct <strong>Audition / Stream</strong> button built into the gig screen. Before unmuting the master sound system, the DJ must cue the track in their DJ headphones, verify the song title and artist, ensure the volume fader is calibrated, and double-check with the photographer and videographer that cameras are rolling!</p>
+        </div>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-mobile-screen-button secondary"></i> 3. Triaging Live Crowd Requests</h2>
+        <p>As guests submit song requests through the mobile portal (<code>requests.html</code>), they appear in real-time within the <strong>Live Guest Requests Drawer</strong> on the DJ's screen:</p>
+        <ul>
+          <li><strong>Accept:</strong> Adds the song to the DJ's upcoming setlist considerations.</li>
+          <li><strong>Decline:</strong> Silently archives the request without interrupting the performance.</li>
+          <li><strong>Played:</strong> Marks the request as fulfilled so guests know their favorite anthem was rocked!</li>
+          <li><strong>Automatic Expiration:</strong> When the DJ clicks <strong>"Mark Gig Completed"</strong>, the system automatically archives the guest request queue to keep the database lean.</li>
+        </ul>
+      </section>
+
+      <footer class="chapter-nav-footer">
+        <a href="chapter-5-leads-crm.html" class="chapter-nav-card">
+          <div class="chapter-nav-label">Previous Chapter</div>
+          <div class="chapter-nav-title"><i class="fa-solid fa-arrow-left"></i> 05. Sales Pipeline, CRM &amp; Consultations</div>
+        </a>
+        <a href="chapter-7-gear-fleet.html" class="chapter-nav-card next">
+          <div class="chapter-nav-label">Next Chapter</div>
+          <div class="chapter-nav-title">07. Equipment Fleet &amp; QR Scanner <i class="fa-solid fa-arrow-right"></i></div>
+        </a>
+      </footer>
+    </main>
+  </div>
+
+  <script src="assets/manual.js"></script>
+</body>
+</html>

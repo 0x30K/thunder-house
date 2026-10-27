@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 08: Thunder Crate &amp; Music Engine · Thunder House Manual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/manual.css">
+</head>
+<body data-chapter-id="chap8">
+
+  <header class="manual-header">
+    <div class="manual-header-inner">
+      <a href="index.html" class="manual-brand">
+        <img src="../assets/images/branding/Thunder%20House%20Logo-PNG.png" alt="Thunder House ENT">
+        <div>
+          <span class="manual-brand-title">THUNDER HOUSE ENT</span>
+          <span class="manual-brand-sub">Staff Operations Manual</span>
+        </div>
+      </a>
+      <div class="manual-header-actions">
+        <button class="mode-toggle-btn" id="manual-mode-toggle">
+          <i class="fa-solid fa-book-open"></i> <span>Standard Mode</span>
+        </button>
+        <a href="../admin/today.html" class="btn-header-link"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a>
+        <a href="../index.html" target="_blank" class="btn-header-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Public Site</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="manual-layout">
+    <nav class="manual-sidebar">
+      <div class="sidebar-search-box">
+        <i class="fa-solid fa-magnifying-glass sidebar-search-icon"></i>
+        <input type="text" id="sidebar-search" class="sidebar-search-input" placeholder="Search manual topics...">
+      </div>
+
+      <div class="chapter-group-title">Foundations</div>
+      <a href="index.html" class="chapter-link" data-chapter="intro"><span class="chap-num">00</span> Introduction &amp; Architecture</a>
+
+      <div class="chapter-group-title">Client-Facing Systems</div>
+      <a href="chapter-1-public-engine.html" class="chapter-link" data-chapter="chap1"><span class="chap-num">01</span> Public Website, Packages &amp; Holds</a>
+      <a href="chapter-2-client-journey.html" class="chapter-link" data-chapter="chap2"><span class="chap-num">02</span> Invoices, Contracts &amp; Portal</a>
+
+      <div class="chapter-group-title">Daily Operations</div>
+      <a href="chapter-3-today-command.html" class="chapter-link" data-chapter="chap3"><span class="chap-num">03</span> Today's Command Dashboard</a>
+      <a href="chapter-4-thunder-wire.html" class="chapter-link" data-chapter="chap4"><span class="chap-num">04</span> Thunder Wire &amp; Broadcasting</a>
+      <a href="chapter-5-leads-crm.html" class="chapter-link" data-chapter="chap5"><span class="chap-num">05</span> Sales Pipeline &amp; Consultations</a>
+
+      <div class="chapter-group-title">Event Execution &amp; Gear</div>
+      <a href="chapter-6-gigs-runofshow.html" class="chapter-link" data-chapter="chap6"><span class="chap-num">06</span> Gigs Run-of-Show &amp; Requests</a>
+      <a href="chapter-7-gear-fleet.html" class="chapter-link" data-chapter="chap7"><span class="chap-num">07</span> Gear Fleet &amp; QR Scanner</a>
+
+      <div class="chapter-group-title">Media &amp; Automations</div>
+      <a href="chapter-8-thunder-crate.html" class="chapter-link active" data-chapter="chap8"><span class="chap-num">08</span> Thunder Crate &amp; Music Engine</a>
+      <a href="chapter-9-automation-station.html" class="chapter-link" data-chapter="chap9"><span class="chap-num">09</span> Automation Station &amp; Daemons</a>
+      <a href="chapter-10-settings-security.html" class="chapter-link" data-chapter="chap10"><span class="chap-num">10</span> Settings, SMTP &amp; Security</a>
+    </nav>
+
+    <main class="manual-content">
+      <div class="manual-breadcrumbs">
+        <a href="index.html">Operations Manual</a>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span>Media &amp; Automations</span>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span style="color:var(--text-main)">Chapter 08: Thunder Crate &amp; Music Engine</span>
+      </div>
+
+      <header class="chapter-header">
+        <div class="chapter-badge"><i class="fa-solid fa-music"></i> Chapter 08</div>
+        <h1 class="chapter-title">Thunder Crate, Music Scout Engine &amp; The Cloud Vault</h1>
+        <p class="chapter-lead">Located at <code>admin/music.html</code>, Thunder Crate is our proprietary digital record pool. Powered by our automated Python discovery engine, it ingests trending weekly releases, generates Clean and Dirty audio pairs, researches artist social channels, and enables seamless mobile streaming without hogging cloud storage.</p>
+      </header>
+
+      <section>
+        <h2><i class="fa-solid fa-robot gold"></i> 1. The Automated Music Scout Architecture</h2>
+        <p>Instead of manually browsing record pools every weekend, our background Python daemon (<code>scripts/music_scout_engine.py</code>) wakes up automatically at <strong>6:00 AM CST</strong> to scout trending releases across Hip-Hop, R&amp;B, Pop, and Latin charts:</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/admin_music_crate.png" alt="Thunder Crate Fresh Drops Music Interface">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 8.1</span>
+            <span>The Thunder Crate interface at <code>admin/music.html</code>. Shows Clean/Dirty buttons, artist research chips, release dates, and download options.</span>
+          </div>
+        </div>
+
+        <h3>Clean &amp; Dirty Dual-Audio Ingestion:</h3>
+        <p>A hallmark of professional DJing is playing the appropriate version for the venue. Our engine downloads two distinct audio cuts for every single release:</p>
+        <ul>
+          <li><strong>Clean (Radio Edit):</strong> Explicit profanity muted or reversed. Mandatory for weddings, sweet 16s, corporate events, and public radio broadcasts.</li>
+          <li><strong>Dirty (Club / Explicit):</strong> The full uncut artist delivery. Reserved for 21+ night clubs, private adult birthday celebrations, and festival sets.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-cloud-arrow-down cyan"></i> 2. The 30-Day Cloud Streaming Vault</h2>
+        <p>DJs need to audition new tracks on the go from their iPhones, iPads, or laptops—even when the studio PC is turned off. To achieve this, our engine uploads lightweight, web-optimized audio files into our private Supabase storage bucket (<code>music-vault</code>).</p>
+
+        <div class="callout rule">
+          <div class="callout-title"><i class="fa-solid fa-database"></i> The 30-Day Auto-Purge Policy</div>
+          <p>To keep our Supabase cloud storage extremely lean (under 1.5 GB total) and prevent storage overload, cloud streaming files have an expiration timestamp set to <strong>30 days from download</strong>.</p>
+          <p>After 30 days, the automated background worker (<code>cloud_stream_purge</code>) purges the audio file from the cloud bucket. <strong>Your permanent master audio files on <code>E:\Thunder House - Music</code> are completely safe and untouched!</strong></p>
+        </div>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-share-nodes gold"></i> 3. Automated Artist Research &amp; Social Chips</h2>
+        <p>Every track in Thunder Crate includes live, clickable artist intelligence badges:</p>
+        <ul>
+          <li><span style="color:#ff5500; font-weight:bold">SoundCloud:</span> Direct link to the artist's tracks or verified profile. If an underground artist has no website, their SoundCloud profile is prominently listed.</li>
+          <li><span style="color:#e1306c; font-weight:bold">Instagram:</span> Artist IG handle for scouting upcoming tours or aesthetic vibes.</li>
+          <li><span style="color:#00e5ff; font-weight:bold">Website:</span> Official artist homepage or booking portal.</li>
+          <li><span style="color:#38bdf8; font-weight:bold">TikTok &amp; YouTube:</span> Visual channels and trending dance challenges.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-download green"></i> 4. 1-Click High-Quality DJ Downloads</h2>
+        <p>When you are preparing your weekend USB flash drives for Serato DJ Pro or Pioneer Rekordbox, simply click the <strong>Download</strong> button on the track or within the floating <strong>Cyber Audio Dock</strong>. The browser downloads the original, tagged MP3 file named perfectly according to DJ software standards: <code>Artist - Title (CLEAN).mp3</code> or <code>Artist - Title (DIRTY).mp3</code>.</p>
+      </section>
+
+      <footer class="chapter-nav-footer">
+        <a href="chapter-7-gear-fleet.html" class="chapter-nav-card">
+          <div class="chapter-nav-label">Previous Chapter</div>
+          <div class="chapter-nav-title"><i class="fa-solid fa-arrow-left"></i> 07. Equipment Fleet &amp; QR Scanner</div>
+        </a>
+        <a href="chapter-9-automation-station.html" class="chapter-nav-card next">
+          <div class="chapter-nav-label">Next Chapter</div>
+          <div class="chapter-nav-title">09. Automation Station &amp; Daemons <i class="fa-solid fa-arrow-right"></i></div>
+        </a>
+      </footer>
+    </main>
+  </div>
+
+  <script src="assets/manual.js"></script>
+</body>
+</html>

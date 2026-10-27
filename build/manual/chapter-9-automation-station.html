@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 09: Automation Station &amp; Daemons · Thunder House Manual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/manual.css">
+</head>
+<body data-chapter-id="chap9">
+
+  <header class="manual-header">
+    <div class="manual-header-inner">
+      <a href="index.html" class="manual-brand">
+        <img src="../assets/images/branding/Thunder%20House%20Logo-PNG.png" alt="Thunder House ENT">
+        <div>
+          <span class="manual-brand-title">THUNDER HOUSE ENT</span>
+          <span class="manual-brand-sub">Staff Operations Manual</span>
+        </div>
+      </a>
+      <div class="manual-header-actions">
+        <button class="mode-toggle-btn" id="manual-mode-toggle">
+          <i class="fa-solid fa-book-open"></i> <span>Standard Mode</span>
+        </button>
+        <a href="../admin/today.html" class="btn-header-link"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a>
+        <a href="../index.html" target="_blank" class="btn-header-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Public Site</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="manual-layout">
+    <nav class="manual-sidebar">
+      <div class="sidebar-search-box">
+        <i class="fa-solid fa-magnifying-glass sidebar-search-icon"></i>
+        <input type="text" id="sidebar-search" class="sidebar-search-input" placeholder="Search manual topics...">
+      </div>
+
+      <div class="chapter-group-title">Foundations</div>
+      <a href="index.html" class="chapter-link" data-chapter="intro"><span class="chap-num">00</span> Introduction &amp; Architecture</a>
+
+      <div class="chapter-group-title">Client-Facing Systems</div>
+      <a href="chapter-1-public-engine.html" class="chapter-link" data-chapter="chap1"><span class="chap-num">01</span> Public Website, Packages &amp; Holds</a>
+      <a href="chapter-2-client-journey.html" class="chapter-link" data-chapter="chap2"><span class="chap-num">02</span> Invoices, Contracts &amp; Portal</a>
+
+      <div class="chapter-group-title">Daily Operations</div>
+      <a href="chapter-3-today-command.html" class="chapter-link" data-chapter="chap3"><span class="chap-num">03</span> Today's Command Dashboard</a>
+      <a href="chapter-4-thunder-wire.html" class="chapter-link" data-chapter="chap4"><span class="chap-num">04</span> Thunder Wire &amp; Broadcasting</a>
+      <a href="chapter-5-leads-crm.html" class="chapter-link" data-chapter="chap5"><span class="chap-num">05</span> Sales Pipeline &amp; Consultations</a>
+
+      <div class="chapter-group-title">Event Execution &amp; Gear</div>
+      <a href="chapter-6-gigs-runofshow.html" class="chapter-link" data-chapter="chap6"><span class="chap-num">06</span> Gigs Run-of-Show &amp; Requests</a>
+      <a href="chapter-7-gear-fleet.html" class="chapter-link" data-chapter="chap7"><span class="chap-num">07</span> Gear Fleet &amp; QR Scanner</a>
+
+      <div class="chapter-group-title">Media &amp; Automations</div>
+      <a href="chapter-8-thunder-crate.html" class="chapter-link" data-chapter="chap8"><span class="chap-num">08</span> Thunder Crate &amp; Music Engine</a>
+      <a href="chapter-9-automation-station.html" class="chapter-link active" data-chapter="chap9"><span class="chap-num">09</span> Automation Station &amp; Daemons</a>
+      <a href="chapter-10-settings-security.html" class="chapter-link" data-chapter="chap10"><span class="chap-num">10</span> Settings, SMTP &amp; Security</a>
+    </nav>
+
+    <main class="manual-content">
+      <div class="manual-breadcrumbs">
+        <a href="index.html">Operations Manual</a>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span>Media &amp; Automations</span>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span style="color:var(--text-main)">Chapter 09: Automation Station &amp; Daemons</span>
+      </div>
+
+      <header class="chapter-header">
+        <div class="chapter-badge"><i class="fa-solid fa-robot"></i> Chapter 09</div>
+        <h1 class="chapter-title">The Automation Station: Background Schedulers &amp; Daemons</h1>
+        <p class="chapter-lead">Located at <code>admin/automations.html</code>, the Automation Station solves the common problem of "invisible" background scripts. It provides a central command room where every scheduled task, auto-downloader, auto-messager, and database cleaner can be observed, scheduled, toggled on or off, and tested on demand.</p>
+      </header>
+
+      <section>
+        <h2><i class="fa-solid fa-sliders cyan"></i> 1. The Automation Station Cockpit</h2>
+        <p>In complex systems, background cron jobs often run silently until something breaks or fills a storage drive. The Automation Station eliminates this blind spot by centralizing all recurring background tasks into a single real-time dashboard:</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/admin_automations_station.png" alt="Automation Station Central Dashboard">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 9.1</span>
+            <span>The Automation Station at <code>admin/automations.html</code>. Displays master switches, daily run times, operational health status, and execution logs.</span>
+          </div>
+        </div>
+
+        <h3>Interactive Controls on Every Automation Card:</h3>
+        <ul>
+          <li><strong>Master ON / OFF Toggle:</strong> Flipping the glowing cyber switch immediately updates <code>public.thunderhouse_automations</code>. If a process is toggled OFF, its background runner or Python daemon safely skips execution until re-enabled.</li>
+          <li><strong>Schedule Adjuster:</strong> For daily tasks, change the target run time (e.g. <code>06:00 CST</code>) right on the card. For interval tasks, adjust the recurring cadence (Every 15 min, 30 min, 1 hour, etc.).</li>
+          <li><strong>On-Demand "Run Now" (⚡):</strong> Test any process immediately without waiting for its scheduled time. The card displays a spinning indicator and reports the execution outcome.</li>
+          <li><strong>Execution History Logs (📜):</strong> Click <strong>Logs</strong> to inspect the exact duration in milliseconds, timestamp, and summary output of previous runs.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-list-check gold"></i> 2. The 8 Core Automated Processes Explained</h2>
+        <div class="steps-container">
+          <div class="step-card">
+            <div class="step-number"><i class="fa-solid fa-music"></i></div>
+            <div class="step-body">
+              <div class="step-title">1. Fresh Drops · Music Scout &amp; Ingest Engine</div>
+              <p>Runs daily at 6:00 AM CST. Discovers new weekly Hip-Hop/R&amp;B/Pop releases, tags ID3 metadata, downloads Clean and Dirty pairs to <code>E:\Thunder House - Music</code>, scrapes social links, and pushes streams to the cloud vault.</p>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number"><i class="fa-solid fa-broom"></i></div>
+            <div class="step-body">
+              <div class="step-title">2. Cloud Audio Stream 30-Day Purge</div>
+              <p>Runs daily at 6:15 AM CST. Audits Supabase storage and prunes temporary mobile stream files older than 30 days, keeping cloud usage under 1.5 GB while leaving master files on your hard drive untouched.</p>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number"><i class="fa-solid fa-bolt"></i></div>
+            <div class="step-body">
+              <div class="step-title">3. Thunder Wire · News &amp; Intelligence Scanner</div>
+              <p>Runs every 60 minutes. Polls RSS feeds from XXL, Billboard, and HipHopDX, auto-categorizes stories into the 5 morning show blocks, and scores virality.</p>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number"><i class="fa-solid fa-calendar-xmark"></i></div>
+            <div class="step-body">
+              <div class="step-title">4. Website Quote 72-Hour Hold Expirer</div>
+              <p>Runs every 60 minutes. Scans pending quote intakes. If a 72-hour hold has expired without a retainer payment, it automatically releases the date back to open calendar availability.</p>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number"><i class="fa-solid fa-bell"></i></div>
+            <div class="step-body">
+              <div class="step-title">5. 14-Day Balance Due Email Reminder</div>
+              <p>Runs daily at 9:00 AM CST. Checks upcoming gigs 14 days away and sends automated reminder emails with Square payment links to clients with unpaid balances.</p>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number"><i class="fa-solid fa-star"></i></div>
+            <div class="step-body">
+              <div class="step-title">6. Post-Event 48h Google Review Outreach</div>
+              <p>Runs daily at 11:00 AM CST. Dispatches a thank-you note and direct Google Review link to clients 48 hours after their performance completes.</p>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number"><i class="fa-solid fa-boxes-stacked"></i></div>
+            <div class="step-body">
+              <div class="step-title">7. Equipment Return &amp; Fleet Health Check</div>
+              <p>Runs daily at 12:00 PM CST. Flags any equipment marked "In Transit" if the event ended over 24 hours ago, preventing lost gear.</p>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number"><i class="fa-solid fa-trash-can"></i></div>
+            <div class="step-body">
+              <div class="step-title">8. Completed Gig Temp Audio &amp; Request Archiver</div>
+              <p>Event-driven hook. Triggers whenever a DJ clicks "Mark Gig Complete", archiving guest song requests and clearing temporary audio.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-plus gold"></i> 3. How to Register Future Automations</h2>
+        <p>Whenever our engineering team builds a new automated script, cron job, or webhook, it must be registered into the Automation Station so staff can manage it:</p>
+        <ol>
+          <li>Click the <strong>"+ Register Automation"</strong> button in the top right corner of <code>admin/automations.html</code>.</li>
+          <li>Enter a unique Slug ID (e.g., <code>tiktok_reels_sync</code>), Title, Category, and Runner Type.</li>
+          <li>Specify the Schedule (Daily at HH:MM or Interval in minutes).</li>
+          <li>Click <strong>Save &amp; Register</strong>. The automation instantly appears in the grid, synced to the database!</li>
+        </ol>
+      </section>
+
+      <footer class="chapter-nav-footer">
+        <a href="chapter-8-thunder-crate.html" class="chapter-nav-card">
+          <div class="chapter-nav-label">Previous Chapter</div>
+          <div class="chapter-nav-title"><i class="fa-solid fa-arrow-left"></i> 08. Thunder Crate &amp; Music Engine</div>
+        </a>
+        <a href="chapter-10-settings-security.html" class="chapter-nav-card next">
+          <div class="chapter-nav-label">Next Chapter</div>
+          <div class="chapter-nav-title">10. Settings, SMTP &amp; Security <i class="fa-solid fa-arrow-right"></i></div>
+        </a>
+      </footer>
+    </main>
+  </div>
+
+  <script src="assets/manual.js"></script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Operations Manual · Thunder House ENT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/manual.css">
+</head>
+<body data-chapter-id="intro">
+
+  <!-- Header -->
+  <header class="manual-header">
+    <div class="manual-header-inner">
+      <a href="index.html" class="manual-brand">
+        <img src="../assets/images/branding/Thunder%20House%20Logo-PNG.png" alt="Thunder House ENT">
+        <div>
+          <span class="manual-brand-title">THUNDER HOUSE ENT</span>
+          <span class="manual-brand-sub">Staff Operations Manual</span>
+        </div>
+      </a>
+      <div class="manual-header-actions">
+        <button class="mode-toggle-btn" id="manual-mode-toggle" title="Switch between Standard Manual & High-Tech Cyber Portal HUD">
+          <i class="fa-solid fa-book-open"></i> <span>Standard Mode</span>
+        </button>
+        <a href="../admin/today.html" class="btn-header-link"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a>
+        <a href="../index.html" target="_blank" class="btn-header-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Public Site</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Layout Wrapper -->
+  <div class="manual-layout">
+    <!-- Sidebar -->
+    <nav class="manual-sidebar">
+      <div class="sidebar-search-box">
+        <i class="fa-solid fa-magnifying-glass sidebar-search-icon"></i>
+        <input type="text" id="sidebar-search" class="sidebar-search-input" placeholder="Search manual topics...">
+      </div>
+
+      <div class="chapter-group-title">Foundations</div>
+      <a href="index.html" class="chapter-link active" data-chapter="intro"><span class="chap-num">00</span> Introduction &amp; Architecture</a>
+
+      <div class="chapter-group-title">Client-Facing Systems</div>
+      <a href="chapter-1-public-engine.html" class="chapter-link" data-chapter="chap1"><span class="chap-num">01</span> Public Website, Packages &amp; Holds</a>
+      <a href="chapter-2-client-journey.html" class="chapter-link" data-chapter="chap2"><span class="chap-num">02</span> Invoices, Contracts &amp; Portal</a>
+
+      <div class="chapter-group-title">Daily Operations</div>
+      <a href="chapter-3-today-command.html" class="chapter-link" data-chapter="chap3"><span class="chap-num">03</span> Today's Command Dashboard</a>
+      <a href="chapter-4-thunder-wire.html" class="chapter-link" data-chapter="chap4"><span class="chap-num">04</span> Thunder Wire &amp; Broadcasting</a>
+      <a href="chapter-5-leads-crm.html" class="chapter-link" data-chapter="chap5"><span class="chap-num">05</span> Sales Pipeline &amp; Consultations</a>
+
+      <div class="chapter-group-title">Event Execution &amp; Gear</div>
+      <a href="chapter-6-gigs-runofshow.html" class="chapter-link" data-chapter="chap6"><span class="chap-num">06</span> Gigs Run-of-Show &amp; Requests</a>
+      <a href="chapter-7-gear-fleet.html" class="chapter-link" data-chapter="chap7"><span class="chap-num">07</span> Gear Fleet &amp; QR Scanner</a>
+
+      <div class="chapter-group-title">Media &amp; Automations</div>
+      <a href="chapter-8-thunder-crate.html" class="chapter-link" data-chapter="chap8"><span class="chap-num">08</span> Thunder Crate &amp; Music Engine</a>
+      <a href="chapter-9-automation-station.html" class="chapter-link" data-chapter="chap9"><span class="chap-num">09</span> Automation Station &amp; Daemons</a>
+      <a href="chapter-10-settings-security.html" class="chapter-link" data-chapter="chap10"><span class="chap-num">10</span> Settings, SMTP &amp; Security</a>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="manual-content">
+      <div class="manual-breadcrumbs">
+        <span>Operations Manual</span>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span>Foundations</span>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span style="color:var(--text-main)">System Overview &amp; Architecture</span>
+      </div>
+
+      <header class="chapter-header">
+        <div class="chapter-badge"><i class="fa-solid fa-graduation-cap"></i> Training Module 00</div>
+        <h1 class="chapter-title">System Architecture &amp; Staff Fundamentals</h1>
+        <p class="chapter-lead">Welcome to Thunder House ENT. This manual is designed to equip every team member—from new apprentice DJs to seasoned operational leads—with an exhaustive, crystal-clear understanding of our technology infrastructure, business philosophy, and event execution protocols.</p>
+      </header>
+
+      <section>
+        <h2><i class="fa-solid fa-compass gold"></i> 1. The Thunder House Operating Philosophy</h2>
+        <p>Thunder House Entertainment is a premier, family-owned DJ and live event production company based in Oklahoma City, Oklahoma. Unlike national DJ booking agencies that subcontract anonymous performers with generic equipment, our entire brand identity is built around two unwavering pillars:</p>
+        <ol>
+          <li><strong>Reading the Crowd with Curated Music:</strong> We do not rely on static Spotify playlists. Our DJs actively monitor dance floor energy, beatmatch seamlessly across multiple genres (Hip-Hop, R&amp;B, Pop, Latin, Country, and Classics), and adapt live to the audience in front of them.</li>
+          <li><strong>Professional MC Coordination:</strong> Great events require steady, polished leadership. We coordinate timelines behind the scenes with caterers, photographers, and venue coordinators so clients experience zero stress from grand introductions to the final send-off.</li>
+        </ol>
+
+        <div class="callout rule">
+          <div class="callout-title"><i class="fa-solid fa-scale-balanced"></i> Core Staff Standard</div>
+          <p>Every digital tool in this ecosystem—from our automated 72-hour date hold releaser to the equipment QR scanner—exists to protect our calendar integrity, eliminate human error during performances, and guarantee our clients receive world-class hospitality.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-users-gear cyan"></i> 2. Staff Roles &amp; Security Permissions</h2>
+        <p>The system is strictly divided into two distinct operational roles. Understanding your role determines which screens you can access, which financial transactions you can authorize, and how quotes are dispatched to clients:</p>
+
+        <div class="steps-container">
+          <div class="step-card">
+            <div class="step-number" style="background:rgba(255,183,3,0.15); border-color:var(--accent-gold); color:var(--accent-gold)">
+              <i class="fa-solid fa-crown"></i>
+            </div>
+            <div class="step-body">
+              <div class="step-title">Superuser (Owner / General Manager)</div>
+              <p>Has full read and write authority across every sector of the platform. Superusers manage bank payout connections, inspect gross revenue analytics, adjust base package pricing, approve staff consultation quotes, configure SMTP email relay credentials, and define automated system cron schedules.</p>
+              <div class="small muted"><strong>Default Owner Account:</strong> <code>olifedigital@gmail.com</code></div>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">
+              <i class="fa-solid fa-headphones"></i>
+            </div>
+            <div class="step-body">
+              <div class="step-title">Staff DJ / Event Producer</div>
+              <p>Focused on event execution, client music consultations, and hardware logistics. Staff DJs have access to the live event Run of Show, guest song requests triage, equipment fleet check-in/check-out scanning, the Thunder Crate fresh drops library, and consultation intake forms. Sensitive company finances and system credentials remain protected.</p>
+              <div class="small muted"><strong>Active Staff Profile:</strong> Marcus Vance (DJ Staff)</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-diagram-project gold"></i> 3. Complete End-to-End System Life Cycle</h2>
+        <p>To avoid feeling overwhelmed by individual dashboards, review the diagram and 6-stage lifecycle below. Every client booking and gig execution follows this exact sequential path:</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/public_homepage_hero.png" alt="Thunder House Public Portal Hero">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 0.1</span>
+            <span>The public client acquisition gateway at <code>thunderhouseent.com</code>. This is where potential clients first discover our brand, calculate transparent estimates, and initiate date reservations.</span>
+          </div>
+        </div>
+
+        <ol>
+          <li><strong>Client Intake &amp; 72-Hour Hold:</strong> The client visits the website, calculates an estimate, and completes the intake form. The system immediately places a temporary 72-hour lock on that date in our calendar so no other inquiry can claim it.</li>
+          <li><strong>Quote Review &amp; Retainer Payment:</strong> The client receives an official quote summary with a secure Square payment link for a $200 date-lock retainer. Once paid, the date transitions permanently from "Hold" to "Booked".</li>
+          <li><strong>Contract E-Signature:</strong> A digital service agreement is generated and legally e-signed in browser by both the client and Thunder House ENT.</li>
+          <li><strong>Pre-Event Planning Portal:</strong> The client accesses their dedicated planning portal to build their timeline, specify VIP moments (first dances, speeches), and curate must-play songs.</li>
+          <li><strong>Studio Pack-Out &amp; Mobile QR Scan:</strong> 24 hours before performance, staff stage speakers, mixers, and lighting, scanning each item via mobile phone camera into "Packed / In Transit".</li>
+          <li><strong>Gig Execution &amp; Automated Archive:</strong> The DJ executes the live run-of-show. Crowd requests are triaged in real time. Following the event, balances are reconciled, review outreach is automated, and temporary streaming audio is cleanly pruned.</li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title"><i class="fa-solid fa-lightbulb"></i> Lightning Bolt Cyber HUD Mode</div>
+          <p>Notice the gold <strong>Lightning Bolt</strong> button in the top right header. When you click it, the manual transforms into the <strong>Cyber Portal Mode</strong>—an animated, high-contrast HUD designed for stage technicians and night-time DJ booth environments. Your choice is saved automatically.</p>
+        </div>
+      </section>
+
+      <!-- Navigation Footer -->
+      <footer class="chapter-nav-footer">
+        <div></div>
+        <a href="chapter-1-public-engine.html" class="chapter-nav-card next">
+          <div class="chapter-nav-label">Next Chapter</div>
+          <div class="chapter-nav-title">01. Public Website, Packages &amp; Holds <i class="fa-solid fa-arrow-right"></i></div>
+        </a>
+      </footer>
+    </main>
+  </div>
+
+  <script src="assets/manual.js"></script>
+</body>
+</html>

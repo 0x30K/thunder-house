@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 07: Equipment Fleet &amp; QR Scanner · Thunder House Manual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/manual.css">
+</head>
+<body data-chapter-id="chap7">
+
+  <header class="manual-header">
+    <div class="manual-header-inner">
+      <a href="index.html" class="manual-brand">
+        <img src="../assets/images/branding/Thunder%20House%20Logo-PNG.png" alt="Thunder House ENT">
+        <div>
+          <span class="manual-brand-title">THUNDER HOUSE ENT</span>
+          <span class="manual-brand-sub">Staff Operations Manual</span>
+        </div>
+      </a>
+      <div class="manual-header-actions">
+        <button class="mode-toggle-btn" id="manual-mode-toggle">
+          <i class="fa-solid fa-book-open"></i> <span>Standard Mode</span>
+        </button>
+        <a href="../admin/today.html" class="btn-header-link"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a>
+        <a href="../index.html" target="_blank" class="btn-header-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Public Site</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="manual-layout">
+    <nav class="manual-sidebar">
+      <div class="sidebar-search-box">
+        <i class="fa-solid fa-magnifying-glass sidebar-search-icon"></i>
+        <input type="text" id="sidebar-search" class="sidebar-search-input" placeholder="Search manual topics...">
+      </div>
+
+      <div class="chapter-group-title">Foundations</div>
+      <a href="index.html" class="chapter-link" data-chapter="intro"><span class="chap-num">00</span> Introduction &amp; Architecture</a>
+
+      <div class="chapter-group-title">Client-Facing Systems</div>
+      <a href="chapter-1-public-engine.html" class="chapter-link" data-chapter="chap1"><span class="chap-num">01</span> Public Website, Packages &amp; Holds</a>
+      <a href="chapter-2-client-journey.html" class="chapter-link" data-chapter="chap2"><span class="chap-num">02</span> Invoices, Contracts &amp; Portal</a>
+
+      <div class="chapter-group-title">Daily Operations</div>
+      <a href="chapter-3-today-command.html" class="chapter-link" data-chapter="chap3"><span class="chap-num">03</span> Today's Command Dashboard</a>
+      <a href="chapter-4-thunder-wire.html" class="chapter-link" data-chapter="chap4"><span class="chap-num">04</span> Thunder Wire &amp; Broadcasting</a>
+      <a href="chapter-5-leads-crm.html" class="chapter-link" data-chapter="chap5"><span class="chap-num">05</span> Sales Pipeline &amp; Consultations</a>
+
+      <div class="chapter-group-title">Event Execution &amp; Gear</div>
+      <a href="chapter-6-gigs-runofshow.html" class="chapter-link" data-chapter="chap6"><span class="chap-num">06</span> Gigs Run-of-Show &amp; Requests</a>
+      <a href="chapter-7-gear-fleet.html" class="chapter-link active" data-chapter="chap7"><span class="chap-num">07</span> Gear Fleet &amp; QR Scanner</a>
+
+      <div class="chapter-group-title">Media &amp; Automations</div>
+      <a href="chapter-8-thunder-crate.html" class="chapter-link" data-chapter="chap8"><span class="chap-num">08</span> Thunder Crate &amp; Music Engine</a>
+      <a href="chapter-9-automation-station.html" class="chapter-link" data-chapter="chap9"><span class="chap-num">09</span> Automation Station &amp; Daemons</a>
+      <a href="chapter-10-settings-security.html" class="chapter-link" data-chapter="chap10"><span class="chap-num">10</span> Settings, SMTP &amp; Security</a>
+    </nav>
+
+    <main class="manual-content">
+      <div class="manual-breadcrumbs">
+        <a href="index.html">Operations Manual</a>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span>Event Execution &amp; Gear</span>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span style="color:var(--text-main)">Chapter 07: Gear Fleet &amp; QR Scanner</span>
+      </div>
+
+      <header class="chapter-header">
+        <div class="chapter-badge"><i class="fa-solid fa-boxes-stacked"></i> Chapter 07</div>
+        <h1 class="chapter-title">Equipment Fleet Management &amp; Mobile QR Code Logistics</h1>
+        <p class="chapter-lead">High-end sound systems and wireless microphones represent tens of thousands of dollars in capital investment. Thunder House maintains absolute inventory accountability using physical QR stickers and real-time mobile camera scanning.</p>
+      </header>
+
+      <section>
+        <h2><i class="fa-solid fa-boxes-stacked cyan"></i> 1. The Equipment Fleet Roster</h2>
+        <p>Located at <code>admin/gear.html</code>, the equipment dashboard tracks every physical item owned by the company:</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/admin_gear_fleet.png" alt="Equipment Fleet Inventory Management">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 7.1</span>
+            <span>The Fleet Roster screen. Displays item health status, current physical location, assigned road cases, and check-in/out timestamps.</span>
+          </div>
+        </div>
+
+        <h3>The 4 Equipment Operational States:</h3>
+        <ul>
+          <li><strong>Available in Studio:</strong> Equipment is stored safely in our Oklahoma City facility, tested, charged, and ready for deployment.</li>
+          <li><strong>Packed / In Transit:</strong> Gear has been scanned into road cases and loaded into the performance vehicle.</li>
+          <li><strong>Deployed at Gig:</strong> Actively wired and operational at the venue.</li>
+          <li><strong>Maintenance / Inspection:</strong> Item flagged with damage, frayed cabling, or dead battery packs, locked from booking until serviced.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-qrcode gold"></i> 2. The Mobile QR Scanner</h2>
+        <p>Staff members never need to manually type serial numbers. Using their mobile phones, staff navigate to <code>admin/gear-scanner.html</code> to scan durable QR code stickers attached to each road case and speaker chassis:</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/admin_gear_scanner.png" alt="Mobile QR Code Scanner Camera Viewfinder">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 7.2</span>
+            <span>The mobile QR code viewfinder at <code>admin/gear-scanner.html</code>. Pointing your camera at any gear sticker immediately recognizes the unit.</span>
+          </div>
+        </div>
+
+        <h3>Pack-Out &amp; Return Protocol:</h3>
+        <ol>
+          <li><strong>Pre-Gig Pack-Out (Check-Out):</strong> As road cases are rolled to the truck, staff scan each item in <em>Continuous Batch Mode</em>. The system beeps, vibrates, and changes the database status to <code>in_transit</code>.</li>
+          <li><strong>Post-Gig Unpack (Check-In):</strong> Upon returning to the studio, staff scan every item back in. The status reverts to <code>available</code> with physical location confirmed.</li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-title"><i class="fa-solid fa-clock"></i> The 24-Hour Return Audit Alarm</div>
+          <p>Our automated background daemon (<code>gear_return_check</code>) scans the equipment table daily at noon. If an event ended more than 24 hours ago and any equipment remains marked <code>in_transit</code>, a red alert is flagged on the Today dashboard and an alert notification is dispatched to prevent forgotten gear at venues!</p>
+        </div>
+      </section>
+
+      <footer class="chapter-nav-footer">
+        <a href="chapter-6-gigs-runofshow.html" class="chapter-nav-card">
+          <div class="chapter-nav-label">Previous Chapter</div>
+          <div class="chapter-nav-title"><i class="fa-solid fa-arrow-left"></i> 06. Gigs Run-of-Show &amp; Requests</div>
+        </a>
+        <a href="chapter-8-thunder-crate.html" class="chapter-nav-card next">
+          <div class="chapter-nav-label">Next Chapter</div>
+          <div class="chapter-nav-title">08. Thunder Crate &amp; Music Engine <i class="fa-solid fa-arrow-right"></i></div>
+        </a>
+      </footer>
+    </main>
+  </div>
+
+  <script src="assets/manual.js"></script>
+</body>
+</html>

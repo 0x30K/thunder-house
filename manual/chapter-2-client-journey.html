@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 02: Invoices, Contracts &amp; Client Portal · Thunder House Manual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/manual.css">
+</head>
+<body data-chapter-id="chap2">
+
+  <header class="manual-header">
+    <div class="manual-header-inner">
+      <a href="index.html" class="manual-brand">
+        <img src="../assets/images/branding/Thunder%20House%20Logo-PNG.png" alt="Thunder House ENT">
+        <div>
+          <span class="manual-brand-title">THUNDER HOUSE ENT</span>
+          <span class="manual-brand-sub">Staff Operations Manual</span>
+        </div>
+      </a>
+      <div class="manual-header-actions">
+        <button class="mode-toggle-btn" id="manual-mode-toggle">
+          <i class="fa-solid fa-book-open"></i> <span>Standard Mode</span>
+        </button>
+        <a href="../admin/today.html" class="btn-header-link"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a>
+        <a href="../index.html" target="_blank" class="btn-header-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Public Site</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="manual-layout">
+    <nav class="manual-sidebar">
+      <div class="sidebar-search-box">
+        <i class="fa-solid fa-magnifying-glass sidebar-search-icon"></i>
+        <input type="text" id="sidebar-search" class="sidebar-search-input" placeholder="Search manual topics...">
+      </div>
+
+      <div class="chapter-group-title">Foundations</div>
+      <a href="index.html" class="chapter-link" data-chapter="intro"><span class="chap-num">00</span> Introduction &amp; Architecture</a>
+
+      <div class="chapter-group-title">Client-Facing Systems</div>
+      <a href="chapter-1-public-engine.html" class="chapter-link" data-chapter="chap1"><span class="chap-num">01</span> Public Website, Packages &amp; Holds</a>
+      <a href="chapter-2-client-journey.html" class="chapter-link active" data-chapter="chap2"><span class="chap-num">02</span> Invoices, Contracts &amp; Portal</a>
+
+      <div class="chapter-group-title">Daily Operations</div>
+      <a href="chapter-3-today-command.html" class="chapter-link" data-chapter="chap3"><span class="chap-num">03</span> Today's Command Dashboard</a>
+      <a href="chapter-4-thunder-wire.html" class="chapter-link" data-chapter="chap4"><span class="chap-num">04</span> Thunder Wire &amp; Broadcasting</a>
+      <a href="chapter-5-leads-crm.html" class="chapter-link" data-chapter="chap5"><span class="chap-num">05</span> Sales Pipeline &amp; Consultations</a>
+
+      <div class="chapter-group-title">Event Execution &amp; Gear</div>
+      <a href="chapter-6-gigs-runofshow.html" class="chapter-link" data-chapter="chap6"><span class="chap-num">06</span> Gigs Run-of-Show &amp; Requests</a>
+      <a href="chapter-7-gear-fleet.html" class="chapter-link" data-chapter="chap7"><span class="chap-num">07</span> Gear Fleet &amp; QR Scanner</a>
+
+      <div class="chapter-group-title">Media &amp; Automations</div>
+      <a href="chapter-8-thunder-crate.html" class="chapter-link" data-chapter="chap8"><span class="chap-num">08</span> Thunder Crate &amp; Music Engine</a>
+      <a href="chapter-9-automation-station.html" class="chapter-link" data-chapter="chap9"><span class="chap-num">09</span> Automation Station &amp; Daemons</a>
+      <a href="chapter-10-settings-security.html" class="chapter-link" data-chapter="chap10"><span class="chap-num">10</span> Settings, SMTP &amp; Security</a>
+    </nav>
+
+    <main class="manual-content">
+      <div class="manual-breadcrumbs">
+        <a href="index.html">Operations Manual</a>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span>Client-Facing Systems</span>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span style="color:var(--text-main)">Chapter 02: Invoices, Contracts &amp; Client Portal</span>
+      </div>
+
+      <header class="chapter-header">
+        <div class="chapter-badge"><i class="fa-solid fa-file-invoice-dollar"></i> Chapter 02</div>
+        <h1 class="chapter-title">The Client Journey: Quotes, Contracts, Square Invoices &amp; The Planning Portal</h1>
+        <p class="chapter-lead">Once an inquiry is initiated, our transactional engine transforms interest into legally binding contracts, secure payment receipts, and collaborative event music playlists.</p>
+      </header>
+
+      <section>
+        <h2><i class="fa-solid fa-file-invoice-dollar green"></i> 1. Quotes, Invoices &amp; Square Retainer Deposits</h2>
+        <p>Thunder House ENT utilizes a unified financial billing system linked directly with <strong>Square Payments</strong>. When a quote is generated, the client receives a secure URL (e.g. <code>thunderhouseent.com/invoice.html?id=INV-8492</code>) rendering an itemized invoice breakdown.</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/client_invoice_square.png" alt="Square Invoice Breakdown and Payment Gateway">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 2.1</span>
+            <span>The live client invoice screen. Note the split payment architecture: the $200 date-lock retainer can be paid immediately online via credit card, Apple Pay, or Google Pay through Square.</span>
+          </div>
+        </div>
+
+        <h3>The $200 Non-Refundable Retainer Protocol</h3>
+        <p>In the entertainment industry, dates are irreplaceable inventory. If a client books an October Saturday and cancels the night before, our company cannot easily resell that performance slot. Therefore, every single event requires a <strong>$200 non-refundable retainer fee</strong>:</p>
+        <ul>
+          <li><strong>Applied to Total:</strong> The $200 fee is not an extra charge; it is credited directly toward the package total (e.g., on a $700 Thunder Party package, paying the $200 retainer leaves a remaining balance of $500).</li>
+          <li><strong>Date Lock Trigger:</strong> The instant Square confirms authorization via webhook, our database automatically updates the date from <code>quote_held</code> to <code>booked</code>, halting the 72-hour hold countdown clock.</li>
+          <li><strong>14-Day Balance Due Date:</strong> The remaining balance is strictly due 14 days before the performance date. This ensures staff scheduling and equipment prep are completed without financial uncertainty.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-file-signature gold"></i> 2. The Digital Contract &amp; Legal E-Signatures</h2>
+        <p>No DJ steps foot on an event stage without a fully executed legal agreement. Our platform provides a paperless, browser-based contract signing experience located at <code>thunderhouseent.com/contract.html</code>.</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/client_contract_esign.png" alt="Digital Contract Execution and Signature Pad">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 2.2</span>
+            <span>The legal contract interface with touch-sensitive signature pad. Works on iPhones, iPads, Android tablets, and desktop mice.</span>
+          </div>
+        </div>
+
+        <h3>Key Contract Clauses Every Staff Member Must Know:</h3>
+        <ol>
+          <li><strong>Performance Scope:</strong> Outlines the exact start and end times, venue address, and package equipment included.</li>
+          <li><strong>Safe Power &amp; Staging:</strong> Requires the client/venue to provide standard 120V 15A or 20A grounded electrical outlets within 25 feet of the DJ booth, plus overhead shelter if the performance is outdoors.</li>
+          <li><strong>Overtime Terms:</strong> If the party is rocking and the host asks the DJ to continue playing past the contracted time, overtime is billed at <strong>$150 per additional hour</strong> (or fraction thereof), subject to DJ agreement and venue curfew.</li>
+          <li><strong>E-Signature Audit Trail:</strong> When the client signs the canvas, the system bundles their signature image, timestamp, client IP address, and browser user-agent into a cryptographic record stored permanently in <code>public.thunderhouse_contracts</code>.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-list-check cyan"></i> 3. The Client Planning Portal</h2>
+        <p>After paying their retainer and signing their agreement, clients receive access to the <strong>Thunder House Planning Portal</strong> (<code>thunderhouseent.com/portal.html</code>). This portal eliminates messy back-and-forth emails by centralizing all event specifics:</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/client_portal_hub.png" alt="Client Event Planning Portal">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 2.3</span>
+            <span>The Client Planning Portal dashboard. Clients can adjust timelines, list bridal party names for introductions, and curate their event soundtrack.</span>
+          </div>
+        </div>
+
+        <p>Within the portal, clients can configure three vital categories:</p>
+        <ul>
+          <li><strong>The Music Vibe &amp; Genre Sliders:</strong> Clients indicate their musical preferences across Hip-Hop, Top 40, R&amp;B, 90s/2000s Throwbacks, Country, and Latin.</li>
+          <li><strong>Must-Play &amp; Do-Not-Play Lists:</strong> Clients submit their top 10 essential anthems and specify songs or artists that must <em>never</em> be played under any circumstances (e.g. no "Cha Cha Slide" or no specific ex-partner songs).</li>
+          <li><strong>VIP Timeline Moments:</strong> For weddings, this includes prelude cues, processional songs, bride's entrance, grand entrance, first dance, father-daughter dance, mother-son dance, toast speakers, bouquet toss, and exit song.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-qrcode secondary"></i> 4. Live Crowd Guest Requests Portal</h2>
+        <p>During the event, clients and guests do not need to crowd around the DJ booth or interrupt the performer to request tracks. Thunder House provides a dedicated mobile web portal located at <code>thunderhouseent.com/requests.html</code>.</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/client_guest_requests.png" alt="Live Crowd Guest Requests Interface">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 2.4</span>
+            <span>The live mobile crowd requests page. Guests scan a small acrylic QR placard placed at the DJ booth or table tent cards to submit requests directly from their phones.</span>
+          </div>
+        </div>
+
+        <div class="callout rule">
+          <div class="callout-title"><i class="fa-solid fa-shield-halved"></i> Clean Edit &amp; Moderation Guardrails</div>
+          <p>Guests can submit track requests and optional shoutouts. However, the system enforces strict guardrails:</p>
+          <ul>
+            <li><strong>DJ Approval Required:</strong> Requests do not automatically play. They appear in the DJ's live Run of Show queue with <strong>Approve</strong> or <strong>Decline</strong> buttons.</li>
+            <li><strong>Radio / Clean Edit Enforcement:</strong> For weddings, school dances, and family birthdays, our database flags explicit versions and prompts the DJ to play only the Clean Radio Edit.</li>
+            <li><strong>Do-Not-Play Filter:</strong> If a guest requests a song that the host placed on the "Do-Not-Play" list, the system flags it in red so the DJ never accidentally violates the client's wishes!</li>
+          </ul>
+        </div>
+      </section>
+
+      <footer class="chapter-nav-footer">
+        <a href="chapter-1-public-engine.html" class="chapter-nav-card">
+          <div class="chapter-nav-label">Previous Chapter</div>
+          <div class="chapter-nav-title"><i class="fa-solid fa-arrow-left"></i> 01. Public Website, Packages &amp; Holds</div>
+        </a>
+        <a href="chapter-3-today-command.html" class="chapter-nav-card next">
+          <div class="chapter-nav-label">Next Chapter</div>
+          <div class="chapter-nav-title">03. Today's Command Dashboard <i class="fa-solid fa-arrow-right"></i></div>
+        </a>
+      </footer>
+    </main>
+  </div>
+
+  <script src="assets/manual.js"></script>
+</body>
+</html>

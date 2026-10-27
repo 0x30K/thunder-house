@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 04: Thunder Wire &amp; Broadcasting · Thunder House Manual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/manual.css">
+</head>
+<body data-chapter-id="chap4">
+
+  <header class="manual-header">
+    <div class="manual-header-inner">
+      <a href="index.html" class="manual-brand">
+        <img src="../assets/images/branding/Thunder%20House%20Logo-PNG.png" alt="Thunder House ENT">
+        <div>
+          <span class="manual-brand-title">THUNDER HOUSE ENT</span>
+          <span class="manual-brand-sub">Staff Operations Manual</span>
+        </div>
+      </a>
+      <div class="manual-header-actions">
+        <button class="mode-toggle-btn" id="manual-mode-toggle">
+          <i class="fa-solid fa-book-open"></i> <span>Standard Mode</span>
+        </button>
+        <a href="../admin/today.html" class="btn-header-link"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a>
+        <a href="../index.html" target="_blank" class="btn-header-link"><i class="fa-solid fa-arrow-up-right-from-square"></i> Public Site</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="manual-layout">
+    <nav class="manual-sidebar">
+      <div class="sidebar-search-box">
+        <i class="fa-solid fa-magnifying-glass sidebar-search-icon"></i>
+        <input type="text" id="sidebar-search" class="sidebar-search-input" placeholder="Search manual topics...">
+      </div>
+
+      <div class="chapter-group-title">Foundations</div>
+      <a href="index.html" class="chapter-link" data-chapter="intro"><span class="chap-num">00</span> Introduction &amp; Architecture</a>
+
+      <div class="chapter-group-title">Client-Facing Systems</div>
+      <a href="chapter-1-public-engine.html" class="chapter-link" data-chapter="chap1"><span class="chap-num">01</span> Public Website, Packages &amp; Holds</a>
+      <a href="chapter-2-client-journey.html" class="chapter-link" data-chapter="chap2"><span class="chap-num">02</span> Invoices, Contracts &amp; Portal</a>
+
+      <div class="chapter-group-title">Daily Operations</div>
+      <a href="chapter-3-today-command.html" class="chapter-link" data-chapter="chap3"><span class="chap-num">03</span> Today's Command Dashboard</a>
+      <a href="chapter-4-thunder-wire.html" class="chapter-link active" data-chapter="chap4"><span class="chap-num">04</span> Thunder Wire &amp; Broadcasting</a>
+      <a href="chapter-5-leads-crm.html" class="chapter-link" data-chapter="chap5"><span class="chap-num">05</span> Sales Pipeline &amp; Consultations</a>
+
+      <div class="chapter-group-title">Event Execution &amp; Gear</div>
+      <a href="chapter-6-gigs-runofshow.html" class="chapter-link" data-chapter="chap6"><span class="chap-num">06</span> Gigs Run-of-Show &amp; Requests</a>
+      <a href="chapter-7-gear-fleet.html" class="chapter-link" data-chapter="chap7"><span class="chap-num">07</span> Gear Fleet &amp; QR Scanner</a>
+
+      <div class="chapter-group-title">Media &amp; Automations</div>
+      <a href="chapter-8-thunder-crate.html" class="chapter-link" data-chapter="chap8"><span class="chap-num">08</span> Thunder Crate &amp; Music Engine</a>
+      <a href="chapter-9-automation-station.html" class="chapter-link" data-chapter="chap9"><span class="chap-num">09</span> Automation Station &amp; Daemons</a>
+      <a href="chapter-10-settings-security.html" class="chapter-link" data-chapter="chap10"><span class="chap-num">10</span> Settings, SMTP &amp; Security</a>
+    </nav>
+
+    <main class="manual-content">
+      <div class="manual-breadcrumbs">
+        <a href="index.html">Operations Manual</a>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span>Daily Operations</span>
+        <i class="fa-solid fa-chevron-right" style="font-size:0.65rem"></i>
+        <span style="color:var(--text-main)">Chapter 04: Thunder Wire &amp; Broadcasting</span>
+      </div>
+
+      <header class="chapter-header">
+        <div class="chapter-badge"><i class="fa-solid fa-bolt"></i> Chapter 04</div>
+        <h1 class="chapter-title">Thunder Wire &amp; Morning Show Broadcasting Intelligence</h1>
+        <p class="chapter-lead">Thunder Wire is our real-time entertainment journalism and morning show production suite. It powers our daily <code>#WAKEITUP</code> morning broadcast, keeping our DJs culturally sharp, informed, and ready to host high-engagement live streams.</p>
+      </header>
+
+      <section>
+        <h2><i class="fa-solid fa-radio cyan"></i> 1. The 5 Morning Show Story Blocks</h2>
+        <p>A professional morning radio or video broadcast cannot be disorganized banter. Thunder Wire automatically ingests, deduplicates, and categorizes trending entertainment news into <strong>5 structured show segments</strong>:</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/admin_wire_feed.png" alt="Thunder Wire Intelligence Feed and Show Curator">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 4.1</span>
+            <span>The Thunder Wire operational suite at <code>admin/wire.html</code>. Displays real-time ingested stories filtered by category, virality score, and verification status.</span>
+          </div>
+        </div>
+
+        <ol>
+          <li><strong>The Lead Story:</strong> Major headline industry news—groundbreaking festival announcements, record label shifts, historic Billboard milestones, and stadium tour announcements.</li>
+          <li><strong>The Shade:</strong> Pop culture debates, playful social media drama, celebrity feuds, and viral TikTok trends that drive caller discussion.</li>
+          <li><strong>Fresh Drops:</strong> Album reviews, surprise midnight EP drops, standout music videos, and newly signed underground talent.</li>
+          <li><strong>Wild World:</strong> Bizarre, humorous, and unbelievable news stories from across the globe that create laughter and comedic relief on air.</li>
+          <li><strong>Real Talk:</strong> Motivational community topics, mental health in the creative industry, financial literacy for artists, and local Oklahoma City spotlights.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-network-wired gold"></i> 2. The Serverless Ingestion Engine</h2>
+        <p>Behind the scenes, our Vercel serverless function (located at <code>/api/wire-scan</code>) continuously monitors high-authority industry RSS feeds including <strong>XXL Magazine, Billboard, AllHipHop, and HipHopDX</strong>:</p>
+        <ul>
+          <li><strong>Direct Server-Side Ingestion:</strong> By fetching feeds through our backend API, the system bypasses browser CORS restrictions and parses RSS/XML feeds in fractions of a second.</li>
+          <li><strong>Deduplication In-Memory:</strong> Stories covered by multiple outlets are deduplicated by target URL so our morning show dashboard remains clean and uncluttered.</li>
+          <li><strong>Virality &amp; Verification Tagging:</strong> Stories are indexed with an estimated Virality Score (1 to 100) and flagged as <code>confirmed</code>, <code>developing</code>, or <code>rumor</code> so hosts know how to frame the topic on air.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-video secondary"></i> 3. Live OBS Lower-Thirds Broadcast Overlay</h2>
+        <p>When broadcasting live to YouTube, Twitch, Facebook Live, or TikTok, hosts do not need to create manual graphics in Photoshop. Thunder House ENT includes a live, transparent browser source overlay located at <code>thunderhouseent.com/wire-overlay.html</code> (or <code>/obs</code>).</p>
+
+        <div class="manual-figure">
+          <div class="manual-figure-img-wrap">
+            <img src="assets/screenshots/wire_obs_overlay.png" alt="OBS Streamer Lower-Thirds Graphic Overlay">
+            <div class="figure-zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</div>
+          </div>
+          <div class="manual-caption">
+            <span class="caption-tag">Figure 4.2</span>
+            <span>The live OBS graphic overlay. Displays dynamic lower-third news tickers, host questions, and show block badges with a transparent background.</span>
+          </div>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-title"><i class="fa-solid fa-desktop"></i> How to Add to OBS Studio</div>
+          <p>Setting up the overlay in OBS Studio takes less than 30 seconds:</p>
+          <ol>
+            <li>In OBS Studio, click the <strong>+</strong> under <strong>Sources</strong> and select <strong>Browser</strong>.</li>
+            <li>Set the URL to <code>https://thunderhouseent.com/wire-overlay.html</code> (or <code>http://localhost:8080/wire-overlay.html</code> for local testing).</li>
+            <li>Set Width to <code>1920</code> and Height to <code>1080</code>. Check <strong>"Shutdown source when not visible"</strong>.</li>
+            <li>Click <strong>OK</strong>. As the host advances stories in <code>admin/wire.html</code>, the lower-third graphic automatically animates in real time!</li>
+          </ol>
+        </div>
+      </section>
+
+      <footer class="chapter-nav-footer">
+        <a href="chapter-3-today-command.html" class="chapter-nav-card">
+          <div class="chapter-nav-label">Previous Chapter</div>
+          <div class="chapter-nav-title"><i class="fa-solid fa-arrow-left"></i> 03. Today's Command Dashboard</div>
+        </a>
+        <a href="chapter-5-leads-crm.html" class="chapter-nav-card next">
+          <div class="chapter-nav-label">Next Chapter</div>
+          <div class="chapter-nav-title">05. Sales Pipeline, CRM &amp; Consultations <i class="fa-solid fa-arrow-right"></i></div>
+        </a>
+      </footer>
+    </main>
+  </div>
+
+  <script src="assets/manual.js"></script>
+</body>
+</html>
