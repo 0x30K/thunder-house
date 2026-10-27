@@ -309,3 +309,78 @@
   box-shadow: 0 0 12px currentColor;
   transform: scale(1.04);
 }
+
+/* Artist Social & Research Chips */
+.artist-research-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-top: 0.3rem;
+}
+
+.artist-chip {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.artist-chip.soundcloud {
+  background: rgba(255, 85, 0, 0.12);
+  color: #ff7733;
+  border-color: rgba(255, 85, 0, 0.3);
+}
+.artist-chip.soundcloud:hover {
+  background: #ff5500;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(255, 85, 0, 0.4);
+}
+
+.artist-chip.instagram {
+  background: rgba(225, 48, 108, 0.12);
+  color: #f43f5e;
+  border-color: rgba(225, 48, 108, 0.3);
+}
+.artist-chip.instagram:hover {
+  background: #e1306c;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(225, 48, 108, 0.4);
+}
+
+.artist-chip.website {
+  background: rgba(0, 229, 255, 0.1);
+  color: var(--cyber-cyan, #00e5ff);
+  border-color: rgba(0, 229, 255, 0.25);
+}
+.artist-chip.website:hover {
+  background: var(--cyber-cyan, #00e5ff);
+  color: #05070b;
+}
+
+.artist-chip.tiktok {
+  background: rgba(0, 242, 234, 0.1);
+  color: #38bdf8;
+  border-color: rgba(0, 242, 234, 0.25);
+}
+.artist-chip.tiktok:hover {
+  background: #00f2ea;
+  color: #000;
+}
+
+.artist-chip.youtube {
+  background: rgba(255, 0, 0, 0.1);
+  color: #ef4444;
+  border-color: rgba(255, 0, 0, 0.25);
+}
+.artist-chip.youtube:hover {
+  background: #ff0000;
+  color: #fff;
+}
+

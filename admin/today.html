@@ -390,6 +390,24 @@
         const hasClean = track.clean_downloaded;
         const hasDirty = track.dirty_downloaded;
 
+        const links = track.artist_links || {};
+        let chipsHtml = '';
+        if (links.soundcloud) {
+          chipsHtml += `<a href="${escapeHtml(links.soundcloud)}" target="_blank" class="artist-chip soundcloud" title="SoundCloud Profile / Tracks"><i class="fa-brands fa-soundcloud"></i> SoundCloud</a>`;
+        }
+        if (links.instagram) {
+          chipsHtml += `<a href="${escapeHtml(links.instagram)}" target="_blank" class="artist-chip instagram" title="Instagram"><i class="fa-brands fa-instagram"></i> IG</a>`;
+        }
+        if (links.website) {
+          chipsHtml += `<a href="${escapeHtml(links.website)}" target="_blank" class="artist-chip website" title="Official Website"><i class="fa-solid fa-globe"></i> Web</a>`;
+        }
+        if (links.tiktok) {
+          chipsHtml += `<a href="${escapeHtml(links.tiktok)}" target="_blank" class="artist-chip tiktok" title="TikTok"><i class="fa-brands fa-tiktok"></i> TikTok</a>`;
+        }
+        if (links.youtube) {
+          chipsHtml += `<a href="${escapeHtml(links.youtube)}" target="_blank" class="artist-chip youtube" title="YouTube Channel"><i class="fa-brands fa-youtube"></i> YouTube</a>`;
+        }
+
         return `
           <div class="row" style="padding:0.75rem 0.5rem; border-bottom:1px solid var(--border-subtle)">
             <div style="width:36px; height:36px; border-radius:8px; background:rgba(255,183,3,0.1); border:1px solid rgba(255,183,3,0.25); display:flex; align-items:center; justify-content:center; color:var(--accent-gold); flex-shrink:0">
@@ -401,8 +419,9 @@
                 <span class="pill" style="font-size:0.68rem; padding:0.15rem 0.45rem">${escapeHtml(track.genre || 'Hip-Hop')}</span>
                 ${track.release_date ? `<span class="small muted">· Drop: ${escapeHtml(track.release_date)}</span>` : ''}
               </div>
-              <div class="small muted" style="margin-top:0.15rem">
-                ${escapeHtml(track.artist)}
+              <div class="small muted" style="margin-top:0.2rem; display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap">
+                <span style="font-weight:600; color:#e2e8f0">${escapeHtml(track.artist)}</span>
+                ${chipsHtml ? `<div class="artist-research-chips">${chipsHtml}</div>` : ''}
               </div>
             </div>
 

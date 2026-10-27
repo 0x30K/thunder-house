@@ -95,6 +95,46 @@ def upload_to_supabase_vault(local_file, storage_path):
         log(f"Supabase storage upload error for {storage_path}: {e}", "WARN")
         return None
 
+def lookup_artist_research(artist_name):
+    """Scouts artist website, social media, and fallback SoundCloud profiles"""
+    clean_artist = re.sub(r'\s*(feat\.|ft\.|&).*$', '', artist_name, flags=re.IGNORECASE).strip()
+    links = {
+        'soundcloud': f'https://soundcloud.com/search/people?q={urllib.parse.quote(clean_artist)}'
+    }
+    try:
+        q = urllib.parse.quote(clean_artist)
+        url = f'https://musicbrainz.org/ws/2/artist/?query=artist:{q}&fmt=json&limit=1'
+        req = urllib.request.Request(url, headers={'User-Agent': 'ThunderHouseScout/2.0 (olifedigital@gmail.com)'})
+        with urllib.request.urlopen(req, timeout=6) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+            artists = data.get('artists', [])
+            if artists:
+                mbid = artists[0]['id']
+                rel_url = f'https://musicbrainz.org/ws/2/artist/{mbid}?inc=url-rels&fmt=json'
+                rel_req = urllib.request.Request(rel_url, headers={'User-Agent': 'ThunderHouseScout/2.0 (olifedigital@gmail.com)'})
+                with urllib.request.urlopen(rel_req, timeout=6) as rresp:
+                    rel_data = json.loads(rresp.read().decode('utf-8'))
+                    for rel in rel_data.get('relations', []):
+                        rtype = rel.get('type')
+                        target = rel.get('url', {}).get('resource')
+                        if not target: 
+                            continue
+                        if 'soundcloud.com' in target: 
+                            links['soundcloud'] = target
+                        elif 'instagram.com' in target: 
+                            links['instagram'] = target
+                        elif 'tiktok.com' in target: 
+                            links['tiktok'] = target
+                        elif 'twitter.com' in target or 'x.com' in target: 
+                            links['twitter'] = target
+                        elif rtype == 'official homepage': 
+                            links['website'] = target
+                        elif rtype == 'youtube': 
+                            links['youtube'] = target
+    except Exception as e:
+        pass
+    return links
+
 def purge_expired_cloud_streams():
     """Purges audio files older than 30 days from cloud storage to keep storage lean (<1GB)"""
     now_iso = datetime.now(timezone.utc).isoformat()
@@ -398,13 +438,17 @@ def run_scout_cycle(max_tracks=8):
         date_str = track["date_str"] # e.g. 10-23-2026
         log(f"Processing Drop: {track['artist']} - {track['title']} (Released: {date_str})")
 
+        # Scout artist research (Website, SoundCloud, Instagram, TikTok, etc.)
+        artist_links = lookup_artist_research(track["artist"])
+
         # Record as pending in Supabase
         inserted = supabase_request("thunderhouse_music_scout", method="POST", payload=[{
             "artist": track["artist"],
             "title": f"{track['title']} [{date_str}]",
             "genre": track["genre"],
             "release_date": date_str,
-            "status": "downloading"
+            "status": "downloading",
+            "artist_links": artist_links
         }])
         record_id = inserted[0]["id"] if inserted and len(inserted) > 0 else None
 
