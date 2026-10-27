@@ -308,6 +308,7 @@
         <button data-cat="wild"><i class="fa-solid fa-face-grin-squint"></i> Are You Out Your Mind?!</button>
         <button data-cat="realtalk"><i class="fa-solid fa-comments green"></i> Real Talk</button>
         <button data-cat="selected" style="border-left:1px solid var(--border-subtle)"><i class="fa-solid fa-star gold"></i> Selected (<span id="btn-badge-selected">0</span>)</button>
+        <button data-cat="archive" style="border-left:1px solid var(--border-subtle)"><i class="fa-solid fa-box-archive" style="color:#c084fc"></i> 30-Day Archive (<span id="btn-badge-archive">0</span>)</button>
       </div>
       <div class="search">
         <i class="fa-solid fa-magnifying-glass"></i>
@@ -574,6 +575,14 @@
     if (!window.supabaseClient) return;
 
     try {
+      if (window.ThunderWire && window.ThunderWire.maintainLifecycle) {
+        try {
+          await window.ThunderWire.maintainLifecycle();
+        } catch (mErr) {
+          console.warn('Lifecycle maintenance note:', mErr);
+        }
+      }
+
       if (window.ThunderWire && window.ThunderWire.getFeedTable) {
         activeFeedTable = await window.ThunderWire.getFeedTable();
       }
@@ -603,12 +612,22 @@
     }
   }
 
+  function isArchivedStory(s) {
+    if (s.is_archived === true) return true;
+    if (!s.published_at) return false;
+    const ageDays = (Date.now() - new Date(s.published_at).getTime()) / (1000 * 60 * 60 * 24);
+    return ageDays > 7;
+  }
+
   function renderStories() {
-    const total = feedStories.length;
-    const leads = feedStories.filter(s => s.category === 'lead').length;
-    const shade = feedStories.filter(s => s.category === 'shade').length;
-    const wild = feedStories.filter(s => s.category === 'wild').length;
-    const selected = feedStories.filter(s => s.selected_for_show).length;
+    const activeStories = feedStories.filter(s => !isArchivedStory(s));
+    const archivedStories = feedStories.filter(s => isArchivedStory(s));
+
+    const total = activeStories.length;
+    const leads = activeStories.filter(s => s.category === 'lead').length;
+    const shade = activeStories.filter(s => s.category === 'shade').length;
+    const wild = activeStories.filter(s => s.category === 'wild').length;
+    const selected = activeStories.filter(s => s.selected_for_show).length;
 
     document.getElementById('wire-total-count').textContent = total;
     document.getElementById('wire-lead-count').textContent = leads;
@@ -616,10 +635,17 @@
     document.getElementById('wire-wild-count').textContent = wild;
     document.getElementById('show-selected-count').textContent = selected;
     document.getElementById('btn-badge-selected').textContent = selected;
+    const archiveBadge = document.getElementById('btn-badge-archive');
+    if (archiveBadge) archiveBadge.textContent = archivedStories.length;
 
-    let filtered = feedStories.filter(s => {
-      if (activeCatFilter === 'selected' && !s.selected_for_show) return false;
-      if (activeCatFilter !== 'all' && activeCatFilter !== 'selected' && s.category !== activeCatFilter) return false;
+    const isArchiveView = (activeCatFilter === 'archive');
+    const sourcePool = isArchiveView ? archivedStories : activeStories;
+
+    let filtered = sourcePool.filter(s => {
+      if (!isArchiveView) {
+        if (activeCatFilter === 'selected' && !s.selected_for_show) return false;
+        if (activeCatFilter !== 'all' && activeCatFilter !== 'selected' && s.category !== activeCatFilter) return false;
+      }
       if (activeSearch) {
         const text = `${s.title || ''} ${s.summary || ''} ${s.source_name || ''} ${(s.tags || []).join(' ')}`.toLowerCase();
         if (!text.includes(activeSearch)) return false;
@@ -629,24 +655,62 @@
 
     const container = document.getElementById('wire-stories-container');
     if (filtered.length === 0) {
-      container.innerHTML = `
-        <div style="padding:2rem 0; text-align:center; grid-column:1/-1" class="muted small">
-          No stories found in this section. Hit "Wire Scan Now" to refresh the live feeds!
-        </div>
-      `;
+      if (isArchiveView) {
+        container.innerHTML = `
+          <div style="padding:3.5rem 1.5rem; text-align:center; grid-column:1/-1; background:rgba(18,24,38,0.4); border:1px dashed var(--border-subtle); border-radius:var(--radius-lg)">
+            <i class="fa-solid fa-box-archive" style="font-size:2.4rem; color:#c084fc; margin-bottom:0.85rem; display:block"></i>
+            <h3 style="margin:0 0 0.5rem 0; color:var(--text-main); font-size:1.15rem">30-Day Archive Is Empty</h3>
+            <p class="muted small" style="max-width:500px; margin:0 auto; line-height:1.6">
+              Stories remain on the active Thunder Wire for 1 week (7 days). Stories older than 7 days automatically move here for 30 days before being permanently deleted to optimize storage.
+            </p>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <div style="padding:2rem 0; text-align:center; grid-column:1/-1" class="muted small">
+            No stories found in this section. Hit "Wire Scan Now" to refresh the live feeds!
+          </div>
+        `;
+      }
       return;
     }
 
-    container.innerHTML = filtered.map(story => {
+    const bannerHtml = isArchiveView ? `
+      <div style="grid-column:1/-1; background:linear-gradient(90deg, rgba(168,85,247,0.12), rgba(0,229,255,0.06)); border:1px solid rgba(168,85,247,0.35); border-radius:var(--radius-md); padding:0.9rem 1.35rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:0.5rem">
+        <div style="display:flex; align-items:center; gap:0.75rem">
+          <i class="fa-solid fa-box-archive" style="color:#c084fc; font-size:1.25rem"></i>
+          <div>
+            <div style="font-size:0.88rem; font-weight:700; color:#f3e8ff">30-Day Storage Archive</div>
+            <div class="muted small" style="font-size:0.75rem">Stories move here after 7 days on the active wire and are permanently deleted after 30 days to conserve space.</div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.5rem">
+          <span class="pill pill-sm" style="background:rgba(168,85,247,0.25); color:#e9d5ff; border:1px solid rgba(168,85,247,0.4)">
+            <i class="fa-solid fa-layer-group"></i> ${archivedStories.length} In Archive
+          </span>
+        </div>
+      </div>
+    ` : '';
+
+    container.innerHTML = bannerHtml + filtered.map(story => {
       const isSelected = story.selected_for_show;
       const catPill = getCategoryPill(story.category);
       const heat = story.virality_score || 85;
+      const isArchived = isArchivedStory(story);
+
+      let ageBadge = '';
+      if (isArchived && story.published_at) {
+        const ageDays = Math.floor((Date.now() - new Date(story.published_at).getTime()) / (1000 * 60 * 60 * 24));
+        const daysLeft = Math.max(1, 30 - ageDays);
+        ageBadge = `<span class="pill pill-sm" style="background:rgba(168,85,247,0.22); color:#e9d5ff; border:1px solid rgba(168,85,247,0.4)"><i class="fa-solid fa-clock-rotate-left"></i> ${daysLeft}d left</span>`;
+      }
 
       return `
         <div class="story-card ${isSelected ? 'selected' : ''}" onclick="openStoryDrawer('${story.id}')">
           <div class="story-thumb" style="background-image: url('${escapeHtml(story.image_url || '')}')">
             <div class="story-meta-float">
               ${catPill}
+              ${ageBadge}
               <span class="pill pill-gold"><i class="fa-solid fa-fire"></i> Heat ${heat}</span>
             </div>
           </div>
@@ -678,8 +742,9 @@
     const drawerWrap = document.getElementById('story-drawer-wrap');
     drawerWrap.style.display = 'block';
 
+    const archiveNote = isArchivedStory(story) ? ' · 📦 Archived (Retained 30d)' : '';
     document.getElementById('sd-title').textContent = story.title;
-    document.getElementById('sd-source-meta').textContent = `${story.source_name} · ${story.published_at ? new Date(story.published_at).toLocaleDateString() : 'Today'}`;
+    document.getElementById('sd-source-meta').textContent = `${story.source_name} · ${story.published_at ? new Date(story.published_at).toLocaleDateString() : 'Today'}${archiveNote}`;
     document.getElementById('sd-source-link').href = story.source_url || '#';
     document.getElementById('sd-pill-heat').innerHTML = `<i class="fa-solid fa-fire"></i> Heat ${story.virality_score || 85}`;
 

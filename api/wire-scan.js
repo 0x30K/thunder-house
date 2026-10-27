@@ -72,6 +72,18 @@ module.exports = async (req, res) => {
       if (upsertRes.ok) {
         savedCount = finalItems.length;
       }
+
+      // Maintain 7-day archive and 30-day storage purge
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/rpc/maintain_thunderwire_lifecycle`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json'
+          }
+        });
+      } catch (lifecycleErr) {}
     } catch (dbErr) {
       console.warn('[Wire Scan] DB sync error:', dbErr.message);
     }

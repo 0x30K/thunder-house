@@ -101,7 +101,9 @@ window.ThunderWire = (function () {
           window.ThunderLogger.error('thunder_wire', `Feed error on ${f.name}: ${err.message}`);
         }
       }
-    }
+    try {
+      await maintainLifecycle();
+    } catch (e) {}
 
     return { totalDiscovered, newSaved };
   }
@@ -247,10 +249,55 @@ window.ThunderWire = (function () {
     return maps[cat] || maps.lead;
   }
 
+  /**
+   * Thunder Wire Lifecycle Maintenance:
+   * Stories stay on active wire for 7 days, move to 30-day archive, then purge after 30 days.
+   */
+  async function maintainLifecycle() {
+    if (!window.supabaseClient) return { archived: 0, deleted: 0 };
+    try {
+      const { data, error } = await window.supabaseClient.rpc('maintain_thunderwire_lifecycle');
+      if (!error && data) {
+        return {
+          archived: data.archived_count || 0,
+          deleted: data.deleted_count || 0,
+          executedAt: data.executed_at
+        };
+      }
+    } catch (e) {}
+
+    // Fallback direct table maintenance
+    try {
+      const table = await getFeedTable();
+      const now = new Date();
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+      // 1. Delete expired stories (>30 days)
+      const { data: delData } = await window.supabaseClient
+        .from(table)
+        .delete()
+        .lt('published_at', thirtyDaysAgo);
+
+      // 2. Mark stories older than 7 days as archived
+      await window.supabaseClient
+        .from(table)
+        .update({ is_archived: true })
+        .lt('published_at', sevenDaysAgo)
+        .or('is_archived.is.null,is_archived.eq.false');
+
+      return { success: true };
+    } catch (err) {
+      console.warn('[Thunder Wire] Lifecycle maintenance note:', err);
+      return { success: false };
+    }
+  }
+
   return {
     scanNow,
     classifyCategory,
-    getFeedTable
+    getFeedTable,
+    maintainLifecycle
   };
 })();
 

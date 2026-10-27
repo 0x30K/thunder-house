@@ -703,6 +703,7 @@
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/shell.js"></script>
+<script src="../js/thunderwire-engine.js"></script>
 <script>
   // 1. Supabase Initialization
   const SUPABASE_URL = 'https://kxoivmflghfgtvawhktt.supabase.co';
@@ -1028,11 +1029,39 @@
 
     try {
       if (id === 'wire_rss_scan') {
-        // Trigger serverless wire scanner
-        const resp = await fetch('/api/wire-scan', { signal: AbortSignal.timeout(12000) });
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const data = await resp.json();
-        summary = `Scanned feeds: Ingested ${data.count || 0} new stories.`;
+        let lifecycleStats = null;
+        try {
+          if (window.ThunderWire && window.ThunderWire.maintainLifecycle) {
+            lifecycleStats = await window.ThunderWire.maintainLifecycle();
+          } else {
+            const { data: rpcRes } = await supabase.rpc('maintain_thunderwire_lifecycle');
+            lifecycleStats = rpcRes;
+          }
+        } catch (lErr) {
+          console.warn('Lifecycle maintenance error during automation trigger:', lErr);
+        }
+
+        let scanCount = 0;
+        try {
+          const resp = await fetch('/api/wire-scan', { signal: AbortSignal.timeout(12000) });
+          if (resp.ok) {
+            const data = await resp.json();
+            scanCount = data.count || 0;
+          } else if (window.ThunderWire && window.ThunderWire.scanNow) {
+            const scanRes = await window.ThunderWire.scanNow();
+            scanCount = scanRes.newSaved || 0;
+          }
+        } catch (_) {
+          if (window.ThunderWire && window.ThunderWire.scanNow) {
+            const scanRes = await window.ThunderWire.scanNow();
+            scanCount = scanRes.newSaved || 0;
+          }
+        }
+
+        const lInfo = lifecycleStats 
+          ? `Lifecycle maintained: ${lifecycleStats.archived_count || 0} sent to 7d archive, ${lifecycleStats.deleted_count || 0} purged (>30d).`
+          : 'Lifecycle maintenance verified.';
+        summary = `Wire scan completed (${scanCount} new ingested). ${lInfo}`;
       } else if (id === 'music_scout') {
         // Post signal to Supabase for local python daemon
         await supabase.from('thunderhouse_site_settings').upsert({

@@ -1419,22 +1419,28 @@
         </div>
       `;
     } else {
-      container.innerHTML = checkedOutItems.map(item => `
+      container.innerHTML = checkedOutItems.map(item => {
+        const isBrandNew = item.condition === 'Brand New';
+        return `
         <div style="display:flex; align-items:center; justify-content:space-between; gap:0.65rem; padding:0.5rem 0.65rem; border-radius:6px; background:rgba(255,255,255,0.03); font-size:0.85rem">
           <label style="display:flex; align-items:center; gap:0.6rem; cursor:pointer; flex:1">
             <input type="checkbox" class="gci-item-checkbox" value="${item.id}" checked onchange="updateGigCheckinCount()">
             <div>
               <strong style="color:#fff">${escapeHtml(item.name)}</strong>
-              <div class="small muted">Barcode: <code>${escapeHtml(item.barcode)}</code> · Holder: ${escapeHtml(item.current_holder || 'DJ')}</div>
+              <div class="small muted">
+                Barcode: <code>${escapeHtml(item.barcode)}</code> · Holder: ${escapeHtml(item.current_holder || 'DJ')}
+                ${isBrandNew ? '<span class="pill pill-gold" style="font-size:0.68rem; padding:0.1rem 0.4rem; margin-left:0.35rem"><i class="fa-solid fa-sparkles"></i> Brand New → Promotes to Excellent</span>' : ''}
+              </div>
             </div>
           </label>
           <select class="input input-sm gci-item-condition" data-item-id="${item.id}" style="width:130px; font-size:0.75rem; padding:0.25rem 0.4rem">
-            <option value="Excellent">Excellent</option>
-            <option value="Good" selected>Good</option>
+            <option value="Excellent" selected>Excellent</option>
+            <option value="Good">Good</option>
             <option value="Needs Maintenance">Needs Maint</option>
           </select>
         </div>
-      `).join('');
+      `;
+      }).join('');
     }
 
     updateGigCheckinCount();
@@ -1735,10 +1741,15 @@
     const item = equipmentList.find(e => e.id === id);
     if (!item) return;
 
+    const isBrandNew = item.condition === 'Brand New';
+
     document.getElementById('ci-gear-id').value = item.id;
     document.getElementById('ci-gear-name').textContent = item.name;
-    document.getElementById('ci-gear-meta').textContent = `Checked out to ${item.current_holder || 'DJ'} for ${item.current_gig_name || 'Event'}`;
-    document.getElementById('ci-condition').value = item.condition || 'Excellent';
+    document.getElementById('ci-gear-meta').innerHTML = `
+      Checked out to ${escapeHtml(item.current_holder || 'DJ')} for ${escapeHtml(item.current_gig_name || 'Event')}
+      ${isBrandNew ? '<span class="pill pill-gold" style="font-size:0.7rem; margin-left:0.5rem"><i class="fa-solid fa-sparkles"></i> Brand New → Promotes to Excellent</span>' : ''}
+    `;
+    document.getElementById('ci-condition').value = isBrandNew ? 'Excellent' : (item.condition || 'Excellent');
     document.getElementById('ci-notes').value = '';
 
     document.getElementById('modal-checkin').style.display = 'flex';
@@ -2022,8 +2033,15 @@
 
       const checkedItems = Array.from(document.querySelectorAll('.gci-item-checkbox:checked')).map(cb => {
         const id = cb.value;
+        const currentItem = equipmentList.find(e => e.id === id);
         const condSelect = document.querySelector(`.gci-item-condition[data-item-id="${id}"]`);
-        const itemCond = condSelect ? condSelect.value : genCondition;
+        let itemCond = condSelect ? condSelect.value : genCondition;
+
+        // Rule: Equipment marked 'Brand New' automatically transitions to 'Excellent' once checked out and returned
+        if (currentItem && (currentItem.condition === 'Brand New' || itemCond === 'Brand New')) {
+          itemCond = (itemCond === 'Brand New' || itemCond === 'Excellent') ? 'Excellent' : itemCond;
+        }
+
         return { id, condition: itemCond };
       });
 
@@ -2140,8 +2158,14 @@
     document.getElementById('form-checkin')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const id = document.getElementById('ci-gear-id').value;
-      const condition = document.getElementById('ci-condition').value;
+      const currentItem = equipmentList.find(e => e.id === id);
+      let condition = document.getElementById('ci-condition').value;
       const notes = document.getElementById('ci-notes').value;
+
+      // Rule: Equipment marked 'Brand New' automatically transitions to 'Excellent' once checked out and returned
+      if (currentItem && (currentItem.condition === 'Brand New' || condition === 'Brand New')) {
+        condition = (condition === 'Brand New' || condition === 'Excellent') ? 'Excellent' : condition;
+      }
 
       const newStatus = condition === 'Needs Maintenance' ? 'In Maintenance' : 'Available in Studio';
 
