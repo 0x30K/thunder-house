@@ -205,6 +205,27 @@
       border: none;
     }
 
+    .quick-chip {
+      background: rgba(255, 183, 3, 0.12);
+      border: 1px solid rgba(255, 183, 3, 0.35);
+      color: var(--accent-gold);
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .quick-chip:hover {
+      background: rgba(255, 183, 3, 0.25);
+      transform: translateY(-1px);
+    }
+
     /* Pulse dot */
     .live-dot {
       width: 8px;
@@ -246,6 +267,18 @@
       <div class="corner br"></div>
     </div>
 
+    <!-- Camera Fallback Banner (when camera not available) -->
+    <div id="camera-fallback-msg" style="display:none; position:absolute; z-index:8; inset:0; background:rgba(7,9,14,0.92); flex-direction:column; align-items:center; justify-content:center; padding:2rem; text-align:center">
+      <i class="fa-solid fa-camera-rotate" style="font-size:2.8rem; color:var(--accent-gold); margin-bottom:1rem"></i>
+      <h3 style="font-size:1.15rem; margin-bottom:0.4rem; color:#fff">Camera Inactive or HTTPS Required</h3>
+      <p style="font-size:0.8rem; color:#94a3b8; max-width:280px; line-height:1.5; margin-bottom:1.25rem">
+        Use the quick-test buttons or manual barcode keyboard below to wirelessly transmit scans.
+      </p>
+      <button class="btn btn-gold" onclick="document.getElementById('manual-modal').style.display='flex'; document.getElementById('manual-barcode-input').focus();" style="font-size:0.85rem">
+        <i class="fa-solid fa-keyboard"></i> Open Barcode Keypad
+      </button>
+    </div>
+
     <!-- Aiming Guidance Text -->
     <div style="position:absolute; bottom:1.25rem; left:0; right:0; text-align:center; z-index:6; pointer-events:none">
       <span style="background:rgba(0,0,0,0.75); padding:6px 14px; border-radius:9999px; font-size:0.75rem; letter-spacing:0.04em; color:#cbd5e1; border:1px solid rgba(255,255,255,0.1)">
@@ -256,6 +289,19 @@
 
   <!-- Bottom Panel -->
   <div class="scanner-bottom-panel">
+    <!-- Quick Fleet Test Barcode Chips -->
+    <div style="margin-bottom:0.85rem">
+      <div style="font-size:0.72rem; color:#94a3b8; text-transform:uppercase; font-weight:700; margin-bottom:0.4rem; letter-spacing:0.5px">
+        Quick Test Fleet Barcodes
+      </div>
+      <div style="display:flex; gap:0.4rem; overflow-x:auto; padding-bottom:4px; scrollbar-width:none">
+        <button class="quick-chip" onclick="simulateScan('TH-EQ-001')">⚡ Deck A</button>
+        <button class="quick-chip" onclick="simulateScan('TH-EQ-002')">⚡ Deck B</button>
+        <button class="quick-chip" onclick="simulateScan('TH-EQ-004')">⚡ QSC Speaker</button>
+        <button class="quick-chip" onclick="simulateScan('TH-EQ-006')">⚡ Subwoofer</button>
+      </div>
+    </div>
+
     <!-- Last Scanned Banner -->
     <div id="last-scanned-container" style="display:none">
       <div class="last-scan-card">
@@ -458,10 +504,16 @@
         onScanSuccess,
         onScanFailure
       ).catch(err => {
-        console.error("Camera start failed:", err);
-        alert("Camera permission required: " + err);
+        console.warn("Camera start failed (using fallback input mode):", err);
+        const fallbackMsg = document.getElementById('camera-fallback-msg');
+        if (fallbackMsg) fallbackMsg.style.display = 'flex';
       });
     }
+
+    // Expose for quick-test chips
+    window.simulateScan = function(code) {
+      onScanSuccess(code);
+    };
 
     // Triggered when a QR code sticker is successfully recognized
     async function onScanSuccess(decodedText) {
@@ -510,11 +562,27 @@
       // Normal per-frame no-code match; keep silent
     }
 
-    function showScannedCard(code) {
+    async function showScannedCard(code) {
       const container = document.getElementById('last-scanned-container');
       const title = document.getElementById('scanned-code-title');
+      const status = document.getElementById('scanned-code-status');
       container.style.display = 'block';
       title.textContent = code;
+      status.textContent = 'Transmitted to Studio Desktop';
+
+      if (window.supabaseClient) {
+        try {
+          const { data } = await window.supabaseClient
+            .from('thunderhouse_equipment')
+            .select('item_name, status, condition')
+            .eq('barcode', code)
+            .maybeSingle();
+          if (data && data.item_name) {
+            title.textContent = `${data.item_name}`;
+            status.textContent = `[${code}] • ${data.status.toUpperCase()} • ${data.condition || 'Good'}`;
+          }
+        } catch (e) {}
+      }
     }
 
     function setupControls() {
