@@ -13,4 +13,6 @@ Thumbs.db
 agent/
 skills-lock.json
 supabase/.temp/
-
+# Python cache
+__pycache__/
+*.py[cod]

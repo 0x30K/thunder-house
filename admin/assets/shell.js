@@ -30,6 +30,7 @@
     { id: 'analytics', href: 'analytics.html', icon: 'fa-chart-line', label: 'Website Analytics', gold: true },
     { id: 'clients', href: 'clients.html', icon: 'fa-users', label: 'Clients CRM' },
     { id: 'money', href: 'money.html', icon: 'fa-chart-column', label: 'Money Analytics' },
+    { id: 'automations', href: 'automations.html', icon: 'fa-robot', label: 'Automation Station', gold: true },
     { id: 'settings', href: 'settings.html', icon: 'fa-gear', label: 'Settings' }
   ];
 

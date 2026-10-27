@@ -135,23 +135,63 @@ def lookup_artist_research(artist_name):
         pass
     return links
 
+def log_automation_execution(automation_id, status, summary, duration_ms=0):
+    """Records execution run in public.thunderhouse_automation_logs and updates thunderhouse_automations"""
+    try:
+        now_iso = datetime.now(timezone.utc).isoformat()
+        supabase_request(f"thunderhouse_automations?id=eq.{automation_id}", method="PATCH", payload={
+            "last_run_at": now_iso,
+            "last_run_status": status,
+            "last_run_summary": summary,
+            "last_duration_ms": duration_ms,
+            "updated_at": now_iso
+        })
+        supabase_request("thunderhouse_automation_logs", method="POST", payload={
+            "automation_id": automation_id,
+            "status": status,
+            "summary": summary,
+            "duration_ms": duration_ms,
+            "triggered_by": "python_daemon"
+        })
+    except Exception as e:
+        log(f"Error logging automation status: {e}", "WARN")
+
 def purge_expired_cloud_streams():
     """Purges audio files older than 30 days from cloud storage to keep storage lean (<1GB)"""
-    now_iso = datetime.now(timezone.utc).isoformat()
+    auto_purge = supabase_request("thunderhouse_automations?id=eq.cloud_stream_purge&select=enabled")
+    if auto_purge and len(auto_purge) > 0 and not auto_purge[0].get("enabled", True):
+        log("Cloud stream purge is PAUSED in Automation Station. Skipping purge check.", "INFO")
+        return
+
+    start_t = time.time()
+    now_iso = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     expired = supabase_request(f"thunderhouse_music_scout?status=eq.downloaded&expires_at=lt.{now_iso}&select=id,title,clean_storage_path,dirty_storage_path")
     if not expired:
+        log_automation_execution("cloud_stream_purge", "success", "Audited cloud vault: All current streams within 30-day window (0 purged).", int((time.time() - start_t) * 1000))
         return
     log(f"Found {len(expired)} expired drops (30+ days old). Purging cloud audio cache...")
     for track in expired:
-        # Mark as archived in database
         supabase_request(f"thunderhouse_music_scout?id=eq.{track['id']}", method="PATCH", payload={
             "status": "archived",
             "archived_at": now_iso
         })
         log(f"Track {track.get('title')} transitioned to permanent local archive.", "INFO")
 
+    summary = f"Audited cloud vault: Pruned {len(expired)} streams older than 30 days to free space."
+    log_automation_execution("cloud_stream_purge", "success", summary, int((time.time() - start_t) * 1000))
+
 def get_settings():
-    """Retrieve music scout settings from Supabase or defaults"""
+    """Retrieve music scout settings from Automation Station in Supabase or defaults"""
+    auto_data = supabase_request("thunderhouse_automations?id=eq.music_scout&select=*")
+    if auto_data and len(auto_data) > 0:
+        row = auto_data[0]
+        cfg = row.get("config") or {}
+        return {
+            "enabled": row.get("enabled", True),
+            "scout_time": row.get("schedule_time") or "06:00",
+            "save_folder": row.get("target_folder") or DEFAULT_SAVE_FOLDER,
+            "auto_archive": cfg.get("auto_archive", True)
+        }
     data = supabase_request("thunderhouse_site_settings?key=eq.music_scout_settings&select=*")
     if data and len(data) > 0 and data[0].get("value"):
         return data[0]["value"]
@@ -400,9 +440,10 @@ def archive_previous_week_music(music_root=DEFAULT_MUSIC_ROOT, save_folder=DEFAU
 
 def run_scout_cycle(max_tracks=8):
     """Main scouting and ingestion pass for fresh 24-72h drops"""
+    start_time = time.time()
     settings = get_settings()
     if not settings.get("enabled", True):
-        log("Music Scout Engine is currently disabled in Settings. Skipping run.")
+        log("Music Scout Engine is currently PAUSED in Automation Station. Skipping run.")
         return
 
     save_folder = settings.get("save_folder", DEFAULT_SAVE_FOLDER)
@@ -483,7 +524,10 @@ def run_scout_cycle(max_tracks=8):
         download_count += 1
         time.sleep(2)  # respectful delay between YouTube requests
 
-    log(f"Scout pass finished. {download_count} new track pairs processed.")
+    duration_ms = int((time.time() - start_time) * 1000)
+    summary = f"Scout pass finished: {download_count} new drops processed, Clean/Dirty pairs tagged, and pushed to cloud vault."
+    log(summary)
+    log_automation_execution("music_scout", "success", summary, duration_ms)
 
 def main():
     if "--archive-now" in sys.argv:

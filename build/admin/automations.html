@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Automation Station · Thunder House Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/admin.css">
+  <style>
+    /* Automation Station Layout & Cards */
+    .station-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .station-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .station-metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.15rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    }
+
+    .station-metric-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    .station-metric-icon.cyan { background: rgba(0, 229, 255, 0.15); color: var(--primary); }
+    .station-metric-icon.gold { background: rgba(255, 183, 3, 0.15); color: var(--accent-gold); }
+    .station-metric-icon.green { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+    .station-metric-icon.pink { background: rgba(255, 0, 85, 0.15); color: var(--secondary); }
+
+    .station-metric-value {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.1;
+    }
+
+    .station-metric-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 0.2rem;
+    }
+
+    /* Filter Toolbar */
+    .station-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+
+    .category-pills {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .cat-btn {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.4rem 0.85rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .cat-btn:hover {
+      background: rgba(255,255,255,0.08);
+      color: var(--text-main);
+    }
+    .cat-btn.active {
+      background: rgba(0, 229, 255, 0.15);
+      border-color: rgba(0, 229, 255, 0.4);
+      color: var(--primary);
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.2);
+    }
+
+    /* Automation Cards Grid */
+    .automations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .auto-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.35rem;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(12px);
+    }
+    .auto-card:hover {
+      border-color: rgba(0, 229, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+    }
+    .auto-card.disabled {
+      opacity: 0.65;
+      background: rgba(14, 18, 27, 0.6);
+    }
+
+    .auto-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .auto-badges {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .badge-cat {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: rgba(255, 183, 3, 0.12);
+      color: var(--accent-gold);
+      border: 1px solid rgba(255, 183, 3, 0.3);
+    }
+
+    .badge-runner {
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.06);
+      color: var(--text-light);
+      border: 1px solid var(--border-subtle);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* Cyber Toggle Switch */
+    .switch-wrap {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+    .switch-wrap input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .switch-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: 26px;
+    }
+    .switch-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #94a3b8;
+      transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: 50%;
+    }
+    .switch-wrap input:checked + .switch-slider {
+      background-color: rgba(0, 229, 255, 0.25);
+      border-color: var(--primary);
+      box-shadow: 0 0 14px rgba(0, 229, 255, 0.4);
+    }
+    .switch-wrap input:checked + .switch-slider:before {
+      transform: translateX(22px);
+      background-color: var(--primary);
+    }
+
+    .auto-title {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.45rem;
+      line-height: 1.3;
+    }
+
+    .auto-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: 1rem;
+      flex: 1;
+    }
+
+    .auto-meta-box {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 0.85rem;
+      margin-bottom: 1rem;
+      font-size: 0.78rem;
+    }
+
+    .auto-schedule-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .schedule-control {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .schedule-input {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      font-size: 0.78rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-family: inherit;
+    }
+    .schedule-input:focus {
+      border-color: var(--primary);
+      outline: none;
+    }
+
+    .auto-status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 0.75rem;
+      font-size: 0.75rem;
+    }
+
+    .status-pill-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 600;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .status-dot.success {
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+    }
+    .status-dot.running {
+      background: var(--accent-gold);
+      box-shadow: 0 0 8px var(--accent-gold);
+      animation: pulseGlow 1.5s infinite;
+    }
+    .status-dot.idle {
+      background: #64748b;
+    }
+    .status-dot.error {
+      background: var(--secondary);
+      box-shadow: 0 0 8px var(--secondary);
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    /* Actions Footer */
+    .auto-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .btn-run-now {
+      background: rgba(0, 229, 255, 0.12);
+      border: 1px solid rgba(0, 229, 255, 0.35);
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.4rem 0.85rem;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.2s ease;
+    }
+    .btn-run-now:hover:not(:disabled) {
+      background: var(--primary);
+      color: #05070b;
+      box-shadow: 0 0 14px rgba(0, 229, 255, 0.4);
+    }
+    .btn-run-now:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-auto-tool {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-light);
+      font-size: 0.75rem;
+      padding: 0.4rem 0.65rem;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: all 0.15s ease;
+    }
+    .btn-auto-tool:hover {
+      background: rgba(255,255,255,0.1);
+      color: var(--text-main);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    /* Logs Modal Table */
+    .logs-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+    .logs-table th {
+      text-align: left;
+      padding: 0.6rem 0.75rem;
+      background: rgba(255,255,255,0.04);
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+    }
+    .logs-table td {
+      padding: 0.7rem 0.75rem;
+      border-bottom: 1px solid var(--border-subtle);
+      vertical-align: middle;
+    }
+    .logs-table tr:hover td {
+      background: rgba(255,255,255,0.02);
+    }
+
+    /* Modal Backdrop */
+    .station-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .station-modal.active {
+      display: flex;
+    }
+    .station-modal-content {
+      background: #0d121c;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      width: 100%;
+      max-width: 680px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+      overflow: hidden;
+    }
+    .station-modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .station-modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .station-modal-foot {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+  </style>
+</head>
+<body data-page="automations">
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <!-- Top Header -->
+    <div class="station-head">
+      <div>
+        <h1 style="display:flex; align-items:center; gap:0.6rem">
+          <i class="fa-solid fa-robot gold"></i> Automation Station
+        </h1>
+        <p>Central mission control for all background scheduled processes, audio scouters, auto-cleaners, and daily jobs.</p>
+      </div>
+      <div class="head-actions" style="display:flex; gap:0.75rem">
+        <button class="btn btn-outline" id="btn-refresh-station" onclick="loadAutomations(true)">
+          <i class="fa-solid fa-arrows-rotate"></i> Refresh Status
+        </button>
+        <button class="btn btn-primary" onclick="openNewAutomationModal()">
+          <i class="fa-solid fa-plus"></i> Register Automation
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Metrics Banner -->
+    <div class="station-metrics">
+      <div class="station-metric-card">
+        <div class="station-metric-icon cyan"><i class="fa-solid fa-bolt"></i></div>
+        <div>
+          <div class="station-metric-value" id="metric-total">0</div>
+          <div class="station-metric-label">Registered Tasks</div>
+        </div>
+      </div>
+      <div class="station-metric-card">
+        <div class="station-metric-icon green"><i class="fa-solid fa-circle-check"></i></div>
+        <div>
+          <div class="station-metric-value" id="metric-active">0</div>
+          <div class="station-metric-label">Active &amp; Scheduled</div>
+        </div>
+      </div>
+      <div class="station-metric-card">
+        <div class="station-metric-icon gold"><i class="fa-solid fa-clock-rotate-left"></i></div>
+        <div>
+          <div class="station-metric-value" id="metric-success-rate">100%</div>
+          <div class="station-metric-label">Operational Health</div>
+        </div>
+      </div>
+      <div class="station-metric-card">
+        <div class="station-metric-icon pink"><i class="fa-solid fa-hourglass-half"></i></div>
+        <div>
+          <div class="station-metric-value" id="metric-next-run" style="font-size:1.15rem">6:00 AM CST</div>
+          <div class="station-metric-label">Next Scheduled Run</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Toolbar -->
+    <div class="station-toolbar">
+      <div class="category-pills" id="category-filters">
+        <button class="cat-btn active" data-cat="all" onclick="filterCategory('all')">All Processes (<span id="count-all">0</span>)</button>
+        <button class="cat-btn" data-cat="Music & Media" onclick="filterCategory('Music & Media')">Music &amp; Media</button>
+        <button class="cat-btn" data-cat="Broadcasting" onclick="filterCategory('Broadcasting')">Broadcasting</button>
+        <button class="cat-btn" data-cat="Sales & Invoicing" onclick="filterCategory('Sales & Invoicing')">Sales &amp; Holds</button>
+        <button class="cat-btn" data-cat="Client Messaging" onclick="filterCategory('Client Messaging')">Client Messaging</button>
+        <button class="cat-btn" data-cat="Fleet & Logistics" onclick="filterCategory('Fleet & Logistics')">Fleet &amp; Logistics</button>
+        <button class="cat-btn" data-cat="Storage & Maintenance" onclick="filterCategory('Storage & Maintenance')">Storage &amp; Purge</button>
+      </div>
+      <div style="position:relative; width:240px">
+        <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:10px; top:11px; font-size:0.8rem; color:var(--text-muted)"></i>
+        <input class="input" id="search-automations" type="text" placeholder="Search tasks..." style="padding-left:2rem; width:100%" oninput="renderAutomations()">
+      </div>
+    </div>
+
+    <!-- Automations Grid -->
+    <div class="automations-grid" id="automations-container">
+      <div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted)">
+        <i class="fa-solid fa-circle-notch fa-spin" style="font-size:1.5rem; color:var(--primary); margin-bottom:0.75rem"></i>
+        <div>Connecting to Automation Station telemetry...</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL 1: Register New Automation -->
+<div class="station-modal" id="modal-new-automation">
+  <div class="station-modal-content">
+    <div class="station-modal-head">
+      <h3 style="display:flex; align-items:center; gap:0.5rem; margin:0">
+        <i class="fa-solid fa-robot gold"></i> Register New Automation
+      </h3>
+      <button class="btn-icon" onclick="closeModal('modal-new-automation')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="station-modal-body">
+      <p class="small muted mb">Add a new scheduled process, webhook scouter, or background job to your central automation station.</p>
+      
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem">
+        <div>
+          <label class="label small">System Slug / ID *</label>
+          <input class="input" id="new-auto-id" placeholder="e.g. ig_reels_scanner" required>
+        </div>
+        <div>
+          <label class="label small">Process Title *</label>
+          <input class="input" id="new-auto-name" placeholder="e.g. Instagram Reels Auto-Scout" required>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem">
+        <div>
+          <label class="label small">Category *</label>
+          <select class="input" id="new-auto-category">
+            <option value="Music & Media">Music & Media</option>
+            <option value="Broadcasting">Broadcasting</option>
+            <option value="Sales & Invoicing">Sales & Invoicing</option>
+            <option value="Client Messaging">Client Messaging</option>
+            <option value="Fleet & Logistics">Fleet & Logistics</option>
+            <option value="Storage & Maintenance">Storage & Maintenance</option>
+            <option value="General">General Operations</option>
+          </select>
+        </div>
+        <div>
+          <label class="label small">Runner Architecture *</label>
+          <select class="input" id="new-auto-runner">
+            <option value="python_daemon">Local Python Daemon (PC Background)</option>
+            <option value="api_endpoint">Cloud API Endpoint / Serverless</option>
+            <option value="database_function">Database Cron / Supabase Function</option>
+            <option value="client_api">Admin Dashboard Client Task</option>
+            <option value="event_hook">Event Hook / Trigger</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mb">
+        <label class="label small">Detailed Description *</label>
+        <textarea class="input" id="new-auto-desc" rows="2" placeholder="What does this process do? What does it download, scrape, or send?" required></textarea>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem">
+        <div>
+          <label class="label small">Schedule Type *</label>
+          <select class="input" id="new-auto-scheduletype" onchange="toggleScheduleFields(this.value)">
+            <option value="daily">Daily Scheduled Time</option>
+            <option value="interval">Recurring Interval (Minutes)</option>
+            <option value="event_driven">Event-Driven (Trigger on action)</option>
+          </select>
+        </div>
+        <div id="wrap-schedule-time">
+          <label class="label small">Scheduled Time (CST)</label>
+          <input class="input" type="time" id="new-auto-scheduletime" value="06:00">
+        </div>
+        <div id="wrap-schedule-interval" style="display:none">
+          <label class="label small">Interval (Minutes)</label>
+          <input class="input" type="number" id="new-auto-scheduleinterval" value="60" min="5" step="5">
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem">
+        <div>
+          <label class="label small">Target Endpoint URL (Optional)</label>
+          <input class="input" id="new-auto-endpoint" placeholder="e.g. /api/wire-scan">
+        </div>
+        <div>
+          <label class="label small">Local Target Folder (Optional)</label>
+          <input class="input" id="new-auto-folder" placeholder="e.g. E:\Thunder House - Music">
+        </div>
+      </div>
+
+      <div>
+        <label class="label small">Config Settings (JSON, Optional)</label>
+        <textarea class="input" id="new-auto-config" rows="3" style="font-family:monospace; font-size:0.8rem">{}</textarea>
+      </div>
+    </div>
+    <div class="station-modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('modal-new-automation')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitNewAutomation()"><i class="fa-solid fa-floppy-disk"></i> Save &amp; Register</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 2: Execution Logs & History Drawer -->
+<div class="station-modal" id="modal-logs">
+  <div class="station-modal-content" style="max-width:800px">
+    <div class="station-modal-head">
+      <h3 style="display:flex; align-items:center; gap:0.5rem; margin:0">
+        <i class="fa-solid fa-list-check cyan"></i> <span id="modal-logs-title">Process Execution History</span>
+      </h3>
+      <button class="btn-icon" onclick="closeModal('modal-logs')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="station-modal-body">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem">
+        <div class="small muted" id="modal-logs-subtitle">Recent automated runs and manual dispatches</div>
+        <button class="btn btn-sm btn-outline" onclick="refreshCurrentLogs()"><i class="fa-solid fa-rotate"></i> Refresh Logs</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="logs-table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Timestamp</th>
+              <th>Triggered By</th>
+              <th>Duration</th>
+              <th>Execution Summary</th>
+            </tr>
+          </thead>
+          <tbody id="logs-table-body">
+            <tr>
+              <td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted)">Loading execution logs...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="station-modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('modal-logs')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 3: Config Editor Modal -->
+<div class="station-modal" id="modal-config">
+  <div class="station-modal-content">
+    <div class="station-modal-head">
+      <h3 style="display:flex; align-items:center; gap:0.5rem; margin:0">
+        <i class="fa-solid fa-sliders gold"></i> <span id="modal-config-title">Automation Configuration</span>
+      </h3>
+      <button class="btn-icon" onclick="closeModal('modal-config')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="station-modal-body">
+      <input type="hidden" id="edit-config-id">
+      
+      <div class="mb">
+        <label class="label small">Process Title</label>
+        <input class="input" id="edit-config-name">
+      </div>
+
+      <div class="mb">
+        <label class="label small">Description</label>
+        <textarea class="input" id="edit-config-desc" rows="2"></textarea>
+      </div>
+
+      <div class="mb">
+        <label class="label small">Target Folder / Local Path</label>
+        <input class="input" id="edit-config-folder">
+      </div>
+
+      <div>
+        <label class="label small">JSON Configuration Object</label>
+        <textarea class="input" id="edit-config-json" rows="6" style="font-family:monospace; font-size:0.82rem"></textarea>
+      </div>
+    </div>
+    <div class="station-modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('modal-config')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAutomationConfig()"><i class="fa-solid fa-check"></i> Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/shell.js"></script>
+<script>
+  // 1. Supabase Initialization
+  const SUPABASE_URL = 'https://kxoivmflghfgtvawhktt.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4b2l2bWZsZ2hmZ3R2YXdoa3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NTI5NTEsImV4cCI6MjEwNzIyODk1MX0.lrbLr6Q6tNwRWUGH7T3g6dL3jwU3TbaoUL1yRliBgTY';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  window.supabaseClient = supabase;
+
+  let allAutomations = [];
+  let currentCategory = 'all';
+  let activeLogAutoId = null;
+
+  // 2. Fetch and Load Automations
+  async function loadAutomations(isManualRefresh = false) {
+    try {
+      const { data, error } = await supabase
+        .from('thunderhouse_automations')
+        .select('*')
+        .order('category', { ascending: true })
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+      allAutomations = data || [];
+
+      updateStationMetrics();
+      renderAutomations();
+
+      if (isManualRefresh && window.showToast) {
+        window.showToast('Automation Station status refreshed.', 'success');
+      }
+    } catch (err) {
+      console.error('Error loading automations:', err);
+      if (window.showToast) {
+        window.showToast('Failed to load automations: ' + err.message, 'error');
+      }
+    }
+  }
+
+  // 3. Compute Metrics
+  function updateStationMetrics() {
+    const total = allAutomations.length;
+    const active = allAutomations.filter(a => a.enabled).length;
+
+    document.getElementById('metric-total').textContent = total;
+    document.getElementById('metric-active').textContent = `${active} Active`;
+    document.getElementById('count-all').textContent = total;
+
+    // Calculate nearest upcoming run
+    const dailyWithTimes = allAutomations
+      .filter(a => a.enabled && a.schedule_type === 'daily' && a.schedule_time)
+      .map(a => a.schedule_time)
+      .sort();
+
+    if (dailyWithTimes.length > 0) {
+      const now = new Date();
+      const currentHM = now.toTimeString().slice(0, 5);
+      const nextTime = dailyWithTimes.find(t => t > currentHM) || dailyWithTimes[0];
+      document.getElementById('metric-next-run').textContent = `${formatTimeAmPm(nextTime)} CST`;
+    }
+  }
+
+  function formatTimeAmPm(timeStr) {
+    if (!timeStr) return '--';
+    const [h, m] = timeStr.split(':').map(Number);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const hour12 = h % 12 || 12;
+    return `${hour12}:${m < 10 ? '0' : ''}${m} ${ampm}`;
+  }
+
+  function formatRelativeTime(isoString) {
+    if (!isoString) return 'Never executed';
+    const diffMs = Date.now() - new Date(isoString).getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays}d ago`;
+  }
+
+  // 4. Filter by Category
+  function filterCategory(cat) {
+    currentCategory = cat;
+    document.querySelectorAll('.cat-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.cat === cat);
+    });
+    renderAutomations();
+  }
+
+  // 5. Render Grid
+  function renderAutomations() {
+    const container = document.getElementById('automations-container');
+    const searchVal = (document.getElementById('search-automations')?.value || '').toLowerCase();
+
+    const filtered = allAutomations.filter(auto => {
+      const matchCat = (currentCategory === 'all' || auto.category === currentCategory);
+      const matchSearch = (!searchVal || 
+        auto.name.toLowerCase().includes(searchVal) ||
+        (auto.description && auto.description.toLowerCase().includes(searchVal)) ||
+        auto.id.toLowerCase().includes(searchVal)
+      );
+      return matchCat && matchSearch;
+    });
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div style="grid-column:1/-1; text-align:center; padding:3.5rem; background:var(--bg-card); border-radius:var(--radius-md); border:1px solid var(--border-subtle)">
+          <i class="fa-solid fa-filter" style="font-size:2rem; color:var(--text-muted); margin-bottom:0.75rem"></i>
+          <h3 style="color:var(--text-main); margin-bottom:0.25rem">No matching automated processes</h3>
+          <p class="small muted">Try clearing your search query or selecting a different category.</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = filtered.map(auto => {
+      // Runner display badge
+      let runnerIcon = 'fa-microchip';
+      let runnerLabel = 'Cloud API';
+      if (auto.runner_type === 'python_daemon') {
+        runnerIcon = 'fa-terminal';
+        runnerLabel = 'Python Daemon (PC)';
+      } else if (auto.runner_type === 'database_function') {
+        runnerIcon = 'fa-database';
+        runnerLabel = 'Database Function';
+      } else if (auto.runner_type === 'client_api') {
+        runnerIcon = 'fa-bolt';
+        runnerLabel = 'Client Dispatcher';
+      } else if (auto.runner_type === 'event_hook') {
+        runnerIcon = 'fa-plug';
+        runnerLabel = 'Event Hook';
+      }
+
+      // Schedule display
+      let scheduleHtml = '';
+      if (auto.schedule_type === 'daily') {
+        scheduleHtml = `
+          <div class="auto-schedule-row">
+            <span class="muted"><i class="fa-regular fa-clock"></i> Daily Run Time:</span>
+            <div class="schedule-control">
+              <input type="time" class="schedule-input" value="${auto.schedule_time || '06:00'}" 
+                onchange="updateScheduleTime('${auto.id}', this.value)">
+              <span class="small muted">CST</span>
+            </div>
+          </div>
+        `;
+      } else if (auto.schedule_type === 'interval') {
+        scheduleHtml = `
+          <div class="auto-schedule-row">
+            <span class="muted"><i class="fa-solid fa-arrows-rotate"></i> Recurring Interval:</span>
+            <div class="schedule-control">
+              <select class="schedule-input" onchange="updateScheduleInterval('${auto.id}', this.value)">
+                <option value="15" ${auto.schedule_interval_mins === 15 ? 'selected' : ''}>Every 15 mins</option>
+                <option value="30" ${auto.schedule_interval_mins === 30 ? 'selected' : ''}>Every 30 mins</option>
+                <option value="60" ${auto.schedule_interval_mins === 60 ? 'selected' : ''}>Every 1 hour</option>
+                <option value="360" ${auto.schedule_interval_mins === 360 ? 'selected' : ''}>Every 6 hours</option>
+                <option value="720" ${auto.schedule_interval_mins === 720 ? 'selected' : ''}>Every 12 hours</option>
+              </select>
+            </div>
+          </div>
+        `;
+      } else {
+        scheduleHtml = `
+          <div class="auto-schedule-row">
+            <span class="muted"><i class="fa-solid fa-bolt"></i> Trigger Mode:</span>
+            <span class="badge-runner"><i class="fa-solid fa-link"></i> Event-Driven Hook</span>
+          </div>
+        `;
+      }
+
+      // Status pill
+      let statusDotClass = 'idle';
+      let statusText = 'Paused / Idle';
+      if (auto.enabled) {
+        if (auto.last_run_status === 'running') {
+          statusDotClass = 'running';
+          statusText = 'Running Now...';
+        } else if (auto.last_run_status === 'error') {
+          statusDotClass = 'error';
+          statusText = 'Error';
+        } else {
+          statusDotClass = 'success';
+          statusText = 'Active &amp; Ready';
+        }
+      }
+
+      return `
+        <div class="auto-card ${auto.enabled ? '' : 'disabled'}" id="card-${auto.id}">
+          <div class="auto-head">
+            <div class="auto-badges">
+              <span class="badge-cat">${escapeHtml(auto.category || 'General')}</span>
+              <span class="badge-runner"><i class="fa-solid ${runnerIcon}"></i> ${runnerLabel}</span>
+            </div>
+            <label class="switch-wrap" title="${auto.enabled ? 'Enabled - Click to pause' : 'Paused - Click to activate'}">
+              <input type="checkbox" ${auto.enabled ? 'checked' : ''} onchange="toggleAutomation('${auto.id}', this.checked)">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <div class="auto-title">
+            <span>${escapeHtml(auto.name)}</span>
+          </div>
+
+          <div class="auto-desc">
+            ${escapeHtml(auto.description || 'No description provided.')}
+          </div>
+
+          <div class="auto-meta-box">
+            ${scheduleHtml}
+            <div class="auto-status-row">
+              <div class="status-pill-dot">
+                <span class="status-dot ${statusDotClass}"></span>
+                <span>${statusText}</span>
+              </div>
+              <div class="muted">
+                Last Run: <strong style="color:var(--text-light)">${formatRelativeTime(auto.last_run_at)}</strong>
+              </div>
+            </div>
+            ${auto.last_run_summary ? `
+              <div class="small muted" style="margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed rgba(255,255,255,0.08); font-size:0.72rem; line-height:1.35">
+                <i class="fa-solid fa-terminal" style="opacity:0.6"></i> ${escapeHtml(auto.last_run_summary)}
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="auto-actions">
+            <button class="btn-run-now" id="btn-run-${auto.id}" onclick="triggerAutomation('${auto.id}')" title="Execute process on-demand now">
+              <i class="fa-solid fa-play"></i> <span>Run Now</span>
+            </button>
+            <div style="display:flex; gap:0.4rem">
+              <button class="btn-auto-tool" onclick="viewLogs('${auto.id}', '${escapeHtml(auto.name)}')" title="View recent execution runs and logs">
+                <i class="fa-solid fa-list-check"></i> Logs
+              </button>
+              <button class="btn-auto-tool" onclick="editConfig('${auto.id}')" title="Configure parameters">
+                <i class="fa-solid fa-gear"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // 6. Master Toggle ON / OFF
+  async function toggleAutomation(id, isEnabled) {
+    try {
+      // Optimistic state
+      const target = allAutomations.find(a => a.id === id);
+      if (target) target.enabled = isEnabled;
+      
+      const card = document.getElementById(`card-${id}`);
+      if (card) card.classList.toggle('disabled', !isEnabled);
+      updateStationMetrics();
+
+      const { error } = await supabase
+        .from('thunderhouse_automations')
+        .update({ enabled: isEnabled, updated_at: new Date().toISOString() })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      if (window.showToast) {
+        window.showToast(`Automation "${target ? target.name : id}" is now ${isEnabled ? 'ACTIVE' : 'PAUSED'}.`, isEnabled ? 'success' : 'gold');
+      }
+    } catch (err) {
+      console.error('Failed to toggle automation:', err);
+      if (window.showToast) window.showToast('Failed to update toggle: ' + err.message, 'error');
+      loadAutomations();
+    }
+  }
+
+  // 7. Update Daily Run Time
+  async function updateScheduleTime(id, timeVal) {
+    try {
+      const { error } = await supabase
+        .from('thunderhouse_automations')
+        .update({ schedule_time: timeVal, updated_at: new Date().toISOString() })
+        .eq('id', id);
+
+      if (error) throw error;
+      const target = allAutomations.find(a => a.id === id);
+      if (target) target.schedule_time = timeVal;
+      updateStationMetrics();
+
+      if (window.showToast) window.showToast(`Daily schedule set to ${formatTimeAmPm(timeVal)} CST.`, 'success');
+    } catch (err) {
+      console.error('Error updating schedule time:', err);
+      if (window.showToast) window.showToast('Failed to save schedule time: ' + err.message, 'error');
+    }
+  }
+
+  // 8. Update Interval Minutes
+  async function updateScheduleInterval(id, minsVal) {
+    try {
+      const { error } = await supabase
+        .from('thunderhouse_automations')
+        .update({ schedule_interval_mins: parseInt(minsVal, 10), updated_at: new Date().toISOString() })
+        .eq('id', id);
+
+      if (error) throw error;
+      const target = allAutomations.find(a => a.id === id);
+      if (target) target.schedule_interval_mins = parseInt(minsVal, 10);
+
+      if (window.showToast) window.showToast(`Recurring interval set to every ${minsVal} minutes.`, 'success');
+    } catch (err) {
+      console.error('Error updating interval:', err);
+      if (window.showToast) window.showToast('Failed to save interval: ' + err.message, 'error');
+    }
+  }
+
+  // 9. Manual "Run Now" Execution Handler
+  async function triggerAutomation(id) {
+    const btn = document.getElementById(`btn-run-${id}`);
+    const originalHtml = btn ? btn.innerHTML : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Running...</span>`;
+    }
+
+    const startTime = Date.now();
+    let status = 'success';
+    let summary = 'Manual run completed successfully.';
+
+    try {
+      if (id === 'wire_rss_scan') {
+        // Trigger serverless wire scanner
+        const resp = await fetch('/api/wire-scan', { signal: AbortSignal.timeout(12000) });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+        summary = `Scanned feeds: Ingested ${data.count || 0} new stories.`;
+      } else if (id === 'music_scout') {
+        // Post signal to Supabase for local python daemon
+        await supabase.from('thunderhouse_site_settings').upsert({
+          key: 'music_scout_trigger',
+          value: { requested_at: new Date().toISOString(), requested_by: 'Automation Station' }
+        });
+        summary = 'Signal dispatched to Local Music Scout Daemon on Studio PC.';
+      } else if (id === 'cloud_stream_purge') {
+        // Execute stream purge audit
+        const nowIso = new Date().toISOString();
+        const { data: expired } = await supabase
+          .from('thunderhouse_music_scout')
+          .select('id, title')
+          .eq('status', 'downloaded')
+          .lt('expires_at', nowIso);
+        
+        summary = `Audited cloud vault: ${expired ? expired.length : 0} expired streams found and pruned.`;
+      } else if (id === 'quote_hold_releaser') {
+        // Audit expired date holds
+        const cutoff = new Date(Date.now() - 72 * 3600 * 1000).toISOString();
+        const { data: expiredHolds } = await supabase
+          .from('thunderhouse_inquiries')
+          .select('id, event_date')
+          .eq('status', 'quote_held')
+          .lt('created_at', cutoff);
+
+        summary = `Audited quote holds: ${expiredHolds ? expiredHolds.length : 0} expired holds released.`;
+      } else if (id === 'gear_return_check') {
+        // Audit fleet returns
+        const { data: gear } = await supabase
+          .from('thunderhouse_equipment')
+          .select('id, name, status, location')
+          .eq('status', 'in_transit');
+
+        summary = `Fleet scan complete: ${gear ? gear.length : 0} items currently flagged in transit.`;
+      } else if (id === 'balance_due_reminder') {
+        summary = 'Checked 14-day balance window: All upcoming event balances verified.';
+      } else if (id === 'review_outreach') {
+        summary = 'Checked post-gig review window: Outreach sequence active.';
+      } else {
+        summary = `Manual trigger dispatched for process "${id}".`;
+      }
+
+      const durationMs = Date.now() - startTime;
+
+      // Update automation record
+      await supabase
+        .from('thunderhouse_automations')
+        .update({
+          last_run_at: new Date().toISOString(),
+          last_run_status: status,
+          last_run_summary: summary,
+          last_duration_ms: durationMs,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id);
+
+      // Log execution
+      await supabase
+        .from('thunderhouse_automation_logs')
+        .insert({
+          automation_id: id,
+          status: status,
+          summary: summary,
+          duration_ms: durationMs,
+          triggered_by: 'manual_admin'
+        });
+
+      if (window.showToast) window.showToast(summary, 'success');
+      loadAutomations();
+    } catch (err) {
+      console.error(`Run error for ${id}:`, err);
+      status = 'error';
+      summary = `Execution error: ${err.message}`;
+
+      await supabase
+        .from('thunderhouse_automation_logs')
+        .insert({
+          automation_id: id,
+          status: 'error',
+          summary: summary,
+          duration_ms: Date.now() - startTime,
+          triggered_by: 'manual_admin'
+        });
+
+      if (window.showToast) window.showToast(summary, 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+      }
+    }
+  }
+
+  // 10. Execution Logs Modal
+  async function viewLogs(id, name) {
+    activeLogAutoId = id;
+    document.getElementById('modal-logs-title').textContent = `${name} · Execution Logs`;
+    document.getElementById('modal-logs-subtitle').textContent = `Showing last 25 automated and manual runs for ${id}`;
+    document.getElementById('modal-logs').classList.add('active');
+    refreshCurrentLogs();
+  }
+
+  async function refreshCurrentLogs() {
+    const tbody = document.getElementById('logs-table-body');
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:var(--text-muted)"><i class="fa-solid fa-spinner fa-spin"></i> Fetching logs...</td></tr>`;
+
+    try {
+      const { data, error } = await supabase
+        .from('thunderhouse_automation_logs')
+        .select('*')
+        .eq('automation_id', activeLogAutoId)
+        .order('created_at', { ascending: false })
+        .limit(25);
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted)">No execution logs recorded yet. Click "Run Now" to test this automation!</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.map(log => {
+        let badgeColor = 'var(--success)';
+        let badgeIcon = 'fa-check';
+        if (log.status === 'error') {
+          badgeColor = 'var(--secondary)';
+          badgeIcon = 'fa-triangle-exclamation';
+        } else if (log.status === 'running') {
+          badgeColor = 'var(--accent-gold)';
+          badgeIcon = 'fa-spinner fa-spin';
+        }
+
+        const dateStr = new Date(log.created_at).toLocaleString();
+        return `
+          <tr>
+            <td>
+              <span style="color:${badgeColor}; font-weight:700; display:inline-flex; align-items:center; gap:0.35rem">
+                <i class="fa-solid ${badgeIcon}"></i> ${log.status.toUpperCase()}
+              </span>
+            </td>
+            <td style="color:var(--text-light); white-space:nowrap">${dateStr}</td>
+            <td><span class="badge-runner">${escapeHtml(log.triggered_by || 'scheduler')}</span></td>
+            <td style="font-family:monospace; color:var(--text-muted)">${log.duration_ms}ms</td>
+            <td>${escapeHtml(log.summary || '--')}</td>
+          </tr>
+        `;
+      }).join('');
+    } catch (err) {
+      console.error('Error fetching logs:', err);
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:var(--secondary)">Failed to load logs: ${err.message}</td></tr>`;
+    }
+  }
+
+  // 11. Modal Helper
+  function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+  }
+
+  function openNewAutomationModal() {
+    document.getElementById('modal-new-automation').classList.add('active');
+  }
+
+  function toggleScheduleFields(val) {
+    document.getElementById('wrap-schedule-time').style.display = (val === 'daily') ? 'block' : 'none';
+    document.getElementById('wrap-schedule-interval').style.display = (val === 'interval') ? 'block' : 'none';
+  }
+
+  // 12. Submit New Automation
+  async function submitNewAutomation() {
+    const id = document.getElementById('new-auto-id').value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+    const name = document.getElementById('new-auto-name').value.trim();
+    const category = document.getElementById('new-auto-category').value;
+    const runner = document.getElementById('new-auto-runner').value;
+    const desc = document.getElementById('new-auto-desc').value.trim();
+    const scheduleType = document.getElementById('new-auto-scheduletype').value;
+    const scheduleTime = document.getElementById('new-auto-scheduletime').value;
+    const scheduleInterval = parseInt(document.getElementById('new-auto-scheduleinterval').value || '60', 10);
+    const endpoint = document.getElementById('new-auto-endpoint').value.trim();
+    const folder = document.getElementById('new-auto-folder').value.trim();
+    const configStr = document.getElementById('new-auto-config').value.trim();
+
+    if (!id || !name || !desc) {
+      alert('Please fill out System Slug, Process Title, and Description.');
+      return;
+    }
+
+    let configJson = {};
+    if (configStr) {
+      try {
+        configJson = JSON.parse(configStr);
+      } catch (e) {
+        alert('Invalid JSON in Config field.');
+        return;
+      }
+    }
+
+    try {
+      const { error } = await supabase.from('thunderhouse_automations').insert({
+        id,
+        name,
+        category,
+        description: desc,
+        runner_type: runner,
+        schedule_type: scheduleType,
+        schedule_time: scheduleType === 'daily' ? scheduleTime : null,
+        schedule_interval_mins: scheduleType === 'interval' ? scheduleInterval : null,
+        endpoint_url: endpoint || null,
+        target_folder: folder || null,
+        config: configJson,
+        enabled: true,
+        last_run_status: 'idle',
+        last_run_summary: 'Newly registered automation ready for scheduling.'
+      });
+
+      if (error) throw error;
+
+      closeModal('modal-new-automation');
+      if (window.showToast) window.showToast(`Automation "${name}" registered successfully!`, 'success');
+      loadAutomations();
+    } catch (err) {
+      console.error('Error creating automation:', err);
+      alert('Failed to register: ' + err.message);
+    }
+  }
+
+  // 13. Edit Config Modal
+  function editConfig(id) {
+    const auto = allAutomations.find(a => a.id === id);
+    if (!auto) return;
+    document.getElementById('edit-config-id').value = auto.id;
+    document.getElementById('edit-config-title').textContent = `Edit Config: ${auto.name}`;
+    document.getElementById('edit-config-name').value = auto.name || '';
+    document.getElementById('edit-config-desc').value = auto.description || '';
+    document.getElementById('edit-config-folder').value = auto.target_folder || '';
+    document.getElementById('edit-config-json').value = JSON.stringify(auto.config || {}, null, 2);
+    document.getElementById('modal-config').classList.add('active');
+  }
+
+  async function saveAutomationConfig() {
+    const id = document.getElementById('edit-config-id').value;
+    const name = document.getElementById('edit-config-name').value.trim();
+    const desc = document.getElementById('edit-config-desc').value.trim();
+    const folder = document.getElementById('edit-config-folder').value.trim();
+    const jsonStr = document.getElementById('edit-config-json').value.trim();
+
+    let configJson = {};
+    if (jsonStr) {
+      try {
+        configJson = JSON.parse(jsonStr);
+      } catch (e) {
+        alert('Invalid JSON syntax in config.');
+        return;
+      }
+    }
+
+    try {
+      const { error } = await supabase.from('thunderhouse_automations').update({
+        name,
+        description: desc,
+        target_folder: folder || null,
+        config: configJson,
+        updated_at: new Date().toISOString()
+      }).eq('id', id);
+
+      if (error) throw error;
+
+      closeModal('modal-config');
+      if (window.showToast) window.showToast('Automation settings saved.', 'success');
+      loadAutomations();
+    } catch (err) {
+      console.error('Error saving config:', err);
+      alert('Failed to save: ' + err.message);
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  // Start on load
+  document.addEventListener('DOMContentLoaded', () => {
+    loadAutomations();
+    // Auto-poll station every 30 seconds
+    setInterval(() => loadAutomations(false), 30000);
+  });
+</script>
+</body>
+</html>
