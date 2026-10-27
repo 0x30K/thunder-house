@@ -131,6 +131,178 @@
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.4; transform: scale(0.85); }
     }
+    /* Gig Cards & Staging Grid */
+    .gear-gigs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.15rem;
+    }
+    .gig-card {
+      position: relative;
+      background: linear-gradient(135deg, rgba(18, 24, 38, 0.95), rgba(10, 14, 24, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 1.25rem 1.35rem 1.15rem;
+      overflow: hidden;
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+    .gig-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--primary);
+      box-shadow: 0 12px 30px rgba(0, 229, 255, 0.12), 0 0 0 1px rgba(0, 229, 255, 0.25);
+    }
+    .gig-card.has-checked-out {
+      border-color: rgba(255, 183, 3, 0.35);
+    }
+    .gig-card.has-checked-out:hover {
+      border-color: var(--accent-gold);
+      box-shadow: 0 12px 30px rgba(255, 183, 3, 0.18), 0 0 0 1px rgba(255, 183, 3, 0.35);
+    }
+    .gig-card.is-done {
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+    .gig-card.is-done:hover {
+      border-color: var(--success);
+      box-shadow: 0 12px 30px rgba(16, 185, 129, 0.18), 0 0 0 1px rgba(16, 185, 129, 0.35);
+    }
+    .gig-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.85rem;
+    }
+    .gig-card-date {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .gig-card-title {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 1.15rem;
+      line-height: 1.25;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+    .gig-card-subtitle {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-bottom: 0.75rem;
+    }
+    .gig-card-meta {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.45rem;
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 0.65rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      margin-bottom: 0.95rem;
+    }
+    .gig-card-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .gig-card-meta-row i {
+      width: 14px;
+      color: var(--accent-gold);
+      text-align: center;
+      font-size: 0.8rem;
+    }
+    .gig-gear-status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      padding: 0.45rem 0.7rem;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      margin-bottom: 0.85rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .gig-hover-action-bar {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: auto;
+    }
+    .gig-action-btn {
+      width: 100%;
+      padding: 0.65rem 1rem;
+      font-family: var(--font-heading);
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.25s ease;
+    }
+    .gig-action-btn.btn-checkout-cta {
+      background: linear-gradient(135deg, rgba(255, 183, 3, 0.18), rgba(255, 136, 0, 0.22));
+      color: var(--accent-gold);
+      border: 1px solid rgba(255, 183, 3, 0.35);
+    }
+    .gig-card:hover .gig-action-btn.btn-checkout-cta {
+      background: linear-gradient(135deg, #ffb703, #ff8800);
+      color: #000;
+      box-shadow: 0 4px 18px rgba(255, 183, 3, 0.4);
+      transform: scale(1.02);
+    }
+    .gig-action-btn.btn-checkin-cta {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(16, 185, 129, 0.2));
+      color: var(--primary);
+      border: 1px solid rgba(0, 229, 255, 0.35);
+    }
+    .gig-card:hover .gig-action-btn.btn-checkin-cta {
+      background: linear-gradient(135deg, #00e5ff, #10b981);
+      color: #000;
+      box-shadow: 0 4px 18px rgba(0, 229, 255, 0.4);
+      transform: scale(1.02);
+    }
+    .gig-action-btn.btn-blocked-cta {
+      background: rgba(255, 255, 255, 0.04);
+      color: #94a3b8;
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      cursor: not-allowed;
+    }
+    .gig-card:hover .gig-action-btn.btn-blocked-cta {
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      border-color: rgba(255, 183, 3, 0.35);
+    }
+    .gig-hover-hint {
+      font-size: 0.73rem;
+      text-align: center;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+      opacity: 0.85;
+      transition: opacity 0.2s ease;
+    }
+    .gig-card:hover .gig-hover-hint {
+      opacity: 1;
+    }
     @media (max-width: 900px) {
       .gear-table, .gear-table tbody, .gear-table tr, .gear-table td {
         display: block;
@@ -159,9 +331,12 @@
     <!-- Page Header -->
     <div class="page-head">
       <div>
-        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.35rem">
+        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.35rem; flex-wrap:wrap">
           <span class="pill pill-gold" style="font-size:0.75rem"><i class="fa-solid fa-boxes-stacked"></i> DJ Equipment Fleet</span>
           <span id="superuser-gear-badge" class="pill pill-gold" style="font-size:0.75rem; display:none"><i class="fa-solid fa-crown"></i> Superuser Controls</span>
+          <button id="btn-toggle-role-view" class="pill" style="font-size:0.75rem; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); color:#cbd5e1" onclick="toggleRolePreview()" title="Click to test as Superuser or Staff / Employee">
+            <i class="fa-solid fa-user-shield"></i> Mode: <strong id="role-view-text" style="color:var(--accent-gold)">Superuser</strong> <i class="fa-solid fa-repeat" style="font-size:0.65rem; margin-left:3px"></i>
+          </button>
         </div>
         <h1>Equipment Fleet & Studio Inventory</h1>
         <p>Road-ready DJ decks, sound systems, wireless mics, and lighting. Scan QR codes with your mobile phone.</p>
@@ -224,6 +399,48 @@
         <div class="small muted" style="margin-top:0.25rem">Needs inspection or cables</div>
       </div>
     </div>
+
+    <!-- Active & Upcoming Gigs Section -->
+    <section id="gear-gigs-section" class="card mb" style="padding:1.25rem 1.35rem; position:relative">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.15rem; flex-wrap:wrap; gap:0.75rem">
+        <div style="display:flex; align-items:center; gap:0.75rem">
+          <div class="gear-icon-box" style="width:40px; height:40px; font-size:1.1rem; background:rgba(255,183,3,0.12); color:var(--accent-gold); border-color:rgba(255,183,3,0.3)">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <div>
+            <div style="display:flex; align-items:center; gap:0.6rem">
+              <h2 style="font-size:1.15rem; font-family:var(--font-heading); font-weight:800; color:#fff; margin:0">Current &amp; Upcoming Gigs</h2>
+              <span id="gigs-count-badge" class="pill pill-gold" style="font-size:0.72rem; padding:0.15rem 0.55rem">Loading Gigs...</span>
+            </div>
+            <div class="small muted" style="margin-top:0.15rem">Gig equipment staging · Click card to start check out or check in based on gig timing &amp; staff role</div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.5rem">
+          <button class="btn btn-sm btn-ghost" id="btn-toggle-demo-empty" onclick="toggleDemoEmptyState()" title="Preview Empty Gigs State" style="font-size:0.78rem">
+            <i class="fa-regular fa-eye-slash"></i> Test Empty State
+          </button>
+          <button class="btn btn-sm btn-outline" id="btn-refresh-gigs" onclick="loadGigs()" title="Refresh Gigs">
+            <i class="fa-solid fa-arrows-rotate"></i> Refresh Gigs
+          </button>
+        </div>
+      </div>
+
+      <!-- Grid of Gig Cards -->
+      <div id="gigs-cards-grid" class="gear-gigs-grid">
+        <!-- Injected dynamically via JS -->
+      </div>
+
+      <!-- Empty State (Shown when 0 gigs exist) -->
+      <div id="gigs-empty-state" style="display:none; text-align:center; padding:3.5rem 1.5rem; background:rgba(255,255,255,0.015); border:1px dashed var(--border-subtle); border-radius:var(--radius-md)">
+        <div style="width:58px; height:58px; border-radius:50%; background:rgba(255,255,255,0.03); display:inline-flex; align-items:center; justify-content:center; margin-bottom:1rem; border:1px solid rgba(255,255,255,0.08)">
+          <i class="fa-solid fa-calendar-xmark" style="font-size:1.65rem; color:var(--text-muted); opacity:0.6"></i>
+        </div>
+        <h3 style="font-size:1.05rem; font-weight:700; color:#fff; margin-bottom:0.35rem">No Current Gigs Scheduled</h3>
+        <p class="small muted" style="max-width:460px; margin:0 auto; line-height:1.55">
+          All DJ decks, speakers, and wireless audio equipment are currently accounted for and racked in the studio. When event bookings or rehearsals are confirmed, interactive gig cards will appear here.
+        </p>
+      </div>
+    </section>
 
     <!-- Filter & Search Toolbar -->
     <div class="card mb" style="padding:1rem 1.25rem">
@@ -555,6 +772,160 @@
   </div>
 </div>
 
+<!-- =========================================================================
+     MODAL 7: GIG BATCH CHECK OUT
+     ========================================================================= -->
+<div id="modal-gig-checkout" class="modal-scrim" style="display:none">
+  <div class="modal-box" style="max-width:620px; max-height:90vh; display:flex; flex-direction:column">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem">
+      <div class="label" style="font-size:0.95rem">
+        <i class="fa-solid fa-truck-ramp-box gold"></i> Start Gig Check Out
+      </div>
+      <button class="btn btn-icon" id="btn-close-gig-checkout-modal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Gig Info Banner -->
+    <div style="background:rgba(255,183,3,0.08); border:1px solid rgba(255,183,3,0.25); border-radius:10px; padding:0.9rem 1.1rem; margin-bottom:1.15rem">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem">
+        <div>
+          <strong id="gco-client-name" style="font-size:1.05rem; color:#fff">Alexander Vance</strong>
+          <div class="small text-light" id="gco-event-type" style="margin-top:0.15rem">Wedding Reception</div>
+          <div class="small muted" id="gco-venue" style="margin-top:0.25rem"><i class="fa-solid fa-location-dot gold"></i> The Skirvin Hilton</div>
+        </div>
+        <div style="text-align:right">
+          <span class="pill pill-gold" id="gco-date">Nov 20, 2026</span>
+          <div class="small muted" id="gco-timing" style="margin-top:0.35rem">Load-in: 3:30 PM</div>
+        </div>
+      </div>
+    </div>
+
+    <form id="form-gig-checkout" style="display:flex; flex-direction:column; flex:1; overflow:hidden">
+      <input type="hidden" id="gco-gig-id">
+      
+      <div style="overflow-y:auto; padding-right:4px; flex:1; margin-bottom:1rem">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem">
+          <div class="field">
+            <label>Assigned DJ / Staff Custodian *</label>
+            <input class="input" id="gco-holder" required placeholder="e.g. DJ Marcus">
+          </div>
+          <div class="field">
+            <label>Expected Studio Return</label>
+            <input class="input" type="datetime-local" id="gco-return-time">
+          </div>
+        </div>
+
+        <!-- Gear Selection Header & Quick Selectors -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem">
+          <label style="margin:0; font-weight:700">Select Studio Gear to Check Out:</label>
+          <div style="display:flex; gap:0.4rem">
+            <button type="button" class="btn btn-sm btn-ghost" id="btn-gco-select-all" style="font-size:0.75rem">Select All</button>
+            <button type="button" class="btn btn-sm btn-ghost" id="btn-gco-select-rec" style="font-size:0.75rem; color:var(--primary)">Recommended</button>
+            <button type="button" class="btn btn-sm btn-ghost" id="btn-gco-deselect" style="font-size:0.75rem">Clear</button>
+          </div>
+        </div>
+
+        <!-- Scrollable Gear Items List -->
+        <div id="gco-gear-list" style="display:flex; flex-direction:column; gap:0.45rem; background:rgba(0,0,0,0.25); border:1px solid var(--border-subtle); border-radius:8px; padding:0.65rem; max-height:220px; overflow-y:auto">
+          <!-- Injected via JS -->
+        </div>
+
+        <div class="field" style="margin-top:0.85rem">
+          <label>Check-Out Notes (Flight cases, accessories, cables)</label>
+          <input class="input" id="gco-notes" placeholder="e.g. Flight case latched, fresh batteries in mic transmitter, power cords packed">
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; padding-top:0.75rem; border-top:1px solid var(--border-subtle)">
+        <span class="small muted"><span id="gco-selected-count">0</span> items selected for gig</span>
+        <div style="display:flex; gap:0.5rem">
+          <button type="button" class="btn" id="btn-cancel-gig-checkout">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-gig-checkout" style="background:linear-gradient(135deg, #ffb703, #ff8800); color:#000; border:none; font-weight:700">
+            <i class="fa-solid fa-truck-ramp-box"></i> Confirm Gig Check Out
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- =========================================================================
+     MODAL 8: GIG BATCH CHECK IN / RETURN
+     ========================================================================= -->
+<div id="modal-gig-checkin" class="modal-scrim" style="display:none">
+  <div class="modal-box" style="max-width:620px; max-height:90vh; display:flex; flex-direction:column">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem">
+      <div class="label" style="font-size:0.95rem">
+        <i class="fa-solid fa-box-open green"></i> Start Gig Check In
+      </div>
+      <button class="btn btn-icon" id="btn-close-gig-checkin-modal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Gig Info Banner -->
+    <div style="background:rgba(0,229,255,0.08); border:1px solid rgba(0,229,255,0.25); border-radius:10px; padding:0.9rem 1.1rem; margin-bottom:1.15rem">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem">
+        <div>
+          <strong id="gci-client-name" style="font-size:1.05rem; color:#fff">Alexander Vance</strong>
+          <div class="small text-light" id="gci-event-type" style="margin-top:0.15rem">Wedding Reception</div>
+          <div class="small muted" id="gci-venue" style="margin-top:0.25rem"><i class="fa-solid fa-location-dot cyan"></i> The Skirvin Hilton</div>
+        </div>
+        <div style="text-align:right">
+          <span class="pill pill-green" id="gci-date">Nov 20, 2026</span>
+          <div id="gci-override-badge" class="small gold" style="display:none; margin-top:0.35rem">
+            <i class="fa-solid fa-crown"></i> Superuser Early Check-In
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form id="form-gig-checkin" style="display:flex; flex-direction:column; flex:1; overflow:hidden">
+      <input type="hidden" id="gci-gig-id">
+
+      <div style="overflow-y:auto; padding-right:4px; flex:1; margin-bottom:1rem">
+        <!-- Return Gear List Header -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem">
+          <label style="margin:0; font-weight:700">Equipment Returning to Studio:</label>
+          <span class="small muted" id="gci-items-count-text">0 items checked out</span>
+        </div>
+
+        <!-- Scrollable Checked Out List -->
+        <div id="gci-gear-list" style="display:flex; flex-direction:column; gap:0.45rem; background:rgba(0,0,0,0.25); border:1px solid var(--border-subtle); border-radius:8px; padding:0.65rem; max-height:220px; overflow-y:auto">
+          <!-- Injected via JS -->
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-top:0.85rem">
+          <div class="field">
+            <label>General Return Condition *</label>
+            <select class="input" id="gci-condition">
+              <option value="Excellent">Excellent · 100% Functional &amp; Clean</option>
+              <option value="Good">Good · Normal gig wear</option>
+              <option value="Needs Maintenance">Needs Maintenance · Bench inspect</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Receiving Staff Member</label>
+            <input class="input" id="gci-staff-name" placeholder="Studio Staff">
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:0.5rem">
+          <label>Return Notes (Cables, packing condition, studio rack)</label>
+          <input class="input" id="gci-notes" placeholder="e.g. All gear returned to studio racks. Cables coiled &amp; tested.">
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; padding-top:0.75rem; border-top:1px solid var(--border-subtle)">
+        <span class="small muted"><span id="gci-selected-count">0</span> items returning to studio</span>
+        <div style="display:flex; gap:0.5rem">
+          <button type="button" class="btn" id="btn-cancel-gig-checkin">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-gig-checkin" style="background:linear-gradient(135deg, #00e5ff, #10b981); color:#000; border:none; font-weight:700">
+            <i class="fa-solid fa-box-open"></i> Check In to Studio
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- Print-only CSS -->
 <style media="print">
   body * { visibility: hidden; }
@@ -587,10 +958,12 @@
 <!-- Equipment Master Controller Script -->
 <script>
   let equipmentList = [];
+  let currentGigs = [];
   let currentFilter = 'all';
   let activeSessionId = null;
   let sessionChannel = null;
   let isSuperuser = false;
+  let demoEmptyState = false;
 
   document.addEventListener('DOMContentLoaded', async () => {
     // Generate or restore pairing session ID
@@ -607,6 +980,7 @@
 
     // Initial data load
     await loadEquipment();
+    await loadGigs();
 
     // Start background session listener
     initScannerSessionListener();
@@ -616,18 +990,466 @@
   });
 
   function checkUserRole() {
-    const userRole = window.currentStaffUser?.role || 'staff';
-    const email = window.currentStaffUser?.email || '';
-    isSuperuser = (userRole === 'superuser' || email.includes('olifedigital') || email.includes('owner') || window.location.hostname === 'localhost');
+    const roleOverride = sessionStorage.getItem('th_gear_role_override');
+    if (roleOverride) {
+      isSuperuser = (roleOverride === 'superuser');
+    } else {
+      const userRole = window.currentStaffUser?.role || 'staff';
+      const email = window.currentStaffUser?.email || '';
+      isSuperuser = (userRole === 'superuser' || email.includes('olifedigital') || email.includes('owner') || window.location.hostname === 'localhost');
+    }
 
     const superBadge = document.getElementById('superuser-gear-badge');
     const addBtn = document.getElementById('btn-add-equipment');
-    if (isSuperuser) {
-      if (superBadge) superBadge.style.display = 'inline-flex';
-      if (addBtn) addBtn.style.display = 'inline-flex';
+    const roleViewText = document.getElementById('role-view-text');
+    if (roleViewText) {
+      roleViewText.textContent = isSuperuser ? 'Superuser' : 'Staff DJ (Employee)';
+      roleViewText.style.color = isSuperuser ? 'var(--accent-gold)' : 'var(--primary)';
     }
-    // Re-render table to display Superuser edit buttons if applicable
+
+    if (superBadge) superBadge.style.display = isSuperuser ? 'inline-flex' : 'none';
+    if (addBtn) addBtn.style.display = isSuperuser ? 'inline-flex' : 'none';
+
+    // Re-render table and gigs to reflect role permissions
     renderTable();
+    renderGigs();
+  }
+
+  window.toggleRolePreview = function() {
+    isSuperuser = !isSuperuser;
+    sessionStorage.setItem('th_gear_role_override', isSuperuser ? 'superuser' : 'employee');
+    window.showToast(`Switched view to: ${isSuperuser ? '👑 Superuser' : '🎧 Staff DJ (Employee)'}`, isSuperuser ? 'gold' : 'info');
+    checkUserRole();
+  };
+
+  window.toggleDemoEmptyState = function() {
+    demoEmptyState = !demoEmptyState;
+    const btn = document.getElementById('btn-toggle-demo-empty');
+    if (btn) {
+      btn.innerHTML = demoEmptyState
+        ? `<i class="fa-solid fa-eye"></i> Restore Gigs`
+        : `<i class="fa-regular fa-eye-slash"></i> Test Empty State`;
+    }
+    window.showToast(demoEmptyState ? 'Simulating Empty Gigs State' : 'Restored Current Gigs', 'info');
+    renderGigs();
+  };
+
+  // Event Timing Helper
+  function parseEventTimings(gig) {
+    const dateStr = gig.event_date;
+    if (!dateStr) return { startTime: null, endTime: null, isStarted: false, isDone: false };
+
+    function parseTimeOnDate(timeStr, baseDateStr, isNextDayIfSmall = false) {
+      if (!timeStr) return null;
+      const match = timeStr.trim().match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+      if (!match) return null;
+      let [_, h, m, period] = match;
+      let hour = parseInt(h, 10);
+      const min = parseInt(m, 10);
+      if (period) {
+        period = period.toUpperCase();
+        if (period === 'PM' && hour < 12) hour += 12;
+        if (period === 'AM' && hour === 12) hour = 0;
+      }
+      const [year, month, day] = baseDateStr.split('-').map(Number);
+      let targetDay = day;
+      if (isNextDayIfSmall && hour < 6) {
+        targetDay += 1;
+      }
+      return new Date(year, month - 1, targetDay, hour, min, 0, 0);
+    }
+
+    let startTime = null;
+    if (gig.load_in_time) {
+      startTime = parseTimeOnDate(gig.load_in_time, dateStr);
+    }
+    if (!startTime && gig.timeline_items && gig.timeline_items.length > 0) {
+      startTime = parseTimeOnDate(gig.timeline_items[0].time, dateStr);
+    }
+    if (!startTime) {
+      const [year, month, day] = dateStr.split('-').map(Number);
+      startTime = new Date(year, month - 1, day, 12, 0, 0, 0);
+    }
+
+    let endTime = null;
+    if (gig.timeline_items && gig.timeline_items.length > 0) {
+      const lastItem = gig.timeline_items[gig.timeline_items.length - 1];
+      endTime = parseTimeOnDate(lastItem.time, dateStr, true);
+    }
+    if (!endTime) {
+      const [year, month, day] = dateStr.split('-').map(Number);
+      endTime = new Date(year, month - 1, day, 23, 59, 59, 999);
+    }
+
+    const now = new Date();
+    const isStarted = now >= startTime;
+    const isDone = now >= endTime;
+
+    return { startTime, endTime, isStarted, isDone };
+  }
+
+  function formatTime(dateObj) {
+    if (!dateObj) return '';
+    return dateObj.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  }
+
+  function formatEventDate(dateStr) {
+    if (!dateStr) return 'TBD';
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const d = new Date(year, month - 1, day);
+    return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function isEventDayOrReady(gig) {
+    if (!gig.event_date) return false;
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (gig.event_date <= todayStr) return true;
+    const { startTime } = parseEventTimings(gig);
+    if (startTime) {
+      const diffHours = (startTime.getTime() - Date.now()) / (1000 * 60 * 60);
+      return diffHours <= 24;
+    }
+    return false;
+  }
+
+  // Load Gigs from Supabase
+  async function loadGigs() {
+    if (!window.supabaseClient) return;
+    try {
+      const { data, error } = await window.supabaseClient
+        .from('thunderhouse_event_plans')
+        .select('*')
+        .order('event_date', { ascending: true });
+
+      if (error) throw error;
+      currentGigs = data || [];
+      renderGigs();
+    } catch (err) {
+      console.error('Error loading gigs:', err);
+      renderGigs();
+    }
+  }
+
+  // Render Gig Cards with Hover Actions & Timing Rules
+  function renderGigs() {
+    const grid = document.getElementById('gigs-cards-grid');
+    const emptyState = document.getElementById('gigs-empty-state');
+    const badge = document.getElementById('gigs-count-badge');
+
+    if (!grid) return;
+
+    if (demoEmptyState || !currentGigs || currentGigs.length === 0) {
+      grid.innerHTML = '';
+      if (emptyState) emptyState.style.display = 'block';
+      if (badge) {
+        badge.textContent = '0 Current Gigs';
+        badge.className = 'pill';
+      }
+      return;
+    }
+
+    if (emptyState) emptyState.style.display = 'none';
+    if (badge) {
+      badge.textContent = `${currentGigs.length} Active Gigs`;
+      badge.className = 'pill pill-gold';
+    }
+
+    grid.innerHTML = currentGigs.map(gig => {
+      const { startTime, endTime, isStarted, isDone } = parseEventTimings(gig);
+
+      // Check equipment checked out to this gig
+      const checkedOutItems = equipmentList.filter(e => {
+        if (e.status !== 'Checked Out') return false;
+        if (!e.current_gig_name) return false;
+        const gigName = e.current_gig_name.toLowerCase();
+        return gigName.includes((gig.client_name || '').toLowerCase()) || gigName.includes(gig.id);
+      });
+      const hasCheckedOutGear = checkedOutItems.length > 0;
+
+      // Status pill & border classes
+      let statusBadgeHtml = '';
+      let borderClass = '';
+      let timingSummary = '';
+
+      if (gig.load_in_time) {
+        timingSummary = `Load-in: ${escapeHtml(gig.load_in_time)}`;
+      }
+      if (gig.timeline_items && gig.timeline_items.length > 0) {
+        const startT = gig.timeline_items[0].time;
+        const endT = gig.timeline_items[gig.timeline_items.length - 1].time;
+        timingSummary += timingSummary ? ` · ${startT} – ${endT}` : `${startT} – ${endT}`;
+      } else if (!timingSummary) {
+        timingSummary = 'Full Event Window';
+      }
+
+      if (hasCheckedOutGear && !isDone) {
+        statusBadgeHtml = `<span class="pill pill-gold"><i class="fa-solid fa-bolt live-pulse"></i> Live On Gig</span>`;
+        borderClass = 'has-checked-out';
+      } else if (hasCheckedOutGear && isDone) {
+        statusBadgeHtml = `<span class="pill pill-green"><i class="fa-solid fa-flag-checkered"></i> Gig Done · Return Gear</span>`;
+        borderClass = 'is-done';
+      } else if (!hasCheckedOutGear && isDone) {
+        statusBadgeHtml = `<span class="pill" style="background:rgba(255,255,255,0.06); color:#94a3b8"><i class="fa-solid fa-calendar-check"></i> Past Event</span>`;
+        borderClass = 'is-done';
+      } else {
+        statusBadgeHtml = `<span class="pill pill-cyan"><i class="fa-solid fa-dolly"></i> Ready to Stage</span>`;
+      }
+
+      // Determine Floating Action & Permissions:
+      let actionText = '';
+      let actionIcon = '';
+      let actionBtnClass = '';
+      let actionHint = '';
+
+      if (hasCheckedOutGear || isDone) {
+        // Gig Check-In Mode
+        actionText = 'Start gig check in';
+        actionIcon = 'fa-solid fa-box-open';
+
+        if (isDone) {
+          // Both Superuser and Employee can check in after gig is done
+          actionBtnClass = 'btn-checkin-cta';
+          actionHint = `Gig time concluded (${formatTime(endTime)}) · Ready for studio return`;
+        } else {
+          // Gig is still underway or before end time
+          if (isSuperuser) {
+            actionBtnClass = 'btn-checkin-cta';
+            actionHint = `<span class="gold"><i class="fa-solid fa-crown"></i> Superuser Early Check-In Active</span>`;
+          } else {
+            // Employee has to wait until gig is done
+            actionBtnClass = 'btn-blocked-cta';
+            actionIcon = 'fa-solid fa-lock';
+            actionHint = `<span style="color:#f59e0b"><i class="fa-solid fa-clock"></i> Staff wait until gig ends (${formatTime(endTime)})</span>`;
+          }
+        }
+      } else {
+        // Gig Check-Out Mode
+        actionText = 'Start gig check out?';
+        actionIcon = 'fa-solid fa-truck-ramp-box';
+
+        if (isSuperuser) {
+          // Superuser can check out anytime
+          actionBtnClass = 'btn-checkout-cta';
+          actionHint = `Superuser check-out enabled anytime · Click to pack gear`;
+        } else {
+          // Employee has to wait until event day / staging window
+          const eventOpen = isEventDayOrReady(gig);
+          if (eventOpen) {
+            actionBtnClass = 'btn-checkout-cta';
+            actionHint = `Gig staging open · Click to check out gear`;
+          } else {
+            actionBtnClass = 'btn-blocked-cta';
+            actionIcon = 'fa-solid fa-lock';
+            actionHint = `<span style="color:#94a3b8"><i class="fa-solid fa-clock"></i> Employee check-out opens on event day (${gig.event_date})</span>`;
+          }
+        }
+      }
+
+      return `
+        <div class="gig-card ${borderClass}" onclick="handleGigClick('${gig.id}')" data-gig-id="${gig.id}">
+          <div>
+            <div class="gig-card-head">
+              <div class="gig-card-date">
+                <i class="fa-solid fa-calendar-day"></i> ${formatEventDate(gig.event_date)}
+              </div>
+              ${statusBadgeHtml}
+            </div>
+
+            <div class="gig-card-title">${escapeHtml(gig.client_name)}</div>
+            <div class="gig-card-subtitle">
+              <i class="fa-solid fa-champagne-glasses" style="color:var(--primary)"></i> ${escapeHtml(gig.event_type || 'Event')}
+            </div>
+
+            <div class="gig-card-meta">
+              <div class="gig-card-meta-row">
+                <i class="fa-solid fa-location-dot"></i>
+                <span class="text-truncate" style="color:#fff">${escapeHtml(gig.venue_name || gig.venue_city || 'Oklahoma City, OK')}</span>
+              </div>
+              <div class="gig-card-meta-row">
+                <i class="fa-regular fa-clock"></i>
+                <span>${timingSummary}</span>
+              </div>
+              <div class="gig-card-meta-row">
+                <i class="fa-solid fa-user-astronaut"></i>
+                <span>Assigned DJ: <strong style="color:var(--accent-gold)">${escapeHtml(gig.assigned_dj_name || 'DJ Staff')}</strong></span>
+              </div>
+            </div>
+
+            <div class="gig-gear-status-bar">
+              <span><i class="fa-solid fa-boxes-stacked" style="color:var(--primary)"></i> ${checkedOutItems.length > 0 ? `<strong>${checkedOutItems.length}</strong> items in field` : 'All gear in studio'}</span>
+              <span style="font-weight:700; color:${checkedOutItems.length > 0 ? 'var(--accent-gold)' : 'var(--success)'}">
+                ${checkedOutItems.length > 0 ? '<i class="fa-solid fa-truck-ramp-box"></i> Checked Out' : '<i class="fa-solid fa-circle-check"></i> Racked &amp; Ready'}
+              </span>
+            </div>
+          </div>
+
+          <div class="gig-hover-action-bar">
+            <button type="button" class="gig-action-btn ${actionBtnClass}" onclick="event.stopPropagation(); handleGigClick('${gig.id}')">
+              <i class="${actionIcon}"></i> ${actionText}
+            </button>
+            <div class="gig-hover-hint">${actionHint}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Handle Gig Card & Action Click
+  window.handleGigClick = function(gigId) {
+    const gig = currentGigs.find(g => g.id === gigId);
+    if (!gig) return;
+
+    const { isStarted, isDone, endTime } = parseEventTimings(gig);
+    const checkedOutItems = equipmentList.filter(e => {
+      if (e.status !== 'Checked Out') return false;
+      if (!e.current_gig_name) return false;
+      const gigName = e.current_gig_name.toLowerCase();
+      return gigName.includes((gig.client_name || '').toLowerCase()) || gigName.includes(gig.id);
+    });
+    const hasCheckedOutGear = checkedOutItems.length > 0;
+
+    // Check-in Branch:
+    if (hasCheckedOutGear || isDone) {
+      if (!isDone && !isSuperuser) {
+        window.showToast(
+          `Staff DJ check-in is locked until the gig concludes at ${formatTime(endTime)}. Superusers can override and check in anytime.`,
+          'info'
+        );
+        return;
+      }
+      openGigCheckinModal(gig, checkedOutItems, !isDone && isSuperuser);
+      return;
+    }
+
+    // Check-out Branch:
+    if (!isSuperuser && !isEventDayOrReady(gig)) {
+      window.showToast(
+        `Staff check-out for ${gig.client_name} unlocks on event day (${gig.event_date}). Superusers can check out gear anytime.`,
+        'info'
+      );
+      return;
+    }
+
+    openGigCheckoutModal(gig);
+  };
+
+  // Open Gig Check Out Modal
+  function openGigCheckoutModal(gig) {
+    document.getElementById('gco-gig-id').value = gig.id;
+    document.getElementById('gco-client-name').textContent = gig.client_name;
+    document.getElementById('gco-event-type').textContent = gig.event_type || 'Event';
+    document.getElementById('gco-venue').innerHTML = `<i class="fa-solid fa-location-dot gold"></i> ${escapeHtml(gig.venue_name || gig.venue_city || 'Oklahoma City')}`;
+    document.getElementById('gco-date').textContent = formatEventDate(gig.event_date);
+    document.getElementById('gco-timing').textContent = gig.load_in_time ? `Load-in: ${gig.load_in_time}` : 'Event Staging';
+    document.getElementById('gco-holder').value = gig.assigned_dj_name || window.currentStaffUser?.displayName || 'DJ Staff';
+    document.getElementById('gco-notes').value = '';
+
+    // Calculate default return time
+    const { endTime } = parseEventTimings(gig);
+    if (endTime) {
+      const pad = n => String(n).padStart(2, '0');
+      const iso = `${endTime.getFullYear()}-${pad(endTime.getMonth()+1)}-${pad(endTime.getDate())}T${pad(endTime.getHours())}:${pad(endTime.getMinutes())}`;
+      document.getElementById('gco-return-time').value = iso;
+    } else {
+      const returnDate = new Date();
+      returnDate.setDate(returnDate.getDate() + 1);
+      returnDate.setHours(2, 0, 0, 0);
+      document.getElementById('gco-return-time').value = returnDate.toISOString().slice(0, 16);
+    }
+
+    // Populate Available Studio Equipment
+    const available = equipmentList.filter(e => e.status === 'Available in Studio');
+    const container = document.getElementById('gco-gear-list');
+
+    if (available.length === 0) {
+      container.innerHTML = `<div class="small muted" style="padding:1rem; text-align:center">All equipment is currently checked out or in maintenance.</div>`;
+    } else {
+      container.innerHTML = available.map(item => {
+        const isRec = item.category.includes('Decks') || item.category.includes('Speaker') || item.category.includes('Microphone') || (gig.gear_checklist && gig.gear_checklist.some(c => c.item.toLowerCase().includes(item.category.toLowerCase().split(' ')[0])));
+        return `
+          <label style="display:flex; align-items:center; gap:0.65rem; padding:0.45rem 0.6rem; border-radius:6px; background:rgba(255,255,255,0.03); cursor:pointer; font-size:0.85rem">
+            <input type="checkbox" class="gco-item-checkbox" value="${item.id}" ${isRec ? 'checked' : ''} onchange="updateGigCheckoutCount()">
+            <div style="flex:1">
+              <strong style="color:#fff">${escapeHtml(item.name)}</strong>
+              <span class="small muted" style="margin-left:0.4rem">${escapeHtml(item.category)} · <code>${escapeHtml(item.barcode)}</code></span>
+            </div>
+            ${isRec ? '<span class="pill pill-gold" style="font-size:0.68rem; padding:0.1rem 0.4rem">Rec</span>' : ''}
+          </label>
+        `;
+      }).join('');
+    }
+
+    updateGigCheckoutCount();
+    document.getElementById('modal-gig-checkout').style.display = 'flex';
+  }
+
+  function updateGigCheckoutCount() {
+    const checked = document.querySelectorAll('.gco-item-checkbox:checked').length;
+    const badge = document.getElementById('gco-selected-count');
+    if (badge) badge.textContent = checked;
+    const submitBtn = document.getElementById('btn-submit-gig-checkout');
+    if (submitBtn) {
+      submitBtn.innerHTML = `<i class="fa-solid fa-truck-ramp-box"></i> Confirm Gig Check Out (${checked} items)`;
+      submitBtn.disabled = checked === 0;
+    }
+  }
+
+  // Open Gig Check In Modal
+  function openGigCheckinModal(gig, checkedOutItems, isEarlySuperuserOverride) {
+    document.getElementById('gci-gig-id').value = gig.id;
+    document.getElementById('gci-client-name').textContent = gig.client_name;
+    document.getElementById('gci-event-type').textContent = gig.event_type || 'Event';
+    document.getElementById('gci-venue').innerHTML = `<i class="fa-solid fa-location-dot cyan"></i> ${escapeHtml(gig.venue_name || gig.venue_city || 'Oklahoma City')}`;
+    document.getElementById('gci-date').textContent = formatEventDate(gig.event_date);
+    document.getElementById('gci-staff-name').value = window.currentStaffUser?.displayName || 'Studio Staff';
+    document.getElementById('gci-notes').value = '';
+
+    const overrideBadge = document.getElementById('gci-override-badge');
+    if (overrideBadge) overrideBadge.style.display = isEarlySuperuserOverride ? 'block' : 'none';
+
+    const container = document.getElementById('gci-gear-list');
+    const countText = document.getElementById('gci-items-count-text');
+    if (countText) countText.textContent = `${checkedOutItems.length} items checked out`;
+
+    if (checkedOutItems.length === 0) {
+      container.innerHTML = `
+        <div class="small muted" style="padding:1.5rem; text-align:center">
+          <i class="fa-solid fa-boxes-stacked" style="font-size:1.5rem; margin-bottom:0.5rem; opacity:0.4"></i>
+          <div>No equipment is currently marked as checked out to this gig.</div>
+        </div>
+      `;
+    } else {
+      container.innerHTML = checkedOutItems.map(item => `
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:0.65rem; padding:0.5rem 0.65rem; border-radius:6px; background:rgba(255,255,255,0.03); font-size:0.85rem">
+          <label style="display:flex; align-items:center; gap:0.6rem; cursor:pointer; flex:1">
+            <input type="checkbox" class="gci-item-checkbox" value="${item.id}" checked onchange="updateGigCheckinCount()">
+            <div>
+              <strong style="color:#fff">${escapeHtml(item.name)}</strong>
+              <div class="small muted">Barcode: <code>${escapeHtml(item.barcode)}</code> · Holder: ${escapeHtml(item.current_holder || 'DJ')}</div>
+            </div>
+          </label>
+          <select class="input input-sm gci-item-condition" data-item-id="${item.id}" style="width:130px; font-size:0.75rem; padding:0.25rem 0.4rem">
+            <option value="Excellent">Excellent</option>
+            <option value="Good" selected>Good</option>
+            <option value="Needs Maintenance">Needs Maint</option>
+          </select>
+        </div>
+      `).join('');
+    }
+
+    updateGigCheckinCount();
+    document.getElementById('modal-gig-checkin').style.display = 'flex';
+  }
+
+  function updateGigCheckinCount() {
+    const checked = document.querySelectorAll('.gci-item-checkbox:checked').length;
+    const badge = document.getElementById('gci-selected-count');
+    if (badge) badge.textContent = checked;
+    const submitBtn = document.getElementById('btn-submit-gig-checkin');
+    if (submitBtn) {
+      submitBtn.innerHTML = `<i class="fa-solid fa-box-open"></i> Check In to Studio (${checked} items)`;
+      submitBtn.disabled = checked === 0;
+    }
   }
 
   // 1. Load Equipment from Supabase
@@ -644,6 +1466,7 @@
         equipmentList = data;
         updateKPIs();
         renderTable();
+        renderGigs();
       }
     } catch (err) {
       console.error('Error loading equipment:', err);
@@ -1102,6 +1925,156 @@
     document.getElementById('btn-close-manage-modal').onclick = () => document.getElementById('modal-manage-gear').style.display = 'none';
     document.getElementById('btn-cancel-manage').onclick = () => document.getElementById('modal-manage-gear').style.display = 'none';
     document.getElementById('btn-close-sheet-modal').onclick = () => document.getElementById('modal-sheet').style.display = 'none';
+    document.getElementById('btn-close-gig-checkout-modal').onclick = () => document.getElementById('modal-gig-checkout').style.display = 'none';
+    document.getElementById('btn-cancel-gig-checkout').onclick = () => document.getElementById('modal-gig-checkout').style.display = 'none';
+    document.getElementById('btn-close-gig-checkin-modal').onclick = () => document.getElementById('modal-gig-checkin').style.display = 'none';
+    document.getElementById('btn-cancel-gig-checkin').onclick = () => document.getElementById('modal-gig-checkin').style.display = 'none';
+
+    document.getElementById('btn-toggle-role-view')?.addEventListener('click', toggleRolePreview);
+    window.toggleRoleView = toggleRolePreview;
+
+    // Quick selection helpers in Gig Checkout
+    document.getElementById('btn-gco-select-all')?.addEventListener('click', () => {
+      document.querySelectorAll('.gco-item-checkbox').forEach(cb => cb.checked = true);
+      updateGigCheckoutCount();
+    });
+    document.getElementById('btn-gco-deselect')?.addEventListener('click', () => {
+      document.querySelectorAll('.gco-item-checkbox').forEach(cb => cb.checked = false);
+      updateGigCheckoutCount();
+    });
+    document.getElementById('btn-gco-select-rec')?.addEventListener('click', () => {
+      const gigId = document.getElementById('gco-gig-id').value;
+      const gig = currentGigs.find(g => g.id === gigId);
+      document.querySelectorAll('.gco-item-checkbox').forEach(cb => {
+        const item = equipmentList.find(e => e.id === cb.value);
+        if (item) {
+          cb.checked = item.category.includes('Decks') || item.category.includes('Speaker') || item.category.includes('Microphone') || (gig?.gear_checklist && gig.gear_checklist.some(c => c.item.toLowerCase().includes(item.category.toLowerCase().split(' ')[0])));
+        }
+      });
+      updateGigCheckoutCount();
+    });
+
+    // Submit Gig Check Out
+    document.getElementById('form-gig-checkout')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const gigId = document.getElementById('gco-gig-id').value;
+      const gig = currentGigs.find(g => g.id === gigId);
+      const holder = document.getElementById('gco-holder').value.trim();
+      const returnTime = document.getElementById('gco-return-time').value;
+      const notes = document.getElementById('gco-notes').value.trim();
+
+      const selectedIds = Array.from(document.querySelectorAll('.gco-item-checkbox:checked')).map(cb => cb.value);
+      if (selectedIds.length === 0) {
+        window.showToast('Please select at least one equipment item to check out.', 'warning');
+        return;
+      }
+
+      const gigLabel = gig ? `${gig.client_name} - ${gig.event_type || 'Event'}` : 'Event Gig';
+
+      try {
+        const nowIso = new Date().toISOString();
+        const expIso = returnTime ? new Date(returnTime).toISOString() : null;
+
+        const updatePromises = selectedIds.map(id => window.supabaseClient
+          .from('thunderhouse_equipment')
+          .update({
+            status: 'Checked Out',
+            current_holder: holder,
+            current_gig_name: gigLabel,
+            checked_out_at: nowIso,
+            expected_return_at: expIso,
+            notes: notes || null,
+            updated_at: nowIso
+          })
+          .eq('id', id)
+        );
+
+        const logEntries = selectedIds.map(id => ({
+          equipment_id: id,
+          action: 'check_out',
+          staff_name: holder,
+          staff_email: window.currentStaffUser?.email || '',
+          gig_name: gigLabel,
+          notes: notes || `Gig check-out for ${gigLabel}`
+        }));
+
+        await Promise.all(updatePromises);
+        await window.supabaseClient.from('thunderhouse_equipment_logs').insert(logEntries);
+
+        window.showToast(`Checked out ${selectedIds.length} items to ${holder} for ${gig?.client_name || 'gig'}!`, 'success');
+        document.getElementById('modal-gig-checkout').style.display = 'none';
+        await loadEquipment();
+        if (window.refreshAdminBadges) window.refreshAdminBadges();
+      } catch (err) {
+        console.error('Error in gig check-out:', err);
+        window.showToast('Gig check-out error: ' + err.message, 'error');
+      }
+    });
+
+    // Submit Gig Check In
+    document.getElementById('form-gig-checkin')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const gigId = document.getElementById('gci-gig-id').value;
+      const gig = currentGigs.find(g => g.id === gigId);
+      const genCondition = document.getElementById('gci-condition').value;
+      const staffName = document.getElementById('gci-staff-name').value.trim() || 'Studio Staff';
+      const notes = document.getElementById('gci-notes').value.trim();
+
+      const checkedItems = Array.from(document.querySelectorAll('.gci-item-checkbox:checked')).map(cb => {
+        const id = cb.value;
+        const condSelect = document.querySelector(`.gci-item-condition[data-item-id="${id}"]`);
+        const itemCond = condSelect ? condSelect.value : genCondition;
+        return { id, condition: itemCond };
+      });
+
+      if (checkedItems.length === 0) {
+        window.showToast('Please select at least one item to check into the studio.', 'warning');
+        return;
+      }
+
+      const gigLabel = gig ? `${gig.client_name} - ${gig.event_type || 'Event'}` : 'Event Gig';
+
+      try {
+        const nowIso = new Date().toISOString();
+
+        const updatePromises = checkedItems.map(({ id, condition }) => {
+          const newStatus = condition === 'Needs Maintenance' ? 'In Maintenance' : 'Available in Studio';
+          return window.supabaseClient
+            .from('thunderhouse_equipment')
+            .update({
+              status: newStatus,
+              condition: condition,
+              current_holder: null,
+              current_gig_name: null,
+              checked_out_at: null,
+              expected_return_at: null,
+              notes: notes || null,
+              updated_at: nowIso
+            })
+            .eq('id', id);
+        });
+
+        const logEntries = checkedItems.map(({ id, condition }) => ({
+          equipment_id: id,
+          action: 'check_in',
+          staff_name: staffName,
+          staff_email: window.currentStaffUser?.email || '',
+          condition_on_action: condition,
+          notes: notes || `Gig return from ${gigLabel}`
+        }));
+
+        await Promise.all(updatePromises);
+        await window.supabaseClient.from('thunderhouse_equipment_logs').insert(logEntries);
+
+        window.showToast(`Checked in ${checkedItems.length} items from ${gig?.client_name || 'gig'} back into studio!`, 'success');
+        document.getElementById('modal-gig-checkin').style.display = 'none';
+        await loadEquipment();
+        if (window.refreshAdminBadges) window.refreshAdminBadges();
+      } catch (err) {
+        console.error('Error in gig check-in:', err);
+        window.showToast('Gig check-in error: ' + err.message, 'error');
+      }
+    });
 
     // Superuser Add Equipment button
     document.getElementById('btn-add-equipment')?.addEventListener('click', () => {
