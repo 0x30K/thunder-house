@@ -729,14 +729,21 @@
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
 <script src="assets/shell.js"></script>
 <script src="../js/thunderwire-engine.js"></script>
 <script>
   // 1. Supabase Initialization
   const SUPABASE_URL = 'https://kxoivmflghfgtvawhktt.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4b2l2bWZsZ2hmZ3R2YXdoa3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NTI5NTEsImV4cCI6MjEwNzIyODk1MX0.lrbLr6Q6tNwRWUGH7T3g6dL3jwU3TbaoUL1yRliBgTY';
-  window.supabaseClient = window.supabaseClient || (window.supabase && window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON));
-  const db = window.supabaseClient;
+  if (!window.supabaseClient && window.supabase) {
+    window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  }
+  const db = window.supabaseClient || {
+    from: (table) => ({
+      select: () => fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*`, { headers: { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON } }).then(r => r.json()).then(d => ({ data: d, error: null }))
+    })
+  };
 
   let allAutomations = [];
   let currentCategory = 'all';
@@ -745,11 +752,40 @@
   // 2. Fetch and Load Automations
   async function loadAutomations(isManualRefresh = false) {
     try {
-      const { data, error } = await db
-        .from('thunderhouse_automations')
-        .select('*')
-        .order('category', { ascending: true })
-        .order('name', { ascending: true });
+      if (!window.supabaseClient && window.supabase) {
+        window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+      }
+      let client = window.supabaseClient;
+      let data = null;
+      let error = null;
+
+      if (client && typeof client.from === 'function') {
+        try {
+          const res = await client
+            .from('thunderhouse_automations')
+            .select('*')
+            .order('category', { ascending: true })
+            .order('name', { ascending: true });
+          data = res.data;
+          error = res.error;
+        } catch (clientErr) {
+          console.warn('client.from note, falling back to direct REST:', clientErr);
+        }
+      }
+
+      // Direct REST fallback if client was not ready or errored
+      if (!data || error) {
+        const resp = await fetch(`${SUPABASE_URL}/rest/v1/thunderhouse_automations?select=*&order=category.asc,name.asc`, {
+          headers: {
+            apikey: SUPABASE_ANON,
+            Authorization: 'Bearer ' + SUPABASE_ANON
+          }
+        });
+        if (resp.ok) {
+          data = await resp.json();
+          error = null;
+        }
+      }
 
       if (error) throw error;
       allAutomations = data || [];
@@ -762,6 +798,17 @@
       }
     } catch (err) {
       console.error('Error loading automations:', err);
+      const container = document.getElementById('automations-container');
+      if (container) {
+        container.innerHTML = `
+          <div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted)">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size:2rem; color:var(--accent-gold); margin-bottom:0.75rem"></i>
+            <div style="color:#fff; font-weight:700; margin-bottom:0.4rem">Could not connect to Automation Station telemetry</div>
+            <div class="small muted" style="margin-bottom:1rem">${escapeHtml(err.message)}</div>
+            <button class="btn btn-outline btn-sm" onclick="loadAutomations(true)"><i class="fa-solid fa-rotate"></i> Retry Connection</button>
+          </div>
+        `;
+      }
       if (window.showToast) {
         window.showToast('Failed to load automations: ' + err.message, 'error');
       }
