@@ -1,5 +1,15 @@
 {
   "cleanUrls": true,
+  "crons": [
+    {
+      "path": "/api/wire-scan",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/daily-wire-digest",
+      "schedule": "0 12 * * *"
+    }
+  ],
   "rewrites": [
     { "source": "/admin", "destination": "/admin/today.html" },
     { "source": "/admin/:page", "destination": "/admin/:page.html" },
