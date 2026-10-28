@@ -300,6 +300,56 @@ Email: ${smtpUser}`;
     }
 
     // =========================================================================
+    // CASE C: THE DAILY WIRE DIGEST EMAIL
+    // =========================================================================
+    if (payload.type === "daily_wire_digest" || payload.is_daily_wire) {
+      let recipientList: string[] = [];
+      if (Array.isArray(payload.recipients)) {
+        recipientList = payload.recipients.map((s: any) => String(s).trim()).filter(Boolean);
+      } else if (typeof payload.recipients === "string") {
+        recipientList = payload.recipients.split(",").map((s: string) => s.trim()).filter(Boolean);
+      }
+      if (recipientList.length === 0) {
+        recipientList = ["breshaun.black@gmail.com", "olifedigital@gmail.com"];
+      }
+
+      const subject = payload.subject || `⚡ The Daily Wire: Morning Culture & Music Intelligence`;
+      const htmlContent = payload.html || `<p>The Daily Wire morning culture briefing.</p>`;
+      const textContent = payload.text || `The Daily Wire morning culture briefing.`;
+
+      const results = [];
+      for (const toEmail of recipientList) {
+        try {
+          await transporter.sendMail({
+            from: `"The Daily Wire · Thunder House" <${smtpUser}>`,
+            to: toEmail,
+            replyTo: smtpUser,
+            subject: subject,
+            text: textContent,
+            html: htmlContent,
+            headers: {
+              "X-Priority": "2",
+              "X-Entity-Ref-ID": `th-daily-wire-${Date.now()}`,
+            },
+          });
+          results.push({ email: toEmail, status: "sent" });
+        } catch (mErr: any) {
+          console.error(`Daily wire dispatch error to ${toEmail}:`, mErr);
+          results.push({ email: toEmail, status: "error", error: mErr.message });
+        }
+      }
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: `The Daily Wire digest dispatched to ${recipientList.length} recipient(s).`,
+          results
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // =========================================================================
     // CASE B: STANDARD BOOKING CONFIRMATION & RESERVATION
     // =========================================================================
     const {

@@ -683,14 +683,41 @@
         <textarea class="input" id="edit-config-desc" rows="2"></textarea>
       </div>
 
-      <div class="mb">
+      <div class="mb" id="wrap-config-folder">
         <label class="label small">Target Folder / Local Path</label>
         <input class="input" id="edit-config-folder">
       </div>
 
+      <!-- Dedicated Daily Wire Recipients Manager -->
+      <div id="wrap-daily-wire-recipients" style="display:none; background:rgba(0, 229, 255, 0.05); border:1px solid rgba(0, 229, 255, 0.25); border-radius:10px; padding:1.15rem; margin-bottom:1.15rem">
+        <div style="font-weight:700; font-size:0.92rem; color:#fff; margin-bottom:0.35rem; display:flex; align-items:center; gap:0.45rem">
+          <i class="fa-solid fa-envelope-open-text cyan"></i> Daily Wire Email Recipients
+        </div>
+        <p class="small muted" style="margin-bottom:0.85rem; line-height:1.45">
+          These email addresses will receive the stylized 7:00 AM culture briefing every morning with full story breakdowns, virality heat scores, and host talking points.
+        </p>
+        <div id="daily-wire-chips-list" style="display:flex; flex-wrap:wrap; gap:0.45rem; margin-bottom:0.75rem">
+          <!-- chips dynamically populated -->
+        </div>
+        <div style="display:flex; gap:0.5rem; margin-bottom:0.85rem">
+          <input type="email" id="daily-wire-new-email" class="input" placeholder="Add recipient email (e.g. name@domain.com)..." style="font-size:0.85rem; padding:0.45rem 0.75rem">
+          <button class="btn btn-primary btn-sm" type="button" onclick="addDailyWireRecipient()" style="white-space:nowrap">
+            <i class="fa-solid fa-plus"></i> Add Recipient
+          </button>
+        </div>
+        <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap; pt:0.5rem; border-top:1px dashed rgba(255,255,255,0.08); padding-top:0.75rem">
+          <a href="/admin/wire-email-preview.html" target="_blank" class="btn btn-outline btn-sm" style="font-size:0.78rem">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Preview Email Layout
+          </a>
+          <button type="button" class="btn btn-gold btn-sm" onclick="triggerAutomation('daily_wire_digest')" style="font-size:0.78rem">
+            <i class="fa-solid fa-paper-plane"></i> Send Test Email Now
+          </button>
+        </div>
+      </div>
+
       <div>
         <label class="label small">JSON Configuration Object</label>
-        <textarea class="input" id="edit-config-json" rows="6" style="font-family:monospace; font-size:0.82rem"></textarea>
+        <textarea class="input" id="edit-config-json" rows="5" style="font-family:monospace; font-size:0.82rem"></textarea>
       </div>
     </div>
     <div class="station-modal-foot">
@@ -1062,6 +1089,21 @@
           ? `Lifecycle maintained: ${lifecycleStats.archived_count || 0} sent to 7d archive, ${lifecycleStats.deleted_count || 0} purged (>30d).`
           : 'Lifecycle maintenance verified.';
         summary = `Wire scan completed (${scanCount} new ingested). ${lInfo}`;
+      } else if (id === 'daily_wire_digest') {
+        let resData = null;
+        if (window.ThunderWire && window.ThunderWire.dispatchDailyWireDigest) {
+          resData = await window.ThunderWire.dispatchDailyWireDigest();
+        } else {
+          const resp = await fetch('/api/daily-wire-digest?force=true', { method: 'POST' });
+          resData = await resp.json().catch(() => ({}));
+          if (!resp.ok || !resData.success) {
+            throw new Error(resData?.error || ('Server returned ' + resp.status));
+          }
+        }
+        summary = `Daily Wire digest dispatched to ${(resData.recipients || []).join(', ')} (${resData.count || 0} stories curated).`;
+        if (window.showToast) window.showToast(summary, 'success');
+        loadAutomations();
+        return;
       } else if (id === 'music_scout') {
         // Post signal to Supabase for local python daemon
         await supabase.from('thunderhouse_site_settings').upsert({
@@ -1289,6 +1331,8 @@
   }
 
   // 13. Edit Config Modal
+  let activeDailyWireRecipients = [];
+
   function editConfig(id) {
     const auto = allAutomations.find(a => a.id === id);
     if (!auto) return;
@@ -1298,7 +1342,74 @@
     document.getElementById('edit-config-desc').value = auto.description || '';
     document.getElementById('edit-config-folder').value = auto.target_folder || '';
     document.getElementById('edit-config-json').value = JSON.stringify(auto.config || {}, null, 2);
+
+    // Toggle daily wire recipient chips manager
+    const wireRecipientsWrap = document.getElementById('wrap-daily-wire-recipients');
+    if (wireRecipientsWrap) {
+      if (id === 'daily_wire_digest') {
+        wireRecipientsWrap.style.display = 'block';
+        activeDailyWireRecipients = Array.isArray(auto.config?.recipients) && auto.config.recipients.length > 0
+          ? [...auto.config.recipients]
+          : ['breshaun.black@gmail.com', 'olifedigital@gmail.com'];
+        renderDailyWireChips();
+      } else {
+        wireRecipientsWrap.style.display = 'none';
+      }
+    }
+
     document.getElementById('modal-config').classList.add('active');
+  }
+
+  function renderDailyWireChips() {
+    const container = document.getElementById('daily-wire-chips-list');
+    if (!container) return;
+    if (!activeDailyWireRecipients || activeDailyWireRecipients.length === 0) {
+      container.innerHTML = '<span class="small muted" style="font-style:italic">No recipients added yet. Add at least one email below.</span>';
+      return;
+    }
+    container.innerHTML = activeDailyWireRecipients.map((email, idx) => `
+      <span style="display:inline-flex; align-items:center; gap:0.45rem; background:rgba(0,229,255,0.14); border:1px solid rgba(0,229,255,0.45); color:#e0f7fa; padding:0.3rem 0.75rem; border-radius:20px; font-size:0.8rem; font-weight:600">
+        <i class="fa-solid fa-envelope" style="font-size:0.75rem; color:var(--primary)"></i>
+        <span>${escapeHtml(email)}</span>
+        <button type="button" onclick="removeDailyWireRecipient(${idx})" style="background:none; border:none; color:rgba(255,255,255,0.7); cursor:pointer; padding:0 0.2rem; font-size:0.95rem; line-height:1; display:inline-flex; align-items:center" title="Remove">&times;</button>
+      </span>
+    `).join('');
+  }
+
+  function addDailyWireRecipient() {
+    const input = document.getElementById('daily-wire-new-email');
+    if (!input) return;
+    const val = input.value.trim().toLowerCase();
+    if (!val || !val.includes('@') || !val.includes('.')) {
+      if (window.showToast) window.showToast('Please enter a valid email address.', 'gold');
+      return;
+    }
+    if (activeDailyWireRecipients.includes(val)) {
+      if (window.showToast) window.showToast('Recipient already in list.', 'gold');
+      return;
+    }
+    activeDailyWireRecipients.push(val);
+    input.value = '';
+    renderDailyWireChips();
+    syncDailyWireConfigJson();
+  }
+
+  function removeDailyWireRecipient(idx) {
+    activeDailyWireRecipients.splice(idx, 1);
+    renderDailyWireChips();
+    syncDailyWireConfigJson();
+  }
+
+  function syncDailyWireConfigJson() {
+    const jsonArea = document.getElementById('edit-config-json');
+    if (!jsonArea) return;
+    try {
+      const parsed = JSON.parse(jsonArea.value || '{}');
+      parsed.recipients = activeDailyWireRecipients;
+      jsonArea.value = JSON.stringify(parsed, null, 2);
+    } catch (_) {
+      jsonArea.value = JSON.stringify({ recipients: activeDailyWireRecipients }, null, 2);
+    }
   }
 
   async function saveAutomationConfig() {
@@ -1316,6 +1427,10 @@
         alert('Invalid JSON syntax in config.');
         return;
       }
+    }
+
+    if (id === 'daily_wire_digest' && activeDailyWireRecipients.length > 0) {
+      configJson.recipients = activeDailyWireRecipients;
     }
 
     try {

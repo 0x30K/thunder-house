@@ -287,6 +287,9 @@
         <a href="../wire-overlay.html" target="_blank" class="btn btn-outline" title="Open OBS Browser Source Preview">
           <i class="fa-solid fa-satellite-dish cyan"></i> OBS Overlay
         </a>
+        <button class="btn btn-outline" onclick="openDailyWireModal()" title="Configure Daily 7:00 AM Wire Email Digest">
+          <i class="fa-solid fa-envelope-open-text cyan"></i> Daily 7AM Email
+        </button>
         <button class="btn btn-outline" onclick="clearOBS()" title="Clear Live OBS Lower-Third">
           <i class="fa-solid fa-eye-slash"></i> Clear OBS
         </button>
@@ -466,6 +469,78 @@
       <!-- Right: Continuous High-Contrast Prompter Screen -->
       <div class="tp-prompter-screen" id="tp-prompter-screen">
         <!-- Rendered teleprompter text blocks -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Daily Wire 7AM Email Config Modal -->
+<div id="daily-wire-modal-wrap" style="display:none">
+  <div class="drawer-scrim" id="daily-wire-modal-scrim" style="background:rgba(2, 4, 8, 0.85); z-index:109" onclick="closeDailyWireModal()"></div>
+  <div style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:92%; max-width:600px; background:#0b0f19; border:1px solid rgba(0, 229, 255, 0.35); border-radius:14px; box-shadow:0 25px 80px rgba(0,0,0,0.95), 0 0 35px rgba(0, 229, 255, 0.2); z-index:110; padding:1.5rem; animation:modalZoom 0.2s cubic-bezier(0.16, 1, 0.3, 1);">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:0.75rem">
+      <div>
+        <div style="font-size:0.72rem; letter-spacing:0.1em; color:var(--primary); font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:0.4rem; margin-bottom:0.25rem">
+          <i class="fa-solid fa-bolt gold"></i> Automated Executive Briefing
+        </div>
+        <h2 style="font-size:1.25rem; font-weight:800; color:#fff; margin:0">⚡ The Daily Wire 7AM Email</h2>
+      </div>
+      <button class="btn-icon" onclick="closeDailyWireModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.5; margin-bottom:1.15rem">
+      Sends a stylized morning briefing with top breaking stories, virality heat indexes, and on-air host debate points straight to your executive inbox every morning.
+    </p>
+
+    <!-- Master Switch & Time Controls -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; padding:1rem; margin-bottom:1.15rem">
+      <div>
+        <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:0.45rem; font-weight:600">Daily Digest Status</label>
+        <label style="display:inline-flex; align-items:center; gap:0.6rem; cursor:pointer">
+          <input type="checkbox" id="wire-digest-enabled" style="width:18px; height:18px; accent-color:var(--primary)">
+          <span id="wire-digest-status-label" style="font-size:0.88rem; font-weight:700; color:#00ff88">Active & Scheduled</span>
+        </label>
+      </div>
+      <div>
+        <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:0.45rem; font-weight:600">Delivery Time (CST)</label>
+        <input type="time" id="wire-digest-time" class="input" value="07:00" style="padding:0.4rem 0.6rem; font-size:0.88rem">
+      </div>
+    </div>
+
+    <!-- Recipients List -->
+    <div style="background:rgba(0, 229, 255, 0.04); border:1px solid rgba(0, 229, 255, 0.2); border-radius:10px; padding:1rem; margin-bottom:1.15rem">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.45rem">
+        <label style="font-size:0.78rem; font-weight:700; color:#fff; display:flex; align-items:center; gap:0.4rem">
+          <i class="fa-solid fa-users cyan"></i> Recipients List
+        </label>
+        <span class="small muted" style="font-size:0.75rem" id="wire-recipients-count">2 emails</span>
+      </div>
+      <div id="wire-recipients-chips" style="display:flex; flex-wrap:wrap; gap:0.45rem; margin-bottom:0.75rem">
+        <!-- Rendered dynamically -->
+      </div>
+      <div style="display:flex; gap:0.5rem">
+        <input type="email" id="wire-new-recipient-input" class="input" placeholder="Add email (e.g. name@domain.com)..." style="font-size:0.85rem; padding:0.45rem 0.75rem">
+        <button type="button" class="btn btn-primary btn-sm" onclick="addWireDigestRecipient()" style="white-space:nowrap">
+          <i class="fa-solid fa-plus"></i> Add
+        </button>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; border-top:1px solid rgba(255,255,255,0.08); padding-top:1rem">
+      <div style="display:flex; gap:0.5rem">
+        <a href="wire-email-preview.html" target="_blank" class="btn btn-outline btn-sm">
+          <i class="fa-solid fa-arrow-up-right-from-square cyan"></i> Preview HTML
+        </a>
+        <button type="button" class="btn btn-gold btn-sm" id="btn-wire-digest-test" onclick="sendTestWireDigest()">
+          <i class="fa-solid fa-paper-plane"></i> Send Test Now
+        </button>
+      </div>
+      <div style="display:flex; gap:0.5rem">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeDailyWireModal()">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-save-wire-digest" onclick="saveWireDigestSettings()">
+          <i class="fa-solid fa-check"></i> Save Schedule
+        </button>
       </div>
     </div>
   </div>
@@ -1189,6 +1264,175 @@
     return String(str).replace(/[&<>"']/g, s => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     }[s]));
+  }
+
+  // Daily Wire 7AM Email Modal Controller
+  let wireDigestRecipients = ['breshaun.black@gmail.com', 'olifedigital@gmail.com'];
+  let wireDigestAutomationData = null;
+
+  async function openDailyWireModal() {
+    document.getElementById('daily-wire-modal-wrap').style.display = 'block';
+    try {
+      const { data, error } = await supabase
+        .from('thunderhouse_automations')
+        .select('*')
+        .eq('id', 'daily_wire_digest')
+        .single();
+
+      if (data) {
+        wireDigestAutomationData = data;
+        const chk = document.getElementById('wire-digest-enabled');
+        const timeIn = document.getElementById('wire-digest-time');
+        const statusLabel = document.getElementById('wire-digest-status-label');
+
+        chk.checked = !!data.enabled;
+        statusLabel.textContent = data.enabled ? 'Active & Scheduled' : 'Paused / Inactive';
+        statusLabel.style.color = data.enabled ? '#00ff88' : 'var(--text-muted)';
+        timeIn.value = data.schedule_time || '07:00';
+
+        chk.onchange = () => {
+          statusLabel.textContent = chk.checked ? 'Active & Scheduled' : 'Paused / Inactive';
+          statusLabel.style.color = chk.checked ? '#00ff88' : 'var(--text-muted)';
+        };
+
+        if (Array.isArray(data.config?.recipients) && data.config.recipients.length > 0) {
+          wireDigestRecipients = [...data.config.recipients];
+        }
+      }
+    } catch (err) {
+      console.warn('Could not load daily_wire_digest settings:', err);
+    }
+    renderWireDigestRecipientChips();
+  }
+
+  function closeDailyWireModal() {
+    document.getElementById('daily-wire-modal-wrap').style.display = 'none';
+  }
+
+  function renderWireDigestRecipientChips() {
+    const container = document.getElementById('wire-recipients-chips');
+    const countLabel = document.getElementById('wire-recipients-count');
+    if (countLabel) countLabel.textContent = `${wireDigestRecipients.length} ${wireDigestRecipients.length === 1 ? 'recipient' : 'recipients'}`;
+    if (!container) return;
+    if (!wireDigestRecipients.length) {
+      container.innerHTML = '<span class="small muted" style="font-style:italic">No recipients added. Add at least one email below.</span>';
+      return;
+    }
+    container.innerHTML = wireDigestRecipients.map((email, idx) => `
+      <span style="display:inline-flex; align-items:center; gap:0.45rem; background:rgba(0,229,255,0.12); border:1px solid rgba(0,229,255,0.4); color:#e0f7fa; padding:0.25rem 0.7rem; border-radius:20px; font-size:0.8rem; font-weight:600">
+        <i class="fa-solid fa-envelope" style="font-size:0.75rem; color:var(--primary)"></i>
+        <span>${escapeHtml(email)}</span>
+        <button type="button" onclick="removeWireDigestRecipient(${idx})" style="background:none; border:none; color:rgba(255,255,255,0.7); cursor:pointer; padding:0 0.15rem; font-size:0.95rem; line-height:1" title="Remove">&times;</button>
+      </span>
+    `).join('');
+  }
+
+  function addWireDigestRecipient() {
+    const input = document.getElementById('wire-new-recipient-input');
+    if (!input) return;
+    const val = input.value.trim().toLowerCase();
+    if (!val || !val.includes('@') || !val.includes('.')) {
+      window.showToast('Please enter a valid email address.', 'gold');
+      return;
+    }
+    if (wireDigestRecipients.includes(val)) {
+      window.showToast('Recipient already in list.', 'gold');
+      return;
+    }
+    wireDigestRecipients.push(val);
+    input.value = '';
+    renderWireDigestRecipientChips();
+  }
+
+  function removeWireDigestRecipient(idx) {
+    wireDigestRecipients.splice(idx, 1);
+    renderWireDigestRecipientChips();
+  }
+
+  async function saveWireDigestSettings() {
+    const saveBtn = document.getElementById('btn-save-wire-digest');
+    const originalHtml = saveBtn ? saveBtn.innerHTML : '';
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+    }
+
+    const enabled = document.getElementById('wire-digest-enabled').checked;
+    const timeVal = document.getElementById('wire-digest-time').value || '07:00';
+
+    if (!wireDigestRecipients.length) {
+      window.showToast('Please add at least one recipient email address.', 'error');
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = originalHtml; }
+      return;
+    }
+
+    try {
+      const existingConfig = (wireDigestAutomationData && wireDigestAutomationData.config) || {};
+      const updatedConfig = {
+        ...existingConfig,
+        recipients: wireDigestRecipients,
+        story_count: existingConfig.story_count || 5,
+        subject_prefix: existingConfig.subject_prefix || '⚡ The Daily Wire',
+        include_talking_points: true
+      };
+
+      const { error } = await supabase
+        .from('thunderhouse_automations')
+        .update({
+          enabled: enabled,
+          schedule_time: timeVal,
+          config: updatedConfig,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', 'daily_wire_digest');
+
+      if (error) throw error;
+
+      window.showToast(`Daily Wire schedule saved! ${enabled ? 'Active at ' + timeVal + ' CST' : 'Paused'}.`, 'success');
+      closeDailyWireModal();
+    } catch (err) {
+      console.error('Failed to save Daily Wire settings:', err);
+      window.showToast('Error saving settings: ' + err.message, 'error');
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = originalHtml;
+      }
+    }
+  }
+
+  async function sendTestWireDigest() {
+    const btn = document.getElementById('btn-wire-digest-test');
+    const originalHtml = btn ? btn.innerHTML : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Dispatching...';
+    }
+    window.showToast('Compiling top stories and dispatching Daily Wire test email...', 'gold');
+
+    try {
+      let data = null;
+      if (window.ThunderWire && window.ThunderWire.dispatchDailyWireDigest) {
+        data = await window.ThunderWire.dispatchDailyWireDigest(wireDigestRecipients);
+      } else {
+        const resp = await fetch('/api/daily-wire-digest?force=true', { method: 'POST' });
+        data = await resp.json().catch(() => ({}));
+        if (!resp.ok || !data.success) {
+          throw new Error(data.error || ('Server returned ' + resp.status));
+        }
+      }
+
+      const recCount = (data.recipients || []).length;
+      window.showToast(`Test Daily Wire email dispatched to ${recCount} recipients (${data.count} stories)!`, 'success');
+    } catch (err) {
+      console.error('Error sending test wire digest:', err);
+      window.showToast('Test email failed: ' + err.message, 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+      }
+    }
   }
 </script>
 </body>

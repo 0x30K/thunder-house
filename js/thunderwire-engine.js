@@ -23,9 +23,18 @@ window.ThunderWire = (function () {
 
   async function getFeedTable() {
     if (detectedTable) return detectedTable;
-    if (!window.supabaseClient) return 'thunderwire_feed';
+    if (!window.supabaseClient) return 'thunderpulse_feed';
     try {
-      const { error } = await window.supabaseClient
+      const { data, error } = await window.supabaseClient
+        .from('thunderpulse_feed')
+        .select('id', { count: 'exact', head: true });
+      if (!error) {
+        detectedTable = 'thunderpulse_feed';
+        return detectedTable;
+      }
+    } catch (e) {}
+    try {
+      const { data, error } = await window.supabaseClient
         .from('thunderwire_feed')
         .select('id', { count: 'exact', head: true });
       if (!error) {
@@ -358,11 +367,278 @@ window.ThunderWire = (function () {
     }
   }
 
+  /**
+   * Dispatches The Daily Wire 7AM Email Briefing.
+   * Works both in Vercel serverless environment and directly via client Supabase Edge Function fallback.
+   */
+  async function dispatchDailyWireDigest(overrideRecipients = null) {
+    const startTime = Date.now();
+    // 1. Try serverless endpoint first
+    try {
+      const resp = await fetch('/api/daily-wire-digest?force=true', { method: 'POST' });
+      const contentType = resp.headers.get('content-type') || '';
+      if (resp.ok && contentType.includes('application/json')) {
+        const data = await resp.json();
+        if (data && data.success) return data;
+      }
+    } catch (_) {}
+
+    // 2. Direct Supabase Edge Function dispatch fallback
+    if (!window.supabaseClient) {
+      throw new Error('Supabase client not initialized.');
+    }
+
+    const { data: autoData } = await window.supabaseClient
+      .from('thunderhouse_automations')
+      .select('*')
+      .eq('id', 'daily_wire_digest')
+      .single();
+
+    let recipients = overrideRecipients || (autoData?.config?.recipients) || ['breshaun.black@gmail.com', 'olifedigital@gmail.com'];
+    if (!Array.isArray(recipients) || recipients.length === 0) {
+      recipients = ['breshaun.black@gmail.com', 'olifedigital@gmail.com'];
+    }
+
+    const table = await getFeedTable();
+    let { data: stories } = await window.supabaseClient
+      .from(table)
+      .select('*')
+      .eq('is_archived', false)
+      .order('virality_score', { ascending: false })
+      .limit(6);
+
+    if (!stories || stories.length === 0) {
+      const { data: fallbackStories } = await window.supabaseClient
+        .from(table)
+        .select('*')
+        .order('virality_score', { ascending: false })
+        .limit(6);
+      stories = fallbackStories || [];
+    }
+
+    if (!stories || !stories.length) {
+      throw new Error('No active stories found on Thunder Wire to compile.');
+    }
+
+    const leadStory = stories[0];
+    const otherStories = stories.slice(1, 5);
+    const now = new Date();
+    const dateFormatted = now.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    const scheduleTime = autoData?.schedule_time || '07:00';
+
+    const getCatColor = (cat) => {
+      if (cat === 'lead') return { bg: 'rgba(0, 229, 255, 0.15)', text: '#00e5ff', border: 'rgba(0, 229, 255, 0.4)', name: 'The Opening Bell' };
+      if (cat === 'shade') return { bg: 'rgba(255, 0, 85, 0.15)', text: '#ff0055', border: 'rgba(255, 0, 85, 0.4)', name: 'The Shade Storm' };
+      if (cat === 'drops') return { bg: 'rgba(255, 183, 3, 0.15)', text: '#ffb703', border: 'rgba(255, 183, 3, 0.4)', name: 'The Drop Zone' };
+      if (cat === 'wild') return { bg: 'rgba(34, 197, 94, 0.15)', text: '#22c55e', border: 'rgba(34, 197, 94, 0.4)', name: 'Are You Out Your Mind?!' };
+      return { bg: 'rgba(148, 163, 184, 0.15)', text: '#cbd5e1', border: 'rgba(148, 163, 184, 0.4)', name: 'Real Talk' };
+    };
+
+    const leadCat = getCatColor(leadStory.category);
+    const leadHeat = leadStory.virality_score || 95;
+    const leadPoints = Array.isArray(leadStory.talking_points) ? leadStory.talking_points : [leadStory.summary];
+
+    const otherRows = otherStories.map(s => {
+      const c = getCatColor(s.category);
+      const h = s.virality_score || 85;
+      return `
+        <tr>
+          <td style="padding: 16px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="vertical-align: top;">
+                  <div style="margin-bottom: 6px;">
+                    <span style="background: ${c.bg}; color: ${c.text}; border: 1px solid ${c.border}; padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase;">
+                      ${c.name}
+                    </span>
+                    <span style="background: rgba(255, 183, 3, 0.15); color: #ffb703; padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 800; margin-left: 4px;">
+                      ⚡ Heat ${h}
+                    </span>
+                  </div>
+                  <h3 style="font-size: 16px; font-weight: 700; color: #ffffff; margin: 0 0 6px 0; line-height: 1.35;">
+                    ${escapeHtml(s.title)}
+                  </h3>
+                  <p style="font-size: 13px; line-height: 1.5; color: #94a3b8; margin: 0 0 8px 0;">
+                    ${escapeHtml(s.summary || '')}
+                  </p>
+                  <div style="font-size: 11px; color: #64748b;">
+                    Source: <span style="color: #cbd5e1;">${escapeHtml(s.source_name || 'Thunder Wire')}</span>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    const emailHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>⚡ The Daily Wire</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #060911; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #e2e8f0;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #060911; width: 100%; table-layout: fixed;">
+    <tr>
+      <td align="center" style="padding: 24px 12px;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 640px; background-color: #0c101c; border: 1px solid rgba(0, 229, 255, 0.25); border-radius: 14px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.85), 0 0 40px rgba(0, 229, 255, 0.1);">
+          <tr>
+            <td style="background: linear-gradient(135deg, #090e1a 0%, #111a2e 100%); padding: 32px 28px 24px; text-align: center; border-bottom: 2px solid rgba(0, 229, 255, 0.35);">
+              <div style="font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #00e5ff; text-transform: uppercase; margin-bottom: 6px;">
+                ⚡ THUNDER HOUSE ENTERTAINMENT · #WAKEITUP
+              </div>
+              <h1 style="margin: 0 0 6px 0; font-size: 32px; font-weight: 800; letter-spacing: 1px; color: #ffffff; text-transform: uppercase;">
+                THE DAILY WIRE
+              </h1>
+              <div style="font-size: 13px; color: #cbd5e1; margin-bottom: 14px;">
+                Morning Culture, Music &amp; Broadcast Intelligence Briefing
+              </div>
+              <div style="display: inline-block; background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: 30px; padding: 5px 16px; font-size: 12px; color: #ffb703; font-weight: 700;">
+                📅 ${escapeHtml(dateFormatted)} · ⚡ ${escapeHtml(scheduleTime)} CST
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 28px;">
+              <div style="margin-bottom: 28px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: 12px; overflow: hidden; box-shadow: 0 0 25px rgba(0, 229, 255, 0.1); padding: 22px;">
+                <div style="margin-bottom: 10px;">
+                  <span style="background: ${leadCat.bg}; color: ${leadCat.text}; border: 1px solid ${leadCat.border}; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase;">
+                    ${leadCat.name}
+                  </span>
+                  <span style="background: rgba(255, 183, 3, 0.2); color: #ffb703; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; margin-left: 6px;">
+                    🔥 Heat ${leadHeat}
+                  </span>
+                  <span style="color: #64748b; font-size: 12px; margin-left: 8px;">
+                    via ${escapeHtml(leadStory.source_name || 'AllHipHop')}
+                  </span>
+                </div>
+                <h2 style="font-size: 22px; font-weight: 800; line-height: 1.3; color: #ffffff; margin: 0 0 10px 0;">
+                  ${escapeHtml(leadStory.title)}
+                </h2>
+                <p style="font-size: 14.5px; line-height: 1.6; color: #cbd5e1; margin: 0 0 16px 0;">
+                  ${escapeHtml(leadStory.summary || '')}
+                </p>
+                <div style="background: rgba(0, 229, 255, 0.05); border-left: 3px solid #00e5ff; border-radius: 0 8px 8px 0; padding: 12px 16px; margin-bottom: 14px;">
+                  <div style="font-size: 11px; font-weight: 800; color: #00e5ff; text-transform: uppercase; margin-bottom: 6px;">
+                    🎙️ On-Air Host Talking Points
+                  </div>
+                  <ul style="margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.5; color: #e2e8f0;">
+                    ${leadPoints.slice(0, 3).map(pt => `<li>${escapeHtml(pt)}</li>`).join('')}
+                  </ul>
+                </div>
+                <div style="background: rgba(255, 0, 85, 0.08); border-left: 3px solid #ff0055; border-radius: 0 8px 8px 0; padding: 12px 16px;">
+                  <div style="font-size: 11px; font-weight: 800; color: #ff0055; text-transform: uppercase; margin-bottom: 4px;">
+                    💬 Charlamagne Style Prompt / Debate
+                  </div>
+                  <div style="font-size: 13.5px; font-weight: 600; color: #ffffff;">
+                    "${escapeHtml(leadStory.host_question || 'What is your honest take on this?')}"
+                  </div>
+                </div>
+              </div>
+              <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 15px; font-weight: 800; color: #00e5ff; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 12px 0; border-bottom: 1px solid rgba(0, 229, 255, 0.2); padding-bottom: 8px;">
+                  ⚡ Today's Morning Rundown
+                </h3>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  ${otherRows}
+                </table>
+              </div>
+              <div style="text-align: center; margin: 30px 0 10px;">
+                <a href="https://thunderhouseent.com/admin/wire.html" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #00e5ff 0%, #0099ff 100%); color: #000; font-weight: 800; font-size: 13px; text-decoration: none; padding: 12px 24px; border-radius: 25px; margin: 6px; text-transform: uppercase;">
+                  ⚡ Open Producer Desk
+                </a>
+                <a href="https://thunderhouseent.com/admin/automations.html" target="_blank" style="display: inline-block; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-weight: 700; font-size: 13px; text-decoration: none; padding: 12px 22px; border-radius: 25px; margin: 6px; text-transform: uppercase;">
+                  ⚙️ Manage Schedule
+                </a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #030407; padding: 20px 28px; border-top: 1px solid rgba(255, 255, 255, 0.08); text-align: center; font-size: 12px; color: #64748b;">
+              <strong style="color: #cbd5e1;">Thunder House Entertainment</strong> · Oklahoma City, OK<br>
+              Direct to: <strong style="color: #94a3b8;">${recipients.map(escapeHtml).join(', ')}</strong>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+    const cleanSub = leadStory.title ? leadStory.title.substring(0, 50) : 'Morning Culture Briefing';
+    const subject = `⚡ The Daily Wire: ${cleanSub} [Morning Briefing]`;
+
+    const edgeResp = await fetch('https://kxoivmflghfgtvawhktt.supabase.co/functions/v1/send-booking-confirmation', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${window.supabaseClient.supabaseKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4b2l2bWZsZ2hmZ3R2YXdoa3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NTI5NTEsImV4cCI6MjEwNzIyODk1MX0.lrbLr6Q6tNwRWUGH7T3g6dL3jwU3TbaoUL1yRliBgTY'}`
+      },
+      body: JSON.stringify({
+        type: 'daily_wire_digest',
+        recipients: recipients,
+        subject: subject,
+        html: emailHtml,
+        text: `⚡ The Daily Wire: ${leadStory.title}\n${leadStory.summary}`
+      })
+    });
+
+    const edgeJson = await edgeResp.json().catch(() => ({}));
+    if (!edgeResp.ok || (edgeJson && edgeJson.success === false)) {
+      throw new Error(edgeJson?.error || ('Edge dispatch failed with status ' + edgeResp.status));
+    }
+
+    const duration = Date.now() - startTime;
+    const summary = `Daily Wire digest dispatched to ${recipients.join(', ')} (${stories.length} stories curated).`;
+
+    // Update automation and log
+    await window.supabaseClient.from('thunderhouse_automations').update({
+      last_run_at: new Date().toISOString(),
+      last_run_status: 'success',
+      last_run_summary: summary,
+      last_duration_ms: duration,
+      updated_at: new Date().toISOString()
+    }).eq('id', 'daily_wire_digest');
+
+    await window.supabaseClient.from('thunderhouse_automation_logs').insert({
+      automation_id: 'daily_wire_digest',
+      status: 'success',
+      summary: summary,
+      duration_ms: duration,
+      triggered_by: 'manual_admin'
+    });
+
+    return {
+      success: true,
+      count: stories.length,
+      recipients: recipients,
+      duration_ms: duration
+    };
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   return {
     scanNow,
     classifyCategory,
     getFeedTable,
-    maintainLifecycle
+    maintainLifecycle,
+    dispatchDailyWireDigest
   };
 })();
 
