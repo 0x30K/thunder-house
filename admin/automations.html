@@ -735,8 +735,8 @@
   // 1. Supabase Initialization
   const SUPABASE_URL = 'https://kxoivmflghfgtvawhktt.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4b2l2bWZsZ2hmZ3R2YXdoa3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NTI5NTEsImV4cCI6MjEwNzIyODk1MX0.lrbLr6Q6tNwRWUGH7T3g6dL3jwU3TbaoUL1yRliBgTY';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-  window.supabaseClient = supabase;
+  window.supabaseClient = window.supabaseClient || (window.supabase && window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON));
+  const db = window.supabaseClient;
 
   let allAutomations = [];
   let currentCategory = 'all';
@@ -745,7 +745,7 @@
   // 2. Fetch and Load Automations
   async function loadAutomations(isManualRefresh = false) {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('thunderhouse_automations')
         .select('*')
         .order('category', { ascending: true })
@@ -1061,7 +1061,7 @@
           if (window.ThunderWire && window.ThunderWire.maintainLifecycle) {
             lifecycleStats = await window.ThunderWire.maintainLifecycle();
           } else {
-            const { data: rpcRes } = await supabase.rpc('maintain_thunderwire_lifecycle');
+            const { data: rpcRes } = await db.rpc('maintain_thunderwire_lifecycle');
             lifecycleStats = rpcRes;
           }
         } catch (lErr) {
@@ -1106,7 +1106,7 @@
         return;
       } else if (id === 'music_scout') {
         // Post signal to Supabase for local python daemon
-        await supabase.from('thunderhouse_site_settings').upsert({
+        await db.from('thunderhouse_site_settings').upsert({
           key: 'music_scout_trigger',
           value: { requested_at: new Date().toISOString(), requested_by: 'Automation Station' }
         });
@@ -1302,7 +1302,7 @@
     }
 
     try {
-      const { error } = await supabase.from('thunderhouse_automations').insert({
+      const { error } = await db.from('thunderhouse_automations').insert({
         id,
         name,
         category,
@@ -1434,7 +1434,7 @@
     }
 
     try {
-      const { error } = await supabase.from('thunderhouse_automations').update({
+      const { error } = await db.from('thunderhouse_automations').update({
         name,
         description: desc,
         target_folder: folder || null,
