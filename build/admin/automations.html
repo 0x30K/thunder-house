@@ -734,11 +734,12 @@
 <script src="../js/thunderwire-engine.js"></script>
 <script>
   // 1. Supabase Initialization
-  const SUPABASE_URL = 'https://kxoivmflghfgtvawhktt.supabase.co';
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4b2l2bWZsZ2hmZ3R2YXdoa3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NTI5NTEsImV4cCI6MjEwNzIyODk1MX0.lrbLr6Q6tNwRWUGH7T3g6dL3jwU3TbaoUL1yRliBgTY';
+  const SB_URL = window.SUPABASE_URL || 'https://kxoivmflghfgtvawhktt.supabase.co';
+  const SB_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4b2l2bWZsZ2hmZ3R2YXdoa3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NTI5NTEsImV4cCI6MjEwNzIyODk1MX0.lrbLr6Q6tNwRWUGH7T3g6dL3jwU3TbaoUL1yRliBgTY';
+
   function getDb() {
     if (!window.supabaseClient && window.supabase && typeof window.supabase.createClient === 'function') {
-      window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+      window.supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
     }
     return window.supabaseClient;
   }
@@ -760,8 +761,8 @@
   // 2. Fetch and Load Automations
   async function loadAutomations(isManualRefresh = false) {
     try {
-      if (!window.supabaseClient && window.supabase) {
-        window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+      if (!window.supabaseClient && window.supabase && typeof window.supabase.createClient === 'function') {
+        window.supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
       }
       let client = window.supabaseClient;
       let data = null;
@@ -783,10 +784,10 @@
 
       // Direct REST fallback if client was not ready or errored
       if (!data || error) {
-        const resp = await fetch(`${SUPABASE_URL}/rest/v1/thunderhouse_automations?select=*&order=category.asc,name.asc`, {
+        const resp = await fetch(`${SB_URL}/rest/v1/thunderhouse_automations?select=*&order=category.asc,name.asc`, {
           headers: {
-            apikey: SUPABASE_ANON,
-            Authorization: 'Bearer ' + SUPABASE_ANON
+            apikey: SB_KEY,
+            Authorization: 'Bearer ' + SB_KEY
           }
         });
         if (resp.ok) {
