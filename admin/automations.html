@@ -736,14 +736,22 @@
   // 1. Supabase Initialization
   const SUPABASE_URL = 'https://kxoivmflghfgtvawhktt.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4b2l2bWZsZ2hmZ3R2YXdoa3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NTI5NTEsImV4cCI6MjEwNzIyODk1MX0.lrbLr6Q6tNwRWUGH7T3g6dL3jwU3TbaoUL1yRliBgTY';
-  if (!window.supabaseClient && window.supabase) {
-    window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  function getDb() {
+    if (!window.supabaseClient && window.supabase && typeof window.supabase.createClient === 'function') {
+      window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    }
+    return window.supabaseClient;
   }
-  const db = window.supabaseClient || {
-    from: (table) => ({
-      select: () => fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*`, { headers: { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON } }).then(r => r.json()).then(d => ({ data: d, error: null }))
-    })
-  };
+
+  const db = new Proxy({}, {
+    get: (target, prop) => {
+      const client = getDb();
+      if (client && typeof client[prop] === 'function') {
+        return client[prop].bind(client);
+      }
+      return client ? client[prop] : undefined;
+    }
+  });
 
   let allAutomations = [];
   let currentCategory = 'all';
@@ -1032,7 +1040,7 @@
       if (card) card.classList.toggle('disabled', !isEnabled);
       updateStationMetrics();
 
-      const { error } = await supabase
+      const { error } = await db
         .from('thunderhouse_automations')
         .update({ enabled: isEnabled, updated_at: new Date().toISOString() })
         .eq('id', id);
@@ -1052,7 +1060,7 @@
   // 7. Update Daily Run Time
   async function updateScheduleTime(id, timeVal) {
     try {
-      const { error } = await supabase
+      const { error } = await db
         .from('thunderhouse_automations')
         .update({ schedule_time: timeVal, updated_at: new Date().toISOString() })
         .eq('id', id);
@@ -1072,7 +1080,7 @@
   // 8. Update Interval Minutes
   async function updateScheduleInterval(id, minsVal) {
     try {
-      const { error } = await supabase
+      const { error } = await db
         .from('thunderhouse_automations')
         .update({ schedule_interval_mins: parseInt(minsVal, 10), updated_at: new Date().toISOString() })
         .eq('id', id);
@@ -1161,7 +1169,7 @@
       } else if (id === 'cloud_stream_purge') {
         // Execute stream purge audit
         const nowIso = new Date().toISOString();
-        const { data: expired } = await supabase
+        const { data: expired } = await db
           .from('thunderhouse_music_scout')
           .select('id, title')
           .eq('status', 'downloaded')
@@ -1171,7 +1179,7 @@
       } else if (id === 'quote_hold_releaser') {
         // Audit expired date holds
         const cutoff = new Date(Date.now() - 72 * 3600 * 1000).toISOString();
-        const { data: expiredHolds } = await supabase
+        const { data: expiredHolds } = await db
           .from('thunderhouse_inquiries')
           .select('id, event_date')
           .eq('status', 'quote_held')
@@ -1180,7 +1188,7 @@
         summary = `Audited quote holds: ${expiredHolds ? expiredHolds.length : 0} expired holds released.`;
       } else if (id === 'gear_return_check') {
         // Audit fleet returns
-        const { data: gear } = await supabase
+        const { data: gear } = await db
           .from('thunderhouse_equipment')
           .select('id, name, status, location')
           .eq('status', 'in_transit');
@@ -1197,7 +1205,7 @@
       const durationMs = Date.now() - startTime;
 
       // Update automation record
-      await supabase
+      await db
         .from('thunderhouse_automations')
         .update({
           last_run_at: new Date().toISOString(),
@@ -1209,7 +1217,7 @@
         .eq('id', id);
 
       // Log execution
-      await supabase
+      await db
         .from('thunderhouse_automation_logs')
         .insert({
           automation_id: id,
@@ -1226,7 +1234,7 @@
       status = 'error';
       summary = `Execution error: ${err.message}`;
 
-      await supabase
+      await db
         .from('thunderhouse_automation_logs')
         .insert({
           automation_id: id,
@@ -1259,7 +1267,7 @@
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:var(--text-muted)"><i class="fa-solid fa-spinner fa-spin"></i> Fetching logs...</td></tr>`;
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('thunderhouse_automation_logs')
         .select('*')
         .eq('automation_id', activeLogAutoId)
