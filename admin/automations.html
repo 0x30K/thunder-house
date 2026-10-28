@@ -688,28 +688,28 @@
         <input class="input" id="edit-config-folder">
       </div>
 
-      <!-- Dedicated Daily Wire Recipients Manager -->
+      <!-- Dedicated Digest Email Recipients Manager -->
       <div id="wrap-daily-wire-recipients" style="display:none; background:rgba(0, 229, 255, 0.05); border:1px solid rgba(0, 229, 255, 0.25); border-radius:10px; padding:1.15rem; margin-bottom:1.15rem">
-        <div style="font-weight:700; font-size:0.92rem; color:#fff; margin-bottom:0.35rem; display:flex; align-items:center; gap:0.45rem">
-          <i class="fa-solid fa-envelope-open-text cyan"></i> Daily Wire Email Recipients
+        <div id="email-recipients-title" style="font-weight:700; font-size:0.92rem; color:#fff; margin-bottom:0.35rem; display:flex; align-items:center; gap:0.45rem">
+          <i class="fa-solid fa-envelope-open-text cyan"></i> Digest Email Recipients
         </div>
-        <p class="small muted" style="margin-bottom:0.85rem; line-height:1.45">
-          These email addresses will receive the stylized 7:00 AM culture briefing every morning with full story breakdowns, virality heat scores, and host talking points.
+        <p class="small muted" id="email-recipients-desc" style="margin-bottom:0.85rem; line-height:1.45">
+          These email addresses will receive the automated email briefing directly in their inboxes.
         </p>
         <div id="daily-wire-chips-list" style="display:flex; flex-wrap:wrap; gap:0.45rem; margin-bottom:0.75rem">
           <!-- chips dynamically populated -->
         </div>
         <div style="display:flex; gap:0.5rem; margin-bottom:0.85rem">
-          <input type="email" id="daily-wire-new-email" class="input" placeholder="Add recipient email (e.g. name@domain.com)..." style="font-size:0.85rem; padding:0.45rem 0.75rem">
+          <input type="email" id="daily-wire-new-email" class="input" placeholder="Add recipient email (e.g. name@domain.com)..." style="font-size:0.85rem; padding:0.45rem 0.75rem" onkeydown="if(event.key==='Enter'){event.preventDefault();addDailyWireRecipient();}">
           <button class="btn btn-primary btn-sm" type="button" onclick="addDailyWireRecipient()" style="white-space:nowrap">
             <i class="fa-solid fa-plus"></i> Add Recipient
           </button>
         </div>
-        <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap; pt:0.5rem; border-top:1px dashed rgba(255,255,255,0.08); padding-top:0.75rem">
-          <a href="/admin/wire-email-preview.html" target="_blank" class="btn btn-outline btn-sm" style="font-size:0.78rem">
+        <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap; padding-top:0.75rem; border-top:1px dashed rgba(255,255,255,0.08)">
+          <a id="email-recipients-preview-btn" href="/admin/wire-email-preview.html" target="_blank" class="btn btn-outline btn-sm" style="font-size:0.78rem">
             <i class="fa-solid fa-arrow-up-right-from-square"></i> Preview Email Layout
           </a>
-          <button type="button" class="btn btn-gold btn-sm" onclick="triggerAutomation('daily_wire_digest')" style="font-size:0.78rem">
+          <button id="email-recipients-test-btn" type="button" class="btn btn-gold btn-sm" onclick="triggerAutomation('daily_wire_digest')" style="font-size:0.78rem">
             <i class="fa-solid fa-paper-plane"></i> Send Test Email Now
           </button>
         </div>
@@ -1160,6 +1160,16 @@
         if (window.showToast) window.showToast(summary, 'success');
         loadAutomations();
         return;
+      } else if (id === 'weekly_music_digest') {
+        const resp = await fetch('/api/weekly-music-digest?force=true');
+        const resData = await resp.json().catch(() => ({}));
+        if (!resp.ok || !resData.success) {
+          throw new Error(resData?.error || ('Server returned ' + resp.status));
+        }
+        summary = `Weekly Fresh Drops digest dispatched to ${(resData.recipients || []).join(', ')} (${resData.tracks_curated || 0} tracks curated).`;
+        if (window.showToast) window.showToast(summary, 'success');
+        loadAutomations();
+        return;
       } else if (id === 'music_scout') {
         // Post signal to Supabase for local python daemon
         await db.from('thunderhouse_site_settings').upsert({
@@ -1399,11 +1409,33 @@
     document.getElementById('edit-config-folder').value = auto.target_folder || '';
     document.getElementById('edit-config-json').value = JSON.stringify(auto.config || {}, null, 2);
 
-    // Toggle daily wire recipient chips manager
+    // Toggle digest recipient chips manager
     const wireRecipientsWrap = document.getElementById('wrap-daily-wire-recipients');
     if (wireRecipientsWrap) {
-      if (id === 'daily_wire_digest') {
+      if (id === 'daily_wire_digest' || id === 'weekly_music_digest') {
         wireRecipientsWrap.style.display = 'block';
+        const isMusic = id === 'weekly_music_digest';
+
+        const titleEl = document.getElementById('email-recipients-title');
+        if (titleEl) {
+          titleEl.innerHTML = isMusic
+            ? `<i class="fa-solid fa-envelope-open-text" style="color:var(--accent-gold)"></i> Weekly Fresh Drops Recipients`
+            : `<i class="fa-solid fa-envelope-open-text cyan"></i> Daily Wire Email Recipients`;
+        }
+
+        const descEl = document.getElementById('email-recipients-desc');
+        if (descEl) {
+          descEl.textContent = isMusic
+            ? `These email addresses will receive the Weekly Fresh Drops email briefing featuring new Clean & Dirty releases, BPM, and player links.`
+            : `These email addresses will receive the stylized 7:00 AM culture briefing every morning with full story breakdowns, virality heat scores, and host talking points.`;
+        }
+
+        const previewBtn = document.getElementById('email-recipients-preview-btn');
+        if (previewBtn) previewBtn.href = isMusic ? '/api/weekly-music-digest?preview=true' : '/admin/wire-email-preview.html';
+
+        const testBtn = document.getElementById('email-recipients-test-btn');
+        if (testBtn) testBtn.setAttribute('onclick', `triggerAutomation('${id}')`);
+
         activeDailyWireRecipients = Array.isArray(auto.config?.recipients) && auto.config.recipients.length > 0
           ? [...auto.config.recipients]
           : ['breshaun.black@gmail.com', 'olifedigital@gmail.com'];
@@ -1485,7 +1517,7 @@
       }
     }
 
-    if (id === 'daily_wire_digest' && activeDailyWireRecipients.length > 0) {
+    if ((id === 'daily_wire_digest' || id === 'weekly_music_digest') && activeDailyWireRecipients.length > 0) {
       configJson.recipients = activeDailyWireRecipients;
     }
 

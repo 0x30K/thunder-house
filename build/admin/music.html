@@ -98,6 +98,9 @@
         <p>Scouts trending Hip-Hop, R&amp;B, and Pop weekly releases, downloads Clean &amp; Dirty versions to your studio folder, and archives weekly.</p>
       </div>
       <div class="head-actions">
+        <button class="btn btn-outline" onclick="openMusicDigestModal()" title="Configure and preview Weekly Fresh Drops email newsletter">
+          <i class="fa-solid fa-envelope-open-text" style="color:var(--accent-gold)"></i> Weekly Drops Email
+        </button>
         <a href="settings.html#music" class="btn btn-outline" title="Engine schedule and directory settings">
           <i class="fa-solid fa-gear"></i> Settings
         </a>
@@ -194,6 +197,7 @@
 <script src="../js/supabase-config.js"></script>
 <script src="assets/shell.js"></script>
 <script src="assets/music-player.js"></script>
+<script src="../js/artist-intelligence.js"></script>
 
 <script>
   let musicTracks = [];
@@ -332,56 +336,74 @@
         chipsHtml += `<a href="${escapeHtml(links.youtube)}" target="_blank" class="artist-chip youtube" title="YouTube Channel"><i class="fa-brands fa-youtube"></i> YouTube</a>`;
       }
 
-      return `
-        <div class="track-row">
-          <div class="track-icon-box">
-            <i class="fa-solid fa-music"></i>
-          </div>
-          <div style="flex:1; min-width:0">
-            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap">
-              <strong style="color:#fff; font-size:0.96rem">${escapeHtml(track.title)}</strong>
-              <span class="pill" style="font-size:0.72rem; background:rgba(255,255,255,0.06)">${escapeHtml(track.genre)}</span>
-              ${track.release_date ? `<span class="muted small">· Released: ${escapeHtml(track.release_date)}</span>` : ''}
+        const artistLinksJson = JSON.stringify(track.artist_links || {}).replace(/"/g, '&quot;');
+
+        return `
+          <div class="track-row" style="align-items:center">
+            <!-- Artist Thumbnail / Cover Art -->
+            <div class="track-thumb-box" id="music-thumb-box-${track.id}" onclick="ThunderArtist.openModal('${escapeHtml(track.artist)}', '${escapeHtml(track.genre || '')}', ${artistLinksJson})" title="Click to view verified artist info &amp; profiles">
+              <img id="music-thumb-img-${track.id}" class="track-thumb-img" style="display:none" alt="${escapeHtml(track.artist)}">
+              <div id="music-thumb-fallback-${track.id}" class="track-thumb-fallback">
+                <i class="fa-solid fa-music"></i>
+              </div>
             </div>
-            <div class="small text-light" style="margin-top:0.25rem; display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap">
-              <strong style="color:#e2e8f0">${escapeHtml(track.artist)}</strong>
-              ${chipsHtml ? `<div class="artist-research-chips">${chipsHtml}</div>` : ''}
+
+            <div style="flex:1; min-width:0; padding-left:0.25rem">
+              <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap">
+                <strong style="color:#fff; font-size:0.96rem">${escapeHtml(track.title)}</strong>
+                <span class="pill" style="font-size:0.72rem; background:rgba(255,255,255,0.06)">${escapeHtml(track.genre)}</span>
+                ${track.release_date ? `<span class="muted small">· Released: ${escapeHtml(track.release_date)}</span>` : ''}
+              </div>
+              <div class="small text-light" style="margin-top:0.25rem; display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap">
+                <a href="javascript:void(0)" class="artist-name-link" onclick="ThunderArtist.openModal('${escapeHtml(track.artist)}', '${escapeHtml(track.genre || '')}', ${artistLinksJson})" title="Click to view verified artist info &amp; profiles">
+                  ${escapeHtml(track.artist)} <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+                ${chipsHtml ? `<div class="artist-research-chips">${chipsHtml}</div>` : ''}
+              </div>
+            </div>
+
+            <!-- Clean & Dirty Play/Download Controls -->
+            <div style="display:flex; gap:0.45rem; align-items:center; flex-wrap:wrap">
+              ${track.clean_downloaded ? `
+                <button class="btn-track-action play-clean" onclick="window.ThunderPlayer.play('${track.id}', 'clean')" title="Stream Clean (Radio Edit)">
+                  <i class="fa-solid fa-play"></i> Clean
+                </button>
+                <button class="btn-track-action download-btn" onclick="window.ThunderPlayer.download('${track.id}', 'clean')" title="Download Clean MP3">
+                  <i class="fa-solid fa-download"></i>
+                </button>
+              ` : `
+                <span class="version-tag missing"><i class="fa-solid fa-minus"></i> No Clean</span>
+              `}
+
+              ${track.dirty_downloaded ? `
+                <button class="btn-track-action play-dirty" onclick="window.ThunderPlayer.play('${track.id}', 'dirty')" title="Stream Dirty (Explicit Cut)">
+                  <i class="fa-solid fa-fire"></i> Dirty
+                </button>
+                <button class="btn-track-action download-btn" onclick="window.ThunderPlayer.download('${track.id}', 'dirty')" title="Download Dirty MP3">
+                  <i class="fa-solid fa-download"></i>
+                </button>
+              ` : `
+                <span class="version-tag missing"><i class="fa-solid fa-minus"></i> No Dirty</span>
+              `}
+            </div>
+
+            <!-- Status -->
+            <div style="text-align:right">
+              ${statusBadge}
             </div>
           </div>
+        `;
+      }).join('');
 
-          <!-- Clean & Dirty Play/Download Controls -->
-          <div style="display:flex; gap:0.45rem; align-items:center; flex-wrap:wrap">
-            ${track.clean_downloaded ? `
-              <button class="btn-track-action play-clean" onclick="window.ThunderPlayer.play('${track.id}', 'clean')" title="Stream Clean (Radio Edit)">
-                <i class="fa-solid fa-play"></i> Clean
-              </button>
-              <button class="btn-track-action download-btn" onclick="window.ThunderPlayer.download('${track.id}', 'clean')" title="Download Clean MP3">
-                <i class="fa-solid fa-download"></i>
-              </button>
-            ` : `
-              <span class="version-tag missing"><i class="fa-solid fa-minus"></i> No Clean</span>
-            `}
-
-            ${track.dirty_downloaded ? `
-              <button class="btn-track-action play-dirty" onclick="window.ThunderPlayer.play('${track.id}', 'dirty')" title="Stream Dirty (Explicit Cut)">
-                <i class="fa-solid fa-fire"></i> Dirty
-              </button>
-              <button class="btn-track-action download-btn" onclick="window.ThunderPlayer.download('${track.id}', 'dirty')" title="Download Dirty MP3">
-                <i class="fa-solid fa-download"></i>
-              </button>
-            ` : `
-              <span class="version-tag missing"><i class="fa-solid fa-minus"></i> No Dirty</span>
-            `}
-          </div>
-
-          <!-- Status -->
-          <div style="text-align:right">
-            ${statusBadge}
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
+      // Asynchronously resolve & inject verified artist photos into thumbnails
+      if (window.ThunderArtist) {
+        filtered.forEach(track => {
+          const imgEl = document.getElementById('music-thumb-img-' + track.id);
+          const fallbackEl = document.getElementById('music-thumb-fallback-' + track.id);
+          window.ThunderArtist.renderThumb(track.artist, track.title, imgEl, fallbackEl);
+        });
+      }
+    }
 
   function setupEventListeners() {
     document.getElementById('music-search-input')?.addEventListener('input', renderTrackList);
@@ -459,6 +481,244 @@
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     }[s]));
   }
+
+  // ==========================================
+  // Weekly Music Digest Executive Modal Controller
+  // ==========================================
+  let activeMdigRecipients = ['breshaun.black@gmail.com', 'olifedigital@gmail.com'];
+
+  async function openMusicDigestModal() {
+    const modal = document.getElementById('modal-music-digest');
+    if (!modal) return;
+    modal.classList.add('active');
+
+    // Fetch live automation config from Supabase
+    try {
+      if (window.supabaseClient) {
+        const { data, error } = await window.supabaseClient
+          .from('thunderhouse_automations')
+          .select('*')
+          .eq('id', 'weekly_music_digest')
+          .maybeSingle();
+
+        if (data) {
+          const toggle = document.getElementById('mdig-enabled');
+          if (toggle) toggle.checked = data.enabled !== false;
+
+          const timeInput = document.getElementById('mdig-time');
+          if (timeInput) timeInput.value = data.schedule_time || '07:00';
+
+          const daySelect = document.getElementById('mdig-day');
+          if (daySelect && data.days_of_week && data.days_of_week.length > 0) {
+            daySelect.value = String(data.days_of_week[0]);
+          }
+
+          if (data.config && Array.isArray(data.config.recipients)) {
+            activeMdigRecipients = [...data.config.recipients];
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Note loading weekly music digest config:', err);
+    }
+
+    renderMdigRecipientChips();
+  }
+
+  function closeMusicDigestModal() {
+    const modal = document.getElementById('modal-music-digest');
+    if (modal) modal.classList.remove('active');
+  }
+
+  function renderMdigRecipientChips() {
+    const container = document.getElementById('mdig-recipient-chips');
+    if (!container) return;
+
+    if (activeMdigRecipients.length === 0) {
+      container.innerHTML = `<span class="small muted" style="font-size:0.8rem">No recipients specified. Will default to studio admins.</span>`;
+      return;
+    }
+
+    container.innerHTML = activeMdigRecipients.map((email, idx) => `
+      <span class="chip-item" style="display:inline-flex; align-items:center; gap:0.4rem; padding:0.3rem 0.65rem; background:rgba(255,183,3,0.12); border:1px solid rgba(255,183,3,0.3); border-radius:20px; font-size:0.82rem; color:#ffb703">
+        <i class="fa-regular fa-envelope"></i>
+        <span>${escapeHtml(email)}</span>
+        <button type="button" onclick="removeMdigRecipient(${idx})" style="background:none; border:none; color:#ef4444; cursor:pointer; padding:0 0.2rem; font-size:0.85rem">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </span>
+    `).join('');
+  }
+
+  function addMdigRecipient() {
+    const input = document.getElementById('mdig-new-email');
+    if (!input) return;
+    const val = input.value.trim().toLowerCase();
+    if (!val || !val.includes('@')) {
+      if (window.showToast) window.showToast('Please enter a valid email address.', 'warn');
+      return;
+    }
+    if (!activeMdigRecipients.includes(val)) {
+      activeMdigRecipients.push(val);
+      renderMdigRecipientChips();
+      input.value = '';
+    } else {
+      if (window.showToast) window.showToast('Recipient already added.', 'info');
+    }
+  }
+
+  function removeMdigRecipient(idx) {
+    activeMdigRecipients.splice(idx, 1);
+    renderMdigRecipientChips();
+  }
+
+  async function saveMusicDigestSettings() {
+    const isEnabled = document.getElementById('mdig-enabled')?.checked ?? true;
+    const timeVal = document.getElementById('mdig-time')?.value || '07:00';
+    const dayVal = parseInt(document.getElementById('mdig-day')?.value || '5', 10);
+
+    try {
+      if (window.supabaseClient) {
+        const { error } = await window.supabaseClient
+          .from('thunderhouse_automations')
+          .update({
+            enabled: isEnabled,
+            schedule_time: timeVal,
+            days_of_week: [dayVal],
+            config: {
+              recipients: activeMdigRecipients,
+              track_count: 8,
+              subject_prefix: '🔥 Fresh Drops · Music of the Week',
+              include_artist_links: true,
+              day_of_week: dayVal === 5 ? 'Friday' : 'Scheduled'
+            },
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', 'weekly_music_digest');
+
+        if (error) throw error;
+      }
+
+      if (window.showToast) {
+        window.showToast('Weekly Fresh Drops schedule & recipients saved!', 'success');
+      }
+      closeMusicDigestModal();
+    } catch (err) {
+      console.error('Save error:', err);
+      if (window.showToast) window.showToast('Error saving: ' + err.message, 'error');
+    }
+  }
+
+  async function sendMdigTestEmail() {
+    const btn = document.getElementById('btn-mdig-test');
+    const origHtml = btn ? btn.innerHTML : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Disagreeing & Sending…`;
+    }
+
+    try {
+      const res = await fetch('/api/weekly-music-digest?force=true');
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        if (window.showToast) {
+          window.showToast(`Test Fresh Drops email sent to ${activeMdigRecipients.length} recipients!`, 'success');
+        }
+      } else {
+        throw new Error(data.error || data.summary || 'Server reported issue');
+      }
+    } catch (err) {
+      console.error('Test dispatch error:', err);
+      if (window.showToast) window.showToast('Test email note: ' + err.message, 'warn');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+      }
+    }
+  }
 </script>
+
+<!-- Weekly Drops Email Modal -->
+<div class="station-modal-backdrop" id="modal-music-digest">
+  <div class="station-modal" style="max-width: 600px; width: 92%;">
+    <div class="station-modal-head">
+      <div>
+        <span class="station-modal-badge" style="background: rgba(255, 183, 3, 0.15); border-color: rgba(255, 183, 3, 0.35); color: #ffb703;">
+          <i class="fa-solid fa-envelope-open-text"></i> Weekly Fresh Drops Briefing
+        </span>
+        <h3 class="station-modal-title">Weekly Music Email Dispatch</h3>
+      </div>
+      <button class="btn-close-modal" onclick="closeMusicDigestModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="station-modal-body" style="padding: 1.25rem;">
+      <!-- Master Toggle & Schedule -->
+      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div>
+            <strong style="color: #fff; font-size: 1rem; display: block;">Weekly Fresh Drops Email</strong>
+            <span class="small muted">Send new clean/dirty releases straight to staff DJ inboxes.</span>
+          </div>
+          <label class="switch-wrap" style="position: relative; display: inline-block; width: 44px; height: 24px;">
+            <input type="checkbox" id="mdig-enabled" checked style="opacity: 0; width: 0; height: 0;">
+            <span class="switch-slider" style="position: absolute; cursor: pointer; inset: 0; background-color: rgba(255,255,255,0.15); transition: .2s; border-radius: 24px;"></span>
+          </label>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; margin-bottom: 0.3rem; display: block;">Dispatch Day</label>
+            <select id="mdig-day" class="form-input" style="width: 100%; padding: 0.55rem 0.8rem; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 8px;">
+              <option value="5" selected>Friday (Recommended)</option>
+              <option value="4">Thursday</option>
+              <option value="6">Saturday</option>
+              <option value="1">Monday</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; margin-bottom: 0.3rem; display: block;">Dispatch Time (CST)</label>
+            <input type="time" id="mdig-time" value="07:00" class="form-input" style="width: 100%; padding: 0.55rem 0.8rem; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 8px;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Recipients Manager -->
+      <div style="margin-bottom: 1.25rem;">
+        <label class="form-label" style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; margin-bottom: 0.4rem; display: block;">
+          Staff DJ Recipients
+        </label>
+        <div id="mdig-recipient-chips" style="display: flex; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 0.6rem;">
+          <!-- Injected chips -->
+        </div>
+
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="email" id="mdig-new-email" placeholder="Add staff email (e.g. dj@thunderhouseent.com)" class="form-input" style="flex: 1; padding: 0.55rem 0.8rem; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 8px; font-size: 0.85rem;" onkeydown="if(event.key==='Enter'){event.preventDefault();addMdigRecipient();}">
+          <button class="btn btn-outline" onclick="addMdigRecipient()" style="padding: 0.55rem 1rem; border-color: rgba(255,183,3,0.3); color: #ffb703;">
+            <i class="fa-solid fa-plus"></i> Add
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div style="display: flex; gap: 0.6rem; align-items: center; justify-content: space-between; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+        <button class="btn btn-outline" id="btn-mdig-test" onclick="sendMdigTestEmail()" style="font-size: 0.82rem; border-color: rgba(0, 240, 255, 0.35); color: #00f0ff;">
+          <i class="fa-solid fa-paper-plane"></i> Send Test Email Now
+        </button>
+        <a href="/api/weekly-music-digest?preview=true" target="_blank" class="btn btn-outline" style="font-size: 0.82rem;">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Preview HTML
+        </a>
+      </div>
+    </div>
+
+    <div class="station-modal-foot" style="display: flex; justify-content: flex-end; gap: 0.6rem;">
+      <button class="btn btn-outline" onclick="closeMusicDigestModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMusicDigestSettings()" style="background: linear-gradient(135deg, #ffb703, #ff8800); color: #000; font-weight: 700; border: none;">
+        <i class="fa-solid fa-check"></i> Save Schedule
+      </button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

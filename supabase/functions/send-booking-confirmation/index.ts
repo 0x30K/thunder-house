@@ -350,6 +350,56 @@ Email: ${smtpUser}`;
     }
 
     // =========================================================================
+    // CASE D: WEEKLY FRESH DROPS / MUSIC OF THE WEEK DIGEST EMAIL
+    // =========================================================================
+    if (payload.type === "weekly_music_digest" || payload.is_music_digest) {
+      let recipientList: string[] = [];
+      if (Array.isArray(payload.recipients)) {
+        recipientList = payload.recipients.map((s: any) => String(s).trim()).filter(Boolean);
+      } else if (typeof payload.recipients === "string") {
+        recipientList = payload.recipients.split(",").map((s: string) => s.trim()).filter(Boolean);
+      }
+      if (recipientList.length === 0) {
+        recipientList = ["breshaun.black@gmail.com", "olifedigital@gmail.com"];
+      }
+
+      const subject = payload.subject || `🔥 Fresh Drops · Music of the Week | Thunder Crate`;
+      const htmlContent = payload.html || `<p>Weekly Fresh Drops Music Briefing.</p>`;
+      const textContent = payload.text || `Weekly Fresh Drops Music Briefing.`;
+
+      const results = [];
+      for (const toEmail of recipientList) {
+        try {
+          await transporter.sendMail({
+            from: `"Thunder Crate · Fresh Drops" <${smtpUser}>`,
+            to: toEmail,
+            replyTo: smtpUser,
+            subject: subject,
+            text: textContent,
+            html: htmlContent,
+            headers: {
+              "X-Priority": "2",
+              "X-Entity-Ref-ID": `th-music-digest-${Date.now()}`,
+            },
+          });
+          results.push({ email: toEmail, status: "sent" });
+        } catch (mErr: any) {
+          console.error(`Weekly music digest dispatch error to ${toEmail}:`, mErr);
+          results.push({ email: toEmail, status: "error", error: mErr.message });
+        }
+      }
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: `Weekly Fresh Drops digest dispatched to ${recipientList.length} recipient(s).`,
+          results
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // =========================================================================
     // CASE B: STANDARD BOOKING CONFIRMATION & RESERVATION
     // =========================================================================
     const {

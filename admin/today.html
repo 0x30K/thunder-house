@@ -150,6 +150,7 @@
 <script src="../js/supabase-config.js"></script>
 <script src="assets/shell.js"></script>
 <script src="assets/music-player.js"></script>
+<script src="../js/artist-intelligence.js"></script>
 
 <script>
   document.addEventListener('DOMContentLoaded', async () => {
@@ -422,19 +423,28 @@
           chipsHtml += `<a href="${escapeHtml(links.youtube)}" target="_blank" class="artist-chip youtube" title="YouTube Channel"><i class="fa-brands fa-youtube"></i> YouTube</a>`;
         }
 
+        const artistLinksJson = JSON.stringify(track.artist_links || {}).replace(/"/g, '&quot;');
+
         return `
-          <div class="row" style="padding:0.75rem 0.5rem; border-bottom:1px solid var(--border-subtle)">
-            <div style="width:36px; height:36px; border-radius:8px; background:rgba(255,183,3,0.1); border:1px solid rgba(255,183,3,0.25); display:flex; align-items:center; justify-content:center; color:var(--accent-gold); flex-shrink:0">
-              <i class="fa-solid fa-music"></i>
+          <div class="row" style="padding:0.75rem 0.5rem; border-bottom:1px solid var(--border-subtle); align-items:center">
+            <!-- Artist Photo / Cover Art Thumbnail -->
+            <div class="track-thumb-box" id="thumb-box-${track.id}" onclick="ThunderArtist.openModal('${escapeHtml(track.artist)}', '${escapeHtml(track.genre || '')}', ${artistLinksJson})" title="Click to view verified artist info &amp; profiles">
+              <img id="thumb-img-${track.id}" class="track-thumb-img" style="display:none" alt="${escapeHtml(track.artist)}">
+              <div id="thumb-fallback-${track.id}" class="track-thumb-fallback">
+                <i class="fa-solid fa-music"></i>
+              </div>
             </div>
-            <div class="grow" style="min-width:0">
+
+            <div class="grow" style="min-width:0; padding-left:0.25rem">
               <div style="display:flex; align-items:center; gap:0.45rem; flex-wrap:wrap">
                 <strong style="color:#fff; font-size:0.92rem">${escapeHtml(cleanTitle)}</strong>
                 <span class="pill" style="font-size:0.68rem; padding:0.15rem 0.45rem">${escapeHtml(track.genre || 'Hip-Hop')}</span>
                 ${track.release_date ? `<span class="small muted">· Drop: ${escapeHtml(track.release_date)}</span>` : ''}
               </div>
               <div class="small muted" style="margin-top:0.2rem; display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap">
-                <span style="font-weight:600; color:#e2e8f0">${escapeHtml(track.artist)}</span>
+                <a href="javascript:void(0)" class="artist-name-link" onclick="ThunderArtist.openModal('${escapeHtml(track.artist)}', '${escapeHtml(track.genre || '')}', ${artistLinksJson})" title="Click to view verified artist info &amp; profiles">
+                  ${escapeHtml(track.artist)} <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
                 ${chipsHtml ? `<div class="artist-research-chips">${chipsHtml}</div>` : ''}
               </div>
             </div>
@@ -466,6 +476,15 @@
           </div>
         `;
       }).join('');
+
+      // Asynchronously resolve & inject verified artist photos into thumbnails
+      if (window.ThunderArtist) {
+        data.forEach(track => {
+          const imgEl = document.getElementById('thumb-img-' + track.id);
+          const fallbackEl = document.getElementById('thumb-fallback-' + track.id);
+          window.ThunderArtist.renderThumb(track.artist, track.title, imgEl, fallbackEl);
+        });
+      }
 
     } catch (err) {
       console.warn('Error loading fresh drops widget:', err);
