@@ -1403,7 +1403,8 @@
     const auto = allAutomations.find(a => a.id === id);
     if (!auto) return;
     document.getElementById('edit-config-id').value = auto.id;
-    document.getElementById('edit-config-title').textContent = `Edit Config: ${auto.name}`;
+    const titleEl = document.getElementById('modal-config-title') || document.getElementById('edit-config-title');
+    if (titleEl) titleEl.textContent = `Edit Config: ${auto.name}`;
     document.getElementById('edit-config-name').value = auto.name || '';
     document.getElementById('edit-config-desc').value = auto.description || '';
     document.getElementById('edit-config-folder').value = auto.target_folder || '';
