@@ -58,6 +58,31 @@
       inset: 0;
       background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(7,9,14,0.85) 100%);
     }
+    .story-scouted-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 5;
+      background: rgba(7, 9, 14, 0.82);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #cbd5e1;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      padding: 0.22rem 0.6rem;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+      pointer-events: none;
+    }
+    .story-scouted-badge i {
+      color: var(--accent-gold);
+      font-size: 0.65rem;
+    }
     .story-meta-float {
       position: absolute;
       bottom: 10px;
@@ -697,6 +722,8 @@
       const catPill = getCategoryPill(story.category);
       const heat = story.virality_score || 85;
       const isArchived = isArchivedStory(story);
+      const scoutedTimeStr = formatScoutedTimestamp(story.created_at || story.published_at);
+      const scoutedFullTitle = story.created_at ? new Date(story.created_at).toLocaleString() : 'Recently scouted';
 
       let ageBadge = '';
       if (isArchived && story.published_at) {
@@ -708,6 +735,10 @@
       return `
         <div class="story-card ${isSelected ? 'selected' : ''}" onclick="openStoryDrawer('${story.id}')">
           <div class="story-thumb" style="background-image: url('${escapeHtml(story.image_url || '')}')">
+            <!-- Top-Left Scouted Timestamp Badge -->
+            <div class="story-scouted-badge" title="Originally scouted: ${scoutedFullTitle}">
+              <i class="fa-solid fa-radar"></i> ${scoutedTimeStr}
+            </div>
             <div class="story-meta-float">
               ${catPill}
               ${ageBadge}
@@ -743,8 +774,21 @@
     drawerWrap.style.display = 'block';
 
     const archiveNote = isArchivedStory(story) ? ' · 📦 Archived (Retained 30d)' : '';
+    const scoutedDate = story.created_at ? new Date(story.created_at) : null;
+    const scoutedFormatted = scoutedDate && !isNaN(scoutedDate.getTime()) 
+      ? `${scoutedDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} at ${scoutedDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`
+      : 'Recently';
+    const pubFormatted = story.published_at ? new Date(story.published_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Today';
+
     document.getElementById('sd-title').textContent = story.title;
-    document.getElementById('sd-source-meta').textContent = `${story.source_name} · ${story.published_at ? new Date(story.published_at).toLocaleDateString() : 'Today'}${archiveNote}`;
+    document.getElementById('sd-source-meta').innerHTML = `
+      <span><i class="fa-regular fa-newspaper"></i> <strong>${escapeHtml(story.source_name)}</strong></span>
+      <span style="opacity:0.4">•</span>
+      <span title="Original publication date"><i class="fa-regular fa-calendar"></i> Pub: ${pubFormatted}</span>
+      <span style="opacity:0.4">•</span>
+      <span title="When Thunder Wire originally discovered this story" style="color:#cbd5e1"><i class="fa-solid fa-radar" style="color:var(--accent-gold)"></i> Scouted: ${scoutedFormatted}</span>
+      ${archiveNote ? `<span style="opacity:0.4">•</span> <span style="color:#c084fc"><i class="fa-solid fa-box-archive"></i> Archived (30d)</span>` : ''}
+    `;
     document.getElementById('sd-source-link').href = story.source_url || '#';
     document.getElementById('sd-pill-heat').innerHTML = `<i class="fa-solid fa-fire"></i> Heat ${story.virality_score || 85}`;
 
@@ -1085,6 +1129,33 @@
             updated_at: new Date().toISOString()
           }, { onConflict: 'show_date' });
       } catch(err) {}
+    }
+  }
+
+  function formatScoutedTimestamp(dateStr) {
+    if (!dateStr) return 'Scouted: Recent';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return 'Scouted: Recent';
+
+      const now = new Date();
+      const isToday = (d.toDateString() === now.toDateString());
+
+      let hours = d.getHours();
+      const minutes = d.getMinutes().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      const timeStr = `${hours}:${minutes} ${ampm}`;
+
+      if (isToday) {
+        return `Scouted Today · ${timeStr}`;
+      } else {
+        const month = d.toLocaleDateString(undefined, { month: 'short' });
+        const day = d.getDate();
+        return `Scouted ${month} ${day} · ${timeStr}`;
+      }
+    } catch (e) {
+      return 'Scouted';
     }
   }
 

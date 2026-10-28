@@ -37,6 +37,26 @@ window.ThunderWire = (function () {
     return detectedTable;
   }
 
+  function cleanSourceUrl(rawUrl) {
+    if (!rawUrl) return '';
+    try {
+      const u = new URL(rawUrl.trim());
+      u.hash = '';
+      const trackingParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid', 'gclid', 'ref', 'source', 'rss'];
+      trackingParams.forEach(p => u.searchParams.delete(p));
+      let clean = u.toString();
+      if (clean.endsWith('/') && u.pathname !== '/') clean = clean.slice(0, -1);
+      return clean;
+    } catch (e) {
+      return rawUrl.trim();
+    }
+  }
+
+  function normalizeHeadline(str) {
+    if (!str) return '';
+    return str.toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+
   /**
    * Run a live wire scan across feeds
    */
@@ -50,6 +70,23 @@ window.ThunderWire = (function () {
     let totalDiscovered = 0;
     let newSaved = 0;
 
+    // Load existing URLs and headlines from database to guarantee we NEVER rescout duplicate stories
+    const existingUrls = new Set();
+    const existingTitles = new Set();
+    try {
+      const { data: existingRows } = await window.supabaseClient
+        .from(table)
+        .select('source_url, title');
+      if (Array.isArray(existingRows)) {
+        existingRows.forEach(r => {
+          if (r.source_url) existingUrls.add(cleanSourceUrl(r.source_url));
+          if (r.title) existingTitles.add(normalizeHeadline(r.title));
+        });
+      }
+    } catch (exErr) {
+      console.warn('[Thunder Wire] Existing story pre-check note:', exErr);
+    }
+
     // 1. Try high-speed serverless wire scanner (bypasses browser CORS completely)
     try {
       if (onProgress) onProgress('Sweeping live culture feeds via serverless wire…');
@@ -58,12 +95,20 @@ window.ThunderWire = (function () {
         const data = await apiRes.json();
         if (data && data.success && Array.isArray(data.stories) && data.stories.length > 0) {
           for (let item of data.stories) {
+            const cUrl = cleanSourceUrl(item.source_url);
+            const nTitle = normalizeHeadline(item.title);
+            if (existingUrls.has(cUrl) || existingTitles.has(nTitle)) {
+              continue; // Already scouted!
+            }
+            existingUrls.add(cUrl);
+            existingTitles.add(nTitle);
+
             const { error } = await window.supabaseClient
               .from(table)
               .upsert([item], { onConflict: 'source_url', ignoreDuplicates: true });
             if (!error) newSaved++;
           }
-          return { totalDiscovered: data.totalDiscovered || data.stories.length, newSaved: newSaved || data.stories.length };
+          return { totalDiscovered: data.totalDiscovered || data.stories.length, newSaved: newSaved };
         }
       }
     } catch (apiErr) {
@@ -85,8 +130,16 @@ window.ThunderWire = (function () {
 
         totalDiscovered += items.length;
 
-        // Ingest into Supabase
+        // Ingest into Supabase, filtering out any story previously scouted
         for (let item of items) {
+          const cUrl = cleanSourceUrl(item.source_url);
+          const nTitle = normalizeHeadline(item.title);
+          if (existingUrls.has(cUrl) || existingTitles.has(nTitle)) {
+            continue; // Already scouted!
+          }
+          existingUrls.add(cUrl);
+          existingTitles.add(nTitle);
+
           const { error } = await window.supabaseClient
             .from(table)
             .upsert([item], { onConflict: 'source_url', ignoreDuplicates: true });
@@ -99,6 +152,8 @@ window.ThunderWire = (function () {
           window.ThunderLogger.error('thunder_wire', `Feed error on ${f.name}: ${err.message}`);
         }
       }
+    }
+
     try {
       await maintainLifecycle();
     } catch (e) {}
@@ -175,7 +230,19 @@ window.ThunderWire = (function () {
     return items.map(el => {
       const title = el.querySelector('title')?.textContent || '';
       const link = el.querySelector('link')?.textContent || el.querySelector('link')?.getAttribute('href') || '';
+      const cleanUrl = cleanSourceUrl(link);
       const pubDate = el.querySelector('pubDate, published, updated')?.textContent;
+
+      if (!title || !cleanUrl) return null;
+
+      // Filter out items older than 7 days so stale stories are never scouted
+      if (pubDate) {
+        const pubTime = new Date(pubDate).getTime();
+        if (!isNaN(pubTime) && (Date.now() - pubTime > 7 * 24 * 60 * 60 * 1000)) {
+          return null;
+        }
+      }
+
       const desc = el.querySelector('description, summary, content')?.textContent || '';
       const cleanDesc = desc.replace(/<[^>]*>/g, '').trim().substring(0, 300);
 
@@ -189,7 +256,7 @@ window.ThunderWire = (function () {
         summary: cleanDesc || title,
         content: cleanDesc || title,
         source_name: sourceName,
-        source_url: link.trim(),
+        source_url: cleanUrl,
         image_url: img,
         category: cat,
         virality_score: 75 + Math.floor(Math.random() * 20),
@@ -204,7 +271,7 @@ window.ThunderWire = (function () {
         tags: [sourceName, cat.toUpperCase()],
         published_at: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString()
       };
-    }).filter(i => i.title && i.source_url);
+    }).filter(i => i && i.title && i.source_url);
   }
 
   /**

@@ -45,32 +45,75 @@ module.exports = async (req, res) => {
       }
     }
 
-    // Deduplicate in-memory by source_url
+    // Deduplicate in-memory by clean source_url and normalized title
     const uniqueMap = new Map();
+    const seenTitles = new Set();
     for (let item of allItems) {
-      if (item.source_url && !uniqueMap.has(item.source_url)) {
-        uniqueMap.set(item.source_url, item);
+      const cUrl = cleanSourceUrl(item.source_url);
+      const nTitle = normalizeTitle(item.title);
+      if (cUrl && !uniqueMap.has(cUrl) && !seenTitles.has(nTitle)) {
+        uniqueMap.set(cUrl, item);
+        seenTitles.add(nTitle);
       }
     }
     const finalItems = Array.from(uniqueMap.values());
 
-    // Sync to Supabase
+    // Sync to Supabase - Checking against existing database records to NEVER re-scout duplicate stories
     let savedCount = 0;
+    const targetTable = 'thunderpulse_feed'; // Supabase active table
+    let brandNewStories = [];
+
     try {
-      const targetTable = 'thunderpulse_feed'; // Supabase active table
-      const upsertRes = await fetch(`${SUPABASE_URL}/rest/v1/${targetTable}?on_conflict=source_url`, {
-        method: 'POST',
-        headers: {
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'resolution=merge-duplicates'
-        },
-        body: JSON.stringify(finalItems)
+      const existingUrls = new Set();
+      const existingTitles = new Set();
+
+      try {
+        const existingRes = await fetch(`${SUPABASE_URL}/rest/v1/${targetTable}?select=source_url,title`, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        });
+        if (existingRes.ok) {
+          const existingData = await existingRes.json();
+          if (Array.isArray(existingData)) {
+            existingData.forEach(row => {
+              if (row.source_url) existingUrls.add(cleanSourceUrl(row.source_url));
+              if (row.title) existingTitles.add(normalizeTitle(row.title));
+            });
+          }
+        }
+      } catch (exErr) {
+        console.warn('[Wire Scan] Existing database pre-check notice:', exErr.message);
+      }
+
+      // Filter to ONLY fresh, previously un-scouted stories
+      brandNewStories = finalItems.filter(item => {
+        const cUrl = cleanSourceUrl(item.source_url);
+        const nTitle = normalizeTitle(item.title);
+        if (existingUrls.has(cUrl) || existingTitles.has(nTitle)) {
+          return false; // Skip already scouted story
+        }
+        existingUrls.add(cUrl);
+        existingTitles.add(nTitle);
+        return true;
       });
 
-      if (upsertRes.ok) {
-        savedCount = finalItems.length;
+      if (brandNewStories.length > 0) {
+        const upsertRes = await fetch(`${SUPABASE_URL}/rest/v1/${targetTable}?on_conflict=source_url`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'resolution=ignore-duplicates'
+          },
+          body: JSON.stringify(brandNewStories)
+        });
+
+        if (upsertRes.ok) {
+          savedCount = brandNewStories.length;
+        }
       }
 
       // Maintain 7-day archive and 30-day storage purge
@@ -91,7 +134,8 @@ module.exports = async (req, res) => {
     return res.status(200).json({
       success: true,
       totalDiscovered: finalItems.length,
-      newSaved: savedCount || finalItems.length,
+      newSaved: savedCount,
+      brandNewCount: brandNewStories.length,
       stories: finalItems.slice(0, 30)
     });
 
@@ -102,6 +146,26 @@ module.exports = async (req, res) => {
     });
   }
 };
+
+function cleanSourceUrl(rawUrl) {
+  if (!rawUrl) return '';
+  try {
+    const u = new URL(rawUrl.trim());
+    u.hash = '';
+    const trackingParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid', 'gclid', 'ref', 'source', 'rss'];
+    trackingParams.forEach(p => u.searchParams.delete(p));
+    let clean = u.toString();
+    if (clean.endsWith('/') && u.pathname !== '/') clean = clean.slice(0, -1);
+    return clean;
+  } catch (e) {
+    return rawUrl.trim();
+  }
+}
+
+function normalizeTitle(str) {
+  if (!str) return '';
+  return str.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
 
 function parseRssItems(xml, sourceName, fallbackCategory) {
   const items = xml.split(/<item[\s>]/i).slice(1);
@@ -119,7 +183,16 @@ function parseRssItems(xml, sourceName, fallbackCategory) {
     if (!titleMatch || !linkMatch) continue;
 
     const title = cleanString(titleMatch[1]);
-    const link = linkMatch[1].trim();
+    const cleanUrl = cleanSourceUrl(linkMatch[1]);
+    if (!title || !cleanUrl) continue;
+
+    // Check publication age - do NOT scout stories older than 7 days
+    const pubDate = pubDateMatch ? new Date(pubDateMatch[1]) : new Date();
+    const pubTime = !isNaN(pubDate.getTime()) ? pubDate.getTime() : Date.now();
+    if (Date.now() - pubTime > 7 * 24 * 60 * 60 * 1000) {
+      continue;
+    }
+
     let desc = descMatch ? cleanString(descMatch[1].replace(/<[^>]*>/g, '')) : title;
     if (desc.length > 280) desc = desc.substring(0, 277) + '...';
 
@@ -131,7 +204,7 @@ function parseRssItems(xml, sourceName, fallbackCategory) {
       summary: desc || title,
       content: desc || title,
       source_name: sourceName,
-      source_url: link,
+      source_url: cleanUrl,
       image_url: imgMatch ? imgMatch[1] : getFallbackImage(cat),
       category: cat,
       virality_score: heat,
@@ -144,7 +217,7 @@ function parseRssItems(xml, sourceName, fallbackCategory) {
       why_it_matters: 'Major cultural conversation capturing nationwide digital momentum.',
       host_question: `Charlamagne style: Is this chess or pure panic? What's your immediate reaction?`,
       tags: [sourceName, cat.toUpperCase()],
-      published_at: pubDateMatch ? new Date(pubDateMatch[1]).toISOString() : new Date().toISOString()
+      published_at: new Date(pubTime).toISOString()
     });
   }
 

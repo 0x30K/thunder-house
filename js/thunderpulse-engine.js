@@ -1,18 +1,19 @@
 /**
  * Thunder Wire Intelligence Feed & Morning Show Ingest Engine
- * (Maintained for legacy compatibility with existing scripts)
+ * Continuously monitors music, hip-hop, celebrity gossip, and viral feeds.
+ * Deduplicates, auto-categorizes into 5 show blocks, and syncs to Supabase.
  */
 
 window.ThunderWire = (function () {
+  // Curated Feed Endpoints (strictly verified music journalism RSS feeds)
   const FEEDS = [
     { name: 'AllHipHop', url: 'https://allhiphop.com/feed/', type: 'rss', defaultCategory: 'lead' },
     { name: 'XXL Mag', url: 'https://www.xxlmag.com/feed/', type: 'rss', defaultCategory: 'lead' },
     { name: 'Billboard', url: 'https://www.billboard.com/feed/', type: 'rss', defaultCategory: 'drops' },
-    { name: 'HipHopDX', url: 'https://hiphopdx.com/rss/news.xml', type: 'rss', defaultCategory: 'shade' },
-    { name: 'r/hiphopheads', url: 'https://www.reddit.com/r/hiphopheads/hot.json?limit=15', type: 'reddit', defaultCategory: 'drops' },
-    { name: 'r/nottheonion', url: 'https://www.reddit.com/r/nottheonion/hot.json?limit=15', type: 'reddit', defaultCategory: 'wild' }
+    { name: 'HipHopDX', url: 'https://hiphopdx.com/rss/news.xml', type: 'rss', defaultCategory: 'shade' }
   ];
 
+  // CORS proxies for cross-origin RSS fetching in browser
   const PROXIES = [
     url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
     url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`
@@ -36,8 +37,32 @@ window.ThunderWire = (function () {
     return detectedTable;
   }
 
+  function cleanSourceUrl(rawUrl) {
+    if (!rawUrl) return '';
+    try {
+      const u = new URL(rawUrl.trim());
+      u.hash = '';
+      const trackingParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid', 'gclid', 'ref', 'source', 'rss'];
+      trackingParams.forEach(p => u.searchParams.delete(p));
+      let clean = u.toString();
+      if (clean.endsWith('/') && u.pathname !== '/') clean = clean.slice(0, -1);
+      return clean;
+    } catch (e) {
+      return rawUrl.trim();
+    }
+  }
+
+  function normalizeHeadline(str) {
+    if (!str) return '';
+    return str.toLowerCase().replace(/[^a-z0-9]/g, '');
+  }
+
+  /**
+   * Run a live wire scan across feeds
+   */
   async function scanNow(onProgress) {
     if (!window.supabaseClient) {
+      if (window.ThunderLogger) window.ThunderLogger.critical('thunder_wire', 'Supabase client not initialized during scanNow');
       throw new Error('Supabase client not initialized');
     }
 
@@ -45,6 +70,54 @@ window.ThunderWire = (function () {
     let totalDiscovered = 0;
     let newSaved = 0;
 
+    // Load existing URLs and headlines from database to guarantee we NEVER rescout duplicate stories
+    const existingUrls = new Set();
+    const existingTitles = new Set();
+    try {
+      const { data: existingRows } = await window.supabaseClient
+        .from(table)
+        .select('source_url, title');
+      if (Array.isArray(existingRows)) {
+        existingRows.forEach(r => {
+          if (r.source_url) existingUrls.add(cleanSourceUrl(r.source_url));
+          if (r.title) existingTitles.add(normalizeHeadline(r.title));
+        });
+      }
+    } catch (exErr) {
+      console.warn('[Thunder Wire] Existing story pre-check note:', exErr);
+    }
+
+    // 1. Try high-speed serverless wire scanner (bypasses browser CORS completely)
+    try {
+      if (onProgress) onProgress('Sweeping live culture feeds via serverless wire…');
+      const apiRes = await fetch('/api/wire-scan', { signal: AbortSignal.timeout(10000) });
+      if (apiRes.ok) {
+        const data = await apiRes.json();
+        if (data && data.success && Array.isArray(data.stories) && data.stories.length > 0) {
+          for (let item of data.stories) {
+            const cUrl = cleanSourceUrl(item.source_url);
+            const nTitle = normalizeHeadline(item.title);
+            if (existingUrls.has(cUrl) || existingTitles.has(nTitle)) {
+              continue; // Already scouted!
+            }
+            existingUrls.add(cUrl);
+            existingTitles.add(nTitle);
+
+            const { error } = await window.supabaseClient
+              .from(table)
+              .upsert([item], { onConflict: 'source_url', ignoreDuplicates: true });
+            if (!error) newSaved++;
+          }
+          return { totalDiscovered: data.totalDiscovered || data.stories.length, newSaved: newSaved };
+        }
+      }
+    } catch (apiErr) {
+      if (window.ThunderLogger) {
+        window.ThunderLogger.warn('thunder_wire', `Serverless scanner note: ${apiErr.message}`);
+      }
+    }
+
+    // 2. Direct client fallback loop
     for (let f of FEEDS) {
       if (onProgress) onProgress(`Scanning ${f.name}…`);
       try {
@@ -57,7 +130,16 @@ window.ThunderWire = (function () {
 
         totalDiscovered += items.length;
 
+        // Ingest into Supabase, filtering out any story previously scouted
         for (let item of items) {
+          const cUrl = cleanSourceUrl(item.source_url);
+          const nTitle = normalizeHeadline(item.title);
+          if (existingUrls.has(cUrl) || existingTitles.has(nTitle)) {
+            continue; // Already scouted!
+          }
+          existingUrls.add(cUrl);
+          existingTitles.add(nTitle);
+
           const { error } = await window.supabaseClient
             .from(table)
             .upsert([item], { onConflict: 'source_url', ignoreDuplicates: true });
@@ -66,12 +148,22 @@ window.ThunderWire = (function () {
         }
       } catch (err) {
         console.warn(`[Thunder Wire] Feed error on ${f.name}:`, err.message);
+        if (window.ThunderLogger) {
+          window.ThunderLogger.error('thunder_wire', `Feed error on ${f.name}: ${err.message}`);
+        }
       }
     }
+
+    try {
+      await maintainLifecycle();
+    } catch (e) {}
 
     return { totalDiscovered, newSaved };
   }
 
+  /**
+   * Fetch Reddit JSON feeds
+   */
   async function fetchReddit(url, sourceName, fallbackCategory) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Reddit HTTP ${res.status}`);
@@ -109,9 +201,13 @@ window.ThunderWire = (function () {
       });
   }
 
+  /**
+   * Fetch XML RSS Feeds
+   */
   async function fetchRSS(feedUrl, sourceName, fallbackCategory) {
     let xmlText = null;
 
+    // Try direct or proxies
     for (let proxy of PROXIES) {
       try {
         const proxied = proxy(feedUrl);
@@ -134,7 +230,19 @@ window.ThunderWire = (function () {
     return items.map(el => {
       const title = el.querySelector('title')?.textContent || '';
       const link = el.querySelector('link')?.textContent || el.querySelector('link')?.getAttribute('href') || '';
+      const cleanUrl = cleanSourceUrl(link);
       const pubDate = el.querySelector('pubDate, published, updated')?.textContent;
+
+      if (!title || !cleanUrl) return null;
+
+      // Filter out items older than 7 days so stale stories are never scouted
+      if (pubDate) {
+        const pubTime = new Date(pubDate).getTime();
+        if (!isNaN(pubTime) && (Date.now() - pubTime > 7 * 24 * 60 * 60 * 1000)) {
+          return null;
+        }
+      }
+
       const desc = el.querySelector('description, summary, content')?.textContent || '';
       const cleanDesc = desc.replace(/<[^>]*>/g, '').trim().substring(0, 300);
 
@@ -148,7 +256,7 @@ window.ThunderWire = (function () {
         summary: cleanDesc || title,
         content: cleanDesc || title,
         source_name: sourceName,
-        source_url: link.trim(),
+        source_url: cleanUrl,
         image_url: img,
         category: cat,
         virality_score: 75 + Math.floor(Math.random() * 20),
@@ -163,9 +271,12 @@ window.ThunderWire = (function () {
         tags: [sourceName, cat.toUpperCase()],
         published_at: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString()
       };
-    }).filter(i => i.title && i.source_url);
+    }).filter(i => i && i.title && i.source_url);
   }
 
+  /**
+   * Smart Classification into the 5 Show Buckets
+   */
   function classifyCategory(text, fallback) {
     const t = text.toLowerCase();
     if (t.includes('florida man') || t.includes('bizarre') || t.includes('wild') || t.includes('drive-thru') || t.includes('caught on video') || t.includes('crazy') || t.includes('fight') || t.includes('arrested for')) {
@@ -203,10 +314,55 @@ window.ThunderWire = (function () {
     return maps[cat] || maps.lead;
   }
 
+  /**
+   * Thunder Wire Lifecycle Maintenance:
+   * Stories stay on active wire for 7 days, move to 30-day archive, then purge after 30 days.
+   */
+  async function maintainLifecycle() {
+    if (!window.supabaseClient) return { archived: 0, deleted: 0 };
+    try {
+      const { data, error } = await window.supabaseClient.rpc('maintain_thunderwire_lifecycle');
+      if (!error && data) {
+        return {
+          archived: data.archived_count || 0,
+          deleted: data.deleted_count || 0,
+          executedAt: data.executed_at
+        };
+      }
+    } catch (e) {}
+
+    // Fallback direct table maintenance
+    try {
+      const table = await getFeedTable();
+      const now = new Date();
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+      // 1. Delete expired stories (>30 days)
+      const { data: delData } = await window.supabaseClient
+        .from(table)
+        .delete()
+        .lt('published_at', thirtyDaysAgo);
+
+      // 2. Mark stories older than 7 days as archived
+      await window.supabaseClient
+        .from(table)
+        .update({ is_archived: true })
+        .lt('published_at', sevenDaysAgo)
+        .or('is_archived.is.null,is_archived.eq.false');
+
+      return { success: true };
+    } catch (err) {
+      console.warn('[Thunder Wire] Lifecycle maintenance note:', err);
+      return { success: false };
+    }
+  }
+
   return {
     scanNow,
     classifyCategory,
-    getFeedTable
+    getFeedTable,
+    maintainLifecycle
   };
 })();
 
